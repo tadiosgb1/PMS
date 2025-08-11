@@ -8,6 +8,7 @@ import AccessDenied from "../views/opened/auth/accessDenied.vue";
 import first_dash from '../views/closed/first_dash.vue'
 import dashboard from '../views/closed/dashboard.vue'
 import  Properties  from '../views/closed/proporty/view.vue';
+import  PropertyDetail from  '../views/closed/proporty/PropertyDetail.vue'
 import  PropertyZone  from '../views/closed/Zones/view.vue';
 import  PropertyPicture  from '../views/closed/proportyPicture/view.vue';
 
@@ -58,6 +59,7 @@ const routes = [
         component: first_dash,
       },
       { path: '/properties', name: 'properties', component: Properties },
+      { path: 'properties/:id', name: 'PropertyDetail', component: PropertyDetail, props: true },
       { path: '/zones', name: 'zones', component: PropertyZone },
       { path: '/pictures', name: 'pictures', component: PropertyPicture },
       { path: '/tenants', name: 'tenants', component: Tenants },

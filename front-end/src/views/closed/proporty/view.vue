@@ -16,7 +16,6 @@
 
         <!-- Content -->
         <div class="p-6">
-          <!-- Search -->
           <input
             v-model="searchTerm"
             type="search"
@@ -24,46 +23,69 @@
             class="w-full max-w-md px-4 py-2 mb-6 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 
-          <!-- Table -->
           <div class="overflow-x-auto">
             <table class="min-w-full table-auto border-collapse border border-gray-300 text-sm">
               <thead>
                 <tr class="bg-gray-200 text-gray-700 text-left">
                   <th
-                    v-for="field in fields"
-                    :key="field.key"
-                    @click="sortBy(field.key)"
-                    class="border border-gray-300 px-3 py-2 cursor-pointer whitespace-nowrap"
+                    class="border border-gray-300 px-3 py-2 cursor-pointer"
+                    @click="sortBy('name')"
                   >
-                    {{ field.label }}
-                    <SortIcon :field="field.key" :sort-key="sortKey" :sort-asc="sortAsc" />
+                    Name
+                  </th>
+                  <th
+                    class="border border-gray-300 px-3 py-2 cursor-pointer"
+                    @click="sortBy('property_type')"
+                  >
+                    Type
+                  </th>
+                  <th
+                    class="border border-gray-300 px-3 py-2 cursor-pointer"
+                    @click="sortBy('city')"
+                  >
+                    City
+                  </th>
+                  <th
+                    class="border border-gray-300 px-3 py-2 cursor-pointer"
+                    @click="sortBy('status')"
+                  >
+                    Status
                   </th>
                   <th class="border border-gray-300 px-3 py-2 text-center">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="property in filteredAndSorted" :key="property.id" class="hover:bg-gray-100">
-                  <td
-                    v-for="field in fields"
-                    :key="field.key"
-                    class="border border-gray-300 px-3 py-2 whitespace-nowrap"
-                  >
-                    <!-- Check if field is property_pictures -->
-                    <template v-if="field.key === 'property_pictures'">
-                      <button
-                        @click="showPictures(property)"
-                        class="text-blue-600 hover:text-blue-800 underline"
-                        title="View Pictures"
-                      >
-                        View Pictures ({{ property.property_pictures.length }})
-                      </button>
-                    </template>
-                    <template v-else>
-                      {{ property[field.key] }}
-                    </template>
+                <tr
+                  v-for="property in filteredAndSorted"
+                  :key="property.id"
+                  class="hover:bg-gray-100"
+                >
+                  <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
+                    {{ property.name }}
+                  </td>
+                  <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
+                    {{ property.property_type }}
+                  </td>
+                  <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
+                    {{ property.city }}
+                  </td>
+                  <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
+                    {{ property.status }}
                   </td>
                   <td class="border border-gray-300 px-3 py-2 text-center space-x-2">
-                    <button @click="editProperty(property)" class="text-blue-600 hover:text-blue-800" title="Edit">
+                    <button
+                      @click="goToDetail(property.id)"
+                      class="text-green-600 hover:text-green-800"
+                      title="Detail"
+                      :disabled="!property.id"
+                    >
+                      <i class="fas fa-info-circle"></i>
+                    </button>
+                    <button
+                      @click="editProperty(property)"
+                      class="text-blue-600 hover:text-blue-800"
+                      title="Edit"
+                    >
                       <i class="fas fa-edit"></i>
                     </button>
                     <button
@@ -76,7 +98,9 @@
                   </td>
                 </tr>
                 <tr v-if="filteredAndSorted.length === 0">
-                  <td :colspan="fields.length + 1" class="text-center py-6 text-gray-500">No properties found.</td>
+                  <td colspan="5" class="text-center py-6 text-gray-500">
+                    No properties found.
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -85,7 +109,12 @@
       </div>
 
       <!-- Modals -->
-      <AddProperty v-if="visible" :visible="visible" @close="visible = false" @refresh="fetchProperties" />
+      <AddProperty
+        v-if="visible"
+        :visible="visible"
+        @close="visible = false"
+        @refresh="fetchProperties"
+      />
       <UpdateProperty
         v-if="updateVisible"
         :visible="updateVisible"
@@ -101,56 +130,19 @@
         @confirm="confirmDelete"
         @cancel="confirmVisible = false"
       />
-
-      <!-- Picture Modal -->
-      <div v-if="picturesVisible" class="fixed inset-0 bg-black bg-opacity-70 flex justify-center items-center z-50">
-        <div class="bg-white rounded-lg p-6 max-w-4xl max-h-[80vh] overflow-auto relative">
-          <button @click="picturesVisible = false" class="absolute top-2 right-2 text-gray-700 hover:text-gray-900 text-xl font-bold">
-            &times;
-          </button>
-          <h3 class="text-xl font-bold mb-4">Property Pictures</h3>
-          <div class="grid grid-cols-3 gap-4">
-            <div v-for="pic in selectedPictures" :key="pic.id" class="border rounded overflow-hidden">
-              <img :src="pic.property_image" :alt="pic.description" class="object-cover w-full h-48" />
-              <p class="text-sm p-2">{{ pic.description }}</p>
-            </div>
-            <div v-if="selectedPictures.length === 0" class="col-span-3 text-center text-gray-500">
-              No pictures available.
-            </div>
-          </div>
-        </div>
-      </div>
     </div>
   </div>
 </template>
 
 <script>
-// ... your imports ...
 import AddProperty from '@/views/closed/proporty/add.vue';
 import UpdateProperty from '@/views/closed/proporty/update.vue';
 import ConfirmModal from '@/components/ConfirmModal.vue';
-import Toast from "../../../components/Toast.vue";
-
-const SortIcon = {
-  props: ['field', 'sortKey', 'sortAsc'],
-  template: `
-    <span class="inline-block ml-1 text-gray-500">
-      <svg v-if="sortKey !== field" xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"/>
-      </svg>
-      <svg v-else-if="sortAsc" xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 13l4 4 4-4m0-6l-4-4-4 4"/>
-      </svg>
-      <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"/>
-      </svg>
-    </span>
-  `
-};
+import Toast from '../../../components/Toast.vue';
 
 export default {
   name: 'PropertyView',
-  components: { SortIcon, AddProperty, UpdateProperty, ConfirmModal, Toast },
+  components: { AddProperty, UpdateProperty, ConfirmModal, Toast },
   data() {
     return {
       properties: [],
@@ -162,32 +154,14 @@ export default {
       searchTerm: '',
       sortKey: 'name',
       sortAsc: true,
-      fields: [
-        { key: 'name', label: 'Name' },
-        { key: 'property_type', label: 'Type' },
-        { key: 'address', label: 'Address' },
-        { key: 'city', label: 'City' },
-        { key: 'state', label: 'State' },
-        { key: 'zip_code', label: 'Zip Code' },
-        { key: 'price', label: 'Price' },
-        { key: 'bed_rooms', label: 'Bedrooms' },
-        { key: 'bath_rooms', label: 'Bathrooms' },
-        { key: 'rent', label: 'Rent' },
-        { key: 'status', label: 'Status' },
-        { key: 'created_at', label: 'Created' },
-        { key: 'updated_at', label: 'Updated' },
-        { key: 'property_pictures', label: 'Property Pictures' }
-      ],
-      picturesVisible: false,
-      selectedPictures: []
     };
   },
   computed: {
     filteredAndSorted() {
       const term = this.searchTerm.toLowerCase();
-      let filtered = this.properties.filter(p =>
-        Object.values(p).some(val =>
-          String(val).toLowerCase().includes(term)
+      let filtered = this.properties.filter((p) =>
+        ['name', 'property_type', 'city', 'status'].some((key) =>
+          String(p[key] || '').toLowerCase().includes(term)
         )
       );
 
@@ -199,7 +173,7 @@ export default {
       });
 
       return filtered;
-    }
+    },
   },
   mounted() {
     this.fetchProperties();
@@ -242,14 +216,14 @@ export default {
       }
       this.propertyToDelete = null;
     },
-    showPictures(property) {
-      this.selectedPictures = property.property_pictures || [];
-      this.picturesVisible = true;
-    }
-  }
+    goToDetail(propertyId) {
+      if (!propertyId) {
+        // Defensive check: don't navigate if id is missing
+        console.warn('Property ID missing, cannot navigate to detail');
+        return;
+      }
+      this.$router.push({ name: 'PropertyDetail', params: { id: propertyId } });
+    },
+  },
 };
 </script>
-
-<style scoped>
-/* Optional: style for modal images */
-</style>
