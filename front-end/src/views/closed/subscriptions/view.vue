@@ -3,7 +3,9 @@
     <Toast ref="toast" />
     <div class="min-h-screen bg-gray-100 p-6">
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
-        <div class="bg-orange-500 text-white px-6 py-4 text-xl font-bold flex justify-between items-center">
+        <div
+          class="bg-orange-500 text-white px-6 py-4 text-xl font-bold flex justify-between items-center"
+        >
           Subscriptions
           <button
             @click="visible = true"
@@ -42,11 +44,22 @@
                 >
                   <td class="px-4 py-2 border">{{ subscription.plan_name }}</td>
                   <td class="px-4 py-2 border">{{ subscription.price }}</td>
-                  <td class="px-4 py-2 border">{{ formatDate(subscription.start_date) }}</td>
-                  <td class="px-4 py-2 border">{{ formatDate(subscription.end_date) }}</td>
+                  <td class="px-4 py-2 border">
+                    {{ formatDate(subscription.start_date) }}
+                  </td>
+                  <td class="px-4 py-2 border">
+                    {{ formatDate(subscription.end_date) }}
+                  </td>
                   <td class="px-4 py-2 border">{{ subscription.status }}</td>
                   <td class="px-4 py-2 border">{{ subscription.user_id }}</td>
                   <td class="px-4 py-2 border text-center space-x-2">
+                    <button
+                      @click="pay(subscription)"
+                      class="text-green-600 hover:text-green-800"
+                      title="Pay"
+                    >
+                      <i class="fas fa-credit-card"></i>
+                    </button>
                     <button
                       @click="edit(subscription)"
                       class="text-blue-600 hover:text-blue-800"
@@ -75,13 +88,27 @@
       </div>
 
       <!-- Add & Update Modals -->
-      <AddSubscription v-if="visible" :visible="visible" @close="visible = false" @refresh="fetch" />
+      <AddSubscription
+        v-if="visible"
+        :visible="visible"
+        @close="visible = false"
+        @refresh="fetch"
+      />
       <UpdateSubscription
         v-if="updateVisible"
         :visible="updateVisible"
         :subscription="editing"
         @close="updateVisible = false"
         @refresh="fetch"
+      />
+
+      <!-- Payment Modal -->
+      <PaymentModal
+        v-if="paymentVisible"
+        :visible="paymentVisible"
+        :payload="paymentPayload"
+        @close="paymentVisible = false"
+        @paid="handlePaymentSuccess"
       />
 
       <!-- Confirm Delete Modal -->
@@ -100,6 +127,7 @@
 <script>
 import AddSubscription from './add.vue';
 import UpdateSubscription from './update.vue';
+import PaymentModal from './Payment.vue';
 import ConfirmModal from '@/components/ConfirmModal.vue';
 import Toast from '@/components/Toast.vue';
 
@@ -110,6 +138,7 @@ export default {
     UpdateSubscription,
     ConfirmModal,
     Toast,
+    PaymentModal,
   },
   data() {
     return {
@@ -118,6 +147,8 @@ export default {
       visible: false,
       updateVisible: false,
       confirmVisible: false,
+      paymentVisible: false,
+      paymentPayload: null,
       editing: null,
       deleting: null,
     };
@@ -154,6 +185,14 @@ export default {
       this.editing = subscription;
       this.updateVisible = true;
     },
+    pay(subscription) {
+      this.paymentPayload = {
+        user_id: subscription.user_id,
+        subscription_id: subscription.id,
+        amount: subscription.price,
+      };
+      this.paymentVisible = true;
+    },
     confirmDelete(subscription) {
       this.deleting = subscription;
       this.confirmVisible = true;
@@ -161,7 +200,10 @@ export default {
     async deleteSubscription() {
       try {
         await this.$apiDelete(`/delete_subscription/${this.deleting.id}`);
-        this.$root.$refs.toast.showToast('Subscription deleted successfully', 'success');
+        this.$root.$refs.toast.showToast(
+          'Subscription deleted successfully',
+          'success'
+        );
         this.fetch();
       } catch (e) {
         this.$root.$refs.toast.showToast('Failed to delete subscription', 'error');
@@ -169,6 +211,11 @@ export default {
         this.confirmVisible = false;
         this.deleting = null;
       }
+    },
+    handlePaymentSuccess() {
+      this.$root.$refs.toast.showToast('Payment successful', 'success');
+      this.paymentVisible = false;
+      this.fetch();
     },
   },
 };
