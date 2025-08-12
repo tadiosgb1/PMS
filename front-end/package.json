@@ -26,6 +26,8 @@
     "leaflet": "^1.9.4",
     "pdfobject": "^2.3.0",
     "qrcode": "^1.5.4",
+    "rtcpeerconnection-shim": "^1.2.15",
+    "sdp": "^3.2.1",
     "swiper": "^11.1.15",
     "tailwindcss": "^3",
     "vue": "^3.4.21",
