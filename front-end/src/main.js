@@ -19,9 +19,6 @@ import VueParticles from "vue-particles";
 
 
 import VueApexCharts from 'vue3-apexcharts';
-
-
-
 const defaultLocale = 'amharic';
 const i18n = createI18n({
   locale: defaultLocale, // Set Amharic as the default language
