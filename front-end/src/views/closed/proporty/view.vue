@@ -6,12 +6,26 @@
         <!-- Header -->
         <div class="bg-primary text-white px-6 py-4 text-xl font-bold flex justify-between items-center">
           Properties
+           <button
+            @click="visible = true"
+            class="bg-white text-blue-700 font-semibold px-1 lg:px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300"
+          >
+            <span class="text-primary">+</span> Add Proporty
+          </button>
           <button
             @click="visible = true"
             class="bg-white text-blue-700 font-semibold px-1 lg:px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300"
           >
-            <span class="text-primary">+</span> Add
+            <span class="text-primary">+</span> Add zone
           </button>
+
+            <button
+            @click="managerVissible = true"
+            class="bg-white text-blue-700 font-semibold px-1 lg:px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300"
+          >
+            <span class="text-primary">+</span> Add Zone  manager
+          </button>
+
         </div>
 
         <!-- Content -->
@@ -95,7 +109,16 @@
                     >
                       <i class="fas fa-trash-alt"></i>
                     </button>
+
+                     <button
+                      @click="managerVissible=true"
+                      class="text-green-600"
+                      title="Proporty Manager"
+                    >
+                     Proporty Manager
+                    </button>
                   </td>
+
                 </tr>
                 <tr v-if="filteredAndSorted.length === 0">
                   <td colspan="5" class="text-center py-6 text-gray-500">
@@ -130,6 +153,9 @@
         @confirm="confirmDelete"
         @cancel="confirmVisible = false"
       />
+
+      <Manager v-if="managerVissible" @close="managerVissible=false;"/>
+
     </div>
   </div>
 </template>
@@ -139,10 +165,11 @@ import AddProperty from '@/views/closed/proporty/add.vue';
 import UpdateProperty from '@/views/closed/proporty/update.vue';
 import ConfirmModal from '@/components/ConfirmModal.vue';
 import Toast from '../../../components/Toast.vue';
+import Manager from './addManager.vue'
 
 export default {
   name: 'PropertyView',
-  components: { AddProperty, UpdateProperty, ConfirmModal, Toast },
+  components: { AddProperty, UpdateProperty, ConfirmModal, Toast ,Manager},
   data() {
     return {
       properties: [],
@@ -154,6 +181,7 @@ export default {
       searchTerm: '',
       sortKey: 'name',
       sortAsc: true,
+      managerVissible:false,
     };
   },
   computed: {

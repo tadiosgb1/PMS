@@ -113,11 +113,15 @@ export default {
 
       try {
         const response = await this.$apiPost("/token", payload);
-        const { refresh, access, permissions } = response;
+        const { refresh, access, permissions ,id,is_superuser,email} = response;
 
         localStorage.setItem("refresh", refresh);
         localStorage.setItem("access", access);
         localStorage.setItem("permissions", JSON.stringify(permissions));
+        localStorage.setItem("userId",id);
+        localStorage.setItem("is_superuser",is_superuser);
+        localStorage.setItem("email",email);
+
 
         this.$refs.toast?.showSuccessToastMessage("Login successful!");
         setTimeout(() => {

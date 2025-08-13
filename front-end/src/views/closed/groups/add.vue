@@ -66,8 +66,12 @@ export default {
   },
   methods: {
     async fetchPermissions() {
+ const params={
+        page_size:1000
+      }
+
       try {
-        const response = await this.$apiGet("/get_permissions");
+        const response = await this.$apiGet("/get_permissions",params);
 
         console.log("response permissions",response.data);
 

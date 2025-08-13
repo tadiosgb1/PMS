@@ -167,8 +167,11 @@ export default {
       }
     },
     async fetchPermissions() {
+      const params={
+        page_size:1000
+      }
       try {
-        const response = await this.$apiGet('/get_permissions');
+        const response = await this.$apiGet('/get_permissions',params);
         this.permissions = response.data;
       } catch (error) {
         console.error('Failed to fetch permissions:', error);

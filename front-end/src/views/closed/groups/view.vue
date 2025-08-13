@@ -127,8 +127,11 @@ export default {
   },
   methods: {
     async fetchGroups() {
+      const params={
+        page_size:1000
+      }
       try {
-        const response = await this.$apiGet("/get_groups");
+        const response = await this.$apiGet("/get_groups",params);
         console.log("response",response);
         this.groups = response.data || [];
         console.log("groups",this.groups);
