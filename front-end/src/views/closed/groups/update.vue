@@ -1,5 +1,5 @@
 <template>
-  <div>
+    <div>
     <Toast ref="toast"/>
   <div
     v-if="visible"
@@ -7,7 +7,7 @@
   >
     <div class="bg-white max-w-2xl w-full rounded-lg shadow-lg overflow-hidden relative">
       <div class="bg-primary text-white px-6 py-4 text-2xl font-semibold flex justify-between items-center">
-        Add New Group
+        Update Group
         <button @click="$emit('close')" class="text-white hover:text-gray-200 text-lg font-bold">✕</button>
       </div>
 
@@ -22,7 +22,7 @@
         <div>
           <label class="block text-gray-700 mb-1">Select Permissions</label>
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-40 overflow-y-auto border rounded p-2">
-            <label v-for="perm in availablePermissions" :key="perm" class="flex items-center space-x-2">
+            <label v-for="perm in availablePermissions" :key="perm.codename" class="flex items-center space-x-2">
               <input
                 type="checkbox"
                 :value="perm.codename"
@@ -40,7 +40,7 @@
             type="submit"
             class="bg-primary hover:bg-primary text-white font-semibold px-6 py-3 rounded shadow"
           >
-            Save Group
+            Update Group
           </button>
         </div>
       </form>
@@ -53,39 +53,44 @@
 import Toast from '../../../components/Toast.vue';
 
 export default {
-  name: "AddGroup",
-  components:{Toast},
+  name: 'UpdateGroup',
+  components: { Toast },
   props: {
     visible: Boolean,
+    groupData: Object
   },
   data() {
     return {
       form: {
+        id: null,
         name: '',
         permissions: []
       },
       availablePermissions: []
     };
   },
+  watch: {
+    groupData: {
+      immediate: true,
+      handler(newVal) {
+        if (newVal) {
+          this.form.id = newVal.id;
+          this.form.name = newVal.name;
+          this.form.permissions = [...newVal.permissions];
+        }
+      }
+    }
+  },
   mounted() {
     this.fetchPermissions();
   },
   methods: {
     async fetchPermissions() {
- const params={
-        page_size:1000
-      }
-
       try {
-        const response = await this.$apiGet("/get_permissions",params);
-
-        console.log("response permissions",response.data);
-
+        const response = await this.$apiGet('/get_permissions', { page_size: 1000 });
         this.availablePermissions = response.data || [];
-
-        
       } catch (err) {
-        console.error("Failed to fetch permissions:", err);
+        console.error('Failed to fetch permissions:', err);
         this.availablePermissions = [];
       }
     },
@@ -93,28 +98,15 @@ export default {
       try {
         const payload = {
           name: this.form.name,
-          permissions: this.form.permissions        };
-
-
-
-        console.log("permissions raw:", this.form.permissions);
-        console.log("permissions type:", typeof this.form.permissions);
-        console.log("Array.isArray:", Array.isArray(this.form.permissions));
-        console.log("Converted:", Array.from(this.form.permissions));
-
-
-        console.log("payload",payload);
-
-        const response = await this.$apiPost("/post_group", payload);
-        this.$root.$refs.toast.showToast('Group saved successfully', 'success');
-        console.log("Group created:", response);
-        this.$emit("close");
+          permissions: this.form.permissions
+        };
+        await this.$apiPut(`/update_group`, this.form.id, payload);
+        this.$root.$refs.toast.showToast('Group updated successfully', 'success');
+        this.$emit('updated');
+        this.$emit('close');
       } catch (err) {
-        console.error("Failed to create group:", err);
-        alert("Failed to save group.");
-      } finally {
-        this.form.name = '';
-        this.form.permissions = [];
+        console.error(err);
+        alert('Failed to update group. Please try again.');
       }
     }
   }

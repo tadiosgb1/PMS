@@ -1,15 +1,16 @@
 <template>
+  <div>
+    <Toast ref="toast" />
   <div class="min-h-screen bg-gray-100 p-6">
-    <div class=" bg-white shadow-md rounded-lg overflow-hidden">
+    <div class="bg-white shadow-md rounded-lg overflow-hidden">
       <div class="bg-primary text-white px-6 py-4 text-xl font-bold flex justify-between items-center">
         Groups
-       <button
-      @click="visible = true"
-      class="bg-white text-blue-700 font-semibold px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300"
-    >
-      <span class="text-primary">+</span>   Add Group
-    </button>
-
+        <button
+          @click="visible = true"
+          class="bg-white text-blue-700 font-semibold px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300"
+        >
+          <span class="text-primary">+</span> Add Group
+        </button>
       </div>
 
       <div class="p-6">
@@ -64,13 +65,26 @@
       </div>
     </div>
 
-    <!-- Optional Modal -->
-    <AddGroup v-if="visible" :visible="visible" @close="visible = false" />
+    <!-- Add Modal -->
+    <AddGroup v-if="visible" :visible="visible" @close="visible = false" @saved="fetchGroups" />
+
+    <!-- Update Modal -->
+    <UpdateGroup
+      v-if="updateVisible"
+      :visible="updateVisible"
+      :groupData="selectedGroup"
+      @close="updateVisible = false"
+      @updated="fetchGroups"
+    />
+  </div>
   </div>
 </template>
 
 <script>
-import AddGroup from './add.vue'
+import Toast from '../../../components/Toast.vue';
+import AddGroup from './add.vue';
+import UpdateGroup from './update.vue';
+
 const SortIcon = {
   props: ['field', 'sortKey', 'sortAsc'],
   template: `
@@ -90,14 +104,13 @@ const SortIcon = {
 
 export default {
   name: 'GroupsView',
-  components: {
-    SortIcon,
-    AddGroup,
-  },
+  components: { SortIcon, AddGroup, UpdateGroup ,Toast},
   data() {
     return {
       searchTerm: '',
       visible: false,
+      updateVisible: false,
+      selectedGroup: null,
       sortKey: 'name',
       sortAsc: true,
       groups: []
@@ -110,47 +123,47 @@ export default {
         g.name.toLowerCase().includes(term) ||
         g.permissions.some(p => p.toLowerCase().includes(term))
       );
-
       filtered.sort((a, b) => {
         let res = 0;
         if (a[this.sortKey] < b[this.sortKey]) res = -1;
         if (a[this.sortKey] > b[this.sortKey]) res = 1;
         return this.sortAsc ? res : -res;
       });
-
       return filtered;
     }
   },
   mounted() {
-    
     this.fetchGroups();
   },
   methods: {
     async fetchGroups() {
-      const params={
-        page_size:1000
-      }
       try {
-        const response = await this.$apiGet("/get_groups",params);
-        console.log("response",response);
+        const response = await this.$apiGet('/get_groups', { page_size: 1000 });
         this.groups = response.data || [];
-        console.log("groups",this.groups);
       } catch (error) {
-        console.error("Failed to fetch groups:", error);
+        console.error('Failed to fetch groups:', error);
+        alert('Failed to load groups. Please try again later.');
         this.groups = [];
-        alert("Failed to load groups. Please try again later.");
       }
     },
     sortBy(key) {
       this.sortKey === key ? (this.sortAsc = !this.sortAsc) : ((this.sortKey = key), (this.sortAsc = true));
     },
     editGroup(group) {
-      alert(`Edit group: ${group.name}`);
+      this.selectedGroup = { ...group };
+      this.updateVisible = true;
     },
-    deleteGroup(group) {
+    async deleteGroup(group) {
       if (confirm(`Are you sure you want to delete "${group.name}"?`)) {
-        this.groups = this.groups.filter(g => g.id !== group.id);
-        alert('Group deleted.');
+        try {
+          await this.$apiDelete(`/delete_group/${group.id}`);
+          this.$root.$refs.toast.showToast('Group deleted successfully', 'success');
+          this.groups = this.groups.filter(g => g.id !== group.id);
+          this.fetchGroups();
+        } catch (err) {
+          console.error(err);
+          alert('Failed to delete group.');
+        }
       }
     }
   }

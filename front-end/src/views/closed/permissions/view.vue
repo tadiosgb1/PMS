@@ -1,4 +1,6 @@
 <template>
+  <div>
+    <Toast ref="toast" />
   <div class="min-h-screen bg-gray-100 p-6">
     <div class=" bg-white shadow-md rounded-lg overflow-hidden">
       <div
@@ -92,9 +94,11 @@
       @confirm="confirmDelete"
     />
   </div>
+  </div>
 </template>
 
 <script>
+import Toast from '../../../components/Toast.vue';
 import AddPermission from './add.vue';
 import UpdatePermission from './update.vue';
 import ConfirmModal from '@/components/ConfirmModal.vue';
@@ -123,6 +127,7 @@ export default {
     AddPermission,
     UpdatePermission,
     ConfirmModal,
+    Toast
   },
   data() {
     return {
@@ -189,7 +194,7 @@ export default {
     async confirmDelete() {
       try {
         await this.$apiDelete(`/delete_permission/${this.permissionToDelete.id}`);
-        alert("Permission deleted.");
+        this.$root.$refs.toast.showToast('Permission deleted successfully', 'success');
         this.fetchPermissions();
       } catch (err) {
         console.error("Delete failed:", err);
