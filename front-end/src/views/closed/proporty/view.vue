@@ -154,7 +154,7 @@
         @cancel="confirmVisible = false"
       />
 
-      <Manager v-if="managerVissible" @close="managerVissible=false;"/>
+      <Manager v-if="managerVissible" :visible="managerVissible" @close="managerVissible=false;"/>
 
     </div>
   </div>

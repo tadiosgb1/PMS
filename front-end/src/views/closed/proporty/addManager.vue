@@ -1,12 +1,12 @@
 <template>
   <div
-    v-if="managerVisible"
+    v-if="visible"
     class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
   >
     <div class="bg-white w-full max-w-3xl rounded-lg shadow-lg p-6 relative">
       <!-- Close Button -->
       <button
-        @click="close"
+        @click="$emit('close')"
         class="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
       >
         ✕
@@ -35,6 +35,15 @@
             <input
               v-model="form.phone_number"
               type="tel"
+              required
+              class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div>
+            <label class="block text-sm font-medium mb-1">Owner Id</label>
+            <input
+              v-model="form.owner_id"
+              type="number"
               required
               class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
             />
@@ -106,7 +115,7 @@
         <div class="flex justify-end space-x-3 pt-4 border-t mt-4">
           <button
             type="button"
-            @click="close"
+             @click="$emit('close')"
             class="px-4 py-2 border rounded-lg text-gray-600 hover:bg-gray-100"
           >
             Cancel
@@ -126,6 +135,9 @@
 <script>
 export default {
   name: "AddManagerModal",
+  props: {
+    visible: Boolean,
+  },
   data() {
     return {
       managerVisible: false,
@@ -140,20 +152,18 @@ export default {
         last_name: "",
         phone_number: "",
         address: "",
-        property_zone: ""
+        property_zone: "",
+        owner_id:''
       }
     };
-  },
-  mounted() {
-    this.managerVisible = true;
   },
   methods: {
     close() {
       this.resetForm();
       this.managerVisible = false;
     },
-    submitForm() {
-      console.log("Form submitted:", this.form);
+    async submitForm() {
+      const res = await this.$apiPost('/create_manager',this.form)
       this.resetForm();
       this.close();
     },
