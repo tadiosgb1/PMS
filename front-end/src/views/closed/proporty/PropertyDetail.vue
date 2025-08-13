@@ -38,42 +38,47 @@
         </button>
       </h2>
 
-      <div v-if="property && property.property_pictures && property.property_pictures.length" class="flex space-x-4 mb-8">
-        <div
-          v-for="(pic, index) in visiblePictures"
-          :key="pic.id"
-          class="border rounded overflow-hidden w-48 cursor-pointer hover:shadow-lg relative"
-        >
-          <img :src="pic.property_image" :alt="pic.description" class="object-cover w-full h-32" />
-          <p class="text-sm p-2">{{ pic.description }}</p>
+      <div
+  v-if="property && property.property_pictures && property.property_pictures.length"
+  class="grid grid-cols-3 gap-4 mb-8"
+>
+  <div
+    v-for="(pic, index) in visiblePictures"
+    :key="pic.id"
+    class="border rounded overflow-hidden cursor-pointer hover:shadow-lg relative"
+  >
+    <img :src="pic.property_image" :alt="pic.description" class="object-cover w-full h-32" />
+    <p class="text-sm p-2">{{ pic.description }}</p>
 
-          <!-- Buttons container -->
-          <div class="absolute top-2 right-2 flex space-x-1">
-            <button
-              @click.stop="openUpdatePicture(pic)"
-              class="bg-blue-600 text-white px-2 py-1 text-xs rounded hover:bg-blue-700"
-              title="Update Picture"
-            >
-              Update
-            </button>
-            <button
-              @click.stop="askDeletePicture(pic)"
-              class="bg-red-600 text-white px-2 py-1 text-xs rounded hover:bg-red-700"
-              title="Delete Picture"
-            >
-              Delete
-            </button>
-          </div>
-        </div>
+    <!-- Buttons container -->
+    <div class="absolute top-2 right-2 flex space-x-1">
+      <button
+        @click.stop="openUpdatePicture(pic)"
+        class="bg-blue-600 text-white px-2 py-1 text-xs rounded hover:bg-blue-700"
+        title="Update Picture"
+      >
+        Update
+      </button>
+      <button
+        @click.stop="askDeletePicture(pic)"
+        class="bg-red-600 text-white px-2 py-1 text-xs rounded hover:bg-red-700"
+        title="Delete Picture"
+      >
+        Delete
+      </button>
+    </div>
+  </div>
 
-        <button
-          v-if="remainingPicturesCount > 0"
-          @click="showAllPictures = true"
-          class="flex items-center justify-center border border-primary text-primary rounded w-48 h-32 hover:bg-primary hover:text-white transition"
-        >
-          +{{ remainingPicturesCount }} More
-        </button>
-      </div>
+  <!-- Show more button -->
+  <div
+    v-if="remainingPicturesCount > 0 && !showAllPictures"
+    @click="showAllPictures = true"
+    class="flex items-center justify-center border border-primary text-primary rounded hover:bg-primary hover:text-white transition cursor-pointer h-32"
+  >
+    +{{ remainingPicturesCount }} More
+  </div>
+</div>
+
       <div v-else class="mb-8 text-gray-500">No pictures available.</div>
 
       <!-- Modals -->
@@ -130,17 +135,18 @@ export default {
       showAllPictures: false,
     };
   },
-  computed: {
-    visiblePictures() {
-      if (!this.property?.property_pictures) return [];
-      if (this.showAllPictures) return this.property.property_pictures;
-      return this.property.property_pictures.slice(0, 4);
-    },
-    remainingPicturesCount() {
-      if (!this.property?.property_pictures) return 0;
-      return Math.max(0, this.property.property_pictures.length - 4);
-    },
+ computed: {
+  visiblePictures() {
+    if (!this.property?.property_pictures) return [];
+    if (this.showAllPictures) return this.property.property_pictures;
+    return this.property.property_pictures.slice(0, 3); // show only 3 initially
   },
+  remainingPicturesCount() {
+    if (!this.property?.property_pictures) return 0;
+    return Math.max(0, this.property.property_pictures.length - 3);
+  },
+},
+
   mounted() {
     this.fetchProperty();
   },

@@ -1,24 +1,17 @@
 <template>
   <div
     v-if="visible"
-    class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50"
+   class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4 overflow-auto"
   >
-    <div class="bg-white w-full max-w-3xl rounded-lg shadow-lg p-6 relative">
+    <div class="bg-white  w-full sm:w-auto sm:max-w-[700px] md:max-w-[850px] lg:max-w-[950px] xl:max-w-[1050px]  rounded-lg shadow-lg overflow-hidden relative mx-auto">
       <!-- Close Button -->
-      <button
-        @click="$emit('close')"
-        class="absolute top-3 right-3 text-gray-500 hover:text-gray-700"
-      >
-        ✕
-      </button>
-
-      <!-- Modal Header -->
-      <h2 class="text-xl font-semibold mb-4 border-b pb-2">
+      <div class="bg-primary text-white px-6 py-4 text-2xl font-semibold flex justify-between items-center">
         Add New Manager
-      </h2>
+        <button @click="$emit('close')" class="text-white hover:text-gray-200 text-lg font-bold">✕</button>
+      </div>
 
       <!-- Form -->
-      <form @submit.prevent="submitForm" class="space-y-4">
+      <form @submit.prevent="submitForm" class="space-y-4 px-4 py-4">
         <!-- Row 1: Email & Phone -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
@@ -114,15 +107,8 @@
         <!-- Actions -->
         <div class="flex justify-end space-x-3 pt-4 border-t mt-4">
           <button
-            type="button"
-             @click="$emit('close')"
-            class="px-4 py-2 border rounded-lg text-gray-600 hover:bg-gray-100"
-          >
-            Cancel
-          </button>
-          <button
             type="submit"
-            class="px-4 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
+            class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
           >
             Save Manager
           </button>
