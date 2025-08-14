@@ -129,6 +129,7 @@ export default {
         console.log("User registered successfully:", response.data);
         this.$emit("close");
       } catch (error) {
+        
   const errorMsg = error.response?.data?.error;
 
   if (errorMsg === "This email already exists in the system") {

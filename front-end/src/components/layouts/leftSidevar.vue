@@ -5,37 +5,42 @@
         class="w-64 flex flex-col fixed md:relative z-15 h-full transition-all duration-300 bg-white mt-0 lg:mt-1"
       >
         <!-- Header -->
-        <div v-if="showTitle" class="flex flex-row space-x-4 p-4 text-center font-bold text-lg text-white bg-orange-500 sticky top-0 z-10">
-        <div class="w-12 h-12 bg-white rounded-full">      
-              <img src="../../assets/img/logo1.jpg" alt="" class="h-10 w-10 rounded-full pl-1 pt-1">
-        </div>
+        <div
+          v-if="showTitle"
+          class="flex flex-row space-x-4 p-4 text-center font-bold text-lg text-white bg-orange-500 sticky top-0 z-10"
+        >
+          <div class="w-12 h-12 bg-white rounded-full">
+            <img
+              src="../../assets/img/logo1.jpg"
+              alt=""
+              class="h-10 w-10 rounded-full pl-1 pt-1"
+            />
+          </div>
 
-        <p class="mt-3">Alpha PMS</p>  
+          <p class="mt-3">Alpha PMS</p>
         </div>
 
         <!-- Navigation -->
         <div class="flex-1 overflow-y-auto">
           <ul class="p-3 space-y-1">
-
             <li v-for="item in menuItems" :key="item.route">
-              <router-link 
+              <router-link
                 :to="{ name: item.route }"
                 class="flex items-center px-3 py-2 rounded-md hover:bg-orange-100 text-sm font-medium transition-all duration-200"
                 :class="{
-                  'bg-orange-50 text-orange-600 font-semibold': $route.name === item.route
+                  'bg-orange-50 text-orange-600 font-semibold':
+                    $route.name === item.route,
                 }"
               >
-              
-                <i 
+                <i
                   :class="[item.icon, 'w-4 text-sm mr-2']"
-                  :style="{ color: $route.name === item.route ? '#f97316' : item.color }"
+                  :style="{
+                    color: $route.name === item.route ? '#f97316' : item.color,
+                  }"
                 ></i>
-                <span class="whitespace-nowrap">{{ item.name }}  </span>
+                <span class="whitespace-nowrap">{{ item.name }} </span>
               </router-link>
             </li>
-
-
-
           </ul>
         </div>
       </aside>
@@ -47,39 +52,119 @@
 export default {
   data() {
     return {
-      showTitle:false,
-      is_superuser:false,
+      showTitle: false,
+      is_superuser: false,
       menuItems: [
-        { name: "Dashboard", route: "first-dash", icon: "fas fa-tachometer-alt", color: "#f97316" },
-        { name: "Users", route: "user_add", icon: "fas fa-user", color: "#60a5fa" },
-        { name: "Plans", route: "plans_view", icon: "fas fa-tags", color: "#f59e0b" ,is_superuser:true},
-        { name: "Subscriptions", route: "subscriptions_view", icon: "fas fa-tags", color: "#f59e0b"},
-        { name: "Permissions", route: "permissions_view", icon: "fas fa-shield-alt", color: "#10b981"},
-        { name: "Groups", route: "groups", icon: "fas fa-layer-group", color: "#6366f1" },
-        { name: "Properties", route: "properties", icon: "fas fa-building", color: "#6b7280" },
-        { name: "Zones", route: "zones", icon: "fas fa-map-marked-alt", color: "#3b82f6" },
-        { name: "Pictures", route: "pictures", icon: "fas fa-map-marked-alt", color: "#3b82f6"},
-        { name: "Tenants", route: "tenants", icon: "fas fa-users", color: "#ef4444" },
-        { name: "Payments", route: "payments", icon: "fas fa-money-bill-wave", color: "#22c55e"},
-        { name: "Maintenance", route: "maintenance", icon: "fas fa-tools", color: "#eab308"},
-        { name: "Leases", route: "leases", icon: "fas fa-file-signature", color: "#8b5cf6" },
-        { name: "Reports", route: "reports", icon: "fas fa-chart-bar", color: "#ec4899" },
-        { name: "Messages", route: "messages", icon: "fas fa-envelope", color: "#0ea5e9" },
-        { name: "Settings", route: "settings", icon: "fas fa-cogs", color: "#84cc16" }
-      ]
+        {
+          name: "Dashboard",
+          route: "first-dash",
+          icon: "fas fa-tachometer-alt",
+          color: "#f97316",
+        },
+        {
+          name: "Custom Users",
+          route: "user_add",
+          icon: "fas fa-user",
+          color: "#60a5fa",
+        },
+        {
+          name: "Plans",
+          route: "plans_view",
+          icon: "fas fa-tags",
+          color: "#f59e0b",
+          is_superuser: true,
+        },
+        {
+          name: "Subscriptions",
+          route: "subscriptions_view",
+          icon: "fas fa-tags",
+          color: "#f59e0b",
+        },
+        {
+          name: "Permissions",
+          route: "permissions_view",
+          icon: "fas fa-shield-alt",
+          color: "#10b981",
+        },
+        {
+          name: "Groups",
+          route: "groups",
+          icon: "fas fa-layer-group",
+          color: "#6366f1",
+        },
+        {
+          name: "Properties",
+          route: "properties",
+          icon: "fas fa-building",
+          color: "#6b7280",
+        },
+        {
+          name: "Zones",
+          route: "zones",
+          icon: "fas fa-map-marked-alt",
+          color: "#3b82f6",
+        },
+        {
+          name: "Pictures",
+          route: "pictures",
+          icon: "fas fa-map-marked-alt",
+          color: "#3b82f6",
+        },
+        {
+          name: "Tenants",
+          route: "tenants",
+          icon: "fas fa-users",
+          color: "#ef4444",
+        },
+        {
+          name: "Payments",
+          route: "payments",
+          icon: "fas fa-money-bill-wave",
+          color: "#22c55e",
+        },
+        {
+          name: "Maintenance",
+          route: "maintenance",
+          icon: "fas fa-tools",
+          color: "#eab308",
+        },
+        {
+          name: "Leases",
+          route: "leases",
+          icon: "fas fa-file-signature",
+          color: "#8b5cf6",
+        },
+        {
+          name: "Reports",
+          route: "reports",
+          icon: "fas fa-chart-bar",
+          color: "#ec4899",
+        },
+        {
+          name: "Messages",
+          route: "messages",
+          icon: "fas fa-envelope",
+          color: "#0ea5e9",
+        },
+        {
+          name: "Settings",
+          route: "settings",
+          icon: "fas fa-cogs",
+          color: "#84cc16",
+        },
+      ],
     };
   },
-  mounted(){
-    
-   this.is_superuser=localStorage.getItem('is_superuser');
+  mounted() {
+    this.is_superuser = localStorage.getItem("is_superuser");
 
-   console.log("is_super_admin",this.is_superuser)
+    console.log("is_super_admin", this.is_superuser);
 
     this.screenWidth = window.innerWidth;
-    if(this.screenWidth < 1024){
-      this.showTitle=true;
+    if (this.screenWidth < 1024) {
+      this.showTitle = true;
     }
-  }
+  },
 };
 </script>
 
