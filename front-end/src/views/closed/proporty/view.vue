@@ -117,6 +117,14 @@
                     >
                      Proporty Manager
                     </button>
+                    <button
+                      @click="rentPay(property.id)"
+                      class="text-green-600 hover:text-green-800"
+                      title="Detail"
+                      :disabled="!property.id"
+                    >
+                      <i class="fas fa-money-bill-wave"></i>
+                    </button>
                   </td>
 
                 </tr>
@@ -251,6 +259,14 @@ export default {
         return;
       }
       this.$router.push({ name: 'PropertyDetail', params: { id: propertyId } });
+    },
+    rentPay(propertyId) {
+      if (!propertyId) {
+        // Defensive check: don't navigate if id is missing
+        console.warn('Property ID missing, cannot navigate to detail');
+        return;
+      }
+      this.$router.push({ name: 'rentPay', params: { id: propertyId } });
     },
   },
 };
