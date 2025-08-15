@@ -1,6 +1,12 @@
 <template>
   <div>
     <Toast ref="toast" />
+   <button
+        @click="$router.back()"
+        class="mb-4 ml-5 mt-5 px-4 py-2 bg-orange-300 rounded hover:bg-orange-400"
+      >
+        &larr; Back
+      </button>
     <div class="min-h-screen bg-gray-100 p-6">
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
         <div class="bg-orange-500 text-white px-6 py-4 text-xl font-bold flex justify-between items-center">
@@ -91,7 +97,7 @@
       </div>
 
       <!-- Modals -->
-      <AddRent v-if="visible" :visible="visible" @close="visible = false" @refresh="fetchRents" />
+      <AddRent :propertyId="this.$route.params.id"  v-if="visible" :visible="visible" @close="visible = false" @refresh="fetchRents" />
       <UpdateRent v-if="updateVisible" :visible="updateVisible" :rent="rentToEdit" @close="updateVisible = false" @refresh="fetchRents" />
       <ConfirmModal
         v-if="confirmVisible"
@@ -145,21 +151,31 @@ export default {
   computed: {
     filteredAndSortedRents() {
       const term = this.searchTerm.toLowerCase();
-      let filtered = this.rents.filter(r => 
-        String(r.property_id).toLowerCase().includes(term) ||
-        String(r.user_id).toLowerCase().includes(term) ||
+
+      // 1️⃣ Filter by current route property ID
+      let filtered = this.rents.filter(rent => 
+        String(rent.property_id.id) === String(this.$route.params.id)
+      );
+
+      // 2️⃣ Apply search filter
+      filtered = filtered.filter(r => 
+        String(r.property_id.id).toLowerCase().includes(term) ||
+        String(r.user_id.id).toLowerCase().includes(term) ||
         r.rent_type.toLowerCase().includes(term) ||
         r.payment_cycle.toLowerCase().includes(term) ||
         String(r.rent_amount).toLowerCase().includes(term) ||
         String(r.deposit_amount).toLowerCase().includes(term) ||
         r.status.toLowerCase().includes(term)
       );
+
+      // 3️⃣ Sort results
       filtered.sort((a, b) => {
         let res = 0;
         if (a[this.sortKey] < b[this.sortKey]) res = -1;
         if (a[this.sortKey] > b[this.sortKey]) res = 1;
         return this.sortAsc ? res : -res;
       });
+
       return filtered;
     }
   },

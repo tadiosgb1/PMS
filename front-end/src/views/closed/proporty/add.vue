@@ -33,6 +33,11 @@
         </div>
 
         <div>
+          <label class="block text-gray-700">Property Zone</label>
+          <input v-model="form.property_zone" type="text" class="custom-input" required />
+        </div>
+
+        <div>
           <label class="block text-gray-700">Property Type</label>
           <input v-model="form.property_type" type="text" class="custom-input" />
         </div>
@@ -123,7 +128,8 @@ export default {
         bed_rooms: '',
         bath_rooms: '',
         rent: '',
-        status: ''
+        status: '',
+        property_zone:''
       }
     };
   },
