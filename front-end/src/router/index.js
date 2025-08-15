@@ -7,11 +7,11 @@ import Reset from '../views/opened/auth/reset.vue';
 import AccessDenied from "../views/opened/auth/accessDenied.vue";
 import first_dash from '../views/closed/first_dash.vue'
 import dashboard from '../views/closed/dashboard.vue'
-import  Properties  from '../views/closed/proporty/view.vue';
-import  PropertyDetail from  '../views/closed/proporty/PropertyDetail.vue'
-import  rentPay from  '../views/closed/rent/view.vue'
-import  PropertyZone  from '../views/closed/Zones/view.vue';
-import  PropertyPicture  from '../views/closed/proportyPicture/view.vue';
+import Properties from '../views/closed/proporty/view.vue';
+import PropertyDetail from '../views/closed/proporty/PropertyDetail.vue'
+import rentPay from '../views/closed/rent/view.vue'
+import PropertyZone from '../views/closed/Zones/view.vue';
+import PropertyPicture from '../views/closed/proportyPicture/view.vue';
 
 const Tenants = { template: '<div class="p-6 text-gray-800">Tenants Page</div>' };
 const Payments = { template: '<div class="p-6 text-gray-800">Payments Page</div>' };
@@ -21,11 +21,16 @@ const Reports = { template: '<div class="p-6 text-gray-800">Reports Page</div>' 
 const Messages = { template: '<div class="p-6 text-gray-800">Messages Page</div>' };
 const Settings = { template: '<div class="p-6 text-gray-800">Settings Page</div>' };
 
+import User_view from '../views/closed/users/view.vue';
+
 import User_add from '../views/closed/users/add.vue';
+import UserEdit from '../views/closed/users/edit.vue';
+import UserDetail from '../views/closed/users/detail.vue';
+
 import Permissions_add from '../views/closed/permissions/add.vue';
 import permissions_view from '../views/closed/permissions/view.vue';
 import plans_view from '../views/closed/plans/view.vue';
-import subscriptions_view  from '../views/closed/subscriptions/view.vue'
+import subscriptions_view from '../views/closed/subscriptions/view.vue'
 import view_groups from '../views/closed/groups/view.vue'
 
 const routes = [
@@ -71,12 +76,33 @@ const routes = [
       { path: '/reports', name: 'reports', component: Reports },
       { path: '/messages', name: 'messages', component: Messages },
       { path: '/settings', name: 'settings', component: Settings },
+
+      { path: '/user_view', name: 'user_view', component: User_view },
+
       { path: '/user_add', name: 'user_add', component: User_add },
+
+      {
+        path: "/user_edit/:id",
+        name: "UserEdit",
+        component: UserEdit,
+        props: true,
+      },
+      {
+        path: "/user_detail/:id",
+        name: "UserDetail",
+        component: UserDetail,
+        props: true, // Pass :id as a prop
+      },
+
+
+
       { path: '/permission_add', name: 'permission_add', component: Permissions_add },
       { path: '/permissions_view', name: 'permissions_view', component: permissions_view },
       { path: '/plans_view', name: 'plans_view', component: plans_view },
       { path: '/subscriptions_view', name: 'subscriptions_view', component: subscriptions_view },
       { path: '/groups', name: 'groups', component: view_groups },
+
+
     ]
   },
   { path: "/forgot-password", name: "forgotPassword", component: ForgotPassword },
