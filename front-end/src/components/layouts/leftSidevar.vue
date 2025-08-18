@@ -104,12 +104,12 @@ export default {
           icon: "fas fa-map-marked-alt",
           color: "#3b82f6",
         },
-        {
-          name: "Pictures",
-          route: "pictures",
-          icon: "fas fa-map-marked-alt",
-          color: "#3b82f6",
-        },
+        // {
+        //   name: "Pictures",
+        //   route: "pictures",
+        //   icon: "fas fa-map-marked-alt",
+        //   color: "#3b82f6",
+        // },
         {
           name: "Tenants",
           route: "tenants",

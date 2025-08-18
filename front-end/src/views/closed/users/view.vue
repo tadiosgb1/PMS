@@ -9,11 +9,11 @@
         >
           Users
           <button
-           @click="showAddUser = true"
+            @click="showAddUser = true"
             class="bg-white text-blue-700 font-semibold px-2 lg:px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300 flex items-center"
           >
             <span class="text-primary mr-1">+</span> Add
-      </button>
+          </button>
         </div>
 
         <!-- Body -->
@@ -45,7 +45,7 @@
           </div>
 
           <!-- Table -->
-          <div class="overflow-x-auto ">
+          <div class="overflow-x-auto">
             <table
               class="min-w-full table-auto border-collapse border border-gray-300 text-sm"
             >
@@ -76,7 +76,8 @@
                   class="hover:bg-gray-100"
                 >
                   <td class="border border-gray-300 px-4 py-2">
-                    {{ user.first_name }} {{ user.middle_name }} {{ user.last_name }}
+                    {{ user.first_name }} {{ user.middle_name }}
+                    {{ user.last_name }}
                   </td>
                   <td class="border border-gray-300 px-4 py-2">
                     {{ user.groups.join(", ") }}
@@ -84,7 +85,9 @@
                   <td class="border border-gray-300 px-4 py-2">
                     {{ user.is_active ? "Yes" : "No" }}
                   </td>
-                  <td class="border border-gray-300 px-4 py-2 text-center space-x-2">
+                  <td
+                    class="border border-gray-300 px-4 py-2 text-center space-x-2"
+                  >
                     <router-link
                       :to="`/user_detail/${user.id}`"
                       class="text-green-600 hover:text-green-800 focus:outline-none"
@@ -92,19 +95,22 @@
                     >
                       <i class="fas fa-eye"></i>
                     </router-link>
-                    <router-link
-                      :to="`/user_edit/${user.id}`"
-                      class="text-blue-600 hover:text-blue-800 focus:outline-none"
-                      title="Edit"
-                    >
-                      <i class="fas fa-edit"></i>
-                    </router-link>
+
                     <button
-                      @click="askDeleteConfirmation(user)"
-                      class="text-red-600 hover:text-red-800 focus:outline-none"
+                      v-if="!user.is_active"
+                      @click="activateUser(user.id)"
+                      class="text-blue-600 hover:text-blue-800 focus:outline-none"
                       title="Delete"
                     >
-                      <i class="fas fa-trash-alt"></i>
+                      <i class="fas fa-trash-alt"></i> Activate user
+                    </button>
+                    <button
+                      v-if="user.is_active"
+                      @click="deactivateUser(user.id)"
+                      class="text-blue-600 hover:text-blue-800 focus:outline-none"
+                      title="Delete"
+                    >
+                      Deactivate User
                     </button>
                   </td>
                 </tr>
@@ -150,11 +156,11 @@
         @cancel="confirmVisible = false"
       />
 
-     <Adduser
-      :visible="showAddUser"
-      @close="showAddUser = false"
-      @success="fetchUsers()" 
-    />
+      <Adduser
+        :visible="showAddUser"
+        @close="showAddUser = false"
+        @success="fetchUsers()"
+      />
     </div>
   </div>
 </template>
@@ -162,8 +168,7 @@
 <script>
 import ConfirmModal from "@/components/ConfirmModal.vue";
 import Toast from "@/components/Toast.vue";
-import Adduser from './add.vue'
-
+import Adduser from "./add.vue";
 const SortIcon = {
   props: ["field", "sortKey", "sortAsc"],
   template: `
@@ -183,7 +188,7 @@ const SortIcon = {
 
 export default {
   name: "usersView",
-  components: { SortIcon, ConfirmModal, Toast,Adduser },
+  components: { SortIcon, ConfirmModal, Toast, Adduser },
   data() {
     return {
       searchTerm: "",
@@ -238,6 +243,7 @@ export default {
     async fetchUsers(url = `/get_users?page=1&page_size=${this.pageSize}`) {
       try {
         const res = await this.$apiGet(url);
+        console.log("res users", res);
         this.users = res.data || [];
         this.currentPage = res.current_page;
         this.totalPages = res.total_pages;
@@ -267,6 +273,26 @@ export default {
         console.error(err);
         this.$refs.toast.showToast("Failed to delete user", "error");
       }
+    },
+
+    activateUser(id) {
+      console.log("id", id);
+      // alert("activate user");
+      const payload = {
+        id: id,
+      };
+      console.log("payload", payload);
+      this.$apiPost(`/activate_user/${id}`, payload).then((res) => {
+        this.$root.$refs.toast.showToast(res.message, "success");
+        this.fetchUsers(`/get_users?page=1&page_size=${this.pageSize}`);
+      });
+    },
+    deactivateUser(id) {
+      this.$apiDelete(`/deactivate_user`, id).then((res) => {
+        console.log("res", res);
+        this.$root.$refs.toast.showToast(res.message, "success");
+        this.fetchUsers(`/get_users?page=1&page_size=${this.pageSize}`);
+      });
     },
   },
 };

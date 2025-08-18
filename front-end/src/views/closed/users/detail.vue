@@ -6,20 +6,12 @@
         class="bg-primary text-white px-6 py-4 flex justify-between items-center"
       >
         <h2 class="text-2xl font-bold">User Detail</h2>
-        <div>
-          <button
-            @click="saveProfile"
-            class="bg-blue-600 text-white font-semibold px-4 py-2 rounded shadow hover:bg-blue-700"
-          >
-            Save Profile
-          </button>
-        </div>
       </div>
 
       <!-- General Profile -->
-      <div class="p-6 border-b">
+      <div class="p-6 border m-2">
         <h3 class="text-lg font-semibold mb-4">General Profile</h3>
-        <form class="space-y-4">
+        <form class="space-y-4 mx-5 border p-3">
           <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
               <label class="block text-gray-600 font-semibold mb-1"
@@ -105,6 +97,14 @@
               <input type="checkbox" v-model="user.is_superuser" />
               <label class="text-gray-600 font-semibold">Superuser</label>
             </div>
+          </div>
+          <div>
+            <button
+              @click.prevent="saveProfile(user)"
+              class="bg-blue-600 text-white font-semibold px-4 py-2 rounded shadow hover:bg-blue-700"
+            >
+              Save Profile
+            </button>
           </div>
         </form>
       </div>
@@ -215,14 +215,29 @@ export default {
         console.error("Failed to fetch user:", err);
       }
     },
-    async saveProfile() {
+    async saveProfile(user) {
+      console.log("user", user);
+      const payload = {
+        address: user.address,
+        email: user.email,
+        first_name: user.first_name,
+        last_name: user.last_name,
+        middle_name: user.middle_name,
+        phone_number: user.phone_number,
+        date_joined: user.date_joined,
+        last_login: user.last_login,
+        is_active: user.is_active,
+        is_staff: user.is_staff,
+        is_superuser: user.is_superuser,
+      };
       try {
         // Custom API to update user profile
-        await this.$apiPost(`/update_user/${this.user.id}`, this.user);
-        alert("Profile updated successfully!");
+        await this.$apiPut(`/old_update_user`, user.id, payload).then((res) => {
+          this.$root.$refs.toast.showToast(res.message, "success");
+        });
       } catch (err) {
         console.error("Failed to save profile:", err);
-        alert("Failed to save profile");
+        this.$root.$refs.toast.showToast(err.message, "error");
       }
     },
     formatDate(date) {

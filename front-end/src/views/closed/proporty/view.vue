@@ -4,9 +4,11 @@
     <div class="min-h-screen bg-gray-100 p-6">
       <div class="max-w-7xl mx-auto bg-white shadow rounded-lg overflow-hidden">
         <!-- Header -->
-        <div class="bg-primary text-white px-6 py-4 text-xl font-bold flex justify-between items-center">
+        <div
+          class="bg-primary text-white px-6 py-4 text-xl font-bold flex justify-between items-center"
+        >
           Properties
-           <button
+          <button
             @click="visible = true"
             class="bg-white text-blue-700 font-semibold px-1 lg:px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300"
           >
@@ -24,7 +26,9 @@
           />
 
           <div class="overflow-x-auto">
-            <table class="min-w-full table-auto border-collapse border border-gray-300 text-sm">
+            <table
+              class="min-w-full table-auto border-collapse border border-gray-300 text-sm"
+            >
               <thead>
                 <tr class="bg-gray-200 text-gray-700 text-left">
                   <th
@@ -59,7 +63,9 @@
                   >
                     Status
                   </th>
-                  <th class="border border-gray-300 px-3 py-2 text-center">Actions</th>
+                  <th class="border border-gray-300 px-3 py-2 text-center">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody>
@@ -68,23 +74,35 @@
                   :key="property.id"
                   class="hover:bg-gray-100"
                 >
-                  <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
+                  <td
+                    class="border border-gray-300 px-3 py-2 whitespace-nowrap"
+                  >
                     {{ property.name }}
                   </td>
-                       <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
+                  <td
+                    class="border border-gray-300 px-3 py-2 whitespace-nowrap"
+                  >
                     {{ property.zone }}
                   </td>
 
-                  <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
+                  <td
+                    class="border border-gray-300 px-3 py-2 whitespace-nowrap"
+                  >
                     {{ property.property_type }}
                   </td>
-                  <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
+                  <td
+                    class="border border-gray-300 px-3 py-2 whitespace-nowrap"
+                  >
                     {{ property.city }}
                   </td>
-                  <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
+                  <td
+                    class="border border-gray-300 px-3 py-2 whitespace-nowrap"
+                  >
                     {{ property.status }}
                   </td>
-                  <td class="border border-gray-300 px-3 py-2 text-center space-x-2">
+                  <td
+                    class="border border-gray-300 px-3 py-2 text-center space-x-2"
+                  >
                     <button
                       @click="goToDetail(property.id)"
                       class="text-green-600 hover:text-green-800"
@@ -108,12 +126,12 @@
                       <i class="fas fa-trash-alt"></i>
                     </button>
 
-                     <button
-                      @click="managerVissible=true"
+                    <button
+                      @click="managerVissible = true"
                       class="text-green-600"
                       title="Proporty Manager"
                     >
-                     Proporty Manager
+                      Proporty Manager
                     </button>
                     <button
                       @click="rentPay(property.id)"
@@ -124,7 +142,6 @@
                       <i class="fas fa-money-bill-wave"></i>
                     </button>
                   </td>
-
                 </tr>
                 <tr v-if="filteredAndSorted.length === 0">
                   <td colspan="5" class="text-center py-6 text-gray-500">
@@ -160,22 +177,25 @@
         @cancel="confirmVisible = false"
       />
 
-      <Manager v-if="managerVissible" :visible="managerVissible" @close="managerVissible=false;"/>
-
+      <Manager
+        v-if="managerVissible"
+        :visible="managerVissible"
+        @close="managerVissible = false"
+      />
     </div>
   </div>
 </template>
 
 <script>
-import AddProperty from '@/views/closed/proporty/add.vue';
-import UpdateProperty from '@/views/closed/proporty/update.vue';
-import ConfirmModal from '@/components/ConfirmModal.vue';
-import Toast from '../../../components/Toast.vue';
-import Manager from '../managers/add.vue'
+import AddProperty from "@/views/closed/proporty/add.vue";
+import UpdateProperty from "@/views/closed/proporty/update.vue";
+import ConfirmModal from "@/components/ConfirmModal.vue";
+import Toast from "../../../components/Toast.vue";
+import Manager from "../managers/add.vue";
 
 export default {
-  name: 'PropertyView',
-  components: { AddProperty, UpdateProperty, ConfirmModal, Toast ,Manager},
+  name: "PropertyView",
+  components: { AddProperty, UpdateProperty, ConfirmModal, Toast, Manager },
   data() {
     return {
       properties: [],
@@ -184,18 +204,20 @@ export default {
       confirmVisible: false,
       propertyToEdit: null,
       propertyToDelete: null,
-      searchTerm: '',
-      sortKey: 'name',
+      searchTerm: "",
+      sortKey: "name",
       sortAsc: true,
-      managerVissible:false,
+      managerVissible: false,
     };
   },
   computed: {
     filteredAndSorted() {
       const term = this.searchTerm.toLowerCase();
       let filtered = this.properties.filter((p) =>
-        ['name', 'property_type', 'city', 'status'].some((key) =>
-          String(p[key] || '').toLowerCase().includes(term)
+        ["name", "property_type", "city", "status"].some((key) =>
+          String(p[key] || "")
+            .toLowerCase()
+            .includes(term)
         )
       );
 
@@ -216,23 +238,20 @@ export default {
   methods: {
     async fetchProperties() {
       try {
-        let params={};
-        if(localStorage.getItem('is_superuser')){
-      
-          params={
-          
-         } 
-        }else{
-          params={
-          owner_id:localStorage.getItem("userId")
-        }
-        }
-        
-        const res = await this.$apiGet('/get_properties',params);
-        this.properties = res.data;
+        const isSuperUser =
+          localStorage.getItem("is_superuser") == "1" ||
+          localStorage.getItem("is_superuser") === "true";
+        const params = isSuperUser
+          ? {}
+          : { owner_id__email: localStorage.getItem("email") };
+
+        console.log("params", params);
+        const response = await this.$apiGet("/get_properties", params);
+
+        this.properties = response.data || [];
       } catch (err) {
-        console.error('Failed to fetch properties', err);
-        alert('Could not load properties.');
+        console.error("Failed to fetch properties", err);
+        alert("Could not load properties.");
       }
     },
     sortBy(key) {
@@ -254,30 +273,32 @@ export default {
     async confirmDelete() {
       this.confirmVisible = false;
       try {
-        const res = await this.$apiDelete(`/delete_property/${this.propertyToDelete.id}`);
-        this.$refs.toast.showToast(res.message, 'success');
+        const res = await this.$apiDelete(
+          `/delete_property/${this.propertyToDelete.id}`
+        );
+        this.$refs.toast.showToast(res.message, "success");
         this.fetchProperties();
       } catch (err) {
         console.error(err);
-        alert('Failed to delete property.');
+        alert("Failed to delete property.");
       }
       this.propertyToDelete = null;
     },
     goToDetail(propertyId) {
       if (!propertyId) {
         // Defensive check: don't navigate if id is missing
-        console.warn('Property ID missing, cannot navigate to detail');
+        console.warn("Property ID missing, cannot navigate to detail");
         return;
       }
-      this.$router.push({ name: 'PropertyDetail', params: { id: propertyId } });
+      this.$router.push({ name: "PropertyDetail", params: { id: propertyId } });
     },
     rentPay(propertyId) {
       if (!propertyId) {
         // Defensive check: don't navigate if id is missing
-        console.warn('Property ID missing, cannot navigate to detail');
+        console.warn("Property ID missing, cannot navigate to detail");
         return;
       }
-      this.$router.push({ name: 'rentPay', params: { id: propertyId } });
+      this.$router.push({ name: "rentPay", params: { id: propertyId } });
     },
   },
 };
