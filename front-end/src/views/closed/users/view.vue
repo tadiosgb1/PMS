@@ -45,7 +45,7 @@
           </div>
 
           <!-- Table -->
-          <div class="overflow-x-auto">
+          <div class="overflow-x-auto ">
             <table
               class="min-w-full table-auto border-collapse border border-gray-300 text-sm"
             >
