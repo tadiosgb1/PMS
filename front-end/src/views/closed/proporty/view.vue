@@ -33,7 +33,7 @@
                   >
                     Name
                   </th>
-                  
+
                   <th
                     class="border border-gray-300 px-3 py-2 cursor-pointer"
                     @click="sortBy('name')"
@@ -216,7 +216,19 @@ export default {
   methods: {
     async fetchProperties() {
       try {
-        const res = await this.$apiGet('/get_properties');
+        let params={};
+        if(localStorage.getItem('is_superuser')){
+      
+          params={
+          
+         } 
+        }else{
+          params={
+          owner_id:localStorage.getItem("userId")
+        }
+        }
+        
+        const res = await this.$apiGet('/get_properties',params);
         this.properties = res.data;
       } catch (err) {
         console.error('Failed to fetch properties', err);

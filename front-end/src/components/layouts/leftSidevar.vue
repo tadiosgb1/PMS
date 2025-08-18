@@ -62,7 +62,7 @@ export default {
           color: "#f97316",
         },
         {
-          name: "Custom Users",
+          name: "Users",
           route: "user_view",
           icon: "fas fa-user",
           color: "#60a5fa",

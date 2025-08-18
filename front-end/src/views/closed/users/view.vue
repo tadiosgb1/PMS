@@ -8,12 +8,12 @@
           class="bg-primary text-white px-6 py-4 text-xl font-bold flex justify-between items-center"
         >
           Users
-          <router-link
-            to="/user_add"
+          <button
+           @click="showAddUser = true"
             class="bg-white text-blue-700 font-semibold px-2 lg:px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300 flex items-center"
           >
             <span class="text-primary mr-1">+</span> Add
-          </router-link>
+      </button>
         </div>
 
         <!-- Body -->
@@ -149,6 +149,12 @@
         @confirm="confirmDelete"
         @cancel="confirmVisible = false"
       />
+
+     <Adduser
+      :visible="showAddUser"
+      @close="showAddUser = false"
+      @success="fetchUsers()" 
+    />
     </div>
   </div>
 </template>
@@ -156,6 +162,7 @@
 <script>
 import ConfirmModal from "@/components/ConfirmModal.vue";
 import Toast from "@/components/Toast.vue";
+import Adduser from './add.vue'
 
 const SortIcon = {
   props: ["field", "sortKey", "sortAsc"],
@@ -176,7 +183,7 @@ const SortIcon = {
 
 export default {
   name: "usersView",
-  components: { SortIcon, ConfirmModal, Toast },
+  components: { SortIcon, ConfirmModal, Toast,Adduser },
   data() {
     return {
       searchTerm: "",
@@ -192,6 +199,7 @@ export default {
       // page size feature
       pageSize: 10,
       pageSizes: [5, 10, 20, 50, 100],
+      showAddUser: false,
     };
   },
   computed: {
