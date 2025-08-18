@@ -146,7 +146,10 @@ export default {
   methods: {
     async fetchZones() {
       try {
-        const response = await this.$apiGet("/get_property_zones");
+        const params ={
+          owner_id:localStorage.getItem('userId'),
+        }
+        const response = await this.$apiGet("/get_property_zones",params);
         this.zones = response.data || [];
       } catch (err) {
         console.error("Error fetching zones:", err);

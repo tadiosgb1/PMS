@@ -18,13 +18,31 @@
 
         <!-- Body -->
         <div class="p-6">
-          <!-- Search -->
-          <input
-            v-model="searchTerm"
-            type="search"
-            placeholder="Search User..."
-            class="w-full max-w-md px-4 py-2 mb-6 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+          <!-- Search & Page Size -->
+          <div class="flex justify-between items-center mb-6">
+            <input
+              v-model="searchTerm"
+              type="search"
+              placeholder="Search User..."
+              class="w-full max-w-md px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+
+            <!-- Page Size Dropdown -->
+            <div class="ml-4">
+              <label for="pageSize" class="mr-2 text-gray-700">Show</label>
+              <select
+                id="pageSize"
+                v-model="pageSize"
+                @change="fetchUsers(`/get_users?page=1&page_size=${pageSize}`)"
+                class="border px-2 py-1 rounded"
+              >
+                <option v-for="size in pageSizes" :key="size" :value="size">
+                  {{ size }}
+                </option>
+              </select>
+              <span class="ml-1 text-gray-700">per page</span>
+            </div>
+          </div>
 
           <!-- Table -->
           <div class="overflow-x-auto">
@@ -44,28 +62,8 @@
                       :sort-asc="sortAsc"
                     />
                   </th>
-                  <th
-                    class="border border-gray-300 px-4 py-2 cursor-pointer"
-                    @click="sortBy('groups')"
-                  >
-                    Groups
-                    <SortIcon
-                      :field="'groups'"
-                      :sort-key="sortKey"
-                      :sort-asc="sortAsc"
-                    />
-                  </th>
-                  <th
-                    class="border border-gray-300 px-4 py-2 cursor-pointer"
-                    @click="sortBy('is_active')"
-                  >
-                    Active
-                    <SortIcon
-                      :field="'is_active'"
-                      :sort-key="sortKey"
-                      :sort-asc="sortAsc"
-                    />
-                  </th>
+                  <th class="border border-gray-300 px-4 py-2">Groups</th>
+                  <th class="border border-gray-300 px-4 py-2">Active</th>
                   <th class="border border-gray-300 px-4 py-2 text-center">
                     Actions
                   </th>
@@ -78,8 +76,7 @@
                   class="hover:bg-gray-100"
                 >
                   <td class="border border-gray-300 px-4 py-2">
-                    {{ user.first_name }} {{ user.middle_name }}
-                    {{ user.last_name }}
+                    {{ user.first_name }} {{ user.middle_name }} {{ user.last_name }}
                   </td>
                   <td class="border border-gray-300 px-4 py-2">
                     {{ user.groups.join(", ") }}
@@ -87,9 +84,7 @@
                   <td class="border border-gray-300 px-4 py-2">
                     {{ user.is_active ? "Yes" : "No" }}
                   </td>
-                  <td
-                    class="border border-gray-300 px-4 py-2 text-center space-x-2"
-                  >
+                  <td class="border border-gray-300 px-4 py-2 text-center space-x-2">
                     <router-link
                       :to="`/user_detail/${user.id}`"
                       class="text-green-600 hover:text-green-800 focus:outline-none"
@@ -120,6 +115,27 @@
                 </tr>
               </tbody>
             </table>
+          </div>
+
+          <!-- Pagination -->
+          <div class="flex justify-between items-center mt-4">
+            <button
+              :disabled="!previous"
+              @click="fetchUsers(previous)"
+              class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+            >
+              Previous
+            </button>
+            <span class="text-gray-600">
+              Page {{ currentPage }} of {{ totalPages }}
+            </span>
+            <button
+              :disabled="!next"
+              @click="fetchUsers(next)"
+              class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+            >
+              Next
+            </button>
           </div>
         </div>
       </div>
@@ -169,6 +185,13 @@ export default {
       sortKey: "first_name",
       sortAsc: true,
       users: [],
+      currentPage: 1,
+      totalPages: 1,
+      next: null,
+      previous: null,
+      // page size feature
+      pageSize: 10,
+      pageSizes: [5, 10, 20, 50, 100],
     };
   },
   computed: {
@@ -201,13 +224,17 @@ export default {
     },
   },
   mounted() {
-    this.fetchUsers();
+    this.fetchUsers(`/get_users?page=1&page_size=${this.pageSize}`);
   },
   methods: {
-    async fetchUsers() {
+    async fetchUsers(url = `/get_users?page=1&page_size=${this.pageSize}`) {
       try {
-        const res = await this.$apiGet("/get_users");
-        this.users = Array.isArray(res.data) ? res.data : [];
+        const res = await this.$apiGet(url);
+        this.users = res.data || [];
+        this.currentPage = res.current_page;
+        this.totalPages = res.total_pages;
+        this.next = res.next;
+        this.previous = res.previous;
       } catch (err) {
         console.error(err);
         this.users = [];
@@ -227,7 +254,7 @@ export default {
       try {
         await this.$apiDelete(`/delete_user/${this.userToDelete.id}`);
         this.$refs.toast.showToast("User deleted", "success");
-        this.fetchUsers();
+        this.fetchUsers(`/get_users?page=1&page_size=${this.pageSize}`);
       } catch (err) {
         console.error(err);
         this.$refs.toast.showToast("Failed to delete user", "error");

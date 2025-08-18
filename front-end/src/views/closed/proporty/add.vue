@@ -13,20 +13,7 @@
 
       <form @submit.prevent="submitForm" class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 max-h-[80vh] overflow-y-auto">
           <!-- Owner -->
-        <div>
-          <label for="owner" class="block mb-2 font-medium text-gray-700">Owner</label>
-          <select
-            v-model="form.owner_id"
-            id="owner"
-            class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-green-500 "
-            required
-          >
-            <option value="" disabled>Select Owner</option>
-            <option v-for="user in users" :key="user.id" :value="user.id" class="text-black">
-              {{ user.first_name }}
-            </option>
-          </select>
-        </div>
+
         <div>
           <label class="block text-gray-700">Name</label>
           <input v-model="form.name" type="text" class="custom-input" required />
@@ -34,7 +21,7 @@
 
         <div>
           <label class="block text-gray-700">Property Zone</label>
-          <input v-model="form.property_zone" type="text" class="custom-input" required />
+          <input v-model="form.property_zone_id" type="text" class="custom-input" required />
         </div>
 
         <div>
@@ -118,6 +105,8 @@ export default {
     return {
       users:[],
       form: {
+        property_zone_id:'12',
+        owner_id:localStorage.getItem('userId'),
         name: '',
         property_type: '',
         address: '',
@@ -129,7 +118,6 @@ export default {
         bath_rooms: '',
         rent: '',
         status: '',
-        property_zone:''
       }
     };
   },
@@ -139,8 +127,11 @@ export default {
 ,
   methods: {
     async submitForm() {
+
+      console.log("Payload proporty",this.form);
+
       try {
-        await this.$apiPost('/post_property', this.form);
+        await this.$apiPost('/post_propertykk', this.form);
          this.$root.$refs.toast.showToast('Property saved successfully ', 'success');
         this.$emit('refresh');
         setTimeout(() => {
@@ -157,6 +148,8 @@ export default {
     },
     resetForm() {
       this.form = {
+        property_zone_id:'12',
+        owner_id:'',
         name: '',
         property_type: '',
         address: '',

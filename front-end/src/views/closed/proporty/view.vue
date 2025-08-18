@@ -12,20 +12,6 @@
           >
             <span class="text-primary">+</span> Add Proporty
           </button>
-          <button
-            @click="visible = true"
-            class="bg-white text-blue-700 font-semibold px-1 lg:px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300"
-          >
-            <span class="text-primary">+</span> Add zone
-          </button>
-
-            <button
-            @click="managerVissible = true"
-            class="bg-white text-blue-700 font-semibold px-1 lg:px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300"
-          >
-            <span class="text-primary">+</span> Add Zone  manager
-          </button>
-
         </div>
 
         <!-- Content -->
@@ -47,6 +33,14 @@
                   >
                     Name
                   </th>
+                  
+                  <th
+                    class="border border-gray-300 px-3 py-2 cursor-pointer"
+                    @click="sortBy('name')"
+                  >
+                    Zone
+                  </th>
+
                   <th
                     class="border border-gray-300 px-3 py-2 cursor-pointer"
                     @click="sortBy('property_type')"
@@ -77,6 +71,10 @@
                   <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
                     {{ property.name }}
                   </td>
+                       <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
+                    {{ property.zone }}
+                  </td>
+
                   <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
                     {{ property.property_type }}
                   </td>
@@ -173,7 +171,7 @@ import AddProperty from '@/views/closed/proporty/add.vue';
 import UpdateProperty from '@/views/closed/proporty/update.vue';
 import ConfirmModal from '@/components/ConfirmModal.vue';
 import Toast from '../../../components/Toast.vue';
-import Manager from './addManager.vue'
+import Manager from '../managers/add.vue'
 
 export default {
   name: 'PropertyView',
@@ -213,6 +211,7 @@ export default {
   },
   mounted() {
     this.fetchProperties();
+    //api/get_properties?property_zone_id__name=zone 1  (since name is unique in property zone)
   },
   methods: {
     async fetchProperties() {

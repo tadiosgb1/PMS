@@ -30,17 +30,20 @@ export default {
   data() {
     return {
       form: {
+        owner_id:localStorage.getItem('userId'),
         name: '',
         address: '',
         city: '',
         state: '',
-        owner_id: null,
         manager_id: null
       }
     };
   },
   methods: {
     async submitForm() {
+
+      console.log("Payload zone",this.form);
+
       try {
         await this.$apiPost("post_property_zone", this.form);
         this.$root.$refs.toast.showToast('Property saved successfully ', 'success');

@@ -64,7 +64,7 @@
             class="px-4 py-2 bg-primary text-white rounded hover:bg-orange-600"
             :disabled="loading || !form.payment_method || !form.status || !form.transaction_id"
           >
-            {{ loading ? 'Processing...' : 'Pay' }}
+            {{ loading ? 'Processing...' : 'Submit' }}
           </button>
         </div>
       </div>
