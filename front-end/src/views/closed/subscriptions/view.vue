@@ -24,7 +24,9 @@
           />
 
           <div class="overflow-x-auto">
-            <table class="min-w-full table-auto border-collapse border border-gray-300">
+            <table
+              class="min-w-full table-auto border-collapse border border-gray-300"
+            >
               <thead>
                 <tr class="bg-gray-200 text-gray-700">
                   <th class="px-4 py-2 border">Plan Name</th>
@@ -125,14 +127,14 @@
 </template>
 
 <script>
-import AddSubscription from './add.vue';
-import UpdateSubscription from './update.vue';
-import PaymentModal from './Payment.vue';
-import ConfirmModal from '@/components/ConfirmModal.vue';
-import Toast from '@/components/Toast.vue';
+import AddSubscription from "./add.vue";
+import UpdateSubscription from "./update.vue";
+import PaymentModal from "./Payment.vue";
+import ConfirmModal from "@/components/ConfirmModal.vue";
+import Toast from "@/components/Toast.vue";
 
 export default {
-  name: 'subscriptionView',
+  name: "subscriptionView",
   components: {
     AddSubscription,
     UpdateSubscription,
@@ -143,7 +145,7 @@ export default {
   data() {
     return {
       subscriptions: [],
-      searchTerm: '',
+      searchTerm: "",
       visible: false,
       updateVisible: false,
       confirmVisible: false,
@@ -169,19 +171,19 @@ export default {
   methods: {
     async fetch() {
       try {
-        const params={
-          user_id:localStorage.getItem('userId'),
-        }
-        const res = await this.$apiGet('/get_subscription',params);
-        
+        const params = {
+          user_id_email: localStorage.getItem("email"),
+        };
+        const res = await this.$apiGet("/get_subscription", params);
+
         this.subscriptions = res.data || [];
       } catch (e) {
-        console.error('Error fetching subscriptions', e);
+        console.error("Error fetching subscriptions", e);
         this.subscriptions = [];
       }
     },
     formatDate(dateStr) {
-      if (!dateStr) return '';
+      if (!dateStr) return "";
       const date = new Date(dateStr);
       return date.toLocaleDateString();
     },
@@ -205,19 +207,22 @@ export default {
       try {
         await this.$apiDelete(`/delete_subscription/${this.deleting.id}`);
         this.$root.$refs.toast.showToast(
-          'Subscription deleted successfully',
-          'success'
+          "Subscription deleted successfully",
+          "success"
         );
         this.fetch();
       } catch (e) {
-        this.$root.$refs.toast.showToast('Failed to delete subscription', 'error');
+        this.$root.$refs.toast.showToast(
+          "Failed to delete subscription",
+          "error"
+        );
       } finally {
         this.confirmVisible = false;
         this.deleting = null;
       }
     },
     handlePaymentSuccess() {
-      this.$root.$refs.toast.showToast('Payment successful', 'success');
+      this.$root.$refs.toast.showToast("Payment successful", "success");
       this.paymentVisible = false;
       this.fetch();
     },
