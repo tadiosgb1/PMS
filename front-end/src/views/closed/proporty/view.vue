@@ -12,19 +12,39 @@
             @click="visible = true"
             class="bg-white text-blue-700 font-semibold px-1 lg:px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300"
           >
-            <span class="text-primary">+</span> Add Proporty
+            <span class="text-primary">+</span> Add Property
           </button>
         </div>
 
         <!-- Content -->
         <div class="p-6">
-          <input
-            v-model="searchTerm"
-            type="search"
-            placeholder="Search properties..."
-            class="w-full max-w-md px-4 py-2 mb-6 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+          <!-- Search & Page Size -->
+          <div class="flex justify-between items-center mb-6">
+            <input
+              v-model="searchTerm"
+              type="search"
+              placeholder="Search properties..."
+              class="w-full max-w-md px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
 
+            <!-- Page Size Dropdown -->
+            <div class="ml-4">
+              <label for="pageSize" class="mr-2 text-gray-700">Show</label>
+              <select
+                id="pageSize"
+                v-model="pageSize"
+                @change="fetchProperties(`/get_properties?page=1&page_size=${pageSize}`)"
+                class="border px-2 py-1 rounded"
+              >
+                <option v-for="size in pageSizes" :key="size" :value="size">
+                  {{ size }}
+                </option>
+              </select>
+              <span class="ml-1 text-gray-700">per page</span>
+            </div>
+          </div>
+
+          <!-- Table -->
           <div class="overflow-x-auto">
             <table
               class="min-w-full table-auto border-collapse border border-gray-300 text-sm"
@@ -37,14 +57,12 @@
                   >
                     Name
                   </th>
-
                   <th
                     class="border border-gray-300 px-3 py-2 cursor-pointer"
-                    @click="sortBy('name')"
+                    @click="sortBy('zone')"
                   >
                     Zone
                   </th>
-
                   <th
                     class="border border-gray-300 px-3 py-2 cursor-pointer"
                     @click="sortBy('property_type')"
@@ -74,30 +92,19 @@
                   :key="property.id"
                   class="hover:bg-gray-100"
                 >
-                  <td
-                    class="border border-gray-300 px-3 py-2 whitespace-nowrap"
-                  >
+                  <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
                     {{ property.name }}
                   </td>
-                  <td
-                    class="border border-gray-300 px-3 py-2 whitespace-nowrap"
-                  >
+                  <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
                     {{ property.zone }}
                   </td>
-
-                  <td
-                    class="border border-gray-300 px-3 py-2 whitespace-nowrap"
-                  >
+                  <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
                     {{ property.property_type }}
                   </td>
-                  <td
-                    class="border border-gray-300 px-3 py-2 whitespace-nowrap"
-                  >
+                  <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
                     {{ property.city }}
                   </td>
-                  <td
-                    class="border border-gray-300 px-3 py-2 whitespace-nowrap"
-                  >
+                  <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
                     {{ property.status }}
                   </td>
                   <td
@@ -125,18 +132,17 @@
                     >
                       <i class="fas fa-trash-alt"></i>
                     </button>
-
                     <button
                       @click="managerVissible = true"
                       class="text-green-600"
-                      title="Proporty Manager"
+                      title="Property Manager"
                     >
-                      Proporty Manager
+                      Property Manager
                     </button>
                     <button
                       @click="rentPay(property.id)"
                       class="text-green-600 hover:text-green-800"
-                      title="Detail"
+                      title="Rent Payment"
                       :disabled="!property.id"
                     >
                       <i class="fas fa-money-bill-wave"></i>
@@ -144,12 +150,33 @@
                   </td>
                 </tr>
                 <tr v-if="filteredAndSorted.length === 0">
-                  <td colspan="5" class="text-center py-6 text-gray-500">
+                  <td colspan="6" class="text-center py-6 text-gray-500">
                     No properties found.
                   </td>
                 </tr>
               </tbody>
             </table>
+          </div>
+
+          <!-- Pagination -->
+          <div class="flex justify-between items-center mt-4">
+            <button
+              :disabled="!previous"
+              @click="fetchProperties(previous)"
+              class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+            >
+              Previous
+            </button>
+            <span class="text-gray-600">
+              Page {{ currentPage }} of {{ totalPages }}
+            </span>
+            <button
+              :disabled="!next"
+              @click="fetchProperties(next)"
+              class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+            >
+              Next
+            </button>
           </div>
         </div>
       </div>
@@ -176,7 +203,6 @@
         @confirm="confirmDelete"
         @cancel="confirmVisible = false"
       />
-
       <Manager
         v-if="managerVissible"
         :visible="managerVissible"
@@ -208,16 +234,22 @@ export default {
       sortKey: "name",
       sortAsc: true,
       managerVissible: false,
+
+      // pagination
+      currentPage: 1,
+      totalPages: 1,
+      next: null,
+      previous: null,
+      pageSize: 10,
+      pageSizes: [5, 10, 20, 50, 100],
     };
   },
   computed: {
     filteredAndSorted() {
       const term = this.searchTerm.toLowerCase();
       let filtered = this.properties.filter((p) =>
-        ["name", "property_type", "city", "status"].some((key) =>
-          String(p[key] || "")
-            .toLowerCase()
-            .includes(term)
+        ["name", "property_type", "city", "status", "zone"].some((key) =>
+          String(p[key] || "").toLowerCase().includes(term)
         )
       );
 
@@ -232,23 +264,26 @@ export default {
     },
   },
   mounted() {
-    this.fetchProperties();
-    //api/get_properties?property_zone_id__name=zone 1  (since name is unique in property zone)
+    this.fetchProperties(`/get_properties?page=1&page_size=${this.pageSize}`);
   },
   methods: {
-    async fetchProperties() {
+    async fetchProperties(url = `/get_properties?page=1&page_size=${this.pageSize}`) {
       try {
         const isSuperUser =
           localStorage.getItem("is_superuser") == "1" ||
           localStorage.getItem("is_superuser") === "true";
+
         const params = isSuperUser
           ? {}
           : { owner_id__email: localStorage.getItem("email") };
 
-        console.log("params", params);
-        const response = await this.$apiGet("/get_properties", params);
+        const response = await this.$apiGet(url, params);
 
         this.properties = response.data || [];
+        this.currentPage = response.current_page;
+        this.totalPages = response.total_pages;
+        this.next = response.next;
+        this.previous = response.previous;
       } catch (err) {
         console.error("Failed to fetch properties", err);
         alert("Could not load properties.");
@@ -277,7 +312,7 @@ export default {
           `/delete_property/${this.propertyToDelete.id}`
         );
         this.$refs.toast.showToast(res.message, "success");
-        this.fetchProperties();
+        this.fetchProperties(`/get_properties?page=1&page_size=${this.pageSize}`);
       } catch (err) {
         console.error(err);
         alert("Failed to delete property.");
@@ -286,7 +321,6 @@ export default {
     },
     goToDetail(propertyId) {
       if (!propertyId) {
-        // Defensive check: don't navigate if id is missing
         console.warn("Property ID missing, cannot navigate to detail");
         return;
       }
@@ -294,8 +328,7 @@ export default {
     },
     rentPay(propertyId) {
       if (!propertyId) {
-        // Defensive check: don't navigate if id is missing
-        console.warn("Property ID missing, cannot navigate to detail");
+        console.warn("Property ID missing, cannot navigate to rent payment");
         return;
       }
       this.$router.push({ name: "rentPay", params: { id: propertyId } });
