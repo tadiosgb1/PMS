@@ -35,15 +35,18 @@
               required
             />
           </div>
-
           <div>
             <label class="block text-gray-700">Property Zone</label>
-            <input
-              v-model="form.property_zone_id"
-              type="text"
-              class="custom-input"
-              required
-            />
+            <select v-model="form.property_zone_id" class="custom-input">
+              <option value="">Select Zone</option>
+              <option 
+                v-for="zone in zones" 
+                :key="zone.id" 
+                :value="zone.id"
+              >
+                {{ zone.name }}
+              </option>
+            </select>
           </div>
 
           <div>
@@ -146,9 +149,11 @@ export default {
   data() {
     return {
       users: [],
+      zones:[],
       form: {
-        property_zone_id: "12",
+        property_zone_id:12,
         owner_id: localStorage.getItem("userId"),
+        manager_id:"",
         name: "",
         property_type: "",
         address: "",
@@ -163,8 +168,27 @@ export default {
       },
     };
   },
-  mounted() {
+  async mounted() {
     this.fetchUser();
+      try {
+        const isSuperUser =
+          localStorage.getItem("is_superuser") == "1" ||
+          localStorage.getItem("is_superuser") === "true";
+
+        const params = isSuperUser
+          ? {}
+          : { owner_id__email: localStorage.getItem("email") };
+
+        const response = await this.$apiGet(`/get_property_zones`, params);
+
+        this.zones = response.data || [];
+
+        console.log("zones",this.zones);
+
+      } catch (err) {
+        console.error("Error fetching zones:", err);
+        this.zones = [];
+      }
   },
   methods: {
     async submitForm() {
@@ -191,7 +215,6 @@ export default {
     },
     resetForm() {
       this.form = {
-        property_zone_id: "12",
         owner_id: "",
         name: "",
         property_type: "",

@@ -9,6 +9,8 @@
         &larr; Back
       </button>
 
+      
+
       <h1 v-if="property" class="text-2xl font-bold mb-4">Property Name: {{ property.name }}</h1>
       <p v-else>Loading...</p>
 

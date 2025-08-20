@@ -90,6 +90,9 @@
                     <button @click="askDeleteConfirmation(zone)" class="text-red-600 hover:text-red-800">
                       <i class="fas fa-trash-alt"></i>
                     </button>
+                    <button @click="properties(zone.id)" class="text-blue-600 hover:text-blue-800">
+                     Properties
+                    </button>
                   </td>
                 </tr>
                 <tr v-if="filteredAndSortedZones.length === 0">
@@ -207,6 +210,12 @@ export default {
     this.fetchZones(`/get_property_zones?page=1&page_size=${this.pageSize}`);
   },
   methods: {
+    properties(zone_id){
+    this.$router.push({
+      path: '/properties',
+      query: { zone_id: zone_id }
+    });
+    },
     async fetchZones(url = `/get_property_zones?page=1&page_size=${this.pageSize}`) {
       try {
         const isSuperUser =

@@ -27,6 +27,21 @@
               class="w-full max-w-md px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
 
+             <div v-if="!zone_id_query_set">
+            <label class="block text-gray-700">Property Zone</label>
+            <select v-model="zone_id" class="custom-input" @change="fetchProperties(`/get_properties?page=1&page_size=${pageSize}`)">
+              <option value="">Select Zone</option>
+              <option 
+                v-for="zone in zones" 
+                :key="zone.id" 
+                :value="zone.id"
+              >
+                {{ zone.name }}
+              </option>
+            </select>
+          </div>
+
+
             <!-- Page Size Dropdown -->
             <div class="ml-4">
               <label for="pageSize" class="mr-2 text-gray-700">Show</label>
@@ -96,7 +111,7 @@
                     {{ property.name }}
                   </td>
                   <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
-                    {{ property.zone }}
+                    {{ property.property_zone_id }}
                   </td>
                   <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
                     {{ property.property_type }}
@@ -224,6 +239,10 @@ export default {
   components: { AddProperty, UpdateProperty, ConfirmModal, Toast, Manager },
   data() {
     return {
+      zones:[],
+      zone_id:'',
+      zone_id_query_set:false,
+      by_zone:false,
       properties: [],
       visible: false,
       updateVisible: false,
@@ -263,12 +282,12 @@ export default {
       return filtered;
     },
   },
-  mounted() {
+  async mounted() {
     this.fetchProperties(`/get_properties?page=1&page_size=${this.pageSize}`);
-  },
-  methods: {
-    async fetchProperties(url = `/get_properties?page=1&page_size=${this.pageSize}`) {
-      try {
+    if(this.$route.query.zone_id){
+      this.zone_id_query_set=true;
+    }
+     try {
         const isSuperUser =
           localStorage.getItem("is_superuser") == "1" ||
           localStorage.getItem("is_superuser") === "true";
@@ -277,17 +296,46 @@ export default {
           ? {}
           : { owner_id__email: localStorage.getItem("email") };
 
-        const response = await this.$apiGet(url, params);
+        const response = await this.$apiGet(`/get_property_zones`, params);
 
-        this.properties = response.data || [];
+        this.zones = response.data || [];
         this.currentPage = response.current_page;
         this.totalPages = response.total_pages;
         this.next = response.next;
         this.previous = response.previous;
       } catch (err) {
-        console.error("Failed to fetch properties", err);
-        alert("Could not load properties.");
+        console.error("Error fetching zones:", err);
+        this.zones = [];
       }
+
+  },
+  methods: {
+
+    async fetchProperties(url = `/get_properties?page=1&page_size=${this.pageSize}`) {
+    try {
+    const isSuperUser =
+    localStorage.getItem("is_superuser") == "1" ||
+    localStorage.getItem("is_superuser") === "true";
+     let params = {};
+   if (this.$route.query.zone_id ||this.zone_id) {
+    // If zone_id is in query → always filter by zone
+    params = { property_zone_id: this.$route.query.zone_id || this.zone_id };
+  } else if (!isSuperUser) {
+    // If not superuser and no zone_id → filter by email
+    params = { property_zone_id__owner_id__email: localStorage.getItem("email") };
+  }
+  console.log("params", params);
+  const response = await this.$apiGet(url, params);
+  this.properties = response.data || [];
+  this.currentPage = response.current_page;
+  this.totalPages = response.total_pages;
+  this.next = response.next;
+  this.previous = response.previous;
+} catch (err) {
+  console.error("Failed to fetch properties", err);
+  alert("Could not load properties.");
+}
+
     },
     sortBy(key) {
       if (this.sortKey === key) {
