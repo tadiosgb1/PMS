@@ -146,7 +146,10 @@ export async function apiGetById(url, id, customHeaders = {}) {
 
 // Function to make a POST request
 export async function apiPost(url, data, customHeaders = {}) {
+
   console.log("url is", url);
+  console.log("payload",data);
+
   const apiClient = getApiClient(); // Get the API client instance
   console.log("url data headers custom",url,data,customHeaders);
   try {
@@ -154,7 +157,7 @@ export async function apiPost(url, data, customHeaders = {}) {
     const response = await apiClient.post(url, data, { headers });
     return response.data;
   } catch (error) {
-    console.log("error in put", error);
+    console.log("error in post", error);
     const handledError = handleApiError(error); // Handle error
     throw handledError; // Re-throw the error so the caller can catch it
   }
@@ -472,4 +475,31 @@ export function convertImageToBase64(file) {
     reader.onload = () => resolve(reader.result);
     reader.onerror = error => reject(error);
   });
+}
+
+/**
+ * Check if the user has a specific permission
+ * @param {string} permission - permission to check, e.g., 'add_user'
+ * @returns {boolean} - true if permission exists, false otherwise
+ */
+export function hasPermission(permission) {
+  // Get permissions from localStorage (stored as JSON array)
+  const userPermissions = JSON.parse(localStorage.getItem('permissions') || '[]');
+
+  // If permission exists directly
+  if (userPermissions.includes(permission)) return true;
+
+  // Get groups from localStorage (stored as JSON array)
+  const groups = JSON.parse(localStorage.getItem('groups') || '[]');
+
+  // Check if any group contains the permission
+  for (let group of groups) {
+    // Assuming each group has a "permissions" array
+    if (group.permissions && group.permissions.includes(permission)) {
+      return true;
+    }
+  }
+
+  // Permission not found
+  return false;
 }

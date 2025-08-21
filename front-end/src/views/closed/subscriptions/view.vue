@@ -172,11 +172,12 @@ export default {
     async fetch() {
       try {
         const params = {
-          user_id_email: localStorage.getItem("email"),
+         owner_id__email: localStorage.getItem("email"),
         };
-        const res = await this.$apiGet("/get_subscription", params);
 
+        const res = await this.$apiGet("/get_subscription", params);
         this.subscriptions = res.data || [];
+
       } catch (e) {
         console.error("Error fetching subscriptions", e);
         this.subscriptions = [];

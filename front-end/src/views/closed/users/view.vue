@@ -16,6 +16,12 @@
           </button>
         </div>
 
+
+        <div>
+
+       <router-link :to="{ name: 'owners' }" class="mx-5 mt-10 text-blue-500">Go to Owners</router-link>
+
+        </div>
         <!-- Body -->
         <div class="p-6">
           <!-- Search & Page Size -->

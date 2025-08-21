@@ -33,6 +33,7 @@ import plans_view from '../views/closed/plans/view.vue';
 import subscriptions_view from '../views/closed/subscriptions/view.vue'
 import view_groups from '../views/closed/groups/view.vue'
 import view_managers from '../views/closed/managers/view.vue'
+import view_owners from '../views/closed/owners/view.vue'
 
 const routes = [
   {
@@ -103,6 +104,7 @@ const routes = [
       { path: '/subscriptions_view', name: 'subscriptions_view', component: subscriptions_view },
       { path: '/groups', name: 'groups', component: view_groups },
       { path: '/managers', name: 'managers', component: view_managers},
+       { path: '/owners', name: 'owners', component: view_owners},
 
     ]
   },
