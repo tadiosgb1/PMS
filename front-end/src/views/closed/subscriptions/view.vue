@@ -171,11 +171,15 @@ export default {
   methods: {
     async fetch() {
       try {
+
         const params = {
-         owner_id__email: localStorage.getItem("email"),
+         user_id__id: localStorage.getItem("userId"),
         };
 
+       console.log("params",params);
+
         const res = await this.$apiGet("/get_subscription", params);
+       
         this.subscriptions = res.data || [];
 
       } catch (e) {

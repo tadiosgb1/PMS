@@ -14,9 +14,9 @@
               <option 
                 v-for="manager in managers" 
                 :key="manager.id" 
-                :value="manager.id"
+                :value="manager.manager.id"
               >
-                {{ manager.first_name }}
+                {{ manager.manager.first_name }}
               </option>
             </select>
           </div>
@@ -52,9 +52,23 @@ export default {
     };
   },
   async mounted(){
-        const res = await this.$apiGet(`/get_managers`);
+    if(localStorage.getItem('is_superuser')==true){
+      const res = await this.$apiGet(`/get_managers`);
         console.log("res managers", res);
         this.managers = res.data || [];
+    }else{
+      console.log("managers for the owner")
+     const params={
+      owner__id:localStorage.getItem("userId")
+    }
+    console.log("params",params)
+
+    const res = await this.$apiGet(`/get_owner_managers`,params);
+        console.log("res managers", res);
+        this.managers = res.data || [];
+    }
+    
+       
   },
   methods: {
     async submitForm() {
