@@ -20,6 +20,7 @@
         <div class="p-6">
           <!-- Search & Page Size -->
           <div class="flex justify-between items-center mb-6">
+            
             <input
               v-model="searchTerm"
               type="search"
@@ -148,11 +149,11 @@
                       <i class="fas fa-trash-alt"></i>
                     </button>
                     <button
-                      @click="managerVissible = true"
+                      @click="managers(property.id)"
                       class="text-green-600"
                       title="Property Manager"
                     >
-                      Property Manager
+                     Managers
                     </button>
                     <button
                       @click="rentPay(property.id)"
@@ -217,11 +218,6 @@
         message="Are you sure you want to delete this property?"
         @confirm="confirmDelete"
         @cancel="confirmVisible = false"
-      />
-      <Manager
-        v-if="managerVissible"
-        :visible="managerVissible"
-        @close="managerVissible = false"
       />
     </div>
   </div>
@@ -310,6 +306,12 @@ export default {
 
   },
   methods: {
+     managers(property_id){
+    this.$router.push({
+      path: '/managers',
+      query: { property_id: property_id }
+    });
+  },
 
     async fetchProperties(url = `/get_properties?page=1&page_size=${this.pageSize}`) {
     try {

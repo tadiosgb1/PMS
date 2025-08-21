@@ -20,6 +20,7 @@
         <div>
 
        <router-link :to="{ name: 'owners' }" class="mx-5 mt-10 text-blue-500">Go to Owners</router-link>
+       <router-link :to="{ name: 'managers' }" class="mx-5 mt-10 text-blue-500">Go to Managers</router-link>
 
         </div>
         <!-- Body -->

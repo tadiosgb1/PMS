@@ -24,16 +24,18 @@
           @submit.prevent="submitForm"
           class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 max-h-[80vh] overflow-y-auto"
         >
-          <!-- Owner -->
-
           <div>
-            <label class="block text-gray-700">Name</label>
-            <input
-              v-model="form.name"
-              type="text"
-              class="custom-input"
-              required
-            />
+            <label class="block text-gray-700">Zone manager</label>
+            <select v-model="form.manager_id" class="custom-input">
+              <option value="">Select Manager</option>
+              <option 
+                v-for="manager in managers" 
+                :key="manager.id" 
+                :value="manager.id"
+              >
+                {{ manager.first_name }}
+              </option>
+            </select>
           </div>
           <div>
             <label class="block text-gray-700">Property Zone</label>
@@ -47,6 +49,16 @@
                 {{ zone.name }}
               </option>
             </select>
+          </div>
+
+           <div>
+            <label class="block text-gray-700">Name</label>
+            <input
+              v-model="form.name"
+              type="text"
+              class="custom-input"
+              required
+            />
           </div>
 
           <div>
@@ -148,6 +160,7 @@ export default {
   },
   data() {
     return {
+      managers:[],
       users: [],
       zones:[],
       form: {
@@ -169,6 +182,9 @@ export default {
     };
   },
   async mounted() {
+    const res = await this.$apiGet(`/get_managers`);
+        console.log("res managers", res);
+        this.managers = res.data || [];
     this.fetchUser();
       try {
         const isSuperUser =

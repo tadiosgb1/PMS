@@ -13,6 +13,25 @@
       <!-- Form -->
       <form @submit.prevent="submitForm" class="space-y-4 px-4 py-4">
         <!-- Row 1: Email & Phone -->
+
+          <!-- Property Zone -->
+        <div>
+          <label class="block text-sm font-medium mb-1">Property Zone</label>
+          <select
+            v-model="form.property_zone"
+            required
+            class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+          >
+            <option disabled value="">Select Zone</option>
+            <option
+              v-for="zone in zones"
+              :key="zone.id"
+              :value="zone.id"
+            >
+              {{ zone.name }}
+            </option>
+          </select>
+        </div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-medium mb-1">Email</label>
@@ -85,24 +104,7 @@
           ></textarea>
         </div>
 
-        <!-- Property Zone -->
-        <div>
-          <label class="block text-sm font-medium mb-1">Property Zone</label>
-          <select
-            v-model="form.property_zone"
-            required
-            class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
-          >
-            <option disabled value="">Select Zone</option>
-            <option
-              v-for="zone in propertyZones"
-              :key="zone.id"
-              :value="zone.id"
-            >
-              {{ zone.name }}
-            </option>
-          </select>
-        </div>
+      
 
         <!-- Actions -->
         <div class="flex justify-end space-x-3 pt-4 border-t mt-4">
@@ -127,10 +129,7 @@ export default {
   data() {
     return {
       managerVisible: false,
-      propertyZones: [
-        { id: 101, name: "Zone 1" },
-        { id: 102, name: "Zone 2" }
-      ],
+      zones:[],
       form: {
         email: "",
         first_name: "",
@@ -139,17 +138,40 @@ export default {
         phone_number: "",
         address: "",
         property_zone: "",
-        owner_id:''
+        owner_id:localStorage.getItem('userId'),
+        is_manager:true,
       }
     };
   },
+ async  mounted(){
+
+      try {
+        const isSuperUser =
+          localStorage.getItem("is_superuser") == "1" ||
+          localStorage.getItem("is_superuser") === "true";
+        const params = isSuperUser
+          ? {}
+          : { owner_id__email: localStorage.getItem("email") };
+        const response = await this.$apiGet('/get_property_zones', params);
+        this.zones = response.data || [];
+      } catch (err) {
+        console.error("Error fetching zones:", err);
+        this.zones = [];
+      }
+    
+  },
   methods: {
+   
     close() {
       this.resetForm();
       this.managerVisible = false;
     },
     async submitForm() {
-      const res = await this.$apiPost('/create_manager',this.form)
+      console.log("this.form",this.form)
+      const res = await this.$apiPost('/sign_up',this.form);
+
+      console.log("res manager add",res);
+
       this.resetForm();
       this.close();
     },
@@ -161,7 +183,9 @@ export default {
         last_name: "",
         phone_number: "",
         address: "",
-        property_zone: ""
+        owner_id:localStorage.getItem('userId'),
+        property_zone: "",
+        is_manager:true,
       };
     }
   }

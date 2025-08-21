@@ -9,6 +9,13 @@
           Property Zones
 
           <button
+            @click="managerVissible = true"
+            class="bg-white text-blue-700 font-semibold px-1 lg:px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300"
+          >
+            <span class="text-primary">+</span> Add manager
+          </button>
+
+          <button
             @click="visible = true"
             class="bg-white text-blue-700 font-semibold px-1 lg:px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300"
           >
@@ -93,6 +100,9 @@
                     <button @click="properties(zone.id)" class="text-blue-600 hover:text-blue-800">
                      Properties
                     </button>
+                       <button @click="managers(zone.id)" class="text-blue-600 hover:text-blue-800">
+                       Managers
+                    </button>
                   </td>
                 </tr>
                 <tr v-if="filteredAndSortedZones.length === 0">
@@ -138,7 +148,16 @@
         @confirm="confirmDelete"
         @cancel="confirmVisible = false"
       />
+
+      <Manager
+        v-if="managerVissible"
+        :visible="managerVissible"
+        @close="managerVissible = false"
+      />
     </div>
+
+
+
   </div>
 </template>
 
@@ -147,6 +166,8 @@ import Toast from "../../../components/Toast.vue";
 import AddZone from "./add.vue";
 import UpdateZone from "./update.vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
+import Manager from "../managers/add.vue";
+
 
 const SortIcon = {
   props: ["field", "sortKey", "sortAsc"],
@@ -166,9 +187,10 @@ const SortIcon = {
 };
 
 export default {
-  components: { AddZone, UpdateZone, ConfirmModal, SortIcon, Toast },
+  components: { AddZone, UpdateZone, ConfirmModal, SortIcon, Toast,Manager },
   data() {
     return {
+      managerVissible:false,
       visible: false,
       updateVisible: false,
       confirmVisible: false,
@@ -206,16 +228,23 @@ export default {
       return filtered;
     },
   },
-  mounted() {
+    mounted() {
     this.fetchZones(`/get_property_zones?page=1&page_size=${this.pageSize}`);
   },
   methods: {
+    managers(zone_id){
+    this.$router.push({
+      path: '/managers',
+      query: { zone_id: zone_id }
+    });
+    },
     properties(zone_id){
     this.$router.push({
       path: '/properties',
       query: { zone_id: zone_id }
     });
     },
+
     async fetchZones(url = `/get_property_zones?page=1&page_size=${this.pageSize}`) {
       try {
         const isSuperUser =

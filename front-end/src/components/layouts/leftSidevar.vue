@@ -116,42 +116,13 @@ export default {
           icon: "fas fa-users",
           color: "#ef4444",
         },
-        {
-          name: "Payments",
-          route: "payments",
-          icon: "fas fa-money-bill-wave",
-          color: "#22c55e",
-        },
-        {
-          name: "Maintenance",
-          route: "maintenance",
-          icon: "fas fa-tools",
-          color: "#eab308",
-        },
-        {
-          name: "Leases",
-          route: "leases",
-          icon: "fas fa-file-signature",
-          color: "#8b5cf6",
-        },
-        {
-          name: "Reports",
-          route: "reports",
-          icon: "fas fa-chart-bar",
-          color: "#ec4899",
-        },
-        {
-          name: "Messages",
-          route: "messages",
-          icon: "fas fa-envelope",
-          color: "#0ea5e9",
-        },
-        {
-          name: "Settings",
-          route: "settings",
-          icon: "fas fa-cogs",
-          color: "#84cc16",
-        },
+        // {
+        //   name: "Payments",
+        //   route: "payments",
+        //   icon: "fas fa-money-bill-wave",
+        //   color: "#22c55e",
+        // },
+       
       ],
     };
   },

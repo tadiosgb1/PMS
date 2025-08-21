@@ -7,13 +7,24 @@
         <button @click="$emit('close')" class="text-white font-bold">✕</button>
       </div>
       <form @submit.prevent="submitForm" class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6">
+      <div>
+            <label class="block text-gray-700">Zone manager</label>
+            <select v-model="form.manager_id" class="custom-input">
+              <option value="">Select Manager</option>
+              <option 
+                v-for="manager in managers" 
+                :key="manager.id" 
+                :value="manager.id"
+              >
+                {{ manager.first_name }}
+              </option>
+            </select>
+          </div>
         <div><label class="block text-gray-700">Name</label><input v-model="form.name" class="custom-input" /></div>
         <div><label class="block text-gray-700">Address</label><input v-model="form.address" class="custom-input" /></div>
         <div><label class="block text-gray-700">City</label><input v-model="form.city" class="custom-input" /></div>
         <div><label class="block text-gray-700">State</label><input v-model="form.state" class="custom-input" /></div>
-        <div><label class="block text-gray-700">Owner ID</label><input v-model="form.owner_id" type="number" class="custom-input" /></div>
-        <div><label class="block text-gray-700">Manager ID</label><input v-model="form.manager_id" type="number" class="custom-input" /></div>
-        <div class="md:col-span-2 text-right">
+          <div class="md:col-span-2 text-right">
           <button type="submit" class="bg-primary hover:bg-primary text-white px-6 py-2 rounded">Save</button>
         </div>
       </form>
@@ -29,15 +40,21 @@ export default {
   components:{Toast},
   data() {
     return {
+      managers:[],
       form: {
         owner_id:localStorage.getItem('userId'),
         name: '',
         address: '',
         city: '',
         state: '',
-        manager_id: null
+        manager_id: '',
       }
     };
+  },
+  async mounted(){
+        const res = await this.$apiGet(`/get_managers`);
+        console.log("res managers", res);
+        this.managers = res.data || [];
   },
   methods: {
     async submitForm() {
