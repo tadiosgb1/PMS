@@ -12,7 +12,6 @@
         <div><label class="block text-gray-700">Address</label><input v-model="form.address" class="custom-input" /></div>
         <div><label class="block text-gray-700">City</label><input v-model="form.city" class="custom-input" /></div>
         <div><label class="block text-gray-700">State</label><input v-model="form.state" class="custom-input" /></div>
-        <div><label class="block text-gray-700">Owner ID</label><input v-model="form.owner_id" type="number" class="custom-input" /></div>
         <div><label class="block text-gray-700">Manager ID</label><input v-model="form.manager_id" type="number" class="custom-input" /></div>
         <div class="md:col-span-2 text-right">
           <button type="submit" class="bg-primary hover:bg-orange-600 text-white px-6 py-2 rounded">Update</button>

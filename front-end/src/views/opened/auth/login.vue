@@ -113,15 +113,22 @@ export default {
 
       try {
         const response = await this.$apiPost("/token", payload);
-        const { refresh, access, permissions ,id,is_superuser,email} = response;
+
+        console.log("response during login",response);
+
+        const { refresh, access, permissions ,id,is_superuser,email,groups} = response;
+       const user= await this.$apiGetById(`/get_user`,id);
+       const name=user.first_name;
 
         localStorage.setItem("refresh", refresh);
         localStorage.setItem("access", access);
         localStorage.setItem("permissions", JSON.stringify(permissions));
+        localStorage.setItem("groups", JSON.stringify(groups));
+
         localStorage.setItem("userId",id);
         localStorage.setItem("is_superuser",is_superuser);
         localStorage.setItem("email",email);
-
+        localStorage.setItem("name",name);
 
         this.$refs.toast?.showSuccessToastMessage("Login successful!");
         setTimeout(() => {

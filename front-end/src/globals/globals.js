@@ -4,7 +4,7 @@ import { reloadPage,apiGet,apiGetById,apiPost,apiPut,
   apiPatch,apiDelete,isStrongPassword,validateField,
   gregorianToEthiopian,getPdfBlobUrl,base64ToFile,
   processFilesToAdd,triggerFileInput,handleFileInput,toggleDragState,removeAttachment,
-  handleAnyFileInput,convertImageToBase64} from "../utils/utils"; // Adjust the path to match your project structure
+  handleAnyFileInput,convertImageToBase64,getFullNameById,getZones,getProperties,getManagers} from "../utils/utils"; // Adjust the path to match your project structure
 export default {
   
    install(app) {
@@ -63,6 +63,7 @@ export default {
       $days: days,
       $banks: banks,
       $reportTypes: reportTypes,
+      $getFullNameById:getFullNameById,
       $reloadPage: reloadPage,
       $apiGet:apiGet,
       $apiGetById:apiGetById,
@@ -83,6 +84,10 @@ export default {
       $handleAnyFileInput:handleAnyFileInput,
       $logger: Logger, 
       $convertImageToBase64:convertImageToBase64,
+      $getZones:getZones,
+      $getProperties:getProperties,
+      $getManagers:getManagers  
+
     };
     // Assign to the global properties in the Vue app
     app.config.globalProperties = {

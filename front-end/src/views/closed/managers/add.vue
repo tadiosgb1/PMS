@@ -51,15 +51,6 @@
               class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
             />
           </div>
-          <div>
-            <label class="block text-sm font-medium mb-1">Owner Id</label>
-            <input
-              v-model="form.owner_id"
-              type="number"
-              required
-              class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
         </div>
 
         <!-- Row 2: First & Last Name -->
@@ -104,6 +95,14 @@
           ></textarea>
         </div>
 
+          <div>
+          <label class="block text-sm font-medium mb-1">Password</label>
+          <input
+            v-model="form.password"
+            type="password"
+            class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+          />
+        </div>
       
 
         <!-- Actions -->
@@ -140,25 +139,14 @@ export default {
         property_zone: "",
         owner_id:localStorage.getItem('userId'),
         is_manager:true,
+        password: "",
       }
     };
   },
  async  mounted(){
-
-      try {
-        const isSuperUser =
-          localStorage.getItem("is_superuser") == "1" ||
-          localStorage.getItem("is_superuser") === "true";
-        const params = isSuperUser
-          ? {}
-          : { owner_id__email: localStorage.getItem("email") };
-        const response = await this.$apiGet('/get_property_zones', params);
-        this.zones = response.data || [];
-      } catch (err) {
-        console.error("Error fetching zones:", err);
-        this.zones = [];
-      }
-    
+  const result = await this.$getZones();
+  this.zones=result.zones;
+  console.log("zones",this.zones);
   },
   methods: {
    
@@ -186,6 +174,7 @@ export default {
         owner_id:localStorage.getItem('userId'),
         property_zone: "",
         is_manager:true,
+        password: "",
       };
     }
   }

@@ -3,18 +3,9 @@
     <Toast ref="toast" />
     <div class="min-h-screen bg-gray-100 p-6">
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
-        <div
-          class="bg-primary text-white px-6 py-4 text-xl font-bold flex justify-between items-center"
-        >
+        <!-- Header -->
+        <div class="bg-primary text-white px-6 py-4 text-xl font-bold flex justify-between items-center">
           Property Zones
-
-          <button
-            @click="managerVissible = true"
-            class="bg-white text-blue-700 font-semibold px-1 lg:px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300"
-          >
-            <span class="text-primary">+</span> Add manager
-          </button>
-
           <button
             @click="visible = true"
             class="bg-white text-blue-700 font-semibold px-1 lg:px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300"
@@ -23,6 +14,7 @@
           </button>
         </div>
 
+        <!-- Content -->
         <div class="p-6">
           <!-- Search & Page Size -->
           <div class="flex justify-between items-center mb-6">
@@ -33,18 +25,15 @@
               class="w-full max-w-md px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
 
-            <!-- Page Size Dropdown -->
             <div class="ml-4">
               <label for="pageSize" class="mr-2 text-gray-700">Show</label>
               <select
                 id="pageSize"
                 v-model="pageSize"
-                @change="fetchZones(`/get_property_zones?page=1&page_size=${pageSize}`)"
+                @change="fetchZones()"
                 class="border px-2 py-1 rounded"
               >
-                <option v-for="size in pageSizes" :key="size" :value="size">
-                  {{ size }}
-                </option>
+                <option v-for="size in pageSizes" :key="size" :value="size">{{ size }}</option>
               </select>
               <span class="ml-1 text-gray-700">per page</span>
             </div>
@@ -52,9 +41,7 @@
 
           <!-- Table -->
           <div class="overflow-x-auto">
-            <table
-              class="min-w-full table-auto border-collapse border border-gray-300"
-            >
+            <table class="min-w-full table-auto border-collapse border border-gray-300">
               <thead>
                 <tr class="bg-gray-200 text-gray-700">
                   <th class="border px-4 py-2 cursor-pointer" @click="sortBy('name')">
@@ -73,23 +60,19 @@
                     State
                     <SortIcon :field="'state'" :sort-key="sortKey" :sort-asc="sortAsc" />
                   </th>
-                  <th class="border px-4 py-2">Owner ID</th>
-                  <th class="border px-4 py-2">Manager ID</th>
+                  <th class="border px-4 py-2">Owner</th>
+                  <th class="border px-4 py-2">Manager</th>
                   <th class="border px-4 py-2 text-center">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                <tr
-                  v-for="zone in filteredAndSortedZones"
-                  :key="zone.id"
-                  class="hover:bg-gray-100"
-                >
+                <tr v-for="zone in filteredAndSortedZones" :key="zone.id" class="hover:bg-gray-100">
                   <td class="border px-4 py-2">{{ zone.name }}</td>
                   <td class="border px-4 py-2">{{ zone.address }}</td>
                   <td class="border px-4 py-2">{{ zone.city }}</td>
                   <td class="border px-4 py-2">{{ zone.state }}</td>
-                  <td class="border px-4 py-2">{{ zone.owner_id }}</td>
-                  <td class="border px-4 py-2">{{ zone.manager_id }}</td>
+                  <td class="border px-4 py-2">{{ zone.ownerName }}</td>
+                  <td class="border px-4 py-2">{{ zone.managerName }}</td>
                   <td class="border px-4 py-2 text-center space-x-2">
                     <button @click="editZone(zone)" class="text-blue-600 hover:text-blue-800">
                       <i class="fas fa-edit"></i>
@@ -98,17 +81,12 @@
                       <i class="fas fa-trash-alt"></i>
                     </button>
                     <button @click="properties(zone.id)" class="text-blue-600 hover:text-blue-800">
-                     Properties
-                    </button>
-                       <button @click="managers(zone.id)" class="text-blue-600 hover:text-blue-800">
-                       Managers
+                      Properties
                     </button>
                   </td>
                 </tr>
                 <tr v-if="filteredAndSortedZones.length === 0">
-                  <td colspan="7" class="text-center py-6 text-gray-500">
-                    No zones found.
-                  </td>
+                  <td colspan="7" class="text-center py-6 text-gray-500">No zones found.</td>
                 </tr>
               </tbody>
             </table>
@@ -116,21 +94,11 @@
 
           <!-- Pagination -->
           <div class="flex justify-between items-center mt-4">
-            <button
-              :disabled="!previous"
-              @click="fetchZones(previous)"
-              class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
-            >
+            <button :disabled="!previous" @click="fetchZones(previous)" class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50">
               Previous
             </button>
-            <span class="text-gray-600">
-              Page {{ currentPage }} of {{ totalPages }}
-            </span>
-            <button
-              :disabled="!next"
-              @click="fetchZones(next)"
-              class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
-            >
+            <span class="text-gray-600">Page {{ currentPage }} of {{ totalPages }}</span>
+            <button :disabled="!next" @click="fetchZones(next)" class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50">
               Next
             </button>
           </div>
@@ -148,16 +116,7 @@
         @confirm="confirmDelete"
         @cancel="confirmVisible = false"
       />
-
-      <Manager
-        v-if="managerVissible"
-        :visible="managerVissible"
-        @close="managerVissible = false"
-      />
     </div>
-
-
-
   </div>
 </template>
 
@@ -166,8 +125,6 @@ import Toast from "../../../components/Toast.vue";
 import AddZone from "./add.vue";
 import UpdateZone from "./update.vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
-import Manager from "../managers/add.vue";
-
 
 const SortIcon = {
   props: ["field", "sortKey", "sortAsc"],
@@ -187,32 +144,30 @@ const SortIcon = {
 };
 
 export default {
-  components: { AddZone, UpdateZone, ConfirmModal, SortIcon, Toast,Manager },
+  components: { AddZone, UpdateZone, ConfirmModal, SortIcon, Toast },
   data() {
     return {
-      managerVissible:false,
+      globalZones: [],
       visible: false,
       updateVisible: false,
       confirmVisible: false,
       zoneToEdit: null,
       zoneToDelete: null,
-      zones: [],
       searchTerm: "",
       sortKey: "name",
       sortAsc: true,
-      // Pagination data
-      pageSize: 10,
-      pageSizes: [5, 10, 20, 50, 100],
       currentPage: 1,
       totalPages: 1,
       next: null,
       previous: null,
+      pageSize: 10,
+      pageSizes: [1,5, 10, 20, 50, 100],
     };
   },
   computed: {
     filteredAndSortedZones() {
       const term = this.searchTerm.toLowerCase();
-      let filtered = this.zones.filter(
+      let filtered = this.globalZones.filter(
         (z) =>
           z.name.toLowerCase().includes(term) ||
           z.address.toLowerCase().includes(term) ||
@@ -228,46 +183,27 @@ export default {
       return filtered;
     },
   },
-    mounted() {
-    this.fetchZones(`/get_property_zones?page=1&page_size=${this.pageSize}`);
+  async mounted() {
+    await this.fetchZones();
   },
   methods: {
-    managers(zone_id){
-    this.$router.push({
-      path: '/managers',
-      query: { zone_id: zone_id }
-    });
-    },
-    properties(zone_id){
-    this.$router.push({
-      path: '/properties',
-      query: { zone_id: zone_id }
-    });
-    },
-
     async fetchZones(url = `/get_property_zones?page=1&page_size=${this.pageSize}`) {
       try {
-        const isSuperUser =
-          localStorage.getItem("is_superuser") == "1" ||
-          localStorage.getItem("is_superuser") === "true";
-
-        const params = isSuperUser
-          ? {}
-          : { owner_id__email: localStorage.getItem("email") };
-
-        const response = await this.$apiGet(url, params);
-
-        this.zones = response.data || [];
-        this.currentPage = response.current_page;
-        this.totalPages = response.total_pages;
-        this.next = response.next;
-        this.previous = response.previous;
+        const result = await this.$getZones(url); // use global function
+        this.globalZones = result.zones;
+        this.currentPage = result.currentPage;
+        this.totalPages = result.totalPages;
+        this.next = result.next;
+        this.previous = result.previous;
       } catch (err) {
         console.error("Error fetching zones:", err);
-        this.zones = [];
+        this.globalZones = [];
+        this.currentPage = 1;
+        this.totalPages = 1;
+        this.next = null;
+        this.previous = null;
       }
     },
-
     editZone(zone) {
       this.zoneToEdit = zone;
       this.updateVisible = true;
@@ -280,21 +216,20 @@ export default {
       this.confirmVisible = false;
       try {
         await this.$apiDelete(`/delete_property_zone/${this.zoneToDelete.id}`);
-        this.$root.$refs.toast.showToast("Zone deleted successfully", "success");
-        this.fetchZones(`/get_property_zones?page=1&page_size=${this.pageSize}`);
+        this.$refs.toast.showToast("Zone deleted successfully", "success");
+        await this.fetchZones();
       } catch (err) {
         this.$refs.toast.showToast("Failed to delete zone", "error");
         console.error(err);
       }
       this.zoneToDelete = null;
     },
+    properties(zone_id) {
+      this.$router.push({ path: "/properties", query: { zone_id } });
+    },
     sortBy(key) {
-      if (this.sortKey === key) {
-        this.sortAsc = !this.sortAsc;
-      } else {
-        this.sortKey = key;
-        this.sortAsc = true;
-      }
+      if (this.sortKey === key) this.sortAsc = !this.sortAsc;
+      else { this.sortKey = key; this.sortAsc = true; }
     },
   },
 };

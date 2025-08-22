@@ -134,7 +134,7 @@ export default {
   components: { Sidebar },
   data() {
     return {
-      name:"",
+      name:localStorage.getItem('name'),
       showSidebar: false,
       isLangOpen: false,
       isProfileDropdownOpen: false,

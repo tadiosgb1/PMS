@@ -28,7 +28,7 @@
             <select
               id="pageSize"
               v-model="pageSize"
-              @change="fetchManagers(`/get_managers?page=1&page_size=${pageSize}`)"
+              @change="fetchManagers()"
               class="border px-2 py-1 rounded"
             >
               <option v-for="size in pageSizes" :key="size" :value="size">{{ size }}</option>
@@ -52,18 +52,18 @@
               </tr>
             </thead>
             <tbody>
-              <tr v-for="manager in filteredAndSortedManagers" :key="manager.id" class="hover:bg-gray-100">
-                <td class="border border-gray-300 px-4 py-2">{{ manager.first_name }} {{ manager.middle_name }} {{ manager.last_name }}</td>
-                <td class="border border-gray-300 px-4 py-2">{{ manager.groups.join(", ") }}</td>
-                <td class="border border-gray-300 px-4 py-2">{{ manager.is_active ? 'Yes' : 'No' }}</td>
+              <tr v-for="manager in filteredAndSortedManagers" :key="manager.manager.id" class="hover:bg-gray-100">
+                <td class="border border-gray-300 px-4 py-2">{{ manager.manager.first_name }} {{ manager.manager.middle_name }} {{ manager.manager.last_name }}</td>
+                <td class="border border-gray-300 px-4 py-2">{{ manager.manager.groups.join(", ") }}</td>
+                <td class="border border-gray-300 px-4 py-2">{{ manager.manager.is_active ? 'Yes' : 'No' }}</td>
                 <td class="border border-gray-300 px-4 py-2 text-center space-x-2">
-                  <router-link :to="`/manager_detail/${manager.id}`" class="text-green-600 hover:text-green-800" title="View">
+                  <router-link :to="`/manager_detail/${manager.manager.id}`" class="text-green-600 hover:text-green-800" title="View">
                     <i class="fas fa-eye"></i>
                   </router-link>
-                  <button v-if="!manager.is_active" @click="activateManager(manager.id)" class="text-blue-600 hover:text-blue-800" title="Activate Manager">
+                  <button v-if="!manager.manager.is_active" @click="activateManager(manager.manager.id)" class="text-blue-600 hover:text-blue-800" title="Activate Manager">
                     Activate
                   </button>
-                  <button v-if="manager.is_active" @click="deactivateManager(manager.id)" class="text-blue-600 hover:text-blue-800" title="Deactivate Manager">
+                  <button v-if="manager.manager.is_active" @click="deactivateManager(manager.manager.id)" class="text-blue-600 hover:text-blue-800" title="Deactivate Manager">
                     Deactivate
                   </button>
                 </td>
@@ -88,7 +88,7 @@
       </div>
 
       <!-- Add Manager Modal -->
-      <AddManager :visible="showAddManager" @close="showAddManager = false" @success="fetchManagers(`/get_managers?page=1&page_size=${pageSize}`)" />
+      <AddManager :visible="showAddManager" @close="showAddManager = false" @success="fetchManagers()" />
     </div>
   </div>
 </template>
@@ -96,6 +96,7 @@
 <script>
 import Toast from "@/components/Toast.vue";
 import AddManager from "./add.vue";
+
 const SortIcon = {
   props: ["field", "sortKey", "sortAsc"],
   template: `
@@ -135,9 +136,9 @@ export default {
     filteredAndSortedManagers() {
       const term = this.searchTerm.toLowerCase();
       let filtered = this.managers.filter(manager =>
-        `${manager.first_name} ${manager.middle_name} ${manager.last_name}`.toLowerCase().includes(term) ||
-        manager.groups.join(", ").toLowerCase().includes(term) ||
-        (manager.is_active ? "yes" : "no").includes(term)
+        `${manager.manager.first_name} ${manager.manager.middle_name} ${manager.manager.last_name}`.toLowerCase().includes(term) ||
+        manager.manager.groups.join(", ").toLowerCase().includes(term) ||
+        (manager.manager.is_active ? "yes" : "no").includes(term)
       );
 
       filtered.sort((a, b) => {
@@ -151,39 +152,43 @@ export default {
       return filtered;
     },
   },
- mounted() {
-    this.fetchManagers(`/get_managers?page=1&page_size=${this.pageSize}`);
+  mounted() {
+    this.fetchManagers();
   },
   methods: {
-    async fetchManagers(url = `/get_managers?page=1&page_size=${this.pageSize}`) {
+    async fetchManagers(url = null) {
       try {
-        const res = await this.$apiGet(url);
-        console.log("res managers", res);
-        this.managers = res.data || [];
-        this.currentPage = res.current_page;
-        this.totalPages = res.total_pages;
-        this.next = res.next;
-        this.previous = res.previous;
+        const result = await this.$getManagers(); // Global function handles URL & params
+        console.log("result", result);
+
+        this.managers = result.managers;
+        this.currentPage = result.currentPage;
+        this.totalPages = result.totalPages;
+        this.next = result.next;
+        this.previous = result.previous;
       } catch (err) {
-        console.error(err);
+        console.error("Failed to fetch managers:", err);
         this.managers = [];
+        this.currentPage = 1;
+        this.totalPages = 1;
+        this.next = null;
+        this.previous = null;
       }
     },
     sortBy(key) {
-      this.sortKey = key === "fullName" ? "fullName" : key;
       if (this.sortKey === key) this.sortAsc = !this.sortAsc;
-      else this.sortAsc = true;
+      else { this.sortKey = key; this.sortAsc = true; }
     },
     activateManager(id) {
       this.$apiPost(`/activate_user/${id}`, { id }).then(res => {
         this.$refs.toast.showToast(res.message, "success");
-        this.fetchManagers(`/get_managers?page=1&page_size=${this.pageSize}`);
+        this.fetchManagers();
       });
     },
     deactivateManager(id) {
-      this.$apiDelete(`/deactivate_user`, id).then(res => {
+      this.$apiDelete(`/deactivate_user`, { id }).then(res => {
         this.$refs.toast.showToast(res.message, "success");
-        this.fetchManagers(`/get_managers?page=1&page_size=${this.pageSize}`);
+        this.fetchManagers();
       });
     }
   },

@@ -28,15 +28,16 @@
             <label class="block text-gray-700">Zone manager</label>
             <select v-model="form.manager_id" class="custom-input">
               <option value="">Select Manager</option>
-              <option 
+              <option  class="text-black"
                 v-for="manager in managers" 
-                :key="manager.id" 
-                :value="manager.id"
+                :key="manager.manager.id" 
+                :value="manager.manager.id"
               >
-                {{ manager.first_name }}
+                {{ manager.manager.first_name }} {{ manager.manager.middle_name }}
               </option>
             </select>
           </div>
+
           <div>
             <label class="block text-gray-700">Property Zone</label>
             <select v-model="form.property_zone_id" class="custom-input">
@@ -160,6 +161,7 @@ export default {
   },
   data() {
     return {
+    
       managers:[],
       users: [],
       zones:[],
@@ -182,30 +184,57 @@ export default {
     };
   },
   async mounted() {
-    const res = await this.$apiGet(`/get_managers`);
+   // alert("hh")
+
+    if(localStorage.getItem('is_superuser')==true){
+      const res = await this.$apiGet(`/get_managers`);
         console.log("res managers", res);
         this.managers = res.data || [];
-    this.fetchUser();
-      try {
-        const isSuperUser =
-          localStorage.getItem("is_superuser") == "1" ||
-          localStorage.getItem("is_superuser") === "true";
+    }else{
+      console.log("managers for the owner")
+     const params={
+      owner__id:localStorage.getItem("userId")
+    }
+    console.log("params",params)
 
-        const params = isSuperUser
-          ? {}
-          : { owner_id__email: localStorage.getItem("email") };
+    const res = await this.$apiGet(`/get_owner_managers`,params);
+        console.log("res managers", res);
+        this.managers = res.data || [];
+    }
+    // this.fetchUser();
+    //zones fetch
 
-        const response = await this.$apiGet(`/get_property_zones`, params);
 
-        this.zones = response.data || [];
+      // try {
+      //   const isSuperUser =
+      //     localStorage.getItem("is_superuser") == "1" ||
+      //     localStorage.getItem("is_superuser") === "true";
+      //   const params = isSuperUser
+      //     ? {}
+      //     : { manager_id__email: localStorage.getItem("email") };
 
-        console.log("zones",this.zones);
+      //   const response = await this.$apiGet(`/get_property_zones`, params);
 
-      } catch (err) {
-        console.error("Error fetching zones:", err);
-        this.zones = [];
-      }
+      //   this.zones = response.data || [];
+
+      //   console.log("zones",this.zones);
+
+      // } catch (err) {
+      //   console.error("Error fetching zones:", err);
+      //   this.zones = [];
+      // }
+
+
+
+          const result = await this.$getZones();
+          this.zones=result.zones;
+
+          console.log("zones",this.zones);
+
+
+
   },
+
   methods: {
     async submitForm() {
       console.log("Payload proporty", this.form);
@@ -225,10 +254,10 @@ export default {
         alert("Failed to save property");
       }
     },
-    async fetchUser() {
-      const response = await this.$apiGet("/get_users");
-      this.users = response.data;
-    },
+    // async fetchUser() {
+    //   const response = await this.$apiGet("/get_users");
+    //   this.users = response.data;
+    // },
     resetForm() {
       this.form = {
         owner_id: "",
