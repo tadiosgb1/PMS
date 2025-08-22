@@ -1,13 +1,15 @@
 import axios from "axios";
-import { Logger } from "../utils/logger"; 
-import { reloadPage,apiGet,apiGetById,apiPost,apiPut,
-  apiPatch,apiDelete,isStrongPassword,validateField,
-  gregorianToEthiopian,getPdfBlobUrl,base64ToFile,
-  processFilesToAdd,triggerFileInput,handleFileInput,toggleDragState,removeAttachment,
-  handleAnyFileInput,convertImageToBase64,getFullNameById,getZones,getProperties,getManagers} from "../utils/utils"; // Adjust the path to match your project structure
+import { Logger } from "../utils/logger";
+import {
+  reloadPage, apiGet, apiGetById, apiPost, apiPut,
+  apiPatch, apiDelete, isStrongPassword, validateField,
+  gregorianToEthiopian, getPdfBlobUrl, base64ToFile,
+  processFilesToAdd, triggerFileInput, handleFileInput, toggleDragState, removeAttachment,
+  handleAnyFileInput, convertImageToBase64, getFullNameById, getZones, getProperties, getManagers, hasPermission
+} from "../utils/utils"; // Adjust the path to match your project structure
 export default {
-  
-   install(app) {
+
+  install(app) {
     // Check environment and set base URL
     const isProduction = import.meta.env.MODE === "production";
     const baseUrl = isProduction
@@ -29,7 +31,7 @@ export default {
     const currentYear = new Date().getFullYear();
     const years = Array.from({ length: 56 }, (v, i) => currentYear - 5 + i);
 
-    const months = [ 
+    const months = [
       { value: 1, name: "January" },
       { value: 2, name: "February" },
       { value: 3, name: "March" },
@@ -63,30 +65,31 @@ export default {
       $days: days,
       $banks: banks,
       $reportTypes: reportTypes,
-      $getFullNameById:getFullNameById,
+      $getFullNameById: getFullNameById,
       $reloadPage: reloadPage,
-      $apiGet:apiGet,
-      $apiGetById:apiGetById,
-      $apiPost:apiPost,
-      $apiPut:apiPut,
-      $apiPatch:apiPatch,
-      $apiDelete:apiDelete,
-      $isStrongPassword:isStrongPassword,
-      $validateField:validateField,
-      $gcEthio:gregorianToEthiopian, 
-      $getPdfBlobUrl:getPdfBlobUrl, 
-      $base64ToFile:base64ToFile,
-      $processFilesToAdd:processFilesToAdd, 
-      $triggerFileInput:triggerFileInput,
-      $handleFileInput:handleFileInput,
-      $toggleDragState:toggleDragState,
-      $removeAttachment:removeAttachment,
-      $handleAnyFileInput:handleAnyFileInput,
-      $logger: Logger, 
-      $convertImageToBase64:convertImageToBase64,
-      $getZones:getZones,
-      $getProperties:getProperties,
-      $getManagers:getManagers  
+      $apiGet: apiGet,
+      $apiGetById: apiGetById,
+      $apiPost: apiPost,
+      $apiPut: apiPut,
+      $apiPatch: apiPatch,
+      $apiDelete: apiDelete,
+      $isStrongPassword: isStrongPassword,
+      $validateField: validateField,
+      $gcEthio: gregorianToEthiopian,
+      $getPdfBlobUrl: getPdfBlobUrl,
+      $base64ToFile: base64ToFile,
+      $processFilesToAdd: processFilesToAdd,
+      $triggerFileInput: triggerFileInput,
+      $handleFileInput: handleFileInput,
+      $toggleDragState: toggleDragState,
+      $removeAttachment: removeAttachment,
+      $handleAnyFileInput: handleAnyFileInput,
+      $logger: Logger,
+      $convertImageToBase64: convertImageToBase64,
+      $getZones: getZones,
+      $getProperties: getProperties,
+      $getManagers: getManagers,
+      $hasPermission: hasPermission
 
     };
     // Assign to the global properties in the Vue app

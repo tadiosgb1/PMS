@@ -75,9 +75,10 @@ export default {
           user_id: this.userId,
           groups: this.selectedGroups,
         };
+
         console.log("payload", payload);
 
-        await this.$apiPost("/set_user_groups/", payload);
+        await this.$apiPost("/set_user_groups", payload);
         this.$emit("close");
       } catch (err) {
         console.error("Failed to save groups:", err);

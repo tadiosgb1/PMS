@@ -82,7 +82,7 @@ export default {
 
         console.log("Permissions", this.permissions);
 
-        await this.$apiPost("/set_user_permissions/", payload);
+        await this.$apiPost("/set_user_permissions", payload);
         this.$emit("close");
       } catch (err) {
         console.error("Failed to save permissions:", err);

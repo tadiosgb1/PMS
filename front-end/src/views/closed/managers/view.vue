@@ -5,9 +5,12 @@
     <div class="min-h-screen bg-gray-100 p-6">
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
         <!-- Header -->
-        <div class="bg-primary text-white px-6 py-4 text-xl font-bold flex justify-between items-center">
+        <div
+          class="bg-primary text-white px-6 py-4 text-xl font-bold flex justify-between items-center"
+        >
           Managers
-          <button @click="showAddManager = true"
+          <button
+            @click="showAddManager = true"
             class="bg-white text-blue-700 font-semibold px-2 lg:px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300 flex items-center"
           >
             <span class="text-primary mr-1">+</span> Add
@@ -31,7 +34,9 @@
               @change="fetchManagers()"
               class="border px-2 py-1 rounded"
             >
-              <option v-for="size in pageSizes" :key="size" :value="size">{{ size }}</option>
+              <option v-for="size in pageSizes" :key="size" :value="size">
+                {{ size }}
+              </option>
             </select>
             <span class="ml-1 text-gray-700">per page</span>
           </div>
@@ -39,37 +44,77 @@
 
         <!-- Table -->
         <div class="overflow-x-auto p-6">
-          <table class="min-w-full table-auto border-collapse border border-gray-300 text-sm">
+          <table
+            class="min-w-full table-auto border-collapse border border-gray-300 text-sm"
+          >
             <thead>
               <tr class="bg-gray-200 text-gray-700">
-                <th class="border border-gray-300 px-4 py-2 cursor-pointer" @click="sortBy('fullName')">
+                <th
+                  class="border border-gray-300 px-4 py-2 cursor-pointer"
+                  @click="sortBy('fullName')"
+                >
                   Full Name
-                  <SortIcon :field="'fullName'" :sort-key="sortKey" :sort-asc="sortAsc" />
+                  <SortIcon
+                    :field="'fullName'"
+                    :sort-key="sortKey"
+                    :sort-asc="sortAsc"
+                  />
                 </th>
                 <th class="border border-gray-300 px-4 py-2">Groups</th>
                 <th class="border border-gray-300 px-4 py-2">Active</th>
-                <th class="border border-gray-300 px-4 py-2 text-center">Actions</th>
+                <th class="border border-gray-300 px-4 py-2 text-center">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="manager in filteredAndSortedManagers" :key="manager.manager.id" class="hover:bg-gray-100">
-                <td class="border border-gray-300 px-4 py-2">{{ manager.manager.first_name }} {{ manager.manager.middle_name }} {{ manager.manager.last_name }}</td>
-                <td class="border border-gray-300 px-4 py-2">{{ manager.manager.groups.join(", ") }}</td>
-                <td class="border border-gray-300 px-4 py-2">{{ manager.manager.is_active ? 'Yes' : 'No' }}</td>
-                <td class="border border-gray-300 px-4 py-2 text-center space-x-2">
-                  <router-link :to="`/manager_detail/${manager.manager.id}`" class="text-green-600 hover:text-green-800" title="View">
+              <tr
+                v-for="manager in filteredAndSortedManagers"
+                :key="manager.id"
+                class="hover:bg-gray-100"
+              >
+                <td class="border border-gray-300 px-4 py-2">
+                  {{ manager.first_name }} {{ manager.middle_name }}
+                  {{ manager.last_name }}
+                </td>
+                <td class="border border-gray-300 px-4 py-2">
+                  {{ manager.groups.join(", ") }}
+                </td>
+                <td class="border border-gray-300 px-4 py-2">
+                  {{ manager.is_active ? "Yes" : "No" }}
+                </td>
+                <td
+                  class="border border-gray-300 px-4 py-2 text-center space-x-2"
+                >
+                  <router-link
+                    :to="`/user_detail/${manager.id}`"
+                    class="text-green-600 hover:text-green-800"
+                    title="View"
+                  >
                     <i class="fas fa-eye"></i>
                   </router-link>
-                  <button v-if="!manager.manager.is_active" @click="activateManager(manager.manager.id)" class="text-blue-600 hover:text-blue-800" title="Activate Manager">
+                  <button
+                    v-if="!manager.is_active"
+                    @click="activateUser(manager.id)"
+                    class="text-blue-600 hover:text-blue-800"
+                    title="Activate Manager"
+                  >
                     Activate
                   </button>
-                  <button v-if="manager.manager.is_active" @click="deactivateManager(manager.manager.id)" class="text-blue-600 hover:text-blue-800" title="Deactivate Manager">
+                  <button
+                    v-if="manager.is_active"
+                    @click="deactivateUser(manager.id)"
+                    class="text-blue-600 hover:text-blue-800"
+                    title="Deactivate Manager"
+                  >
                     Deactivate
                   </button>
                 </td>
               </tr>
               <tr v-if="filteredAndSortedManagers.length === 0">
-                <td colspan="4" class="text-center py-6 text-gray-500">No managers found.</td>
+                <td colspan="4" class="text-center py-6 text-gray-500">
+                  No managers found.
+                </td>
               </tr>
             </tbody>
           </table>
@@ -77,18 +122,32 @@
 
         <!-- Pagination -->
         <div class="flex justify-between items-center p-6">
-          <button :disabled="!previous" @click="fetchManagers(previous)" class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50">
+          <button
+            :disabled="!previous"
+            @click="fetchManagers(previous)"
+            class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+          >
             Previous
           </button>
-          <span class="text-gray-600">Page {{ currentPage }} of {{ totalPages }}</span>
-          <button :disabled="!next" @click="fetchManagers(next)" class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50">
+          <span class="text-gray-600"
+            >Page {{ currentPage }} of {{ totalPages }}</span
+          >
+          <button
+            :disabled="!next"
+            @click="fetchManagers(next)"
+            class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+          >
             Next
           </button>
         </div>
       </div>
 
       <!-- Add Manager Modal -->
-      <AddManager :visible="showAddManager" @close="showAddManager = false" @success="fetchManagers()" />
+      <AddManager
+        :visible="showAddManager"
+        @close="showAddManager = false"
+        @success="fetchManagers()"
+      />
     </div>
   </div>
 </template>
@@ -135,15 +194,20 @@ export default {
   computed: {
     filteredAndSortedManagers() {
       const term = this.searchTerm.toLowerCase();
-      let filtered = this.managers.filter(manager =>
-        `${manager.manager.first_name} ${manager.manager.middle_name} ${manager.manager.last_name}`.toLowerCase().includes(term) ||
-        manager.manager.groups.join(", ").toLowerCase().includes(term) ||
-        (manager.manager.is_active ? "yes" : "no").includes(term)
+      let filtered = this.managers.filter(
+        (manager) =>
+          `${manager.first_name} ${manager.middle_name} ${manager.last_name}`
+            .toLowerCase()
+            .includes(term) ||
+          manager.groups.join(", ").toLowerCase().includes(term) ||
+          (manager.is_active ? "yes" : "no").includes(term)
       );
 
       filtered.sort((a, b) => {
-        let aVal = `${a.first_name} ${a.middle_name} ${a.last_name}`.toLowerCase();
-        let bVal = `${b.first_name} ${b.middle_name} ${b.last_name}`.toLowerCase();
+        let aVal =
+          `${a.first_name} ${a.middle_name} ${a.last_name}`.toLowerCase();
+        let bVal =
+          `${b.first_name} ${b.middle_name} ${b.last_name}`.toLowerCase();
         if (aVal < bVal) return this.sortAsc ? -1 : 1;
         if (aVal > bVal) return this.sortAsc ? 1 : -1;
         return 0;
@@ -177,20 +241,23 @@ export default {
     },
     sortBy(key) {
       if (this.sortKey === key) this.sortAsc = !this.sortAsc;
-      else { this.sortKey = key; this.sortAsc = true; }
+      else {
+        this.sortKey = key;
+        this.sortAsc = true;
+      }
     },
-    activateManager(id) {
-      this.$apiPost(`/activate_user/${id}`, { id }).then(res => {
-        this.$refs.toast.showToast(res.message, "success");
+    activateUser(id) {
+      this.$apiPost(`/activate_user/${id}`, { id }).then((res) => {
+        this.$root.$refs.toast.showToast("Plan saved successfully ", "success");
         this.fetchManagers();
       });
     },
-    deactivateManager(id) {
-      this.$apiDelete(`/deactivate_user`, { id }).then(res => {
-        this.$refs.toast.showToast(res.message, "success");
+    deactivateUser(id) {
+      this.$apiDelete(`/deactivate_user`, { id }).then((res) => {
+        this.$root.$refs.toast.showToast("Plan saved successfully ", "success");
         this.fetchManagers();
       });
-    }
+    },
   },
 };
 </script>

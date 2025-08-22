@@ -89,7 +89,7 @@ function handleApiError(error) {
 function getDefaultHeaders(customHeaders = {}) {
   const token = localStorage.getItem("access"); // Access the token from localStorage
 
-  console.log("token",token);
+  console.log("token", token);
 
   // Default headers
   const defaultHeaders = {
@@ -116,7 +116,7 @@ function getDefaultHeaders(customHeaders = {}) {
 export async function apiGet(url, params = {}, customHeaders = {}) {
   const apiClient = getApiClient(); // Get the API client instance
   try {
-   const headers = getDefaultHeaders(customHeaders);
+    const headers = getDefaultHeaders(customHeaders);
     const response = await apiClient.get(url, { params, headers });
     return response.data;
   } catch (error) {
@@ -148,10 +148,10 @@ export async function apiGetById(url, id, customHeaders = {}) {
 export async function apiPost(url, data, customHeaders = {}) {
 
   console.log("url is", url);
-  console.log("payload",data);
+  console.log("payload", data);
 
   const apiClient = getApiClient(); // Get the API client instance
-  console.log("url data headers custom",url,data,customHeaders);
+  console.log("url data headers custom", url, data, customHeaders);
   try {
     const headers = getDefaultHeaders(customHeaders);
     const response = await apiClient.post(url, data, { headers });
@@ -477,31 +477,36 @@ export function convertImageToBase64(file) {
   });
 }
 
-/**
- * Check if the user has a specific permission
- * @param {string} permission - permission to check, e.g., 'add_user'
- * @returns {boolean} - true if permission exists, false otherwise
- */
-export function hasPermission(permission) {
-  // Get permissions from localStorage (stored as JSON array)
-  const userPermissions = JSON.parse(localStorage.getItem('permissions') || '[]');
 
-  // If permission exists directly
-  if (userPermissions.includes(permission)) return true;
 
-  // Get groups from localStorage (stored as JSON array)
-  const groups = JSON.parse(localStorage.getItem('groups') || '[]');
+export async function loadPermissions($apiPost) {
+  const groups = JSON.parse(localStorage.getItem("groups") || "[]");
+  let allPermissions = JSON.parse(localStorage.getItem("permissions") || "[]");
+  console.log("first permissions", allPermissions);
 
-  // Check if any group contains the permission
-  for (let group of groups) {
-    // Assuming each group has a "permissions" array
-    if (group.permissions && group.permissions.includes(permission)) {
-      return true;
+  for (const groupName of groups) {
+    try {
+      const res = await $apiPost("/get_group_permissions", { name: groupName });
+      if (res && Array.isArray(res.permissions)) {
+        allPermissions.push(...res.permissions);
+      }
+    } catch (err) {
+      console.error(`Failed to fetch permissions for group: ${groupName}`, err);
     }
   }
 
-  // Permission not found
-  return false;
+  allPermissions = [...new Set(allPermissions)];
+  localStorage.setItem("permissions", JSON.stringify(allPermissions));
+}
+
+
+
+export function hasPermission(permission) {
+  const userPermissions = JSON.parse(localStorage.getItem("permissions") || "[]");
+
+  console.log("userPermissions", userPermissions);
+
+  return userPermissions.includes(permission);
 }
 
 
@@ -586,8 +591,8 @@ export async function getZones(url = null, pageSize = 10) {
 export async function getManagers() {
   try {
     const isSuperUser =
-      localStorage.getItem("is_superuser") === "1" ||
-      localStorage.getItem("is_superuser") === "true";
+      localStorage.getItem("is_superuser") == "1" ||
+      localStorage.getItem("is_superuser") == "true";
 
     const groups = JSON.parse(localStorage.getItem("groups") || "[]");
     const email = localStorage.getItem("email");
@@ -610,8 +615,17 @@ export async function getManagers() {
     }
 
     const response = await this.$apiGet(apiUrl, params);
-    const managers = response.data || [];
 
+
+    console.log("Response managers", response);
+    let managers = response.data || [];
+    if (groups.includes("owner")) {
+      let ownerManagers = [];
+      managers.forEach(element => {
+        ownerManagers.push(element.manager);
+      });
+      managers = ownerManagers;
+    }
     // Optionally populate full names
     for (const manager of managers) {
       if (manager.owner_id) manager.ownerName = await this.$getFullNameById(manager.owner_id);
@@ -640,7 +654,12 @@ export async function getManagers() {
 
 
 
-export async function getProperties(url = "/get_properties?page=1&page_size=10") {
+export async function getProperties(
+  url = "/get_properties?page=1&page_size=10",
+  extraParams = null
+) {
+
+  console.log("extraparams", extraParams);
   try {
     const isSuperUser =
       localStorage.getItem("is_superuser") === "1" ||
@@ -659,8 +678,13 @@ export async function getProperties(url = "/get_properties?page=1&page_size=10")
       params = { property_zone_id__manager_id__email: email };
     }
 
+    // merge with extra params if provided
+    if (extraParams && typeof extraParams === "object") {
+      params = { ...params, ...extraParams };
+    }
+
     const response = await this.$apiGet(url, params);
-    console.log("response in global pro",response);
+    console.log("response in global pro", response);
     const properties = response.data || [];
 
     return {
@@ -681,5 +705,6 @@ export async function getProperties(url = "/get_properties?page=1&page_size=10")
     };
   }
 }
+
 
 

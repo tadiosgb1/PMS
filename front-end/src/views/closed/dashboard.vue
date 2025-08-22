@@ -2,100 +2,94 @@
   <!-- Root container -->
   <div class="flex flex-col h-screen bg-gray-100 font-sans">
     <!-- Header -->
-<header class="relative bg-white w-full shadow sticky top-0 z-20 px-4 py-3">
-  <div class="flex items-center justify-between w-full">
-    <!-- Left side: Toggle + Logo + Title -->
-    <div class="flex items-center space-x-3">
-      <!-- Sidebar toggle (mobile only) -->
-      <button
-        v-if="showToggleButton"
-        @click="toggleSidebar"
-        class="text-blue-500 hover:text-yellow-400 focus:outline-none sm:hidden"
-        aria-label="Toggle sidebar"
-      >
-        <i class="fas fa-bars text-2xl"></i>
-      </button>
+    <header class="relative bg-white w-full shadow sticky top-0 z-20 px-4 py-3">
+      <div class="flex items-center justify-between w-full">
+        <!-- Left side: Toggle + Logo + Title -->
+        <div class="flex items-center space-x-3">
+          <!-- Sidebar toggle (mobile only) -->
+          <button
+            v-if="showToggleButton"
+            @click="toggleSidebar"
+            class="text-blue-500 hover:text-yellow-400 focus:outline-none sm:hidden"
+            aria-label="Toggle sidebar"
+          >
+            <i class="fas fa-bars text-2xl"></i>
+          </button>
 
-      <!-- Logo and title -->
-      <div class="flex items-center space-x-2">
-        <img
-          src="../../assets/img/logo1.jpg"
-          alt="Logo"
-          class="h-10 w-10 rounded-full flex-shrink-0"
-        />
-        <h1
-          class="text-xl md:text-2xl font-extrabold text-blue-400 truncate"
-          title="NePAF"
-        >
-          PMS
-        </h1>
-      </div>
-    </div>
-
-    <!-- Right side: Welcome + Username + Profile -->
-    <div class="flex items-center space-x-4 text-blue-500">
-      <span class="whitespace-nowrap hidden sm:block">Welcome,</span>
-      <h1
-        class="font-extrabold text-blue-400 hidden sm:block"
-        title="User Name"
-      >
-        {{ name }}
-      </h1>
-
-      <!-- Profile dropdown -->
-      <div class="relative" @click.stop="toggleProfileDropdown">
-        <div
-          class="w-8 h-8 bg-white text-primary rounded-full flex items-center justify-center cursor-pointer hover:bg-yellow-100"
-          aria-haspopup="true"
-          aria-expanded="isProfileDropdownOpen ? 'true' : 'false'"
-          role="button"
-          tabindex="0"
-        >
-          <i class="fas fa-user text-yellow-500"></i>
+          <!-- Logo and title -->
+          <div class="flex items-center space-x-2">
+            <img
+              src="../../assets/img/logo1.jpg"
+              alt="Logo"
+              class="h-10 w-10 rounded-full flex-shrink-0"
+            />
+            <h1
+              class="text-xl md:text-2xl font-extrabold text-blue-400 truncate"
+              title="NePAF"
+            >
+              PMS
+            </h1>
+          </div>
         </div>
 
-        <transition name="fade">
-          <ul
-            v-show="isProfileDropdownOpen"
-            class="absolute right-0 mt-2 w-44 bg-white shadow-md z-50 text-sm py-2 rounded"
-            @click.outside="isProfileDropdownOpen = false"
+        <!-- Right side: Welcome + Username + Profile -->
+        <div class="flex items-center space-x-4 text-blue-500">
+          <span class="whitespace-nowrap hidden sm:block">Welcome,</span>
+          <h1
+            class="font-extrabold text-blue-400 hidden sm:block"
+            title="User Name"
           >
-            <li>
-              <a
-                href="#"
-                class="flex items-center px-4 py-2 hover:bg-gray-100 text-gray-700"
+            {{ name }}
+          </h1>
+
+          <!-- Profile dropdown -->
+          <div class="relative" @click.stop="toggleProfileDropdown">
+            <div
+              class="w-8 h-8 bg-white text-primary rounded-full flex items-center justify-center cursor-pointer hover:bg-yellow-100"
+              aria-haspopup="true"
+              aria-expanded="isProfileDropdownOpen ? 'true' : 'false'"
+              role="button"
+              tabindex="0"
+            >
+              <i class="fas fa-user text-yellow-500"></i>
+            </div>
+
+            <transition name="fade">
+              <ul
+                v-show="isProfileDropdownOpen"
+                class="absolute right-0 mt-2 w-44 bg-white shadow-md z-50 text-sm py-2 rounded"
+                @click.outside="isProfileDropdownOpen = false"
               >
-                <i class="fas fa-cog text-yellow-500 mr-2"></i>
-                <span>Change Password</span>
-              </a>
-            </li>
-            <li>
-              <a
-                @click="logout"
-                href="#"
-                class="flex items-center px-4 py-2 hover:bg-gray-100 text-gray-700"
-              >
-                <i class="fas fa-sign-out-alt text-yellow-500 mr-2"></i>
-                <span>Logout</span>
-              </a>
-            </li>
-          </ul>
-        </transition>
+                <li>
+                  <a
+                    href="#"
+                    class="flex items-center px-4 py-2 hover:bg-gray-100 text-gray-700"
+                  >
+                    <i class="fas fa-cog text-yellow-500 mr-2"></i>
+                    <span>Change Password</span>
+                  </a>
+                </li>
+                <li>
+                  <a
+                    @click="logout"
+                    href="#"
+                    class="flex items-center px-4 py-2 hover:bg-gray-100 text-gray-700"
+                  >
+                    <i class="fas fa-sign-out-alt text-yellow-500 mr-2"></i>
+                    <span>Logout</span>
+                  </a>
+                </li>
+              </ul>
+            </transition>
+          </div>
+        </div>
       </div>
-    </div>
-  </div>
-</header>
-
-
-
-
+    </header>
 
     <!-- Main Content -->
     <div class="flex flex-1 overflow-hidden">
       <!-- Sidebar always visible on large screens (lg+), hidden on md and below -->
-      <div
-        class="hidden lg:block w-64   h-full  bg-white"
-      >
+      <div class="hidden lg:block w-64 h-full bg-white">
         <Sidebar />
       </div>
 
@@ -134,7 +128,7 @@ export default {
   components: { Sidebar },
   data() {
     return {
-      name:localStorage.getItem('name'),
+      name: localStorage.getItem("name"),
       showSidebar: false,
       isLangOpen: false,
       isProfileDropdownOpen: false,
@@ -145,7 +139,7 @@ export default {
   },
   created() {
     window.addEventListener("resize", this.handleResize);
-    this.name=localStorage.getItem('name');
+    this.name = localStorage.getItem("name");
   },
   // mounted(){
   //    this.$router.push("/dashboard/first-dash");
@@ -169,6 +163,7 @@ export default {
       this.isLangOpen = false;
     },
     logout() {
+      localStorage.clear();
       this.$router.push("/");
     },
   },

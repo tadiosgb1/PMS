@@ -1,5 +1,4 @@
 <template>
-  
   <Toast ref="toast" />
 
   <Teleport to="body">
@@ -7,9 +6,7 @@
       v-if="visible"
       class="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 px-4 py-8"
     >
-      <div
-        class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 relative"
-      >
+      <div class="bg-white rounded-2xl shadow-2xl w-full max-w-md p-6 relative">
         <!-- Close Button -->
         <button
           @click="$emit('close')"
@@ -42,7 +39,10 @@
 
           <!-- Password -->
           <div>
-            <label class="block text-gray-700 font-semibold mb-1" for="password">
+            <label
+              class="block text-gray-700 font-semibold mb-1"
+              for="password"
+            >
               Password
             </label>
             <input
@@ -73,11 +73,14 @@
         <!-- Register Link -->
         <p class="mt-5 text-center text-sm text-gray-600">
           Don't have an account?
-          <a  @click="$emit('close')" href="#plans"  class="text-orange-700 font-semibold hover:underline ml-1">
+          <a
+            @click="$emit('close')"
+            href="#plans"
+            class="text-orange-700 font-semibold hover:underline ml-1"
+          >
             Register
-         </a>
+          </a>
         </p>
-       
       </div>
     </div>
   </Teleport>
@@ -114,22 +117,30 @@ export default {
       try {
         const response = await this.$apiPost("/token", payload);
 
-        console.log("response during login",response);
+        console.log("response during login", response);
 
-        const { refresh, access, permissions ,id,is_superuser,email,groups} = response;
-       const user= await this.$apiGetById(`/get_user`,id);
-       const name=user.first_name;
+        const {
+          refresh,
+          access,
+          permissions,
+          id,
+          is_superuser,
+          email,
+          groups,
+        } = response;
 
         localStorage.setItem("refresh", refresh);
         localStorage.setItem("access", access);
         localStorage.setItem("permissions", JSON.stringify(permissions));
         localStorage.setItem("groups", JSON.stringify(groups));
 
-        localStorage.setItem("userId",id);
-        localStorage.setItem("is_superuser",is_superuser);
-        localStorage.setItem("email",email);
-        localStorage.setItem("name",name);
+        localStorage.setItem("userId", id);
+        localStorage.setItem("is_superuser", is_superuser);
+        localStorage.setItem("email", email);
 
+        const user = await this.$apiGetById(`/get_user`, id);
+        const name = user.first_name;
+        localStorage.setItem("name", name);
         this.$refs.toast?.showSuccessToastMessage("Login successful!");
         setTimeout(() => {
           this.$emit("close"); // Close the modal
