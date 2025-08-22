@@ -1,15 +1,14 @@
 <template>
   <div>
     <Toast ref="toast" />
-    <div class="p-6 max-w-4xl mx-auto">
+    <div class="max-w-7xl p-4 mx-auto bg-white shadow rounded-lg overflow-hidden">
       <button
         @click="$router.back()"
         class="mb-4 px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
       >
         &larr; Back
       </button>
-
-      
+         <i class=" fas fa-eye ml-[500px] bg-orange-400 hover:bg-orange-500" @click="maintenanceView = true">Maintenance Request</i>
 
       <h1 v-if="property" class="text-2xl font-bold mb-4">Property Name: {{ property.name }}</h1>
       <p v-else>Loading...</p>
@@ -30,11 +29,11 @@
         <div class="mb-2"><strong>Updated At:</strong> {{ property.updated_at || 'N/A' }}</div>
       </div>
 
-      <h2 class="text-xl font-semibold mb-2 flex items-center justify-between">
+      <h2 class="text-xl font-semibold mb-2 flex items-center">
         Pictures
         <button
           @click="addPictureVisible = true"
-          class="bg-primary text-white px-4 py-1 rounded hover:bg-primary-dark"
+          class="bg-primary text-white ml-14 px-4 py-1 rounded hover:bg-primary-dark"
         >
           + Add Picture
         </button>
@@ -79,6 +78,7 @@
   >
     +{{ remainingPicturesCount }} More
   </div>
+
 </div>
 
       <div v-else class="mb-8 text-gray-500">No pictures available.</div>
@@ -108,16 +108,22 @@
         @confirm="confirmDeletePicture"
         @cancel="confirmDeleteVisible = false"
       />
+      <Maintenance
+        v-if="maintenanceView"
+        :visible="maintenanceView"
+        :propertyId="property.id"
+        @close="maintenanceView = false"
+       
+      />
     </div>
   </div>
 </template>
-
 <script>
 import AddPictureModal from '@/views/closed/proporty/AddPropertyPicture.vue';
 import UpdatePictureModal from '@/views/closed/proporty/UpdatePropertyPicture.vue';
 import ConfirmModal from '@/components/ConfirmModal.vue';
 import Toast from '../../../components/Toast.vue';
-
+import Maintenance from '@/views/closed/maintenance/view.vue';
 export default {
   name: 'PropertyDetail',
   components: {
@@ -125,6 +131,7 @@ export default {
     UpdatePictureModal,
     ConfirmModal,
     Toast,
+    Maintenance
   },
   data() {
     return {
@@ -135,6 +142,7 @@ export default {
       confirmDeleteVisible: false,
       pictureToDelete: null,
       showAllPictures: false,
+      maintenanceView:false,
     };
   },
  computed: {

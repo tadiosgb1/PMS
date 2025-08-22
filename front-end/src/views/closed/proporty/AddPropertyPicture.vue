@@ -5,7 +5,7 @@
       v-if="visible"
       class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4 overflow-auto"
     >
-      <div class="bg-white w-full sm:w-auto sm:max-w-[700px] md:max-w-[850px] rounded-lg shadow-lg overflow-hidden relative mx-auto">
+      <div class="bg-white w-full sm:w-auto sm:max-w-[700px] md:max-w-[850px] md:min-w-[500px] lg:min-w-[600px] xl:min-w-[700px] rounded-lg shadow-lg overflow-hidden relative mx-auto">
         <div class="bg-primary text-white px-6 py-4 text-2xl font-semibold flex justify-between items-center">
           Add Property Picture
           <button @click="$emit('close')" class="text-white hover:text-gray-200 text-lg font-bold">✕</button>
@@ -39,6 +39,7 @@
                 <p class="text-sm text-gray-500">Click to upload</p>
               </div>
               <input
+                required
                 id="file-upload"
                 type="file"
                 class="hidden"
