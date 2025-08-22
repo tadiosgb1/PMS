@@ -31,7 +31,7 @@
           <!-- Replace image -->
           <div>
             <label class="block mb-2 font-medium text-gray-700">Replace Image</label>
-            <input type="file" @change="onFileChange" accept="image/*" />
+            <input required type="file" @change="onFileChange" accept="image/*" />
             <div v-if="form.preview" class="mt-3">
               <img :src="form.preview" class="rounded-lg max-h-48 object-cover" />
             </div>
