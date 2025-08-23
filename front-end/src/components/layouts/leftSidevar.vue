@@ -4,7 +4,6 @@
       <aside
         class="w-64 flex flex-col fixed md:relative z-15 h-full transition-all duration-300 bg-white mt-0 lg:mt-1"
       >
-        <!-- Header -->
         <div
           v-if="showTitle"
           class="flex flex-row space-x-4 p-4 text-center font-bold text-lg text-white bg-orange-500 sticky top-0 z-10"
