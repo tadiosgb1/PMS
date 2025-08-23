@@ -298,6 +298,9 @@ export default {
   },
   async mounted() {
     // Fetch zones first
+    if(this.$route.query.zone_id){
+      this.zone_id_query_set=true;
+    }
     const resultZones = await this.$getZones();
     this.zones = resultZones.zones;
 
@@ -311,13 +314,20 @@ export default {
         const pageUrl =
           url || `/get_properties?page=1&page_size=${this.pageSize}`;
 
-        let result = await this.$getProperties(pageUrl, this.zone_id);
-        if (this.$route.params.zone_id) {
+       // let result = await this.$getProperties(pageUrl, this.zone_id);
+       let result=[];
+        if (this.$route.query.zone_id ||this.zone_id) {
+          //alert("hii")
           const params = {
-            property_zone_id: this.$route.params.zone_id,
+            property_zone_id: this.$route.query.zone_id || this.zone_id,
           };
+          console.log("custom params",params);
           result = await this.$getProperties(pageUrl, params);
+        }else{
+          //alert("else")
+           result = await this.$getProperties(pageUrl);
         }
+
         console.log("result", result);
         this.properties = result.properties;
         this.currentPage = result.currentPage;
