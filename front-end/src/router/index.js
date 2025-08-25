@@ -20,6 +20,7 @@ const Leases = { template: '<div class="p-6 text-gray-800">Leases Page</div>' };
 const Reports = { template: '<div class="p-6 text-gray-800">Reports Page</div>' };
 const Messages = { template: '<div class="p-6 text-gray-800">Messages Page</div>' };
 const Settings = { template: '<div class="p-6 text-gray-800">Settings Page</div>' };
+const Rents = { template: '<div class="p-6 text-gray-800">Settings Page</div>' };
 
 import User_view from '../views/closed/users/view.vue';
 
@@ -78,6 +79,7 @@ const routes = [
       { path: '/reports', name: 'reports', component: Reports },
       { path: '/messages', name: 'messages', component: Messages },
       { path: '/settings', name: 'settings', component: Settings },
+      { path: '/rents', name: 'rents', component: Rents },
 
       { path: '/user_view', name: 'user_view', component: User_view },
 
@@ -103,8 +105,8 @@ const routes = [
       { path: '/plans_view', name: 'plans_view', component: plans_view },
       { path: '/subscriptions_view', name: 'subscriptions_view', component: subscriptions_view },
       { path: '/groups', name: 'groups', component: view_groups },
-      { path: '/managers', name: 'managers', component: view_managers},
-       { path: '/owners', name: 'owners', component: view_owners},
+      { path: '/managers', name: 'managers', component: view_managers },
+      { path: '/owners', name: 'owners', component: view_owners },
 
     ]
   },

@@ -60,7 +60,7 @@
                       class="text-green-600 hover:text-green-800"
                       title="Pay"
                     >
-                      <i class="fas fa-credit-card"></i>
+                      <i class="fas fa-credit-card"></i> Subscription payment
                     </button>
                     <button
                       @click="edit(subscription)"
@@ -171,17 +171,15 @@ export default {
   methods: {
     async fetch() {
       try {
-
         const params = {
-         user_id__id: localStorage.getItem("userId"),
+          user_id__id: localStorage.getItem("userId"),
         };
 
-       console.log("params",params);
+        console.log("params", params);
 
         const res = await this.$apiGet("/get_subscription", params);
-       
-        this.subscriptions = res.data || [];
 
+        this.subscriptions = res.data || [];
       } catch (e) {
         console.error("Error fetching subscriptions", e);
         this.subscriptions = [];

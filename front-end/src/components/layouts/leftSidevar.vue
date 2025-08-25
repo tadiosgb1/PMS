@@ -103,25 +103,25 @@ export default {
           icon: "fas fa-map-marked-alt",
           color: "#3b82f6",
         },
-        // {
-        //   name: "Pictures",
-        //   route: "pictures",
-        //   icon: "fas fa-map-marked-alt",
-        //   color: "#3b82f6",
-        // },
+        {
+          name: "Rent",
+          route: "rents",
+          icon: "fas fa-map-marked-alt",
+          color: "#3b82f6",
+        },
+
         {
           name: "Tenants",
           route: "tenants",
           icon: "fas fa-users",
           color: "#ef4444",
         },
-        // {
-        //   name: "Payments",
-        //   route: "payments",
-        //   icon: "fas fa-money-bill-wave",
-        //   color: "#22c55e",
-        // },
-       
+        {
+          name: "Payments",
+          route: "payments",
+          icon: "fas fa-money-bill-wave",
+          color: "#22c55e",
+        },
       ],
     };
   },
