@@ -246,6 +246,30 @@ export default {
         this.previous = null;
       }
     },
+  async fetch() {
+  let params = {};
+
+  try {
+    const isSuperuser = localStorage.getItem("is_superuser") === "true"; 
+    // convert to boolean
+
+    if (!isSuperuser) {
+      params = {
+        user_id__id: localStorage.getItem("userId"),
+      };
+    }
+
+    console.log("params", params);
+
+    const res = await this.$apiGet("/get_subscription", params);
+
+    this.subscriptions = res.data || [];
+  } catch (e) {
+    console.error("Error fetching subscriptions", e);
+    this.subscriptions = [];
+  }
+},
+
     formatDate(dateStr) {
       if (!dateStr) return "";
       const date = new Date(dateStr);

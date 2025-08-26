@@ -83,6 +83,12 @@
 
       <div v-else class="mb-8 text-gray-500">No pictures available.</div>
 
+
+
+      <div>
+        <button @click="saleProperty()" class="bg-primary text-white ml-14 px-4 py-1 rounded hover:bg-primary-dark">Sale this property</button>
+      </div>
+
       <!-- Modals -->
       <AddPictureModal
         v-if="addPictureVisible"
@@ -161,7 +167,10 @@ export default {
     this.fetchProperty();
   },
   methods: {
-    async fetchProperty() {
+      saleProperty(){
+
+      },
+     async fetchProperty() {
       try {
         const res = await this.$apiGet(`/get_property/${this.$route.params.id}`);
         this.property = res.data || res; // adapt if API wraps in data
