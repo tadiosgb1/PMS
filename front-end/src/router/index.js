@@ -32,6 +32,7 @@ import Permissions_add from '../views/closed/permissions/add.vue';
 import permissions_view from '../views/closed/permissions/view.vue';
 import plans_view from '../views/closed/plans/view.vue';
 import subscriptions_view from '../views/closed/subscriptions/view.vue'
+import subscriptionsPayment_view from '../views/closed/subscriptions/SubscriptionPayment/view.vue'
 import view_groups from '../views/closed/groups/view.vue'
 import view_managers from '../views/closed/managers/view.vue'
 import view_owners from '../views/closed/owners/view.vue'
@@ -104,6 +105,7 @@ const routes = [
       { path: '/permissions_view', name: 'permissions_view', component: permissions_view },
       { path: '/plans_view', name: 'plans_view', component: plans_view },
       { path: '/subscriptions_view', name: 'subscriptions_view', component: subscriptions_view },
+      { path: '/subscriptions_view/payment/:id', name: 'subscriptionsPayment_view', component: subscriptionsPayment_view },
       { path: '/groups', name: 'groups', component: view_groups },
       { path: '/managers', name: 'managers', component: view_managers },
       { path: '/owners', name: 'owners', component: view_owners },

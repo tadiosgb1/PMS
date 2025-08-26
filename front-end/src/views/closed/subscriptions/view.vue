@@ -3,6 +3,7 @@
     <Toast ref="toast" />
     <div class="min-h-screen bg-gray-100 p-6">
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <!-- Header -->
         <div
           class="bg-orange-500 text-white px-6 py-4 text-xl font-bold flex justify-between items-center"
         >
@@ -16,13 +17,32 @@
         </div>
 
         <div class="p-6">
-          <input
-            v-model="searchTerm"
-            type="search"
-            placeholder="Search Subscriptions..."
-            class="w-full max-w-md px-4 py-2 mb-6 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+          <!-- ✅ Search & Page Size -->
+          <div class="flex justify-between items-center mb-6">
+            <input
+              v-model="searchTerm"
+              type="search"
+              placeholder="Search subscriptions..."
+              class="w-full max-w-md px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
 
+            <div class="ml-4">
+              <label for="pageSize" class="mr-2 text-gray-700">Show</label>
+              <select
+                id="pageSize"
+                v-model="pageSize"
+                @change="fetchSubscriptions()"
+                class="border px-2 py-1 rounded"
+              >
+                <option v-for="size in pageSizes" :key="size" :value="size">
+                  {{ size }}
+                </option>
+              </select>
+              <span class="ml-1 text-gray-700">per page</span>
+            </div>
+          </div>
+
+          <!-- Table -->
           <div class="overflow-x-auto">
             <table
               class="min-w-full table-auto border-collapse border border-gray-300"
@@ -60,7 +80,14 @@
                       class="text-green-600 hover:text-green-800"
                       title="Pay"
                     >
-                      <i class="fas fa-credit-card"></i> Subscription payment
+                      <i class="fas fa-credit-card"></i> Pay
+                    </button>
+                    <button
+                      @click="payment(subscription.id)"
+                      class="text-green-600 hover:text-green-800"
+                      title="Subscription payments"
+                    >
+                      <i class="fas fa-info-circle"></i>Payments
                     </button>
                     <button
                       @click="edit(subscription)"
@@ -86,6 +113,27 @@
               </tbody>
             </table>
           </div>
+
+          <!-- ✅ Pagination -->
+          <div class="flex justify-between items-center mt-4">
+            <button
+              :disabled="!previous"
+              @click="fetchSubscriptions(previous)"
+              class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+            >
+              Previous
+            </button>
+            <span class="text-gray-600"
+              >Page {{ currentPage }} of {{ totalPages }}</span
+            >
+            <button
+              :disabled="!next"
+              @click="fetchSubscriptions(next)"
+              class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
         </div>
       </div>
 
@@ -94,14 +142,14 @@
         v-if="visible"
         :visible="visible"
         @close="visible = false"
-        @refresh="fetch"
+        @refresh="fetchSubscriptions"
       />
       <UpdateSubscription
         v-if="updateVisible"
         :visible="updateVisible"
         :subscription="editing"
         @close="updateVisible = false"
-        @refresh="fetch"
+        @refresh="fetchSubscriptions"
       />
 
       <!-- Payment Modal -->
@@ -153,6 +201,14 @@ export default {
       paymentPayload: null,
       editing: null,
       deleting: null,
+
+      // ✅ Pagination state
+      currentPage: 1,
+      totalPages: 1,
+      next: null,
+      previous: null,
+      pageSize: 10,
+      pageSizes: [5, 10, 20, 50, 100],
     };
   },
   computed: {
@@ -166,23 +222,28 @@ export default {
     },
   },
   mounted() {
-    this.fetch();
+    this.fetchSubscriptions();
   },
   methods: {
-    async fetch() {
+    async fetchSubscriptions(url = null) {
       try {
-        const params = {
-          user_id__id: localStorage.getItem("userId"),
-        };
+        const pageUrl =
+          url || `/get_subscription?page=1&page_size=${this.pageSize}`;
 
-        console.log("params", params);
-
-        const res = await this.$apiGet("/get_subscription", params);
+        const res = await this.$apiGet(pageUrl);
 
         this.subscriptions = res.data || [];
+        this.currentPage = res.currentPage || 1;
+        this.totalPages = res.totalPages || 1;
+        this.next = res.next || null;
+        this.previous = res.previous || null;
       } catch (e) {
         console.error("Error fetching subscriptions", e);
         this.subscriptions = [];
+        this.currentPage = 1;
+        this.totalPages = 1;
+        this.next = null;
+        this.previous = null;
       }
     },
     formatDate(dateStr) {
@@ -213,7 +274,7 @@ export default {
           "Subscription deleted successfully",
           "success"
         );
-        this.fetch();
+        this.fetchSubscriptions();
       } catch (e) {
         this.$root.$refs.toast.showToast(
           "Failed to delete subscription",
@@ -224,10 +285,17 @@ export default {
         this.deleting = null;
       }
     },
+    payment(subscriptionId) {
+      if (subscriptionId)
+        this.$router.push({
+          name: "subscriptionsPayment_view",
+          params: { id: subscriptionId },
+        });
+    },
     handlePaymentSuccess() {
       this.$root.$refs.toast.showToast("Payment successful", "success");
       this.paymentVisible = false;
-      this.fetch();
+      this.fetchSubscriptions();
     },
   },
 };
