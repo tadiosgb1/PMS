@@ -91,18 +91,27 @@ export default {
           icon: "fas fa-layer-group",
           color: "#6366f1",
         },
+            {
+          name: "Zones",
+          route: "zones",
+          icon: "fas fa-map-marked-alt",
+          color: "#3b82f6",
+        },
         {
           name: "Properties",
           route: "properties",
           icon: "fas fa-building",
           color: "#6b7280",
         },
+
         {
-          name: "Zones",
-          route: "zones",
-          icon: "fas fa-map-marked-alt",
-          color: "#3b82f6",
+          name: "Property Sales",
+          route: "property_sales",
+          icon: "fas fa-building",
+          color: "#6b7280",
         },
+
+
         {
           name: "Rent",
           route: "rents",

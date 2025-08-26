@@ -35,6 +35,7 @@ import subscriptions_view from '../views/closed/subscriptions/view.vue'
 import view_groups from '../views/closed/groups/view.vue'
 import view_managers from '../views/closed/managers/view.vue'
 import view_owners from '../views/closed/owners/view.vue'
+import Property_sales from '../views/closed/PropertySales/view.vue'
 
 const routes = [
   {
@@ -80,6 +81,7 @@ const routes = [
       { path: '/messages', name: 'messages', component: Messages },
       { path: '/settings', name: 'settings', component: Settings },
       { path: '/rents', name: 'rents', component: Rents },
+      { path: '/property_sales', name: 'property_sales', component: Property_sales },
 
       { path: '/user_view', name: 'user_view', component: User_view },
 

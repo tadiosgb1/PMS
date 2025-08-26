@@ -169,22 +169,30 @@ export default {
     this.fetch();
   },
   methods: {
-    async fetch() {
-      try {
-        const params = {
-          user_id__id: localStorage.getItem("userId"),
-        };
+  async fetch() {
+  let params = {};
 
-        console.log("params", params);
+  try {
+    const isSuperuser = localStorage.getItem("is_superuser") === "true"; 
+    // convert to boolean
 
-        const res = await this.$apiGet("/get_subscription", params);
+    if (!isSuperuser) {
+      params = {
+        user_id__id: localStorage.getItem("userId"),
+      };
+    }
 
-        this.subscriptions = res.data || [];
-      } catch (e) {
-        console.error("Error fetching subscriptions", e);
-        this.subscriptions = [];
-      }
-    },
+    console.log("params", params);
+
+    const res = await this.$apiGet("/get_subscription", params);
+
+    this.subscriptions = res.data || [];
+  } catch (e) {
+    console.error("Error fetching subscriptions", e);
+    this.subscriptions = [];
+  }
+},
+
     formatDate(dateStr) {
       if (!dateStr) return "";
       const date = new Date(dateStr);
