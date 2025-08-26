@@ -33,7 +33,9 @@
               <select
                 id="pageSize"
                 v-model="pageSize"
-                @change="fetchSales(`/get_property_sales?page=1&page_size=${pageSize}`)"
+                @change="
+                  fetchSales(`/get_property_sales?page=1&page_size=${pageSize}`)
+                "
                 class="border px-2 py-1 rounded"
               >
                 <option v-for="size in pageSizes" :key="size" :value="size">
@@ -77,16 +79,16 @@
                   class="hover:bg-gray-100"
                 >
                   <td class="border border-gray-300 px-4 py-2">
-                    {{ sale.property_name }}
+                    {{ sale.property_id }}
                   </td>
                   <td class="border border-gray-300 px-4 py-2">
-                    {{ sale.buyer_name }}
+                    {{ sale.buyer.first_name }}
                   </td>
                   <td class="border border-gray-300 px-4 py-2">
-                    {{ sale.price | currency }}
+                    {{ sale.selling_price | currency }}
                   </td>
                   <td class="border border-gray-300 px-4 py-2">
-                    {{ sale.date }}
+                    {{ sale.updated_at }}
                   </td>
                   <td
                     class="border border-gray-300 px-4 py-2 text-center space-x-2"
@@ -105,6 +107,20 @@
                       title="Delete"
                     >
                       <i class="fas fa-trash-alt"></i>
+                    </button>
+                    <button
+                      @click="askDeleteConfirmation(sale)"
+                      class="text-green-600 hover:text-green-800 focus:outline-none"
+                      title="Delete"
+                    >
+                      <i class=""></i> Approve
+                    </button>
+                    <button
+                      @click="askDeleteConfirmation(sale)"
+                      class="text-green-600 hover:text-green-800 focus:outline-none"
+                      title="Delete"
+                    >
+                      <i class=""></i> View Payment
                     </button>
                   </td>
                 </tr>
@@ -205,12 +221,8 @@ export default {
   computed: {
     filteredAndSortedSales() {
       const term = this.searchTerm.toLowerCase();
-      let filtered = this.sales.filter(
-        (sale) =>
-          sale.property_name.toLowerCase().includes(term) ||
-          sale.buyer_name.toLowerCase().includes(term) ||
-          String(sale.price).toLowerCase().includes(term) ||
-          sale.date.toLowerCase().includes(term)
+      let filtered = this.sales.filter((sale) =>
+        sale.buyer.first_name.toLowerCase().includes(term)
       );
 
       filtered.sort((a, b) => {
@@ -228,9 +240,12 @@ export default {
     this.fetchSales(`/get_property_sales?page=1&page_size=${this.pageSize}`);
   },
   methods: {
-    async fetchSales(url = `/get_property_sales?page=1&page_size=${this.pageSize}`) {
+    async fetchSales(
+      url = `/get_property_sales?page=1&page_size=${this.pageSize}`
+    ) {
       try {
         const res = await this.$apiGet(url);
+        console.log("res", res);
         this.sales = res.data || [];
         this.currentPage = res.current_page;
         this.totalPages = res.total_pages;
@@ -254,7 +269,9 @@ export default {
       try {
         await this.$apiDelete(`/delete_property_sale/${this.saleToDelete.id}`);
         this.$refs.toast.showToast("Property sale deleted", "success");
-        this.fetchSales(`/get_property_sales?page=1&page_size=${this.pageSize}`);
+        this.fetchSales(
+          `/get_property_sales?page=1&page_size=${this.pageSize}`
+        );
       } catch (err) {
         console.error(err);
         this.$refs.toast.showToast("Failed to delete property sale", "error");

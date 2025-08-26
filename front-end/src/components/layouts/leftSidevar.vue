@@ -91,7 +91,7 @@ export default {
           icon: "fas fa-layer-group",
           color: "#6366f1",
         },
-            {
+        {
           name: "Zones",
           route: "zones",
           icon: "fas fa-map-marked-alt",
@@ -111,7 +111,12 @@ export default {
           color: "#6b7280",
         },
 
-
+        {
+          name: "Sales Payments",
+          route: "sales_payments",
+          icon: "fas fa-building",
+          color: "#6b7280",
+        },
         {
           name: "Rent",
           route: "rents",

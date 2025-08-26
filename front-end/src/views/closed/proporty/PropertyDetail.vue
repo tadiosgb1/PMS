@@ -1,32 +1,52 @@
 <template>
   <div>
     <Toast ref="toast" />
-    <div class="max-w-7xl p-4 mx-auto bg-white shadow rounded-lg overflow-hidden">
+    <div
+      class="max-w-7xl p-4 mx-auto bg-white shadow rounded-lg overflow-hidden"
+    >
       <button
         @click="$router.back()"
         class="mb-4 px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
       >
         &larr; Back
       </button>
-         <i class=" fas fa-eye ml-[500px] bg-orange-400 hover:bg-orange-500" @click="maintenanceView = true">Maintenance Request</i>
+      <i
+        class="fas fa-eye ml-[500px] bg-orange-400 hover:bg-orange-500"
+        @click="maintenanceView = true"
+        >Maintenance Request</i
+      >
 
-      <h1 v-if="property" class="text-2xl font-bold mb-4">Property Name: {{ property.name }}</h1>
+      <h1 v-if="property" class="text-2xl font-bold mb-4">
+        Property Name: {{ property.name }}
+      </h1>
       <p v-else>Loading...</p>
 
       <div v-if="property" class="grid grid-cols-2 gap-4 mb-6">
         <div class="mb-2"><strong>Name:</strong> {{ property.name }}</div>
-        <div class="mb-2"><strong>Type:</strong> {{ property.property_type }}</div>
+        <div class="mb-2">
+          <strong>Type:</strong> {{ property.property_type }}
+        </div>
         <div class="mb-2"><strong>Address:</strong> {{ property.address }}</div>
         <div class="mb-2"><strong>City:</strong> {{ property.city }}</div>
         <div class="mb-2"><strong>State:</strong> {{ property.state }}</div>
-        <div class="mb-2"><strong>Zip Code:</strong> {{ property.zip_code }}</div>
+        <div class="mb-2">
+          <strong>Zip Code:</strong> {{ property.zip_code }}
+        </div>
         <div class="mb-2"><strong>Price:</strong> {{ property.price }}</div>
-        <div class="mb-2"><strong>Bedrooms:</strong> {{ property.bed_rooms }}</div>
-        <div class="mb-2"><strong>Bathrooms:</strong> {{ property.bath_rooms }}</div>
+        <div class="mb-2">
+          <strong>Bedrooms:</strong> {{ property.bed_rooms }}
+        </div>
+        <div class="mb-2">
+          <strong>Bathrooms:</strong> {{ property.bath_rooms }}
+        </div>
         <div class="mb-2"><strong>Rent:</strong> {{ property.rent }}</div>
         <div class="mb-2"><strong>Status:</strong> {{ property.status }}</div>
-        <div class="mb-2"><strong>Created At:</strong> {{ property.created_at }}</div>
-        <div class="mb-2"><strong>Updated At:</strong> {{ property.updated_at || 'N/A' }}</div>
+        <div class="mb-2">
+          <strong>Created At:</strong> {{ property.created_at }}
+        </div>
+        <div class="mb-2">
+          <strong>Updated At:</strong> {{ property.updated_at || "N/A" }}
+        </div>
       </div>
 
       <h2 class="text-xl font-semibold mb-2 flex items-center">
@@ -40,54 +60,64 @@
       </h2>
 
       <div
-  v-if="property && property.property_pictures && property.property_pictures.length"
-  class="grid grid-cols-3 gap-4 mb-8"
->
-  <div
-    v-for="(pic, index) in visiblePictures"
-    :key="pic.id"
-    class="border rounded overflow-hidden cursor-pointer hover:shadow-lg relative"
-  >
-    <img :src="pic.property_image" :alt="pic.description" class="object-cover w-full h-32" />
-    <p class="text-sm p-2">{{ pic.description }}</p>
-
-    <!-- Buttons container -->
-    <div class="absolute top-2 right-2 flex space-x-1">
-      <button
-        @click.stop="openUpdatePicture(pic)"
-        class="bg-blue-600 text-white px-2 py-1 text-xs rounded hover:bg-blue-700"
-        title="Update Picture"
+        v-if="
+          property &&
+          property.property_pictures &&
+          property.property_pictures.length
+        "
+        class="grid grid-cols-3 gap-4 mb-8"
       >
-        Update
-      </button>
-      <button
-        @click.stop="askDeletePicture(pic)"
-        class="bg-red-600 text-white px-2 py-1 text-xs rounded hover:bg-red-700"
-        title="Delete Picture"
-      >
-        Delete
-      </button>
-    </div>
-  </div>
+        <div
+          v-for="(pic, index) in visiblePictures"
+          :key="pic.id"
+          class="border rounded overflow-hidden cursor-pointer hover:shadow-lg relative"
+        >
+          <img
+            :src="pic.property_image"
+            :alt="pic.description"
+            class="object-cover w-full h-32"
+          />
+          <p class="text-sm p-2">{{ pic.description }}</p>
 
-  <!-- Show more button -->
-  <div
-    v-if="remainingPicturesCount > 0 && !showAllPictures"
-    @click="showAllPictures = true"
-    class="flex items-center justify-center border border-primary text-primary rounded hover:bg-primary hover:text-white transition cursor-pointer h-32"
-  >
-    +{{ remainingPicturesCount }} More
-  </div>
+          <!-- Buttons container -->
+          <div class="absolute top-2 right-2 flex space-x-1">
+            <button
+              @click.stop="openUpdatePicture(pic)"
+              class="bg-blue-600 text-white px-2 py-1 text-xs rounded hover:bg-blue-700"
+              title="Update Picture"
+            >
+              Update
+            </button>
+            <button
+              @click.stop="askDeletePicture(pic)"
+              class="bg-red-600 text-white px-2 py-1 text-xs rounded hover:bg-red-700"
+              title="Delete Picture"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
 
-</div>
+        <!-- Show more button -->
+        <div
+          v-if="remainingPicturesCount > 0 && !showAllPictures"
+          @click="showAllPictures = true"
+          class="flex items-center justify-center border border-primary text-primary rounded hover:bg-primary hover:text-white transition cursor-pointer h-32"
+        >
+          +{{ remainingPicturesCount }} More
+        </div>
+      </div>
 
       <div v-else class="mb-8 text-gray-500">No pictures available.</div>
 
-
-
-      <div>
-        <button @click="saleProperty()" class="bg-primary text-white ml-14 px-4 py-1 rounded hover:bg-primary-dark">Sale this property</button>
-      </div>
+      <!-- <div>
+        <button
+          @click="saleProperty()"
+          class="bg-primary text-white ml-14 px-4 py-1 rounded hover:bg-primary-dark"
+        >
+          Sale this property
+        </button>
+      </div> -->
 
       <!-- Modals -->
       <AddPictureModal
@@ -119,25 +149,24 @@
         :visible="maintenanceView"
         :propertyId="property.id"
         @close="maintenanceView = false"
-       
       />
     </div>
   </div>
 </template>
 <script>
-import AddPictureModal from '@/views/closed/proporty/AddPropertyPicture.vue';
-import UpdatePictureModal from '@/views/closed/proporty/UpdatePropertyPicture.vue';
-import ConfirmModal from '@/components/ConfirmModal.vue';
-import Toast from '../../../components/Toast.vue';
-import Maintenance from '@/views/closed/maintenance/view.vue';
+import AddPictureModal from "@/views/closed/proporty/AddPropertyPicture.vue";
+import UpdatePictureModal from "@/views/closed/proporty/UpdatePropertyPicture.vue";
+import ConfirmModal from "@/components/ConfirmModal.vue";
+import Toast from "../../../components/Toast.vue";
+import Maintenance from "@/views/closed/maintenance/view.vue";
 export default {
-  name: 'PropertyDetail',
+  name: "PropertyDetail",
   components: {
     AddPictureModal,
     UpdatePictureModal,
     ConfirmModal,
     Toast,
-    Maintenance
+    Maintenance,
   },
   data() {
     return {
@@ -148,35 +177,35 @@ export default {
       confirmDeleteVisible: false,
       pictureToDelete: null,
       showAllPictures: false,
-      maintenanceView:false,
+      maintenanceView: false,
     };
   },
- computed: {
-  visiblePictures() {
-    if (!this.property?.property_pictures) return [];
-    if (this.showAllPictures) return this.property.property_pictures;
-    return this.property.property_pictures.slice(0, 3); // show only 3 initially
+  computed: {
+    visiblePictures() {
+      if (!this.property?.property_pictures) return [];
+      if (this.showAllPictures) return this.property.property_pictures;
+      return this.property.property_pictures.slice(0, 3); // show only 3 initially
+    },
+    remainingPicturesCount() {
+      if (!this.property?.property_pictures) return 0;
+      return Math.max(0, this.property.property_pictures.length - 3);
+    },
   },
-  remainingPicturesCount() {
-    if (!this.property?.property_pictures) return 0;
-    return Math.max(0, this.property.property_pictures.length - 3);
-  },
-},
 
   mounted() {
     this.fetchProperty();
   },
   methods: {
-      saleProperty(){
-
-      },
-     async fetchProperty() {
+    saleProperty() {},
+    async fetchProperty() {
       try {
-        const res = await this.$apiGet(`/get_property/${this.$route.params.id}`);
+        const res = await this.$apiGet(
+          `/get_property/${this.$route.params.id}`
+        );
         this.property = res.data || res; // adapt if API wraps in data
       } catch (err) {
-        console.error('Failed to fetch property details', err);
-        alert('Could not load property details.');
+        console.error("Failed to fetch property details", err);
+        alert("Could not load property details.");
       }
     },
     openUpdatePicture(picture) {
@@ -191,12 +220,17 @@ export default {
       this.confirmDeleteVisible = false;
       if (!this.pictureToDelete) return;
       try {
-        const res = await this.$apiDelete(`/delete_property_picture/${this.pictureToDelete.id}`);
-        this.$root.$refs.toast.showToast(res.message || 'Picture deleted successfully', 'success');
+        const res = await this.$apiDelete(
+          `/delete_property_picture/${this.pictureToDelete.id}`
+        );
+        this.$root.$refs.toast.showToast(
+          res.message || "Picture deleted successfully",
+          "success"
+        );
         this.fetchProperty();
       } catch (err) {
         console.error(err);
-        alert('Failed to delete picture.');
+        alert("Failed to delete picture.");
       }
       this.pictureToDelete = null;
     },

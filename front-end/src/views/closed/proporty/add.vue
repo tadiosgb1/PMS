@@ -28,12 +28,14 @@
             <label class="block text-gray-700">Zone manager</label>
             <select v-model="form.manager_id" class="custom-input">
               <option value="">Select Manager</option>
-              <option  class="text-black"
-                v-for="manager in managers" 
-                :key="manager.manager.id" 
+              <option
+                class="text-black"
+                v-for="manager in managers"
+                :key="manager.manager.id"
                 :value="manager.manager.id"
               >
-                {{ manager.manager.first_name }} {{ manager.manager.middle_name }}
+                {{ manager.manager.first_name }}
+                {{ manager.manager.middle_name }}
               </option>
             </select>
           </div>
@@ -42,17 +44,13 @@
             <label class="block text-gray-700">Property Zone</label>
             <select v-model="form.property_zone_id" class="custom-input">
               <option value="">Select Zone</option>
-              <option 
-                v-for="zone in zones" 
-                :key="zone.id" 
-                :value="zone.id"
-              >
+              <option v-for="zone in zones" :key="zone.id" :value="zone.id">
                 {{ zone.name }}
               </option>
             </select>
           </div>
 
-           <div>
+          <div>
             <label class="block text-gray-700">Name</label>
             <input
               v-model="form.name"
@@ -131,6 +129,9 @@
             <label class="block text-gray-700">Status</label>
             <select v-model="form.status" class="custom-input">
               <option value="">Select</option>
+              <option value="sale">Sale</option>
+              <option value="pending">Pending</option>
+              <option value="complete">Complete</option>
               <option value="available">Available</option>
               <option value="rented">Rented</option>
               <option value="maintenance">Maintenance</option>
@@ -161,14 +162,13 @@ export default {
   },
   data() {
     return {
-    
-      managers:[],
+      managers: [],
       users: [],
-      zones:[],
+      zones: [],
       form: {
-        property_zone_id:12,
+        property_zone_id: 12,
         owner_id: localStorage.getItem("userId"),
-        manager_id:"",
+        manager_id: "",
         name: "",
         property_type: "",
         address: "",
@@ -184,55 +184,49 @@ export default {
     };
   },
   async mounted() {
-   // alert("hh")
+    // alert("hh")
 
-    if(localStorage.getItem('is_superuser')==true){
+    if (localStorage.getItem("is_superuser") == true) {
       const res = await this.$apiGet(`/get_managers`);
-        console.log("res managers", res);
-        this.managers = res.data || [];
-    }else{
-      console.log("managers for the owner")
-     const params={
-      owner__id:localStorage.getItem("userId")
-    }
-    console.log("params",params)
+      console.log("res managers", res);
+      this.managers = res.data || [];
+    } else {
+      console.log("managers for the owner");
+      const params = {
+        owner__id: localStorage.getItem("userId"),
+      };
+      console.log("params", params);
 
-    const res = await this.$apiGet(`/get_owner_managers`,params);
-        console.log("res managers", res);
-        this.managers = res.data || [];
+      const res = await this.$apiGet(`/get_owner_managers`, params);
+      console.log("res managers", res);
+      this.managers = res.data || [];
     }
     // this.fetchUser();
     //zones fetch
 
+    // try {
+    //   const isSuperUser =
+    //     localStorage.getItem("is_superuser") == "1" ||
+    //     localStorage.getItem("is_superuser") === "true";
+    //   const params = isSuperUser
+    //     ? {}
+    //     : { manager_id__email: localStorage.getItem("email") };
 
-      // try {
-      //   const isSuperUser =
-      //     localStorage.getItem("is_superuser") == "1" ||
-      //     localStorage.getItem("is_superuser") === "true";
-      //   const params = isSuperUser
-      //     ? {}
-      //     : { manager_id__email: localStorage.getItem("email") };
+    //   const response = await this.$apiGet(`/get_property_zones`, params);
 
-      //   const response = await this.$apiGet(`/get_property_zones`, params);
+    //   this.zones = response.data || [];
 
-      //   this.zones = response.data || [];
+    //   console.log("zones",this.zones);
 
-      //   console.log("zones",this.zones);
+    // } catch (err) {
+    //   console.error("Error fetching zones:", err);
+    //   this.zones = [];
+    // }
 
-      // } catch (err) {
-      //   console.error("Error fetching zones:", err);
-      //   this.zones = [];
-      // }
+    const result = await this.$getZones();
+    this.zones = result.zones;
 
-
-
-          const result = await this.$getZones();
-          this.zones=result.zones;
-
-          console.log("zones",this.zones);
-
-
-
+    console.log("zones", this.zones);
   },
 
   methods: {
