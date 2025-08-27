@@ -226,49 +226,58 @@ export default {
   },
   methods: {
     async fetchSubscriptions(url = null) {
-      try {
-        const pageUrl =
-          url || `/get_subscription?page=1&page_size=${this.pageSize}`;
+    try {
+  let params = {
+    user_id__id: localStorage.getItem("userId"),
+  };
 
-        const res = await this.$apiGet(pageUrl);
-
-        this.subscriptions = res.data || [];
-        this.currentPage = res.currentPage || 1;
-        this.totalPages = res.totalPages || 1;
-        this.next = res.next || null;
-        this.previous = res.previous || null;
-      } catch (e) {
-        console.error("Error fetching subscriptions", e);
-        this.subscriptions = [];
-        this.currentPage = 1;
-        this.totalPages = 1;
-        this.next = null;
-        this.previous = null;
-      }
-    },
-  async fetch() {
-  let params = {};
-
-  try {
-    const isSuperuser = localStorage.getItem("is_superuser") === "true"; 
-    // convert to boolean
-
-    if (!isSuperuser) {
-      params = {
-        user_id__id: localStorage.getItem("userId"),
-      };
-    }
-
-    console.log("params", params);
-
-    const res = await this.$apiGet("/get_subscription", params);
-
-    this.subscriptions = res.data || [];
-  } catch (e) {
-    console.error("Error fetching subscriptions", e);
-    this.subscriptions = [];
+  // Make sure to compare properly (localStorage stores strings!)
+  if (localStorage.getItem("is_superuser") === "true") {
+    params = {}; // empty object instead of []
   }
-},
+
+  const pageUrl =
+    url || `/get_subscription?page=1&page_size=${this.pageSize}`;
+
+  const res = await this.$apiGet(pageUrl, params);
+
+  this.subscriptions = res.data || [];
+  this.currentPage = res.currentPage || 1;
+  this.totalPages = res.totalPages || 1;
+  this.next = res.next || null;
+  this.previous = res.previous || null;
+} catch (e) {
+  console.error("Error fetching subscriptions", e);
+  this.subscriptions = [];
+  this.currentPage = 1;
+  this.totalPages = 1;
+  this.next = null;
+  this.previous = null;
+}
+
+    },
+//   async fetch() {
+//   let params = {};
+
+//   try {
+//     const isSuperuser = localStorage.getItem("is_superuser") === "true"; 
+//     // convert to boolean
+//     if (!isSuperuser) {
+//       params = {
+//         user_id__id: localStorage.getItem("userId"),
+//       };
+//     }
+
+//     console.log("params", params);
+
+//     const res = await this.$apiGet("/get_subscription", params);
+
+//     this.subscriptions = res.data || [];
+//   } catch (e) {
+//     console.error("Error fetching subscriptions", e);
+//     this.subscriptions = [];
+//   }
+// },
 
     formatDate(dateStr) {
       if (!dateStr) return "";
