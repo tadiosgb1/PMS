@@ -121,6 +121,7 @@
       <!-- ==================================================== -->
 
       <!-- Modals -->
+       <AddRent v-if="visible" :visible="visible" @close="visible = false" />
       <AddPictureModal
         v-if="addPictureVisible && property"
         :visible="addPictureVisible"
@@ -150,6 +151,7 @@
 </template>
 
 <script>
+import AddRent from "@/views/closed/tenant/add.vue";
 import AddPictureModal from '@/views/closed/proporty/AddPropertyPicture.vue';
 import UpdatePictureModal from '@/views/closed/proporty/UpdatePropertyPicture.vue';
 import ConfirmModal from '@/components/ConfirmModal.vue';
@@ -168,6 +170,7 @@ export default {
     Maintenance,
     RentPayments,
     SalePayment,
+    AddRent
   },
   data() {
     return {
@@ -179,6 +182,7 @@ export default {
       pictureToDelete: null,
       showAllPictures: false,
       maintenanceView: false,
+      visible: false
     };
   },
   computed: {
@@ -197,7 +201,9 @@ export default {
   },
   methods: {
     saleProperty() {},
-    rentProperty() {},
+    rentProperty() {
+      this.visible=true
+    },
     async fetchProperty() {
       try {
         const res = await this.$apiGet(`/get_property/${this.$route.params.id}`);

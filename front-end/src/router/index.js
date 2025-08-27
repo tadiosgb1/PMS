@@ -13,7 +13,6 @@ import rentPay from '../views/closed/rent/view.vue'
 import PropertyZone from '../views/closed/Zones/view.vue';
 import PropertyPicture from '../views/closed/proportyPicture/view.vue';
 
-const Tenants = { template: '<div class="p-6 text-gray-800">Tenants Page</div>' };
 const Payments = { template: '<div class="p-6 text-gray-800">Payments Page</div>' };
 const Maintenance = { template: '<div class="p-6 text-gray-800">Maintenance Page</div>' };
 const Leases = { template: '<div class="p-6 text-gray-800">Leases Page</div>' };
@@ -27,7 +26,7 @@ import User_view from '../views/closed/users/view.vue';
 import User_add from '../views/closed/users/add.vue';
 import UserEdit from '../views/closed/users/edit.vue';
 import UserDetail from '../views/closed/users/detail.vue';
-
+import Tenants from '../views/closed/tenant/view.vue';
 import Permissions_add from '../views/closed/permissions/add.vue';
 import permissions_view from '../views/closed/permissions/view.vue';
 import plans_view from '../views/closed/plans/view.vue';
