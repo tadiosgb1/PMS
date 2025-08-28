@@ -251,7 +251,7 @@ export default {
       try {
        // const params = {subscription_id__user_id__id:localStorage.getItem('userId') };
         const params={
-        user_id:localStorage.getItem("userId"),
+       // user_id:localStorage.getItem("userId"),
         subscription_id:this.$route.params.id,
         }
         console.log("params",params);
