@@ -228,7 +228,7 @@ export default {
     async fetchSubscriptions(url = null) {
     try {
   let params = {
-    user_id__id: localStorage.getItem("userId"),
+    user_id: localStorage.getItem("userId"),
   };
 
   // Make sure to compare properly (localStorage stores strings!)

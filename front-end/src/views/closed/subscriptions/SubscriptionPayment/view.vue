@@ -251,11 +251,10 @@ export default {
       try {
        // const params = {subscription_id__user_id__id:localStorage.getItem('userId') };
         const params={
-         subscription_id:this.$route.params.id 
+        user_id:localStorage.getItem("userId"),
+        subscription_id:this.$route.params.id,
         }
-        
         console.log("params",params);
-
         const response = await this.$apiGet(`/get_subscription_payment`,params);
         if (Array.isArray(response.data)) {
           this.payments = response.data;
