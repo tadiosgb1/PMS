@@ -15,7 +15,7 @@ import rentPay from '../views/closed/rent/view.vue'
 import PropertyZone from '../views/closed/Zones/view.vue';
 import PropertyPicture from '../views/closed/proportyPicture/view.vue';
 
-const Payments = { template: '<div class="p-6 text-gray-800">Payments Page</div>' };
+import Payments from '../views/closed/payments/view.vue'
 const Maintenance = { template: '<div class="p-6 text-gray-800">Maintenance Page</div>' };
 const Leases = { template: '<div class="p-6 text-gray-800">Leases Page</div>' };
 const Reports = { template: '<div class="p-6 text-gray-800">Reports Page</div>' };
