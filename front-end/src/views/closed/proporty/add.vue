@@ -130,7 +130,6 @@
               class="custom-input"
             />
           </div>
-
           <div>
             <label class="block text-gray-700">Status</label>
             <select v-model="form.status" class="custom-input">
@@ -138,7 +137,6 @@
               <option value="available">Available</option>
             </select>
           </div>
-
           <div class="md:col-span-2 text-right">
             <button
               type="submit"
