@@ -188,6 +188,7 @@ export default {
         const response = await this.$apiGet("/get_rents");
         if (Array.isArray(response.data)) {
           this.rents = response.data;
+          console.log("rents",this.rents);
         } else {
           console.warn("Unexpected response format:", response);
           this.rents = [];

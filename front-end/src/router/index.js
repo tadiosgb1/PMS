@@ -10,6 +10,8 @@ import dashboard from '../views/closed/dashboard.vue'
 import Properties from '../views/closed/proporty/view.vue';
 import PropertyDetail from '../views/closed/proporty/PropertyDetail.vue'
 import rentPay from '../views/closed/rent/view.vue'
+
+
 import PropertyZone from '../views/closed/Zones/view.vue';
 import PropertyPicture from '../views/closed/proportyPicture/view.vue';
 
@@ -19,7 +21,10 @@ const Leases = { template: '<div class="p-6 text-gray-800">Leases Page</div>' };
 const Reports = { template: '<div class="p-6 text-gray-800">Reports Page</div>' };
 const Messages = { template: '<div class="p-6 text-gray-800">Messages Page</div>' };
 const Settings = { template: '<div class="p-6 text-gray-800">Settings Page</div>' };
-const Rents = { template: '<div class="p-6 text-gray-800">Settings Page</div>' };
+
+import Rents from  '../views/closed/rent/view.vue';
+
+import  MaintenanceRequests from  '../views/closed/maintenanceRequests/view1.vue';
 
 import User_view from '../views/closed/users/view.vue';
 
@@ -81,9 +86,12 @@ const routes = [
       { path: '/reports', name: 'reports', component: Reports },
       { path: '/messages', name: 'messages', component: Messages },
       { path: '/settings', name: 'settings', component: Settings },
-      { path: '/rents', name: 'rents', component: Rents },
+
+      {path: '/rents', name: 'rents', component: Rents },
+
       { path: '/property_sales', name: 'property_sales', component: Property_sales },
       { path: '/sales_payments', name: 'sales_payments', component: Sales_Payments },
+      { path: '/maintenance-requests', name: 'maintenance-requests', component: MaintenanceRequests },
 
       { path: '/user_view', name: 'user_view', component: User_view },
 
