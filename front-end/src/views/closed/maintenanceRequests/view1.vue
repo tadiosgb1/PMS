@@ -1,7 +1,14 @@
 <template>
-  <div class="mx-6 bg-white p-3">
+  <div class="m-6 bg-white p-3">
+
+     <div
+          class="bg-primary hover:bg-primary text-white px-6 py-4 text-xl font-semibold flex justify-between items-center"
+        >
+            Maintenance Requests
+        
+        </div>
     <!-- Filters -->
-    <div class="mb-3 flex justify-between items-center">
+    <div class="mb-3 flex justify-between items-center mt-10">
       <div class="flex gap-4">
         <div>
           <label class="block text-sm font-medium text-gray-700">Start Date</label>
