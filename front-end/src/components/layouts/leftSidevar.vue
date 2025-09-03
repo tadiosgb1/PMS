@@ -96,6 +96,12 @@ export default {
           icon: "fas fa-map-marked-alt",
           color: "#3b82f6",
         },
+         {
+          name: "staffs",
+          route: "staffs",
+          icon: "fas fa-map-marked-alt",
+          color: "#3b82f6",
+        },
         {
           name: "Properties",
           route: "properties",
