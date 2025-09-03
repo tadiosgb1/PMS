@@ -19,7 +19,6 @@
           <label class="block text-sm font-medium mb-1">Property Zone</label>
           <select
             v-model="form.property_zone"
-            required
             class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
           >
             <option disabled value="">Select Zone</option>
@@ -138,7 +137,6 @@ export default {
         address: "",
         property_zone: "",
         owner_id:localStorage.getItem('userId'),
-        is_manager:true,
         password: "",
       }
     };
@@ -156,7 +154,7 @@ export default {
     },
     async submitForm() {
       console.log("this.form",this.form)
-      const res = await this.$apiPost('/sign_up',this.form);
+      const res = await this.$apiPost('/create_staff',this.form);
 
       console.log("res manager add",res);
 
@@ -173,7 +171,6 @@ export default {
         address: "",
         owner_id:localStorage.getItem('userId'),
         property_zone: "",
-        is_manager:true,
         password: "",
       };
     }
