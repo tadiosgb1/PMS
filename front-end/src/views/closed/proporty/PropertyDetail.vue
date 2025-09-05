@@ -1,7 +1,9 @@
 <template>
   <div>
     <Toast ref="toast" />
-    <div class="max-w-7xl p-4 mx-auto bg-white shadow rounded-lg overflow-hidden">
+    <div
+      class="max-w-7xl p-4 mx-auto bg-white shadow rounded-lg overflow-hidden"
+    >
       <button
         @click="$router.back()"
         class="mb-4 px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
@@ -17,18 +19,30 @@
       <!-- Property Details -->
       <div v-if="property" class="grid grid-cols-2 gap-4 mb-6">
         <div class="mb-2"><strong>Name:</strong> {{ property.name }}</div>
-        <div class="mb-2"><strong>Type:</strong> {{ property.property_type }}</div>
+        <div class="mb-2">
+          <strong>Type:</strong> {{ property.property_type }}
+        </div>
         <div class="mb-2"><strong>Address:</strong> {{ property.address }}</div>
         <div class="mb-2"><strong>City:</strong> {{ property.city }}</div>
         <div class="mb-2"><strong>State:</strong> {{ property.state }}</div>
-        <div class="mb-2"><strong>Zip Code:</strong> {{ property.zip_code }}</div>
+        <div class="mb-2">
+          <strong>Zip Code:</strong> {{ property.zip_code }}
+        </div>
         <div class="mb-2"><strong>Price:</strong> {{ property.price }}</div>
-        <div class="mb-2"><strong>Bedrooms:</strong> {{ property.bed_rooms }}</div>
-        <div class="mb-2"><strong>Bathrooms:</strong> {{ property.bath_rooms }}</div>
+        <div class="mb-2">
+          <strong>Bedrooms:</strong> {{ property.bed_rooms }}
+        </div>
+        <div class="mb-2">
+          <strong>Bathrooms:</strong> {{ property.bath_rooms }}
+        </div>
         <div class="mb-2"><strong>Rent:</strong> {{ property.rent }}</div>
         <div class="mb-2"><strong>Status:</strong> {{ property.status }}</div>
-        <div class="mb-2"><strong>Created At:</strong> {{ property.created_at }}</div>
-        <div class="mb-2"><strong>Updated At:</strong> {{ property.updated_at || 'N/A' }}</div>
+        <div class="mb-2">
+          <strong>Created At:</strong> {{ property.created_at }}
+        </div>
+        <div class="mb-2">
+          <strong>Updated At:</strong> {{ property.updated_at || "N/A" }}
+        </div>
       </div>
 
       <!-- Pictures -->
@@ -43,7 +57,11 @@
       </h2>
 
       <div
-        v-if="property && property.property_pictures && property.property_pictures.length"
+        v-if="
+          property &&
+          property.property_pictures &&
+          property.property_pictures.length
+        "
         class="grid grid-cols-3 gap-4 mb-8"
       >
         <div
@@ -51,7 +69,11 @@
           :key="pic.id"
           class="border rounded overflow-hidden cursor-pointer hover:shadow-lg relative"
         >
-          <img :src="pic.property_image" :alt="pic.description" class="object-cover w-full h-32" />
+          <img
+            :src="pic.property_image"
+            :alt="pic.description"
+            class="object-cover w-full h-32"
+          />
           <p class="text-sm p-2">{{ pic.description }}</p>
 
           <!-- Picture actions -->
@@ -85,16 +107,22 @@
       <div v-else class="mb-8 text-gray-500">No pictures available.</div>
 
       <!-- Actions -->
-      <div v-if="property">
-        <button @click="saleProperty()" class="bg-primary text-white ml-14 px-4 py-1 rounded hover:bg-primary-dark">
+      <!-- <div v-if="property">
+        <button
+          @click="saleProperty()"
+          class="bg-primary text-white ml-14 px-4 py-1 rounded hover:bg-primary-dark"
+        >
           Sale this property
         </button>
       </div>
       <div v-if="property">
-        <button @click="rentProperty()" class="mt-5 bg-primary text-white ml-14 px-4 py-1 rounded hover:bg-primary-dark">
+        <button
+          @click="rentProperty()"
+          class="mt-5 bg-primary text-white ml-14 px-4 py-1 rounded hover:bg-primary-dark"
+        >
           Rent this property
         </button>
-      </div>
+      </div> -->
 
       <!-- ================== EXTRA SECTIONS ================== -->
       <div v-if="property" class="mt-10 flex-4">
@@ -105,23 +133,11 @@
           :propertyId="property.id"
           @close="maintenanceView = false"
         />
-
-        <!-- Rent Payments (sample table) -->
-        <div class="mt-10">
-          <h2 class="text-xl font-semibold mb-4">Rent Payments</h2>
-          <RentPayments :propertyId="property.id" />
-        </div>
-
-        <!-- Sale Payment (single record) -->
-        <div class="mt-10">
-          <h2 class="text-xl font-semibold mb-4">Sale Payment</h2>
-          <SalePayment :propertyId="property.id" />
-        </div>
       </div>
       <!-- ==================================================== -->
 
       <!-- Modals -->
-       <AddRent v-if="visible" :visible="visible" @close="visible = false" />
+      <AddRent v-if="visible" :visible="visible" @close="visible = false" />
       <AddPictureModal
         v-if="addPictureVisible && property"
         :visible="addPictureVisible"
@@ -152,16 +168,16 @@
 
 <script>
 import AddRent from "@/views/closed/tenant/add.vue";
-import AddPictureModal from '@/views/closed/proporty/AddPropertyPicture.vue';
-import UpdatePictureModal from '@/views/closed/proporty/UpdatePropertyPicture.vue';
-import ConfirmModal from '@/components/ConfirmModal.vue';
-import Toast from '../../../components/Toast.vue';
-import Maintenance from '@/views/closed/maintenance/view.vue';
-import RentPayments from '@/views/closed/rent/RentPayments.vue';
-import SalePayment from '@/views/closed/sale/SalePayment.vue';
+import AddPictureModal from "@/views/closed/proporty/AddPropertyPicture.vue";
+import UpdatePictureModal from "@/views/closed/proporty/UpdatePropertyPicture.vue";
+import ConfirmModal from "@/components/ConfirmModal.vue";
+import Toast from "../../../components/Toast.vue";
+import Maintenance from "@/views/closed/maintenanceRequests/view.vue";
+import RentPayments from "@/views/closed/rent/RentPayments.vue";
+import SalePayment from "@/views/closed/sale/SalePayment.vue";
 
 export default {
-  name: 'PropertyDetail',
+  name: "PropertyDetail",
   components: {
     AddPictureModal,
     UpdatePictureModal,
@@ -170,7 +186,7 @@ export default {
     Maintenance,
     RentPayments,
     SalePayment,
-    AddRent
+    AddRent,
   },
   data() {
     return {
@@ -182,7 +198,7 @@ export default {
       pictureToDelete: null,
       showAllPictures: false,
       maintenanceView: false,
-      visible: false
+      visible: false,
     };
   },
   computed: {
@@ -202,15 +218,17 @@ export default {
   methods: {
     saleProperty() {},
     rentProperty() {
-      this.visible=true
+      this.visible = true;
     },
     async fetchProperty() {
       try {
-        const res = await this.$apiGet(`/get_property/${this.$route.params.id}`);
+        const res = await this.$apiGet(
+          `/get_property/${this.$route.params.id}`
+        );
         this.property = res.data || res;
       } catch (err) {
-        console.error('Failed to fetch property details', err);
-        alert('Could not load property details.');
+        console.error("Failed to fetch property details", err);
+        alert("Could not load property details.");
       }
     },
     openUpdatePicture(picture) {
@@ -225,12 +243,17 @@ export default {
       this.confirmDeleteVisible = false;
       if (!this.pictureToDelete) return;
       try {
-        const res = await this.$apiDelete(`/delete_property_picture/${this.pictureToDelete.id}`);
-        this.$root.$refs.toast.showToast(res.message || 'Picture deleted successfully', 'success');
+        const res = await this.$apiDelete(
+          `/delete_property_picture/${this.pictureToDelete.id}`
+        );
+        this.$root.$refs.toast.showToast(
+          res.message || "Picture deleted successfully",
+          "success"
+        );
         this.fetchProperty();
       } catch (err) {
         console.error(err);
-        alert('Failed to delete picture.');
+        alert("Failed to delete picture.");
       }
       this.pictureToDelete = null;
     },

@@ -46,7 +46,6 @@
     </transition>
   </div>
 </template>
-
 <script>
 export default {
   data() {
@@ -97,6 +96,12 @@ export default {
           icon: "fas fa-map-marked-alt",
           color: "#3b82f6",
         },
+         {
+          name: "staffs",
+          route: "staffs",
+          icon: "fas fa-map-marked-alt",
+          color: "#3b82f6",
+        },
         {
           name: "Properties",
           route: "properties",
@@ -117,11 +122,19 @@ export default {
           icon: "fas fa-building",
           color: "#6b7280",
         },
+        
         {
-          name: "Rent",
+          name: "Rent Management",
           route: "rents",
           icon: "fas fa-map-marked-alt",
           color: "#3b82f6",
+        },
+        
+        {
+          name: "Maintenance Requests",
+          route: "maintenance-requests",
+          icon: "fas fa-users",
+          color: "#ef4444",
         },
 
         {
@@ -130,6 +143,8 @@ export default {
           icon: "fas fa-users",
           color: "#ef4444",
         },
+
+
         {
           name: "Payments",
           route: "payments",

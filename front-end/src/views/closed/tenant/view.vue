@@ -7,7 +7,7 @@
         <div
           class="bg-orange-500 text-white px-6 py-4 text-xl font-bold flex justify-between items-center"
         >
-          Rents
+          Tenants
           <button
             @click="visible = true"
             class="bg-white text-blue-700 font-semibold px-1 lg:px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300"
@@ -22,7 +22,7 @@
             <input
               v-model="searchTerm"
               type="search"
-              placeholder="Search rents..."
+              placeholder="Search tenants..."
               class="w-full max-w-md px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
 
@@ -31,7 +31,7 @@
               <select
                 id="pageSize"
                 v-model="pageSize"
-                @change="fetchRents()"
+                @change="fetchTenants()"
                 class="border px-2 py-1 rounded"
               >
                 <option v-for="size in pageSizes" :key="size" :value="size">
@@ -51,103 +51,21 @@
                 <tr class="bg-gray-200 text-gray-700">
                   <th
                     class="border border-gray-300 px-4 py-2 cursor-pointer"
-                    @click="sortBy('property_id')"
+                    @click="sortBy('id')"
                   >
-                    Property ID
+                    ID
                     <SortIcon
-                      :field="'property_id'"
+                      :field="'id'"
                       :sort-key="sortKey"
                       :sort-asc="sortAsc"
                     />
                   </th>
-                  <th
-                    class="border border-gray-300 px-4 py-2 cursor-pointer"
-                    @click="sortBy('user_id')"
-                  >
-                    User ID
-                    <SortIcon
-                      :field="'user_id'"
-                      :sort-key="sortKey"
-                      :sort-asc="sortAsc"
-                    />
-                  </th>
-                  <th
-                    class="border border-gray-300 px-4 py-2 cursor-pointer"
-                    @click="sortBy('rent_type')"
-                  >
-                    Rent Type
-                    <SortIcon
-                      :field="'rent_type'"
-                      :sort-key="sortKey"
-                      :sort-asc="sortAsc"
-                    />
-                  </th>
-                  <th
-                    class="border border-gray-300 px-4 py-2 cursor-pointer"
-                    @click="sortBy('start_date')"
-                  >
-                    Start Date
-                    <SortIcon
-                      :field="'start_date'"
-                      :sort-key="sortKey"
-                      :sort-asc="sortAsc"
-                    />
-                  </th>
-                  <th
-                    class="border border-gray-300 px-4 py-2 cursor-pointer"
-                    @click="sortBy('end_date')"
-                  >
-                    End Date
-                    <SortIcon
-                      :field="'end_date'"
-                      :sort-key="sortKey"
-                      :sort-asc="sortAsc"
-                    />
-                  </th>
-                  <th
-                    class="border border-gray-300 px-4 py-2 cursor-pointer"
-                    @click="sortBy('payment_cycle')"
-                  >
-                    Payment Cycle
-                    <SortIcon
-                      :field="'payment_cycle'"
-                      :sort-key="sortKey"
-                      :sort-asc="sortAsc"
-                    />
-                  </th>
-                  <th
-                    class="border border-gray-300 px-4 py-2 cursor-pointer"
-                    @click="sortBy('rent_amount')"
-                  >
-                    Rent Amount
-                    <SortIcon
-                      :field="'rent_amount'"
-                      :sort-key="sortKey"
-                      :sort-asc="sortAsc"
-                    />
-                  </th>
-                  <th
-                    class="border border-gray-300 px-4 py-2 cursor-pointer"
-                    @click="sortBy('deposit_amount')"
-                  >
-                    Deposit
-                    <SortIcon
-                      :field="'deposit_amount'"
-                      :sort-key="sortKey"
-                      :sort-asc="sortAsc"
-                    />
-                  </th>
-                  <th
-                    class="border border-gray-300 px-4 py-2 cursor-pointer"
-                    @click="sortBy('status')"
-                  >
-                    Status
-                    <SortIcon
-                      :field="'status'"
-                      :sort-key="sortKey"
-                      :sort-asc="sortAsc"
-                    />
-                  </th>
+                  <th class="border border-gray-300 px-4 py-2">Full Name</th>
+                  <th class="border border-gray-300 px-4 py-2">Email</th>
+                  <th class="border border-gray-300 px-4 py-2">Phone</th>
+                  <th class="border border-gray-300 px-4 py-2">Groups</th>
+                  <th class="border border-gray-300 px-4 py-2">Status</th>
+                  <th class="border border-gray-300 px-4 py-2">Date Joined</th>
                   <th class="border border-gray-300 px-4 py-2 text-center">
                     Actions
                   </th>
@@ -155,49 +73,57 @@
               </thead>
               <tbody>
                 <tr
-                  v-for="rent in filteredAndSortedRents"
-                  :key="rent.id"
+                  v-for="tenant in filteredAndSortedTenants"
+                  :key="tenant.id"
                   class="hover:bg-gray-100"
                 >
                   <td class="border border-gray-300 px-4 py-2">
-                    {{ rent.property_id.id }}
+                    {{ tenant.id }}
                   </td>
                   <td class="border border-gray-300 px-4 py-2">
-                    {{ rent.user_id.id }}
+                    {{ formatFullName(tenant) }}
                   </td>
                   <td class="border border-gray-300 px-4 py-2">
-                    {{ rent.rent_type }}
+                    {{ tenant.email }}
                   </td>
                   <td class="border border-gray-300 px-4 py-2">
-                    {{ formatDate(rent.start_date) }}
+                    {{ tenant.phone_number }}
                   </td>
                   <td class="border border-gray-300 px-4 py-2">
-                    {{ formatDate(rent.end_date) }}
+                    <span
+                      v-for="g in tenant.groups"
+                      :key="g"
+                      class="inline-block bg-blue-100 text-blue-700 px-2 py-1 rounded text-xs mr-1"
+                    >
+                      {{ g }}
+                    </span>
                   </td>
                   <td class="border border-gray-300 px-4 py-2">
-                    {{ rent.payment_cycle }}
+                    <span
+                      :class="
+                        tenant.is_active
+                          ? 'text-green-600 font-semibold'
+                          : 'text-red-600 font-semibold'
+                      "
+                    >
+                      {{ tenant.is_active ? "Active" : "Inactive" }}
+                    </span>
                   </td>
                   <td class="border border-gray-300 px-4 py-2">
-                    {{ rent.rent_amount }}
-                  </td>
-                  <td class="border border-gray-300 px-4 py-2">
-                    {{ rent.deposit_amount }}
-                  </td>
-                  <td class="border border-gray-300 px-4 py-2">
-                    {{ rent.status }}
+                    {{ formatDate(tenant.date_joined) }}
                   </td>
                   <td
                     class="border border-gray-300 px-4 py-2 text-center space-x-2"
                   >
                     <button
-                      @click="editRent(rent)"
+                      @click="editTenant(tenant)"
                       class="text-blue-600 hover:text-blue-800"
                       title="Edit"
                     >
                       <i class="fas fa-edit"></i>
                     </button>
                     <button
-                      @click="askDeleteConfirmation(rent)"
+                      @click="askDeleteConfirmation(tenant)"
                       class="text-red-600 hover:text-red-800"
                       title="Delete"
                     >
@@ -205,9 +131,9 @@
                     </button>
                   </td>
                 </tr>
-                <tr v-if="filteredAndSortedRents.length === 0">
-                  <td colspan="10" class="text-center py-6 text-gray-500">
-                    No rents found.
+                <tr v-if="filteredAndSortedTenants.length === 0">
+                  <td colspan="8" class="text-center py-6 text-gray-500">
+                    No tenants found.
                   </td>
                 </tr>
               </tbody>
@@ -218,7 +144,7 @@
           <div class="flex justify-between items-center mt-4">
             <button
               :disabled="!previous"
-              @click="fetchRents(previous)"
+              @click="fetchTenants(previous)"
               class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
             >
               Previous
@@ -228,7 +154,7 @@
             >
             <button
               :disabled="!next"
-              @click="fetchRents(next)"
+              @click="fetchTenants(next)"
               class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
             >
               Next
@@ -238,25 +164,22 @@
       </div>
 
       <!-- Modals -->
-      <AddRent v-if="visible" :visible="visible" @close="visible = false" />
+      <!-- Add Tenant Modal (placeholder, create later) -->
       <ConfirmModal
         v-if="confirmVisible"
         :visible="confirmVisible"
         title="Confirm Deletion"
-        message="Are you sure you want to delete this rent?"
+        message="Are you sure you want to delete this tenant?"
         @confirm="confirmDelete"
         @cancel="confirmVisible = false"
       />
-      <!-- <UpdateRent v-if="updateVisible" :visible="updateVisible" :rent="rentToEdit" @close="updateVisible = false" @refresh="fetchRents" /> -->
     </div>
   </div>
 </template>
 
 <script>
-import AddRent from "@/views/closed/tenant/add.vue";
-//import UpdateRent from "@/views/closed/rents/update.vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
-import Toast from "../../../components/Toast.vue";
+import Toast from "@/components/Toast.vue";
 
 const SortIcon = {
   props: ["field", "sortKey", "sortAsc"],
@@ -274,19 +197,14 @@ const SortIcon = {
 };
 
 export default {
-  name: "rentView",
-  components: { SortIcon, AddRent, ConfirmModal, Toast },
+  name: "TenantView",
+  components: { SortIcon, ConfirmModal, Toast },
   data() {
     return {
       searchTerm: "",
-      visible: false,
-      confirmVisible: false,
-      rentToDelete: null,
-      updateVisible: false,
-      rentToEdit: null,
-      sortKey: "property_id",
+      tenants: [],
+      sortKey: "id",
       sortAsc: true,
-      rents: [],
       // Pagination
       currentPage: 1,
       totalPages: 1,
@@ -294,20 +212,21 @@ export default {
       previous: null,
       pageSize: 10,
       pageSizes: [5, 10, 20, 50, 100],
+
+      confirmVisible: false,
+      tenantToDelete: null,
     };
   },
   computed: {
-    filteredAndSortedRents() {
+    filteredAndSortedTenants() {
       const term = this.searchTerm.toLowerCase();
-      let filtered = this.rents.filter(
-        (r) =>
-          String(r.property_id.id).includes(term) ||
-          String(r.user_id.id).includes(term) ||
-          r.rent_type.toLowerCase().includes(term) ||
-          r.payment_cycle.toLowerCase().includes(term) ||
-          String(r.rent_amount).includes(term) ||
-          String(r.deposit_amount).includes(term) ||
-          r.status.toLowerCase().includes(term)
+      let filtered = this.tenants.filter(
+        (t) =>
+          String(t.id).includes(term) ||
+          this.formatFullName(t).toLowerCase().includes(term) ||
+          t.email.toLowerCase().includes(term) ||
+          (t.phone_number || "").toLowerCase().includes(term) ||
+          t.groups.some((g) => g.toLowerCase().includes(term))
       );
       filtered.sort((a, b) => {
         let res = 0;
@@ -319,28 +238,27 @@ export default {
     },
   },
   mounted() {
-    this.fetchRents();
+    this.fetchTenants();
   },
   methods: {
-    async fetchRents(url = null) {
+    async fetchTenants(url = null) {
       try {
-        const pageUrl = url || `/get_rents?page=1&page_size=${this.pageSize}`;
+        const pageUrl = url || `/get_tenants?page=1&page_size=${this.pageSize}`;
         const response = await this.$apiGet(pageUrl);
-
-        // handle API response
-        this.rents = response.rents || response.data || [];
+        console.log("response", response);
+        this.tenants = response.tenants || response.data || [];
         this.currentPage = response.currentPage || 1;
         this.totalPages = response.totalPages || 1;
         this.next = response.next || null;
         this.previous = response.previous || null;
       } catch (error) {
-        console.error("Failed to fetch rents:", error);
-        this.rents = [];
+        console.error("Failed to fetch tenants:", error);
+        this.tenants = [];
         this.currentPage = 1;
         this.totalPages = 1;
         this.next = null;
         this.previous = null;
-        alert("Failed to load rents. Please try again later.");
+        alert("Failed to load tenants. Please try again later.");
       }
     },
     sortBy(key) {
@@ -351,27 +269,31 @@ export default {
       if (!dateStr) return "";
       return new Date(dateStr).toLocaleDateString();
     },
-    editRent(rent) {
-      this.rentToEdit = rent;
-      this.updateVisible = true;
+    formatFullName(tenant) {
+      return [tenant.first_name, tenant.middle_name, tenant.last_name]
+        .filter(Boolean)
+        .join(" ");
     },
-    askDeleteConfirmation(rent) {
-      this.rentToDelete = rent;
+    editTenant(tenant) {
+      alert(`Edit tenant ${tenant.id} (you can add modal here)`);
+    },
+    askDeleteConfirmation(tenant) {
+      this.tenantToDelete = tenant;
       this.confirmVisible = true;
     },
     async confirmDelete() {
       this.confirmVisible = false;
       try {
         const response = await this.$apiDelete(
-          `/delete_rent/${this.rentToDelete.id}`
+          `/delete_tenant/${this.tenantToDelete.id}`
         );
         this.$refs.toast.showToast(response.message, "success");
-        this.fetchRents();
+        this.fetchTenants();
       } catch (error) {
-        alert("Failed to delete rent.");
+        alert("Failed to delete tenant.");
         console.error(error);
       }
-      this.rentToDelete = null;
+      this.tenantToDelete = null;
     },
   },
 };

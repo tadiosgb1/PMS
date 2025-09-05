@@ -244,7 +244,10 @@ export default {
       url = `/get_property_sales?page=1&page_size=${this.pageSize}`
     ) {
       try {
-        const res = await this.$apiGet(url);
+        const params = {
+          seller__id: localStorage.getItem("userId"),
+        };
+        const res = await this.$apiGet(url, params);
         console.log("res", res);
         this.sales = res.data || [];
         this.currentPage = res.current_page;

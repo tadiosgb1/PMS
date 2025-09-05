@@ -30,10 +30,20 @@
             <input v-model="form.user_id" type="number" class="custom-input" required />
           </div>
 
+    
+
           <div>
-            <label class="block text-gray-700 mb-1">Rent Type</label>
-            <input v-model="form.rent_type" type="text" class="custom-input" required />
-          </div>
+        <label class="block text-sm font-medium text-gray-700">Rent Type</label>
+        <select
+          v-model="form.rent_type"
+          class="custom-select mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
+        >
+          <option value="lease">Lease</option>
+          <option value="house_rent">House Rent</option>
+          <option value="vehicle_rent">Vehicle Rent</option>
+          <option value="other">Other</option>
+        </select>
+      </div>
 
           <div>
             <label class="block text-gray-700 mb-1">Start Date</label>
@@ -45,10 +55,20 @@
             <input v-model="form.end_date" type="date" class="custom-input" required />
           </div>
 
+      
+
           <div>
-            <label class="block text-gray-700 mb-1">Payment Cycle</label>
-            <input v-model="form.payment_cycle" type="text" class="custom-input" required />
-          </div>
+        <label class="block text-sm font-medium text-gray-700">Payment Cycle</label>
+        <select
+          v-model="form.payment_cycle"
+          class="custom-select mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
+        >
+          <option value="weekly">Weekly</option>
+          <option value="monthly">Monthly</option>
+          <option value="yearly">Yearly</option>
+          <option value="quarterly">Quarterly</option>
+        </select>
+      </div>
 
           <div>
             <label class="block text-gray-700 mb-1">Rent Amount</label>
@@ -60,11 +80,18 @@
             <input v-model="form.deposit_amount" type="number" class="custom-input" required />
           </div>
 
-          <div>
-            <label class="block text-gray-700 mb-1">Status</label>
-            <input v-model="form.status" type="text" class="custom-input" required />
-          </div>
+        
 
+       <div>
+        <label class="block text-sm font-medium text-gray-700">Status</label>
+        <select
+          v-model="form.status"
+          class="custom-select mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
+        >
+          <option value="active">Active</option>
+          <option value="inactive">Inactive</option>
+        </select>
+      </div>
           <!-- Actions -->
           <div class="md:col-span-2 text-right pt-2">
             <button

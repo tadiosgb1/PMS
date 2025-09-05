@@ -27,6 +27,14 @@ export default {
         swing: 'swing 0.8s ease-in-out',
       },
       keyframes: {
+         glow: {
+          '0%, 100%': { boxShadow: '0 0 5px #22c55e, 0 0 10px #22c55e' },
+          '50%': { boxShadow: '0 0 20px #22c55e, 0 0 30px #22c55e' },
+        },
+      
+      animation: {
+        glow: 'glow 2s ease-in-out infinite',
+      },
         'border-loop': {
           '0%': { 'background-position': '0% 0%' },
           '100%': { 'background-position': '200% 200%' },

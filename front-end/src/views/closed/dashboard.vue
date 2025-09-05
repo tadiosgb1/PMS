@@ -34,6 +34,19 @@
 
         <!-- Right side: Welcome + Username + Profile -->
         <div class="flex items-center space-x-4 text-blue-500">
+<div class="relative inline-block">
+  <!-- Bell Icon -->
+  <i class="fas fa-bell text-gray-700 text-xl cursor-pointer"></i>
+
+  <!-- Notification Badge -->
+  <span
+    class="absolute -top-3 -right-2 bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow"
+  >
+    5
+  </span>
+</div>
+
+
           <span class="whitespace-nowrap hidden sm:block">Welcome,</span>
           <h1
             class="font-extrabold text-blue-400 hidden sm:block"

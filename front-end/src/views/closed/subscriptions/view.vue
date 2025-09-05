@@ -75,13 +75,19 @@
                   <td class="px-4 py-2 border">{{ subscription.status }}</td>
                   <td class="px-4 py-2 border">{{ subscription.user_id }}</td>
                   <td class="px-4 py-2 border text-center space-x-2">
-                    <button
-                      @click="pay(subscription)"
-                      class="text-green-600 hover:text-green-800"
-                      title="Pay"
-                    >
-                      <i class="fas fa-credit-card"></i> Pay
-                    </button>
+                   
+                   
+                <button
+  @click="pay(subscription)"
+  class="relative px-4 py-2 text-green-600 border border-green-600 rounded-lg
+         hover:text-white hover:bg-green-600
+         transition duration-300 ease-in-out
+         animate-glow"
+  title="Pay"
+>
+  <i class="fas fa-credit-card mr-2"></i> Pay
+</button>
+
                     <button
                       @click="payment(subscription.id)"
                       class="text-green-600 hover:text-green-800"
