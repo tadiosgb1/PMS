@@ -44,7 +44,9 @@
 
           <!-- Table -->
           <div class="overflow-x-auto">
-            <table class="min-w-full table-auto border-collapse border border-gray-300">
+            <table
+              class="min-w-full table-auto border-collapse border border-gray-300"
+            >
               <thead>
                 <tr class="bg-gray-200 text-gray-700">
                   <th
@@ -52,89 +54,161 @@
                     @click="sortBy('property_id')"
                   >
                     Property ID
-                    <SortIcon :field="'property_id'" :sort-key="sortKey" :sort-asc="sortAsc" />
+                    <SortIcon
+                      :field="'property_id'"
+                      :sort-key="sortKey"
+                      :sort-asc="sortAsc"
+                    />
                   </th>
                   <th
                     class="border border-gray-300 px-4 py-2 cursor-pointer"
                     @click="sortBy('user_id')"
                   >
                     User ID
-                    <SortIcon :field="'user_id'" :sort-key="sortKey" :sort-asc="sortAsc" />
+                    <SortIcon
+                      :field="'user_id'"
+                      :sort-key="sortKey"
+                      :sort-asc="sortAsc"
+                    />
                   </th>
                   <th
                     class="border border-gray-300 px-4 py-2 cursor-pointer"
                     @click="sortBy('rent_type')"
                   >
                     Rent Type
-                    <SortIcon :field="'rent_type'" :sort-key="sortKey" :sort-asc="sortAsc" />
+                    <SortIcon
+                      :field="'rent_type'"
+                      :sort-key="sortKey"
+                      :sort-asc="sortAsc"
+                    />
                   </th>
                   <th
                     class="border border-gray-300 px-4 py-2 cursor-pointer"
                     @click="sortBy('start_date')"
                   >
                     Start Date
-                    <SortIcon :field="'start_date'" :sort-key="sortKey" :sort-asc="sortAsc" />
+                    <SortIcon
+                      :field="'start_date'"
+                      :sort-key="sortKey"
+                      :sort-asc="sortAsc"
+                    />
                   </th>
                   <th
                     class="border border-gray-300 px-4 py-2 cursor-pointer"
                     @click="sortBy('end_date')"
                   >
                     End Date
-                    <SortIcon :field="'end_date'" :sort-key="sortKey" :sort-asc="sortAsc" />
+                    <SortIcon
+                      :field="'end_date'"
+                      :sort-key="sortKey"
+                      :sort-asc="sortAsc"
+                    />
                   </th>
                   <th
                     class="border border-gray-300 px-4 py-2 cursor-pointer"
                     @click="sortBy('payment_cycle')"
                   >
                     Payment Cycle
-                    <SortIcon :field="'payment_cycle'" :sort-key="sortKey" :sort-asc="sortAsc" />
+                    <SortIcon
+                      :field="'payment_cycle'"
+                      :sort-key="sortKey"
+                      :sort-asc="sortAsc"
+                    />
                   </th>
                   <th
                     class="border border-gray-300 px-4 py-2 cursor-pointer"
                     @click="sortBy('rent_amount')"
                   >
                     Rent Amount
-                    <SortIcon :field="'rent_amount'" :sort-key="sortKey" :sort-asc="sortAsc" />
+                    <SortIcon
+                      :field="'rent_amount'"
+                      :sort-key="sortKey"
+                      :sort-asc="sortAsc"
+                    />
                   </th>
                   <th
                     class="border border-gray-300 px-4 py-2 cursor-pointer"
                     @click="sortBy('deposit_amount')"
                   >
                     Deposit
-                    <SortIcon :field="'deposit_amount'" :sort-key="sortKey" :sort-asc="sortAsc" />
+                    <SortIcon
+                      :field="'deposit_amount'"
+                      :sort-key="sortKey"
+                      :sort-asc="sortAsc"
+                    />
                   </th>
                   <th
                     class="border border-gray-300 px-4 py-2 cursor-pointer"
                     @click="sortBy('status')"
                   >
                     Status
-                    <SortIcon :field="'status'" :sort-key="sortKey" :sort-asc="sortAsc" />
+                    <SortIcon
+                      :field="'status'"
+                      :sort-key="sortKey"
+                      :sort-asc="sortAsc"
+                    />
                   </th>
-                  <th class="border border-gray-300 px-4 py-2 text-center"> Actions </th>
+                  <th class="border border-gray-300 px-4 py-2 text-center">
+                    Actions
+                  </th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="rent in filteredAndSortedRents" :key="rent.id" class="hover:bg-gray-100">
-                  <td class="border border-gray-300 px-4 py-2"> {{ rent.property_id.id }} </td>
-                  <td class="border border-gray-300 px-4 py-2"> {{ rent.user_id.id }} </td>
-                  <td class="border border-gray-300 px-4 py-2"> {{ rent.rent_type }} </td>
-                  <td class="border border-gray-300 px-4 py-2"> {{ formatDate(rent.start_date) }} </td>
-                  <td class="border border-gray-300 px-4 py-2"> {{ formatDate(rent.end_date) }} </td>
-                  <td class="border border-gray-300 px-4 py-2"> {{ rent.payment_cycle }} </td>
-                  <td class="border border-gray-300 px-4 py-2"> {{ rent.rent_amount }} </td>
-                  <td class="border border-gray-300 px-4 py-2"> {{ rent.deposit_amount }} </td>
-                  <td class="border border-gray-300 px-4 py-2"> {{ rent.status }} </td>
-                  <td class="border border-gray-300 px-4 py-2 text-center space-x-2">
-                    <button @click="editRent(rent)" class="text-blue-600 hover:text-blue-800" title="Edit">
+                <tr
+                  v-for="rent in filteredAndSortedRents"
+                  :key="rent.id"
+                  class="hover:bg-gray-100"
+                >
+                  <td class="border border-gray-300 px-4 py-2">
+                    {{ rent.property_id.id }}
+                  </td>
+                  <td class="border border-gray-300 px-4 py-2">
+                    {{ rent.user_id.id }}
+                  </td>
+                  <td class="border border-gray-300 px-4 py-2">
+                    {{ rent.rent_type }}
+                  </td>
+                  <td class="border border-gray-300 px-4 py-2">
+                    {{ formatDate(rent.start_date) }}
+                  </td>
+                  <td class="border border-gray-300 px-4 py-2">
+                    {{ formatDate(rent.end_date) }}
+                  </td>
+                  <td class="border border-gray-300 px-4 py-2">
+                    {{ rent.payment_cycle }}
+                  </td>
+                  <td class="border border-gray-300 px-4 py-2">
+                    {{ rent.rent_amount }}
+                  </td>
+                  <td class="border border-gray-300 px-4 py-2">
+                    {{ rent.deposit_amount }}
+                  </td>
+                  <td class="border border-gray-300 px-4 py-2">
+                    {{ rent.status }}
+                  </td>
+                  <td
+                    class="border border-gray-300 px-4 py-2 text-center space-x-2"
+                  >
+                    <button
+                      @click="editRent(rent)"
+                      class="text-blue-600 hover:text-blue-800"
+                      title="Edit"
+                    >
                       <i class="fas fa-edit"></i>
                     </button>
-                    <button @click="askDeleteConfirmation(rent)" class="text-red-600 hover:text-red-800" title="Delete">
+                    <button
+                      @click="askDeleteConfirmation(rent)"
+                      class="text-red-600 hover:text-red-800"
+                      title="Delete"
+                    >
                       <i class="fas fa-trash-alt"></i>
                     </button>
                   </td>
                 </tr>
                 <tr v-if="filteredAndSortedRents.length === 0">
-                  <td colspan="10" class="text-center py-6 text-gray-500"> No rents found. </td>
+                  <td colspan="10" class="text-center py-6 text-gray-500">
+                    No rents found.
+                  </td>
                 </tr>
               </tbody>
             </table>
@@ -149,7 +223,9 @@
             >
               Previous
             </button>
-            <span class="text-gray-600">Page {{ currentPage }} of {{ totalPages }}</span>
+            <span class="text-gray-600"
+              >Page {{ currentPage }} of {{ totalPages }}</span
+            >
             <button
               :disabled="!next"
               @click="fetchRents(next)"
@@ -211,7 +287,6 @@ export default {
       sortKey: "property_id",
       sortAsc: true,
       rents: [],
-
       // Pagination
       currentPage: 1,
       totalPages: 1,
@@ -270,7 +345,7 @@ export default {
     },
     sortBy(key) {
       if (this.sortKey === key) this.sortAsc = !this.sortAsc;
-      else this.sortKey = key, this.sortAsc = true;
+      else ((this.sortKey = key), (this.sortAsc = true));
     },
     formatDate(dateStr) {
       if (!dateStr) return "";
@@ -287,7 +362,9 @@ export default {
     async confirmDelete() {
       this.confirmVisible = false;
       try {
-        const response = await this.$apiDelete(`/delete_rent/${this.rentToDelete.id}`);
+        const response = await this.$apiDelete(
+          `/delete_rent/${this.rentToDelete.id}`
+        );
         this.$refs.toast.showToast(response.message, "success");
         this.fetchRents();
       } catch (error) {
