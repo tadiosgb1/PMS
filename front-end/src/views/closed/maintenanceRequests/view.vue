@@ -30,6 +30,8 @@
             >
               Resolved At
             </th>
+             <th class="border border-gray-300 px-3 py-2">Action
+                 </th>
           </tr>
         </thead>
         <tbody>
@@ -50,6 +52,9 @@
             <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
               {{ maint.resolved_at || "N/A" }}
             </td>
+            <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
+                   <button @click="confirm=true; selectedId=maint.id ">Resolve</button>
+                </td>
           </tr>
 
           <tr v-if="maintenance.length === 0">
@@ -60,6 +65,15 @@
         </tbody>
       </table>
     </div>
+    <div v-if="confirm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-10">
+    <div class="bg-white rounded-lg shadow-md max-w-sm w-full p-6 text-center">
+      <p class="text-orange-400  mb-6">Do you want to make it resolved</p>
+      <div class="flex justify-center space-x-4">
+        <button @click="confirm=false" class="px-4 py-2 rounded bg-orange-400 text-white hover:bg-orange-500">Cancel</button>
+        <button @click="resolve()" class="px-4 py-2 rounded bg-orange-500 text-white hover:bg-orange-600">OK</button>
+      </div>
+    </div>
+  </div>
   </div>
 </template>
 
@@ -72,6 +86,7 @@ export default {
   data() {
     return {
       maintenance: [], // initialize as empty array
+      confirm:false,
     };
   },
   mounted() {
@@ -101,6 +116,16 @@ export default {
         if (a[field] > b[field]) return 1;
         return 0;
       });
+    },
+     async resolve(){
+      const payload={
+        id:this.selectedId
+      }
+      console.log("selcted",payload)
+     await this.$apiPost('/resolve_maintenance_request',payload )
+
+     this.confirm=false
+
     },
   },
 };
