@@ -197,12 +197,15 @@ export default {
     return this.rents;
     }
   },
+
   mounted() {
-    this.fetchRents();
+    this.fetchRent();
   },
+  
   methods: {
     rentDetail(rent_id){
      console.log("rent id",rent_id);
+     
     },
     goToPayments(rent_id){
 
