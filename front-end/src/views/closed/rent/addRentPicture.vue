@@ -108,7 +108,7 @@ export default {
       try {
         const fd = new FormData();
         fd.append('description', this.form.description);
-        fd.append('property_id', this.form.rent_id);
+        fd.append('rent_id', this.form.rent_id);
         if (this.form.file) fd.append('rent_image', this.form.file);
 
         const res = await this.$apiPost('/post_rent_picture', fd, { 'Content-Type': 'multipart/form-data' });
@@ -119,7 +119,7 @@ export default {
 
         // Reset form
         this.form.description = '';
-        this.form.property_id = '';
+        this.form.rent_id = '';
         this.form.file = null;
         this.form.preview = null;
       } catch (err) {

@@ -86,18 +86,16 @@
           <!-- Pictures -->
           <div class="mt-6">
             <h3 class="text-lg font-bold mb-2">Pictures</h3>
-            <div v-if="pictures.length > 0" class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div  class="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div v-for="pic in pictures" :key="pic.id" class="border rounded overflow-hidden">
                 <img
-                  :src="pic.url"
+                  :src="pic.rent_image"
                   :alt="'Rent picture ' + pic.id"
                   class="w-full h-32 object-cover"
                 />
               </div>
             </div>
-            <div v-else class="text-gray-500">
-              No pictures available.
-            </div>
+            
           </div>
         </div>
       </div>
@@ -159,8 +157,13 @@ export default {
       const rentId = this.$route.params.id;
       if (!rentId) return;
       try {
-        const response = await this.$apiGet(`/get_rent_picture/${rentId}`);
-        this.pictures = Array.isArray(response.data) ? response.data : [];
+        const response = await this.$apiGetById(`/get_rent_picture`,rentId);
+
+        console.log("response",response);
+
+         this.pictures =response ? (Array.isArray(response) ? response : [response]) : [];
+
+        console.log("pictures",this.pictures)
       } catch (error) {
         console.error("Failed to fetch pictures:", error);
         this.pictures = [];
