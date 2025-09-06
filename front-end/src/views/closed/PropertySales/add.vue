@@ -39,16 +39,20 @@
               required />
           </div>
 
-          <div class="mt-2 border rounded bg-white shadow">
-            <div
-              v-for="property in properties"
-              :key="property.id"
-              class="p-2 hover:bg-gray-100 cursor-pointer"
-              @click="selectProperty(property.id)"
-            >
-              {{ property.name }}
-            </div>
-          </div>
+                <div class="mt-2 border rounded bg-white shadow w-full" v-if="pr_length > 0">
+  <div
+    v-for="property in properties"
+    :key="property.id"
+    class="p-2 hover:bg-gray-100 cursor-pointer flex items-center justify-between"
+    @click="selectProperty(property.id)"
+  >
+    <span>{{ property.name }}</span>
+
+    <!-- Show check icon only for the selected one -->
+    <i v-if="form.property_id === property.id" class="fas fa-check text-green-500"></i>
+  </div>
+</div>
+
           <!-- Seller -->
           <!-- <div>
             <label class="block text-gray-700 mb-1">Seller ID</label>
@@ -62,7 +66,7 @@
               @input="searchBuyer()"/>
           </div>
 
-             <div class="mt-2 border rounded bg-white shadow">
+             <div class="mt-2 border rounded bg-white shadow w-full" v-if="buyer_length>0">
             <div
               v-for="buyer in buyers"
               :key="buyer.id"
@@ -70,8 +74,11 @@
               @click="selectBuyer(buyer.id)"
             >
               {{ buyer.first_name }}  {{ buyer.middle_name }}   {{ buyer.last_name }} 
+               <i v-if="form.buyer === buyer.id" class="fas fa-check text-green-500"></i>
             </div>
           </div>
+
+             
 
           <!-- Listing Price -->
           <div>
@@ -130,7 +137,7 @@ export default {
       form: {
         property_id: this.propertyId || "",
         seller: localStorage.getItem('userId'),
-        buyer: 55,
+        buyer: "",
         listing_price: "",
         selling_price: "",
         status: "",
@@ -139,7 +146,7 @@ export default {
       },
       properties:[],
       pr_length:0,
-      buyers_length:0,
+      buyer_length:0,
       buyers:[],
     };
   },
@@ -154,7 +161,8 @@ console.log("form",this.form);
 },
     async searchProperty() {
       const params={
-        search:this.form.property_id
+        search:this.form.property_id,
+        page_size:100000000,
       }
       console.log("Searching for:", this.form.property_id);
        const res=await this.$apiGet(`get_properties`,params);
@@ -166,12 +174,13 @@ console.log("form",this.form);
 
    async searchBuyer() {
       const params={
-        search:this.form.buyer
+        search:this.form.buyer,
+        page_size:100000000,
       }
       console.log("Searching for:", this.form.buyer);
        const res=await this.$apiGet(`get_users`,params);
        this.buyers=res.data
-      // this.pr_length=res.data.length;
+       this.buyer_length=res.data.length;
        console.log("res",res);
       
     },

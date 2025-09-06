@@ -33,7 +33,7 @@
                     <SortIcon :field="'property_id'" :sort-key="sortKey" :sort-asc="sortAsc" />
                   </th>
                   <th class="border border-gray-300 px-4 py-2 cursor-pointer" @click="sortBy('user_id')">
-                    User ID
+                    Tenant
                     <SortIcon :field="'user_id'" :sort-key="sortKey" :sort-asc="sortAsc" />
                   </th>
                   <th class="border border-gray-300 px-4 py-2 cursor-pointer" @click="sortBy('rent_type')">
@@ -69,8 +69,8 @@
               </thead>
               <tbody>
                 <tr v-for="rent in filteredAndSortedRents" :key="rent.id" class="hover:bg-gray-100">
-                  <td class="border border-gray-300 px-4 py-2">{{ rent.property_id.id }}</td>
-                  <td class="border border-gray-300 px-4 py-2">{{ rent.user_id.id }}</td>
+                  <td class="border border-gray-300 px-4 py-2">{{ rent.property_id.name }}</td>
+                  <td class="border border-gray-300 px-4 py-2">{{ rent.user_id.first_name }}</td>
                   <td class="border border-gray-300 px-4 py-2">{{ rent.rent_type }}</td>
                   <td class="border border-gray-300 px-4 py-2">{{ rent.start_date }}</td>
                   <td class="border border-gray-300 px-4 py-2">{{ rent.end_date }}</td>
@@ -84,6 +84,9 @@
                     </button>
                     <button @click="askDeleteConfirmation(rent)" class="text-red-600 hover:text-red-800 focus:outline-none" title="Delete">
                       <i class="fas fa-trash-alt"></i>
+                    </button>
+                     <button @click="payments(rent)" class="text-green-600 hover:text-red-800 focus:outline-none" title="Delete">
+                      <i class=""></i> Payments
                     </button>
                   </td>
                 </tr>
@@ -151,32 +154,32 @@ export default {
   computed: {
     filteredAndSortedRents() {
       const term = this.searchTerm.toLowerCase();
+      // // 1️⃣ Filter by current route property ID
+      // let filtered = this.rents.filter(rent => 
+      //   String(rent.property_id.id) === String(this.$route.params.id)
+      // );
 
-      // 1️⃣ Filter by current route property ID
-      let filtered = this.rents.filter(rent => 
-        String(rent.property_id.id) === String(this.$route.params.id)
-      );
+      // // 2️⃣ Apply search filter
+      // filtered = filtered.filter(r => 
+      //   String(r.property_id.id).toLowerCase().includes(term) ||
+      //   String(r.user_id.id).toLowerCase().includes(term) ||
+      //   r.rent_type.toLowerCase().includes(term) ||
+      //   r.payment_cycle.toLowerCase().includes(term) ||
+      //   String(r.rent_amount).toLowerCase().includes(term) ||
+      //   String(r.deposit_amount).toLowerCase().includes(term) ||
+      //   r.status.toLowerCase().includes(term)
+      // );
 
-      // 2️⃣ Apply search filter
-      filtered = filtered.filter(r => 
-        String(r.property_id.id).toLowerCase().includes(term) ||
-        String(r.user_id.id).toLowerCase().includes(term) ||
-        r.rent_type.toLowerCase().includes(term) ||
-        r.payment_cycle.toLowerCase().includes(term) ||
-        String(r.rent_amount).toLowerCase().includes(term) ||
-        String(r.deposit_amount).toLowerCase().includes(term) ||
-        r.status.toLowerCase().includes(term)
-      );
+      // // 3️⃣ Sort results
+      // filtered.sort((a, b) => {
+      //   let res = 0;
+      //   if (a[this.sortKey] < b[this.sortKey]) res = -1;
+      //   if (a[this.sortKey] > b[this.sortKey]) res = 1;
+      //   return this.sortAsc ? res : -res;
+      // });
 
-      // 3️⃣ Sort results
-      filtered.sort((a, b) => {
-        let res = 0;
-        if (a[this.sortKey] < b[this.sortKey]) res = -1;
-        if (a[this.sortKey] > b[this.sortKey]) res = 1;
-        return this.sortAsc ? res : -res;
-      });
-
-      return filtered;
+      //return filtered;
+    return this.rents;
     }
   },
   mounted() {
@@ -184,8 +187,13 @@ export default {
   },
   methods: {
     async fetchRents() {
+      const params={
+
+      }
+      console.log("params",params);
       try {
-        const response = await this.$apiGet("/get_rents");
+        const response = await this.$apiGet("/get_rents",params);
+        console.log("response get rents",response);
         if (Array.isArray(response.data)) {
           this.rents = response.data;
           console.log("rents",this.rents);

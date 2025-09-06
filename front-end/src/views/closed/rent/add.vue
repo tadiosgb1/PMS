@@ -20,17 +20,56 @@
           @submit.prevent="submitForm"
           class="p-4 sm:p-6 grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[80vh] overflow-y-auto"
         >
-          <div>
+       
+
+           <div>
             <label class="block text-gray-700 mb-1">Property ID</label>
-            <input v-model="form.property_id" type="number" class="custom-input" required />
+            <input 
+              v-model="form.property_id" 
+              type="text"
+              class="custom-input" 
+              @input="searchProperty"
+              required />
           </div>
 
-          <div>
-            <label class="block text-gray-700 mb-1">User ID</label>
-            <input v-model="form.user_id" type="number" class="custom-input" required />
-          </div>
+         <div class="mt-2 border rounded bg-white shadow w-full" v-if="pr_length > 0">
+  <div
+    v-for="property in properties"
+    :key="property.id"
+    class="p-2 hover:bg-gray-100 cursor-pointer flex items-center justify-between"
+    @click="selectProperty(property.id)"
+  >
+    <span>{{ property.name }}</span>
+
+    <!-- Show check icon only for the selected one -->
+    <i v-if="form.property_id === property.id" class="fas fa-check text-green-500"></i>
+  </div>
+</div>
+
 
     
+
+           <div>
+            <label class="block text-gray-700 mb-1">Tenant </label>
+            <input v-model="form.user_id" type="text" class="custom-input" 
+              @input="searchUser()"/>
+          </div>
+
+           <div class="mt-2 border rounded bg-white shadow w-full" v-if="users.length > 0">
+  <div
+    v-for="user in users"
+    :key="user.id"
+    class="p-2 hover:bg-gray-100 cursor-pointer flex items-center justify-between"
+    @click="selectUser(user.id)"
+  >
+    <span>{{ user.first_name }} {{ user.middle_name }} {{ user.last_name }}</span>
+
+    <!-- Check icon if selected -->
+    <i v-if="form.user_id === user.id" class="fas fa-check text-green-500"></i>
+  </div>
+</div>
+
+
 
           <div>
         <label class="block text-sm font-medium text-gray-700">Rent Type</label>
@@ -129,10 +168,47 @@ export default {
         rent_amount: "",
         deposit_amount: "",
         status: ""
-      }
+      },
+      properties:[],
+      pr_length:0,
+      user_length:0,
+      users:[],
     };
   },
   methods: {
+selectUser(user_id){
+this.form.user_id=user_id
+console.log("form",this.form);
+},
+selectProperty(property_id){
+this.form.property_id=property_id
+console.log("form",this.form);
+},
+    async searchProperty() {
+      const params={
+        search:this.form.property_id,
+        page_size:100000000,
+      }
+      console.log("Searching for:", this.form.property_id);
+       const res=await this.$apiGet(`get_properties`,params);
+       this.properties=res.data
+       this.pr_length=res.data.length;
+       console.log("res",res);
+      
+    },
+
+   async searchUser() {
+      const params={
+        search:this.form.user_id,
+        page_size:100000000,
+      }
+      console.log("Searching for:", this.form.user_id);
+       const res=await this.$apiGet(`get_tenants`,params);
+       this.users=res.data
+       this.user_length=res.data.length;
+       console.log("res",res);
+      
+    },
     async submitForm() {
       try {
         const response = await this.$apiPost("/post_rent", this.form);
