@@ -97,7 +97,15 @@ export default {
   methods: {
     async fetchPayments() {
       try {
-        const res = await this.$apiGet(`/get_sales_payments`);
+        let params={};
+        const id = this.$route.query.id;
+        if(id){
+          params={
+            property_id__id:id
+          }
+        }
+        console.log("params",params);
+        const res = await this.$apiGet(`/get_sales_payments`,params);
         console.log("res", res);
         this.payments = res.data || [];
       } catch (err) {

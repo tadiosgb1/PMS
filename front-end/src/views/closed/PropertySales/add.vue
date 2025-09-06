@@ -31,9 +31,24 @@
           <!-- Property ID -->
           <div>
             <label class="block text-gray-700 mb-1">Property ID</label>
-            <input v-model="form.property_id" type="number" class="custom-input" required />
+            <input 
+              v-model="form.property_id" 
+              type="text"
+              class="custom-input" 
+              @input="searchProperty"
+              required />
           </div>
 
+          <div class="mt-2 border rounded bg-white shadow">
+            <div
+              v-for="property in properties"
+              :key="property.id"
+              class="p-2 hover:bg-gray-100 cursor-pointer"
+              @click="selectProperty(property.id)"
+            >
+              {{ property.name }}
+            </div>
+          </div>
           <!-- Seller -->
           <!-- <div>
             <label class="block text-gray-700 mb-1">Seller ID</label>
@@ -43,7 +58,19 @@
           <!-- Buyer -->
           <div>
             <label class="block text-gray-700 mb-1">Buyer ID</label>
-            <input v-model="form.buyer" type="number" class="custom-input" required />
+            <input v-model="form.buyer" type="text" class="custom-input" required 
+              @input="searchBuyer()"/>
+          </div>
+
+             <div class="mt-2 border rounded bg-white shadow">
+            <div
+              v-for="buyer in buyers"
+              :key="buyer.id"
+              class="p-2 hover:bg-gray-100 cursor-pointer"
+              @click="selectBuyer(buyer.id)"
+            >
+              {{ buyer.first_name }}  {{ buyer.middle_name }}   {{ buyer.last_name }} 
+            </div>
           </div>
 
           <!-- Listing Price -->
@@ -110,9 +137,45 @@ export default {
         created_at: new Date(),
         updated_at: new Date(),
       },
+      properties:[],
+      pr_length:0,
+      buyers_length:0,
+      buyers:[],
     };
   },
   methods: {
+    selectBuyer(buyer_id){
+this.form.buyer=buyer_id
+console.log("form",this.form);
+},
+selectProperty(property_id){
+this.form.property_id=property_id
+console.log("form",this.form);
+},
+    async searchProperty() {
+      const params={
+        search:this.form.property_id
+      }
+      console.log("Searching for:", this.form.property_id);
+       const res=await this.$apiGet(`get_properties`,params);
+       this.properties=res.data
+       this.pr_length=res.data.length;
+       console.log("res",res);
+      
+    },
+
+   async searchBuyer() {
+      const params={
+        search:this.form.buyer
+      }
+      console.log("Searching for:", this.form.buyer);
+       const res=await this.$apiGet(`get_users`,params);
+       this.buyers=res.data
+      // this.pr_length=res.data.length;
+       console.log("res",res);
+      
+    },
+
     async submitForm() {
       try {
         const response = await this.$apiPost("/post_property_sale", this.form);
@@ -120,17 +183,16 @@ export default {
           response.message || "Sale added successfully",
           "success"
         );
-
         // Reset form (keep property_id if provided from route)
-        this.form = {
-          property_id: this.propertyId || "",
-          seller: "",
-          buyer: "",
-          listing_price: "",
-          selling_price: "",
-          status: "",
+        // this.form = {
+        //   property_id: this.propertyId || "",
+        //   seller: "",
+        //   buyer: "",
+        //   listing_price: "",
+        //   selling_price: "",
+        //   status: "",
      
-        };
+        // };
 
         setTimeout(() => {
           this.$emit("close");
