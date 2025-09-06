@@ -23,6 +23,7 @@ const Messages = { template: '<div class="p-6 text-gray-800">Messages Page</div>
 const Settings = { template: '<div class="p-6 text-gray-800">Settings Page</div>' };
 
 import Rents from  '../views/closed/rent/view.vue';
+import RentDetail from  '../views/closed/rent/rentDetail.vue';
 
 import  MaintenanceRequests from  '../views/closed/maintenanceRequests/view1.vue';
 
@@ -72,10 +73,17 @@ const routes = [
     meta:
       { requiresGuest: true },
     children: [
+      
       {
         path: "first-dash", name: "first-dash",
         component: first_dash,
       },
+       {
+    path: '/rent-detail/:id',   // Route param :id
+    name: 'rent-detail',
+    component: RentDetail,
+    props: true,              // optional: allows you to receive `id` as a prop
+  },
       { path: '/properties', name: 'properties', component: Properties },
       { path: 'properties/:id', name: 'PropertyDetail', component: PropertyDetail, props: true },
       { path: 'properties/rentPay/:id', name: 'rentPay', component: rentPay, props: true },

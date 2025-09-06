@@ -202,7 +202,8 @@ export default {
   },
   methods: {
     rentDetail(rent_id){
-     console.log("rent id",rent_id);
+     this.$router.push({ name: 'rent-detail', params: { id: rent_id} });
+
     },
     goToPayments(rent_id){
 
