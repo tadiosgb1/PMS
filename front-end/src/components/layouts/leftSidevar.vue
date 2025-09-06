@@ -129,6 +129,13 @@ export default {
           icon: "fas fa-map-marked-alt",
           color: "#3b82f6",
         },
+
+         {
+          name: "Rents Payments",
+          route: "rents_payments",
+          icon: "fas fa-building",
+          color: "#6b7280",
+        },
         
         {
           name: "Maintenance Requests",

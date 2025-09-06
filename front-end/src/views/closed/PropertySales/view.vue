@@ -93,30 +93,30 @@
                   <td
                     class="border border-gray-300 px-4 py-2 text-center space-x-2"
                   >
-                    <router-link
+                    <!-- <router-link
                       :to="`/property_sale_detail/${sale.id}`"
                       class="text-green-600 hover:text-green-800 focus:outline-none"
                       title="View"
                     >
                       <i class="fas fa-eye"></i>
-                    </router-link>
+                    </router-link> -->
 
-                    <button
+                    <!-- <button
                       @click="askDeleteConfirmation(sale)"
                       class="text-red-600 hover:text-red-800 focus:outline-none"
                       title="Delete"
                     >
                       <i class="fas fa-trash-alt"></i>
-                    </button>
+                    </button> -->
                     <button
-                      @click="askDeleteConfirmation(sale)"
+                      @click="approve(sale.property_id)"
                       class="text-green-600 hover:text-green-800 focus:outline-none"
                       title="Delete"
                     >
                       <i class=""></i> Approve
                     </button>
                     <button
-                      @click="askDeleteConfirmation(sale)"
+                      @click="goToPayment(sale.property_id)"
                       class="text-green-600 hover:text-green-800 focus:outline-none"
                       title="Delete"
                     >
@@ -240,6 +240,15 @@ export default {
     this.fetchSales(`/get_property_sales?page=1&page_size=${this.pageSize}`);
   },
   methods: {
+    goToPayment(proprety_sale_id) {
+  this.$router.push({
+    path: '/sales_payments',
+    query: {
+      id: proprety_sale_id
+    }
+  });
+},
+
     async fetchSales(
       url = `/get_property_sales?page=1&page_size=${this.pageSize}`
     ) {

@@ -42,6 +42,7 @@ import view_managers from '../views/closed/managers/view.vue'
 import view_owners from '../views/closed/owners/view.vue'
 import Property_sales from '../views/closed/PropertySales/view.vue'
 import Sales_Payments from '../views/closed/SalesPayment/view.vue'
+import Rent_Payments from '../views/closed/rent/RentPayments.vue'
 import staffs from '../views/closed/stafs/view.vue'
 
 const routes = [
@@ -92,6 +93,7 @@ const routes = [
 
       { path: '/property_sales', name: 'property_sales', component: Property_sales },
       { path: '/sales_payments', name: 'sales_payments', component: Sales_Payments },
+      { path: '/rents_payments', name: 'rents_payments', component: Rent_Payments },
       { path: '/maintenance-requests', name: 'maintenance-requests', component: MaintenanceRequests },
 
       { path: '/user_view', name: 'user_view', component: User_view },
