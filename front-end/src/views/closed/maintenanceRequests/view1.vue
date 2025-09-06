@@ -242,22 +242,24 @@ export default {
         this.sortAsc = true;
       }
     },
+
     async applyDateFilter() {
       try {
        let params=[];
       if(this.filter_by=='requested_at'){
         params={
-        requested_at__gt:this.startDate,
-        requested_at__lt:this.endDate
+        requested_at__gte:new Date(this.startDate).toISOString(),
+        requested_at__lte: new Date(this.endDate).toISOString(),
         }
       }else{
         params={
-          resolved_at__gt:this.startDate,
-          resolved_at__lt:this.endDate
+          resolved_at__gte:new Date(this.startDate).toISOString(),
+          resolved_at__lte:new Date(this.endDate).toISOString()
         }
       }
      const res=await this.$apiGet('get_maintenance_requests',params)
      this.maintenance=res.data;
+     console.log("maintennace by start and end date",this.maintenance);
     } catch (error) {
        console.error("Failed to fetch maintenance", error);
        this.maintenance = [];

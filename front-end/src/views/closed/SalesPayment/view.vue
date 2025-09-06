@@ -101,7 +101,7 @@ export default {
         const id = this.$route.query.id;
         if(id){
           params={
-            property_id__id:id
+          property_sale_id__id:id
           }
         }
         console.log("params",params);

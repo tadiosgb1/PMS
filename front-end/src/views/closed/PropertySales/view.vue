@@ -116,7 +116,7 @@
                       <i class=""></i> Approve
                     </button>
                     <button
-                      @click="goToPayment(sale.property_id)"
+                      @click="goToPayment(sale.id)"
                       class="text-green-600 hover:text-green-800 focus:outline-none"
                       title="Delete"
                     >

@@ -155,7 +155,6 @@ export default {
     async submitForm() {
       console.log("this.form",this.form)
       const res = await this.$apiPost('/create_staff',this.form);
-
       console.log("res manager add",res);
 
       this.resetForm();

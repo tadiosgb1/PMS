@@ -91,6 +91,10 @@
                       <i class=""></i> Add picture
                     </button>
 
+                      <button @click="selectedRentId=rent.id;showModal = true" class="text-pink-600 hover:text-pink-800 focus:outline-none" title="Delete">
+                      <i class=""></i> Add payment
+                    </button>
+
                      <button @click="payments(rent)" class="text-blue-600 hover:text-blue-800 focus:outline-none" title="Delete">
                       <i class=""></i> Payments
                     </button>
@@ -112,6 +116,12 @@
         @close="addPictureVisible = false"
         @refresh="fetchRents"
       />
+      <MakePaymentModal
+      v-if="showModal"
+      :rentId="selectedRentId"
+      @close="showModal = false"
+      @success="handlePaymentSuccess"
+    />
       <!-- Modals -->
       <AddRent :propertyId="this.$route.params.id"  v-if="visible" :visible="visible" @close="visible = false" @refresh="fetchRents" />
       <UpdateRent v-if="updateVisible" :visible="updateVisible" :rent="rentToEdit" @close="updateVisible = false" @refresh="fetchRents" />
@@ -133,6 +143,8 @@ import UpdateRent from '@/views/closed/rent/update.vue';
 import ConfirmModal from '@/components/ConfirmModal.vue';
 import Toast from "@/components/Toast.vue";
 import AddPictureModal from "@/views/closed/rent/addRentPicture.vue";
+import MakePaymentModal from "@/views/closed/rent/addRentPayment.vue";
+
 const SortIcon = {
   props: ['field', 'sortKey', 'sortAsc'],
   template: `<span class="inline-block ml-1 text-gray-500">
@@ -150,7 +162,7 @@ const SortIcon = {
 
 export default {
   name: 'RentsView',
-  components: { SortIcon, AddRent, UpdateRent, ConfirmModal, Toast,AddPictureModal },
+  components: { SortIcon, AddRent, UpdateRent, ConfirmModal, Toast,AddPictureModal ,MakePaymentModal},
   data() {
     return {
       selectedRentId:"",
@@ -201,6 +213,9 @@ export default {
     this.fetchRents();
   },
   methods: {
+    payRent(rent_id){
+   
+    },
     rentDetail(rent_id){
      this.$router.push({ name: 'rent-detail', params: { id: rent_id} });
 

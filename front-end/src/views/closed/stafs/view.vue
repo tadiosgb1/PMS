@@ -10,7 +10,7 @@
         >
           Staffs
           <button
-            @click="showAddManager = true"
+            @click="showAddStaff = true"
             class="bg-white text-blue-700 font-semibold px-2 lg:px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300 flex items-center"
           >
             <span class="text-primary mr-1">+</span> Add
@@ -22,7 +22,7 @@
           <input
             v-model="searchTerm"
             type="search"
-            placeholder="Search Manager..."
+            placeholder="Search Staff..."
             class="w-full max-w-md px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 
@@ -31,7 +31,7 @@
             <select
               id="pageSize"
               v-model="pageSize"
-              @change="fetchManagers()"
+              @change="fetchStaffs()"
               class="border px-2 py-1 rounded"
             >
               <option v-for="size in pageSizes" :key="size" :value="size">
@@ -60,6 +60,8 @@
                     :sort-asc="sortAsc"
                   />
                 </th>
+                <th class="border border-gray-300 px-4 py-2">Email</th>
+                <th class="border border-gray-300 px-4 py-2">Phone</th>
                 <th class="border border-gray-300 px-4 py-2">Groups</th>
                 <th class="border border-gray-300 px-4 py-2">Active</th>
                 <th class="border border-gray-300 px-4 py-2 text-center">
@@ -69,51 +71,57 @@
             </thead>
             <tbody>
               <tr
-                v-for="manager in filteredAndSortedManagers"
-                :key="manager.id"
+                v-for="staff in filteredAndSortedStaffs"
+                :key="staff.id"
                 class="hover:bg-gray-100"
               >
                 <td class="border border-gray-300 px-4 py-2">
-                  {{ manager.first_name }} {{ manager.middle_name }}
-                  {{ manager.last_name }}
+                  {{ staff.first_name }} {{ staff.middle_name }}
+                  {{ staff.last_name }}
                 </td>
                 <td class="border border-gray-300 px-4 py-2">
-                  {{ manager.groups.join(", ") }}
+                  {{ staff.email }}
                 </td>
                 <td class="border border-gray-300 px-4 py-2">
-                  {{ manager.is_active ? "Yes" : "No" }}
+                  {{ staff.phone_number }}
+                </td>
+                <td class="border border-gray-300 px-4 py-2">
+                  {{ staff.groups.join(", ") }}
+                </td>
+                <td class="border border-gray-300 px-4 py-2">
+                  {{ staff.is_active ? "Yes" : "No" }}
                 </td>
                 <td
                   class="border border-gray-300 px-4 py-2 text-center space-x-2"
                 >
                   <router-link
-                    :to="`/user_detail/${manager.id}`"
+                    :to="`/user_detail/${staff.id}`"
                     class="text-green-600 hover:text-green-800"
                     title="View"
                   >
                     <i class="fas fa-eye"></i>
                   </router-link>
                   <button
-                    v-if="!manager.is_active"
-                    @click="activateUser(manager.id)"
+                    v-if="!staff.is_active"
+                    @click="activateUser(staff.id)"
                     class="text-blue-600 hover:text-blue-800"
-                    title="Activate Manager"
+                    title="Activate Staff"
                   >
                     Activate
                   </button>
                   <button
-                    v-if="manager.is_active"
-                    @click="deactivateUser(manager.id)"
+                    v-if="staff.is_active"
+                    @click="deactivateUser(staff.id)"
                     class="text-blue-600 hover:text-blue-800"
-                    title="Deactivate Manager"
+                    title="Deactivate Staff"
                   >
                     Deactivate
                   </button>
                 </td>
               </tr>
-              <tr v-if="filteredAndSortedManagers.length === 0">
-                <td colspan="4" class="text-center py-6 text-gray-500">
-                  No managers found.
+              <tr v-if="filteredAndSortedStaffs.length === 0">
+                <td colspan="6" class="text-center py-6 text-gray-500">
+                  No staffs found.
                 </td>
               </tr>
             </tbody>
@@ -124,7 +132,7 @@
         <div class="flex justify-between items-center p-6">
           <button
             :disabled="!previous"
-            @click="fetchManagers(previous)"
+            @click="fetchStaffs(previous)"
             class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
           >
             Previous
@@ -134,7 +142,7 @@
           >
           <button
             :disabled="!next"
-            @click="fetchManagers(next)"
+            @click="fetchStaffs(next)"
             class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
           >
             Next
@@ -142,11 +150,11 @@
         </div>
       </div>
 
-      <!-- Add Manager Modal -->
-      <AddManager
-        :visible="showAddManager"
-        @close="showAddManager = false"
-        @success="fetchManagers()"
+      <!-- Add Staff Modal -->
+      <AddStaff
+        :visible="showAddStaff"
+        @close="showAddStaff = false"
+        @success="fetchStaffs()"
       />
     </div>
   </div>
@@ -154,7 +162,7 @@
 
 <script>
 import Toast from "@/components/Toast.vue";
-import AddManager from "./add.vue";
+import AddStaff from "./add.vue";
 
 const SortIcon = {
   props: ["field", "sortKey", "sortAsc"],
@@ -174,33 +182,35 @@ const SortIcon = {
 };
 
 export default {
-  name: "ManagersView",
-  components: { SortIcon, Toast, AddManager },
+  name: "StaffsView",
+  components: { SortIcon, Toast, AddStaff },
   data() {
     return {
       searchTerm: "",
       sortKey: "fullName",
       sortAsc: true,
-      managers: [],
+      staffs: [],
       currentPage: 1,
       totalPages: 1,
       next: null,
       previous: null,
       pageSize: 5,
       pageSizes: [5, 10, 20, 50, 100],
-      showAddManager: false,
+      showAddStaff: false,
     };
   },
   computed: {
-    filteredAndSortedManagers() {
+    filteredAndSortedStaffs() {
       const term = this.searchTerm.toLowerCase();
-      let filtered = this.managers.filter(
-        (manager) =>
-          `${manager.first_name} ${manager.middle_name} ${manager.last_name}`
+      let filtered = this.staffs.filter(
+        (staff) =>
+          `${staff.first_name} ${staff.middle_name} ${staff.last_name}`
             .toLowerCase()
             .includes(term) ||
-          manager.groups.join(", ").toLowerCase().includes(term) ||
-          (manager.is_active ? "yes" : "no").includes(term)
+          staff.email.toLowerCase().includes(term) ||
+          staff.phone_number.toLowerCase().includes(term) ||
+          staff.groups.join(", ").toLowerCase().includes(term) ||
+          (staff.is_active ? "yes" : "no").includes(term)
       );
 
       filtered.sort((a, b) => {
@@ -217,22 +227,18 @@ export default {
     },
   },
   mounted() {
-    this.fetchManagers();
+    this.fetchStaffs();
   },
   methods: {
-    async fetchManagers(url = null) {
+    async fetchStaffs(url = null) {
       try {
-        const result = await this.$getManagers(); // Global function handles URL & params
-        console.log("result", result);
-
-        this.managers = result.managers;
-        this.currentPage = result.currentPage;
-        this.totalPages = result.totalPages;
-        this.next = result.next;
-        this.previous = result.previous;
+        const result = await this.$apiGet(`/get_staffs`);
+        console.log("staffs result", result);
+        this.staffs = Array.isArray(result.data) ? result.data : [];
+        // TODO: if backend returns pagination { next, previous, count } handle it here
       } catch (err) {
-        console.error("Failed to fetch managers:", err);
-        this.managers = [];
+        console.error("Failed to fetch staffs:", err);
+        this.staffs = [];
         this.currentPage = 1;
         this.totalPages = 1;
         this.next = null;
@@ -247,15 +253,15 @@ export default {
       }
     },
     activateUser(id) {
-      this.$apiPost(`/activate_user/${id}`, { id }).then((res) => {
-        this.$root.$refs.toast.showToast("Plan saved successfully ", "success");
-        this.fetchManagers();
+      this.$apiPost(`/activate_user/${id}`, { id }).then(() => {
+        this.$root.$refs.toast.showToast("Staff activated successfully", "success");
+        this.fetchStaffs();
       });
     },
     deactivateUser(id) {
-      this.$apiDelete(`/deactivate_user`, { id }).then((res) => {
-        this.$root.$refs.toast.showToast("Plan saved successfully ", "success");
-        this.fetchManagers();
+      this.$apiDelete(`/deactivate_user`, { id }).then(() => {
+        this.$root.$refs.toast.showToast("Staff deactivated successfully", "success");
+        this.fetchStaffs();
       });
     },
   },

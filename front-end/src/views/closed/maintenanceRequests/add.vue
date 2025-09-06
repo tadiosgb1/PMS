@@ -63,18 +63,38 @@
           </div>
 
           <!-- Property ID -->
-          <div>
+       
+
+
+
+
+
+             <div>
             <label class="block text-gray-700 mb-1">Property ID</label>
-            <input
-              v-model="form.property_id"
-              type="number"
-              class="custom-input"
-              placeholder="Enter property ID"
-            />
+            <input 
+              v-model="form.property_id" 
+              type="text"
+              class="custom-input" 
+              @input="searchProperty"
+              required />
           </div>
 
+                <div class="mt-2 border rounded bg-white shadow w-full" v-if="pr_length > 0">
+                <div
+                  v-for="property in properties"
+                  :key="property.id"
+                  class="p-2 hover:bg-gray-100 cursor-pointer flex items-center justify-between"
+                  @click="selectProperty(property.id)"
+                >
+                  <span>{{ property.name }}</span>
+
+                  <!-- Show check icon only for the selected one -->
+                  <i v-if="form.property_id === property.id" class="fas fa-check text-green-500"></i>
+                </div>
+              </div>
+
           <!-- User ID -->
-          <div>
+          <!-- <div>
             <label class="block text-gray-700 mb-1">User ID</label>
             <input
               v-model="form.user_id"
@@ -82,8 +102,30 @@
               class="custom-input"
               placeholder="Enter user ID"
             />
+          </div> -->
+
+
+
+          
+           <div>
+            <label class="block text-gray-700 mb-1">Requester </label>
+            <input v-model="form.user_id" type="text" class="custom-input" 
+              @input="searchUser()"/>
           </div>
 
+           <div class="mt-2 border rounded bg-white shadow w-full" v-if="users.length > 0">
+  <div
+    v-for="user in users"
+    :key="user.id"
+    class="p-2 hover:bg-gray-100 cursor-pointer flex items-center justify-between"
+    @click="selectUser(user.id)"
+  >
+    <span>{{ user.first_name }} {{ user.middle_name }} {{ user.last_name }}</span>
+
+    <!-- Check icon if selected -->
+    <i v-if="form.user_id === user.id" class="fas fa-check text-green-500"></i>
+  </div>
+</div>
           <!-- Submit -->
           <div class="md:col-span-2 text-right pt-2">
             <button
@@ -118,9 +160,46 @@ export default {
         user_id: "",
         property_id: "",
       },
+      properties:[],
+      pr_length:0,
+      user_length:0,
+      users:[],
     };
   },
   methods: {
+    selectUser(user_id){
+this.form.user_id=user_id
+console.log("form",this.form);
+},
+selectProperty(property_id){
+this.form.property_id=property_id
+console.log("form",this.form);
+},
+    async searchProperty() {
+      const params={
+        search:this.form.property_id,
+        page_size:100000000,
+      }
+      console.log("Searching for:", this.form.property_id);
+       const res=await this.$apiGet(`get_properties`,params);
+       this.properties=res.data
+       this.pr_length=res.data.length;
+       console.log("res",res);
+      
+    },
+
+   async searchUser() {
+      const params={
+        search:this.form.user_id,
+        page_size:100000000,
+      }
+      console.log("Searching for:", this.form.user_id);
+       const res=await this.$apiGet(`get_tenants`,params);
+       this.users=res.data
+       this.user_length=res.data.length;
+       console.log("res",res);
+      
+    },
     async submitForm() {
       try {
         const response = await this.$apiPost("/post_maintenance_request", this.form);
