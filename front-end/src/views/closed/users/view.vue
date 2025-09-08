@@ -43,16 +43,7 @@
       Owners
     </button>
 
-  
-    <button
-      @click="activeTab = 'managers'"
-      class="tab-link"
-      :class="{ 'tab-active': activeTab === 'managers' }"
-    >
-      Managers
-    </button>
-
-    <button
+   <button v-if="$hasPermission('pms.view_ownerstaff') || is_superuser === 'true'"
       @click="activeTab = 'staffs'"
       class="tab-link"
       :class="{ 'tab-active': activeTab === 'staffs' }"
@@ -60,6 +51,15 @@
       Owner Staffs
     </button>
 
+    <button v-if="$hasPermission('pms.view_ownermanager') || is_superuser === 'true'"
+      @click="activeTab = 'managers'"
+      class="tab-link"
+      :class="{ 'tab-active': activeTab === 'managers' }"
+    >
+      Managers
+    </button>
+
+   
     <button
       @click="activeTab = 'tenants'"
       class="tab-link"
