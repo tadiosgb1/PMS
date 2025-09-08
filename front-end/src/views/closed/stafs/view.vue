@@ -232,9 +232,13 @@ export default {
   methods: {
     async fetchStaffs(url = null) {
       try {
-        const result = await this.$apiGet(`/get_staffs`);
-        console.log("staffs result", result);
-        this.staffs = Array.isArray(result.data) ? result.data : [];
+        const res = await this.$apiGet(`/get_staffs`);
+
+        console.log("staffs result", res);
+        this.staffs = Array.isArray(res.data) ? res.data : [];
+
+        console.log("staffs", this.staffs);
+
         // TODO: if backend returns pagination { next, previous, count } handle it here
       } catch (err) {
         console.error("Failed to fetch staffs:", err);
@@ -254,13 +258,19 @@ export default {
     },
     activateUser(id) {
       this.$apiPost(`/activate_user/${id}`, { id }).then(() => {
-        this.$root.$refs.toast.showToast("Staff activated successfully", "success");
+        this.$root.$refs.toast.showToast(
+          "Staff activated successfully",
+          "success"
+        );
         this.fetchStaffs();
       });
     },
     deactivateUser(id) {
       this.$apiDelete(`/deactivate_user`, { id }).then(() => {
-        this.$root.$refs.toast.showToast("Staff deactivated successfully", "success");
+        this.$root.$refs.toast.showToast(
+          "Staff deactivated successfully",
+          "success"
+        );
         this.fetchStaffs();
       });
     },

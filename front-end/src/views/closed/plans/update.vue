@@ -92,7 +92,7 @@
             </select>
           </div>
 
-          <div>
+          <!-- <div>
             <label class="block text-gray-700">Created At</label>
             <input v-model="form.created_at" type="date" class="custom-input" />
           </div>
@@ -100,7 +100,7 @@
           <div>
             <label class="block text-gray-700">Updated At</label>
             <input v-model="form.updated_at" type="date" class="custom-input" />
-          </div>
+          </div> -->
 
           <div class="md:col-span-2 text-right">
             <button
@@ -138,8 +138,7 @@ export default {
         kds_enabled: false,
         price: null,
         billing_cycle: '',
-        created_at: '',
-        updated_at: '',
+        updated_at: new Date().toISOString(),
       },
     };
   },
@@ -161,7 +160,7 @@ export default {
     async submitForm() {
       try {
         await this.$apiPut(`/update_plan`, this.form.id, this.form);
-        this.$refs.toast.showToast('Plan updated successfully', 'success');
+        this.$root.$refs.toast.showToast('Plan updated successfully', 'success');
 
         setTimeout(() => {
           this.$emit('close');

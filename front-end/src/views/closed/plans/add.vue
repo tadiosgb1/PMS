@@ -71,7 +71,7 @@
             </select>
           </div>
 
-        <div>
+        <!-- <div>
           <label class="block text-gray-700 mb-1">Created At</label>
           <input v-model="form.created_at" type="date" class="custom-input" />
         </div>
@@ -79,7 +79,7 @@
         <div>
           <label class="block text-gray-700 mb-1">Updated At</label>
           <input v-model="form.updated_at" type="date" class="custom-input" />
-        </div>
+        </div> -->
 
         <div class="md:col-span-2 text-right pt-2">
           <button
@@ -121,8 +121,8 @@ export default {
         kds_enabled: false,
         price: null,
         billing_cycle: null,
-        created_at: '',
-        updated_at: '',
+        created_at: new Date().toISOString(),
+        updated_at: new Date().toISOString(),
       },
       
     };

@@ -73,7 +73,7 @@
                 <td class="border border-gray-300 px-4 py-2">{{ plan.max_staff }}</td>
                 <td class="border border-gray-300 px-4 py-2">{{ plan.max_users }}</td>
                 <td class="border border-gray-300 px-4 py-2">{{ plan.max_kds }}</td>
-                <td class="border border-gray-300 px-4 py-2">{{ plan.kds_enabled }}</td>
+                <td class="border border-gray-300 px-4 py-2">{{ plan.kds_enabled ? 'Yes' : 'No'}}</td>
                 <td class="border border-gray-300 px-4 py-2">{{ plan.price }}</td>
                 <td class="border border-gray-300 px-4 py-2">{{ plan.billing_cycle }}</td>
                 <td class="border border-gray-300 px-4 py-2 text-center space-x-2">
