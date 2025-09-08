@@ -194,7 +194,7 @@ console.log("form",this.form);
         page_size:100000000,
       }
       console.log("Searching for:", this.form.user_id);
-       const res=await this.$apiGet(`get_tenants`,params);
+       const res=await this.$apiGet(`get_users`,params);
        this.users=res.data
        this.user_length=res.data.length;
        console.log("res",res);
