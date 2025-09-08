@@ -1,7 +1,7 @@
 <template>
   <div>
     <Toast ref="toast" />
-    <div class="min-h-screen bg-gray-100 p-6">
+    <div class="min-h-screen bg-gray-100">
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
         <!-- Header -->
         <div
@@ -97,15 +97,15 @@ export default {
   methods: {
     async fetchPayments() {
       try {
-        let params={};
+        let params = {};
         const id = this.$route.query.id;
-        if(id){
-          params={
-          property_sale_id__id:id
-          }
+        if (id) {
+          params = {
+            property_sale_id__id: id,
+          };
         }
-        console.log("params",params);
-        const res = await this.$apiGet(`/get_sales_payments`,params);
+        console.log("params", params);
+        const res = await this.$apiGet(`/get_sales_payments`, params);
         console.log("res", res);
         this.payments = res.data || [];
       } catch (err) {
