@@ -9,7 +9,7 @@
         >
           Tenants
           <button
-            @click="visible = true"
+            @click="addTenantVisible = true"
             class="bg-white text-blue-700 font-semibold px-1 lg:px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300"
           >
             <span class="text-primary">+</span> Add
@@ -173,6 +173,12 @@
         @confirm="confirmDelete"
         @cancel="confirmVisible = false"
       />
+       <addTenant
+        v-if="addTenantVisible"
+        :visible="addTenantVisible"
+        @close="addTenantVisible=false"
+      />
+
     </div>
   </div>
 </template>
@@ -180,7 +186,7 @@
 <script>
 import ConfirmModal from "@/components/ConfirmModal.vue";
 import Toast from "@/components/Toast.vue";
-
+import addTenant from './add.vue'
 const SortIcon = {
   props: ["field", "sortKey", "sortAsc"],
   template: `<span class="inline-block ml-1 text-gray-500">
@@ -198,9 +204,10 @@ const SortIcon = {
 
 export default {
   name: "TenantView",
-  components: { SortIcon, ConfirmModal, Toast },
+  components: { SortIcon, ConfirmModal, Toast,addTenant },
   data() {
     return {
+      addTenantVisible:false,
       searchTerm: "",
       tenants: [],
       sortKey: "id",

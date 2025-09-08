@@ -250,10 +250,26 @@ export default {
     async fetchPayments() {
       try {
        // const params = {subscription_id__user_id__id:localStorage.getItem('userId') };
-        const params={
-       // user_id:localStorage.getItem("userId"),
+        let params={};
+       if(this.$route.params.id){
+            params={
+      // user_id:localStorage.getItem("userId"),
         subscription_id:this.$route.params.id,
         }
+
+       }else{
+         params={
+         user_id:localStorage.getItem("userId"),
+        //subscription_id:this.$route.params.id,
+        }
+       }
+       
+       if(localStorage.getItem('is_superuser')=='true'){
+          params={}
+         // alert("hii")
+       }
+
+
         console.log("params",params);
         const response = await this.$apiGet(`/get_subscription_payment`,params);
         if (Array.isArray(response.data)) {

@@ -2,7 +2,7 @@
   <div>
     <Toast ref="toast" />
 
-    <div class="min-h-screen bg-gray-100 p-6">
+    <div class="min-h-screen bg-gray-100">
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
         <div class="bg-primary text-white px-6 py-4 text-xl font-bold flex justify-between items-center">
           Owners

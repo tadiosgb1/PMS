@@ -1,172 +1,125 @@
 <template>
-  <div>
-    <!-- ✅ Toast Component -->
-    <Toast ref="toast" />
+  <div
+    v-if="visible"
+    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+  >
+    <div class="bg-white w-full max-w-3xl rounded-lg shadow-lg overflow-hidden">
+      <!-- Header -->
+      <div class="bg-primary text-white px-6 py-4 text-xl font-semibold flex justify-between items-center">
+        Add New Tenant
+        <button @click="$emit('close')" class="text-white hover:text-gray-200 text-2xl">&times;</button>
+      </div>
 
-    <div
-      v-if="visible"
-      class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4 overflow-auto"
-    >
-      <div
-        class="bg-white w-full sm:w-auto sm:max-w-[700px] md:max-w-[850px] lg:max-w-[950px] xl:max-w-[1050px] rounded-lg shadow-lg overflow-hidden relative mx-auto"
-      >
-        <!-- Header -->
-        <div
-          class="bg-primary hover:bg-primary text-white px-6 py-4 text-xl font-semibold flex justify-between items-center"
-        >
-          Add New Rent
-          <button
-            @click="$emit('close')"
-            class="text-white hover:text-gray-200 text-lg font-bold"
-          >
-            ✕
-          </button>
+      <!-- Body -->
+      <form @submit.prevent="submitForm" class="p-6 space-y-6">
+        <!-- Row 1: Name Fields -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <label class="block mb-1 font-medium text-gray-700">First Name</label>
+            <input v-model="form.first_name" type="text" required placeholder="John"
+              class="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-600" />
+          </div>
+          <div>
+            <label class="block mb-1 font-medium text-gray-700">Middle Name</label>
+            <input v-model="form.middle_name" type="text" placeholder="Michael"
+              class="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-600" />
+          </div>
+          <div>
+            <label class="block mb-1 font-medium text-gray-700">Last Name</label>
+            <input v-model="form.last_name" type="text" required placeholder="Doe"
+              class="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-600" />
+          </div>
         </div>
 
-        <!-- Form -->
-        <form
-          @submit.prevent="submitForm"
-          class="p-4 sm:p-6 grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[80vh] overflow-y-auto"
-        >
+        <!-- Row 2: Email & Phone -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label class="block text-gray-700 mb-1">Property ID</label>
-            <input v-model="form.property_id" type="number" class="custom-input" />
+            <label class="block mb-1 font-medium text-gray-700">Email</label>
+            <input v-model="form.email" type="email" required placeholder="john@example.com"
+              class="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-600" />
           </div>
-
           <div>
-            <label class="block text-gray-700 mb-1">User ID</label>
-            <input v-model="form.user_id" type="number" class="custom-input" />
+            <label class="block mb-1 font-medium text-gray-700">Phone Number</label>
+            <input v-model="form.phone_number" type="text" placeholder="+251912345678"
+              class="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-600" />
           </div>
+        </div>
 
+        <!-- Row 3: Password & Address -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label class="block text-gray-700 mb-1">Rent Type</label>
-            <input
-              v-model="form.rent_type"
-              type="text"
-              placeholder="e.g. apartment"
-              class="custom-input"
-            />
+            <label class="block mb-1 font-medium text-gray-700">Password</label>
+            <input v-model="form.password" type="password" required placeholder="••••••••"
+              class="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-600" />
           </div>
-
           <div>
-            <label class="block text-gray-700 mb-1">Start Date</label>
-            <input v-model="form.start_date" type="date" class="custom-input" />
+            <label class="block mb-1 font-medium text-gray-700">Address</label>
+            <input v-model="form.address" type="text" placeholder="Addis Ababa, Ethiopia"
+              class="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-600" />
           </div>
+        </div>
 
-          <div>
-            <label class="block text-gray-700 mb-1">End Date</label>
-            <input v-model="form.end_date" type="date" class="custom-input" />
-          </div>
+        <!-- Flags -->
+        <div class="flex space-x-4">
+          <label class="flex items-center">
+            <input type="checkbox" v-model="form.is_active" class="mr-2" /> Active
+          </label>
+        </div>
 
-          <div>
-            <label class="block text-gray-700 mb-1">Payment Cycle</label>
-            <select v-model="form.payment_cycle" class="custom-input">
-              <option value="" disabled>Select cycle</option>
-              <option value="weekly">Weekly</option>
-              <option value="monthly">Monthly</option>
-              <option value="yearly">Yearly</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="block text-gray-700 mb-1">Rent Amount</label>
-            <input v-model="form.rent_amount" type="number" class="custom-input" />
-          </div>
-
-          <div>
-            <label class="block text-gray-700 mb-1">Deposit Amount</label>
-            <input v-model="form.deposit_amount" type="number" class="custom-input" />
-          </div>
-
-          <div>
-            <label class="block text-gray-700 mb-1">Status</label>
-            <input
-              v-model="form.status"
-              type="text"
-              placeholder="e.g. active"
-              class="custom-input"
-            />
-          </div>
-
-          <div>
-            <label class="block text-gray-700 mb-1">Created At</label>
-            <input v-model="form.created_at" type="date" class="custom-input" />
-          </div>
-
-          <div>
-            <label class="block text-gray-700 mb-1">Updated At</label>
-            <input v-model="form.updated_at" type="date" class="custom-input" />
-          </div>
-
-          <div class="md:col-span-2 text-right pt-2">
-            <button
-              type="submit"
-              class="bg-primary hover:bg-orange-600 text-white font-semibold px-6 py-2 rounded border-orange-100 focus:ring-orange-300 shadow"
-            >
-              Save Rent
-            </button>
-          </div>
-        </form>
-      </div>
+        <!-- Footer -->
+        <div class="flex justify-end space-x-3">
+          <button
+            type="button"
+            @click="$emit('close')"
+            class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="bg-primary hover:bg-orange-600 text-white font-semibold px-6 py-2 rounded shadow"
+          >
+            Create Tenant
+          </button>
+        </div>
+      </form>
     </div>
   </div>
 </template>
-
 <script>
-import Toast from "../../../components/Toast.vue";
-
 export default {
-  name: "AddRent",
-  components: { Toast },
+  name: "AddUserModal",
   props: {
-    visible: Boolean,
+    visible: { type: Boolean, default: false },
   },
   data() {
     return {
       form: {
-        property_id: "",
-        user_id: "",
-        rent_type: "",
-        start_date: "",
-        end_date: "",
-        payment_cycle: "",
-        rent_amount: "",
-        deposit_amount: "",
-        status: "",
-        created_at: "",
-        updated_at: "",
+        password: "",
+        last_login: new Date().toISOString(),
+        email: "",
+        first_name: "",
+        middle_name: "",
+        last_name: "",
+        phone_number: "",
+        address: "",
+        date_joined: new Date().toISOString(),
+        is_active: true,
+        is_staff: false,
+        is_superuser: false,
       },
     };
   },
   methods: {
     async submitForm() {
       try {
-        await this.$apiPost("/post_rent", this.form).then((response) => {
-          this.$root.$refs.toast.showToast("Rent saved successfully", "success");
-        });
-
-        // Reset and close modal
-        this.form = {
-          property_id: "",
-          user_id: "",
-          rent_type: "",
-          start_date: "",
-          end_date: "",
-          payment_cycle: "",
-          rent_amount: "",
-          deposit_amount: "",
-          status: "",
-          created_at: "",
-          updated_at: "",
-        };
-
-        setTimeout(() => {
-          this.$emit("close");
-          this.$emit("refresh");
-        }, 2000);
+        const payload = { ...this.form };
+        await this.$apiPost("/post_user", payload);
+        this.$emit("success"); // notify parent to refresh users
+        this.$emit("close");   // close modal after success
       } catch (error) {
-        console.error("Failed to add rent:", error);
-        alert("Failed to save rent. Please try again.");
+        console.error("Failed to create user:", error);
+        alert("Failed to create user.");
       }
     },
   },
