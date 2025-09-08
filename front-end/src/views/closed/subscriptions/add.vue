@@ -2,16 +2,24 @@
   <div>
     <Toast ref="toast" />
 
-
     <div
       v-if="visible"
       class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4 overflow-auto"
     >
-      <div class="bg-white w-full sm:w-auto sm:max-w-[700px] md:max-w-[850px] lg:max-w-[950px] xl:max-w-[1050px] rounded-lg shadow-lg overflow-hidden relative mx-auto">
+      <div
+        class="bg-white w-full sm:w-auto sm:max-w-[700px] md:max-w-[850px] lg:max-w-[950px] xl:max-w-[1050px] rounded-lg shadow-lg overflow-hidden relative mx-auto"
+      >
         <!-- Header -->
-        <div class="bg-primary text-white px-6 py-4 text-xl font-semibold flex justify-between items-center">
+        <div
+          class="bg-primary text-white px-6 py-4 text-xl font-semibold flex justify-between items-center"
+        >
           Add Subscription
-          <button @click="$emit('close')" class="text-white hover:text-gray-200 text-lg font-bold">✕</button>
+          <button
+            @click="$emit('close')"
+            class="text-white hover:text-gray-200 text-lg font-bold"
+          >
+            ✕
+          </button>
         </div>
 
         <!-- Form -->
@@ -19,10 +27,22 @@
           @submit.prevent="submitForm"
           class="p-4 sm:p-6 grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[80vh] overflow-y-auto"
         >
-          <div>
-            <label class="block text-gray-700 mb-1">User ID</label>
-            <input v-model="form.user_id" type="number" class="custom-input" />
-          </div>
+          <!-- User Dropdown with Search (Single Select) -->
+<div>
+  <label class="block text-gray-700 mb-1">User</label>
+  <multiselect
+    v-model="selectedUser"
+    :options="users"
+    :searchable="true"
+    :close-on-select="true"
+    :clear-on-select="true"
+    placeholder="Search or select a user"
+    label="fullName"
+    track-by="id"
+    :multiple="false" 
+  />
+</div>
+
 
           <div>
             <label class="block text-gray-700 mb-1">Plan Name</label>
@@ -80,15 +100,19 @@
 
 <script>
 import Toast from "../../../components/Toast.vue";
+import Multiselect from "vue-multiselect";
+import "vue-multiselect/dist/vue-multiselect.min.css";
 
 export default {
   name: "AddSubscription",
-  components: { Toast },
+  components: { Toast, Multiselect },
   props: {
     visible: Boolean,
   },
   data() {
     return {
+      users: [],
+      selectedUser: null,
       form: {
         user_id: "",
         plan_name: "",
@@ -100,11 +124,31 @@ export default {
       },
     };
   },
+  watch: {
+    selectedUser(newVal) {
+      this.form.user_id = newVal ? newVal.id : "";
+    },
+  },
   methods: {
+    async fetchUsers() {
+      try {
+        const response = await this.$apiGet("/get_users");
+        // Map backend users into { id, fullName }
+        this.users = response.data.map((u) => ({
+          id: u.id,
+          fullName: `${u.first_name} ${u.middle_name} ${u.last_name}`,
+        }));
+      } catch (error) {
+        console.error("Failed to fetch users:", error);
+      }
+    },
     async submitForm() {
       try {
         await this.$apiPost("/post_subscription", this.form);
-        this.$root.$refs.toast.showToast('Subscription Added successfully ', 'success');
+        this.$root.$refs.toast.showToast(
+          "Subscription Added successfully",
+          "success"
+        );
 
         setTimeout(() => {
           this.$emit("close");
@@ -112,10 +156,12 @@ export default {
         }, 3000);
       } catch (error) {
         console.error("Failed to add subscription:", error);
-         this.$root.$refs.toast.showToast("Failed to add subscription", "error");
-        
+        this.$root.$refs.toast.showToast("Failed to add subscription", "error");
       }
     },
+  },
+  mounted() {
+    this.fetchUsers();
   },
 };
 </script>
