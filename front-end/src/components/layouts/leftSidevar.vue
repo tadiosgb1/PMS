@@ -4,6 +4,7 @@
       <aside
         class="w-64 flex flex-col fixed md:relative z-15 h-full transition-all duration-300 bg-white mt-0 lg:mt-1"
       >
+        <!-- Sidebar Title -->
         <div
           v-if="showTitle"
           class="flex flex-row space-x-4 p-4 text-center font-bold text-lg text-white bg-orange-500 sticky top-0 z-10"
@@ -11,18 +12,17 @@
           <div class="w-12 h-12 bg-white rounded-full">
             <img
               src="../../assets/img/logo1.jpg"
-              alt=""
+              alt="Logo"
               class="h-10 w-10 rounded-full pl-1 pt-1"
             />
           </div>
-
           <p class="mt-3">Alpha PMS</p>
         </div>
 
         <!-- Navigation -->
         <div class="flex-1 overflow-y-auto">
           <ul class="p-3 space-y-1">
-            <li v-for="item in menuItems" :key="item.route">
+            <li v-for="item in filteredMenuItems" :key="item.route">
               <router-link
                 :to="{ name: item.route }"
                 class="flex items-center px-3 py-2 rounded-md hover:bg-orange-100 text-sm font-medium transition-all duration-200"
@@ -37,7 +37,7 @@
                     color: $route.name === item.route ? '#f97316' : item.color,
                   }"
                 ></i>
-                <span class="whitespace-nowrap">{{ item.name }} </span>
+                <span class="whitespace-nowrap">{{ item.name }}</span>
               </router-link>
             </li>
           </ul>
@@ -59,17 +59,12 @@ export default {
           icon: "fas fa-tachometer-alt",
           color: "#f97316",
         },
-        {
-          name: "Users",
-          route: "user_view",
-          icon: "fas fa-user",
-          color: "#60a5fa",
-        },
-        {
+          {
           name: "Plans",
           route: "plans_view",
           icon: "fas fa-tags",
           color: "#f59e0b",
+          permission: "pms.view_plan",
           is_superuser: true,
         },
         {
@@ -77,81 +72,73 @@ export default {
           route: "subscriptions_view",
           icon: "fas fa-tags",
           color: "#f59e0b",
+          permission: "pms.view_subscription",
+        },
+         {
+          name: "Groups",
+          route: "groups",
+          icon: "fas fa-layer-group",
+          color: "#6366f1",
+          permission: "auth.view_group",
         },
         {
           name: "Permissions",
           route: "permissions_view",
           icon: "fas fa-shield-alt",
           color: "#10b981",
+          permission: "auth.view_permission",
         },
         {
-          name: "Groups",
-          route: "groups",
-          icon: "fas fa-layer-group",
-          color: "#6366f1",
+          name: "Users",
+          route: "user_view",
+          icon: "fas fa-user",
+          color: "#60a5fa",
+          permission: "pms.view_user",
         },
+      
+         
+      
         {
           name: "Zones",
           route: "zones",
           icon: "fas fa-map-marked-alt",
           color: "#3b82f6",
+          permission: "pms.view_propertyzone",
         },
-         {
-          name: "staffs",
-          route: "staffs",
-          icon: "fas fa-map-marked-alt",
-          color: "#3b82f6",
-        },
+        
         {
           name: "Properties",
           route: "properties",
           icon: "fas fa-building",
           color: "#6b7280",
+          permission: "pms.view_property",
         },
-
         {
           name: "Property Sales",
           route: "property_sales",
-          icon: "fas fa-building",
+          icon: "fas fa-hand-holding-usd",
           color: "#6b7280",
+          permission: "pms.view_propertysale",
         },
-
-        {
-          name: "Sales Payments",
-          route: "sales_payments",
-          icon: "fas fa-building",
-          color: "#6b7280",
-        },
-        
+    
         {
           name: "Rent Management",
           route: "rents",
-          icon: "fas fa-map-marked-alt",
+          icon: "fas fa-file-contract",
           color: "#3b82f6",
+          permission: "pms.view_rent",
         },
+      
 
-         {
-          name: "Rents Payments",
-          route: "rents_payments",
-          icon: "fas fa-building",
-          color: "#6b7280",
-        },
-        
         {
           name: "Maintenance Requests",
           route: "maintenance-requests",
-          icon: "fas fa-users",
+          icon: "fas fa-tools",
           color: "#ef4444",
+          permission: "pms.view_maintenancerequest",
         },
 
-        {
-          name: "Tenants",
-          route: "tenants",
-          icon: "fas fa-users",
-          color: "#ef4444",
-        },
-
-
+       
         {
           name: "Payments",
           route: "payments",
@@ -161,11 +148,23 @@ export default {
       ],
     };
   },
+  computed: {
+    filteredMenuItems() {
+      return this.menuItems.filter((item) => {
+        // Superuser-only items
+        if (item.is_superuser && !this.is_superuser) return false;
+
+        // Permission check
+        if (item.permission) {
+          return this.$hasPermission(item.permission);
+        }
+
+        return true;
+      });
+    },
+  },
   mounted() {
-    this.is_superuser = localStorage.getItem("is_superuser");
-
-    console.log("is_super_admin", this.is_superuser);
-
+    this.is_superuser = localStorage.getItem("is_superuser") === "true";
     this.screenWidth = window.innerWidth;
     if (this.screenWidth < 1024) {
       this.showTitle = true;
@@ -173,24 +172,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-/* Slide transition */
-.slide-enter-active,
-.slide-leave-active {
-  transition: transform 0.3s ease;
-}
-.slide-enter-from,
-.slide-leave-to {
-  transform: translateX(-100%);
-}
-
-/* Optional: Better scroll experience */
-::-webkit-scrollbar {
-  width: 6px;
-}
-::-webkit-scrollbar-thumb {
-  background-color: rgba(249, 115, 22, 0.4); /* orange scrollbar thumb */
-  border-radius: 4px;
-}
-</style>

@@ -211,6 +211,7 @@ export default {
       try {
         const response = await this.$apiGet("/get_permissions", params);
         this.permissions = response.data;
+        console.log("permissions are",this.permissions)
       } catch (error) {
         console.error("Failed to fetch permissions:", error);
         alert("Failed to load permissions.");
