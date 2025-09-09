@@ -155,13 +155,14 @@ export default {
 
     async fetchPictures() {
       const rentId = this.$route.params.id;
+      let param= {
+        rent_id:rentId
+      }
       if (!rentId) return;
       try {
-        const response = await this.$apiGetById(`/get_rent_picture`,rentId);
-
-        console.log("response",response);
-
-         this.pictures =response ? (Array.isArray(response) ? response : [response]) : [];
+         const response = await this.$apiGet(`/get_rent_pictures`,param);
+         console.log("pictures",response)
+    this.pictures = response ? (Array.isArray(response) ? response : [response]) : [];
 
         console.log("pictures",this.pictures)
       } catch (error) {

@@ -227,6 +227,7 @@ export default {
         );
         this.property = res.data || res;
       } catch (err) {
+        
         console.error("Failed to fetch property details", err);
         alert("Could not load property details.");
       }

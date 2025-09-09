@@ -40,7 +40,7 @@
                     Rent Type
                     <SortIcon :field="'rent_type'" :sort-key="sortKey" :sort-asc="sortAsc" />
                   </th>
-                  <th class="border border-gray-300 px-4 py-2 cursor-pointer" @click="sortBy('start_date')">
+                 <!--  <th class="border border-gray-300 px-4 py-2 cursor-pointer" @click="sortBy('start_date')">
                     Start Date
                     <SortIcon :field="'start_date'" :sort-key="sortKey" :sort-asc="sortAsc" />
                   </th>
@@ -59,12 +59,12 @@
                   <th class="border border-gray-300 px-4 py-2 cursor-pointer" @click="sortBy('deposit_amount')">
                     Deposit Amount
                     <SortIcon :field="'deposit_amount'" :sort-key="sortKey" :sort-asc="sortAsc" />
-                  </th>
+                  </th> -->
                   <th class="border border-gray-300 px-4 py-2 cursor-pointer" @click="sortBy('status')">
                     Status
                     <SortIcon :field="'status'" :sort-key="sortKey" :sort-asc="sortAsc" />
                   </th>
-                  <th class="border border-gray-300 px-4 py-2 text-center">Actions</th>
+                  <th class="px-4 py-2 border text-center">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -72,27 +72,29 @@
                   <td class="border border-gray-300 px-4 py-2">{{ rent.property_id.name }}</td>
                   <td class="border border-gray-300 px-4 py-2">{{ rent.user_id.first_name }}</td>
                   <td class="border border-gray-300 px-4 py-2">{{ rent.rent_type }}</td>
-                  <td class="border border-gray-300 px-4 py-2">{{ rent.start_date }}</td>
+                  <!-- <td class="border border-gray-300 px-4 py-2">{{ rent.start_date }}</td>
                   <td class="border border-gray-300 px-4 py-2">{{ rent.end_date }}</td>
                   <td class="border border-gray-300 px-4 py-2">{{ rent.payment_cycle }}</td>
                   <td class="border border-gray-300 px-4 py-2">{{ rent.rent_amount }}</td>
-                  <td class="border border-gray-300 px-4 py-2">{{ rent.deposit_amount }}</td>
+                  <td class="border border-gray-300 px-4 py-2">{{ rent.deposit_amount }}</td> -->
                   <td class="border border-gray-300 px-4 py-2">{{ rent.status }}</td>
                   <td class="border border-gray-300 px-4 py-2 text-center space-x-2">
 
                     <!-- <button @click="editRent(rent)" class="text-blue-600 hover:text-blue-800 focus:outline-none" title="Edit">
                       <i class="fas fa-edit"></i>
                     </button> -->
+                    <button @click="selectedRentId=rent.id;showModal = true" class="relative px-4 py-2 text-green-600 border border-green-600 rounded-lg
+         hover:text-white hover:bg-green-600
+         transition duration-300 ease-in-out
+         animate-glow" title="Pay Rent">
+                      <i class="fas fa-credit-card mr-2"></i> Pay
+                    </button>
                       <button @click="rentDetail(rent.id)" class="text-blue-600 hover:text-blue-800 focus:outline-none" title="Edit">
                       <i class=""></i>Detail
                     </button>
           
                      <button @click="addPictureVisible=true;selectedRentId=rent.id" class="text-green-600 hover:text-red-800 focus:outline-none" title="Delete">
                       <i class=""></i> Add picture
-                    </button>
-
-                      <button @click="selectedRentId=rent.id;showModal = true" class="text-pink-600 hover:text-pink-800 focus:outline-none" title="Delete">
-                      <i class=""></i> Add payment
                     </button>
 
                      <button @click="payments(rent)" class="text-blue-600 hover:text-blue-800 focus:outline-none" title="Delete">
@@ -118,6 +120,7 @@
       />
       <MakePaymentModal
       v-if="showModal"
+      :visible="showModal"
       :rentId="selectedRentId"
       @close="showModal = false"
       @success="handlePaymentSuccess"
@@ -175,7 +178,8 @@ export default {
       rentToDelete: null,
       sortKey: 'property_id',
       sortAsc: true,
-      rents: []
+      rents: [],
+      showModal:false
     };
   },
   computed: {
