@@ -145,6 +145,14 @@ export default {
           icon: "fas fa-money-bill-wave",
           color: "#22c55e",
         },
+            {
+          name: "Notifications",
+          route: "notifications",
+          icon: "fas fa-money-bill-wave",
+          color: "#22c55e",
+        },
+
+       
       ],
     };
   },
