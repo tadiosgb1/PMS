@@ -230,25 +230,42 @@ export default {
     this.fetchStaffs();
   },
   methods: {
-    async fetchStaffs(url = null) {
-      try {
-        const res = await this.$apiGet(`/get_staffs`);
+  async fetchStaffs(customUrl = null) {
+  try {
+    let params = {};
+    let url = customUrl;
 
-        console.log("staffs result", res);
-        this.staffs = Array.isArray(res.data) ? res.data : [];
+    if (localStorage.getItem('is_superuser') === 'true') {
+      url = 'get_staffs';   // fixed spelling
+      params = {};          // keep it object
+    } else {
+      url = 'get_owner_staffs';
+      params = {
+        owner__id: localStorage.getItem('userId')
+      };
+    }
 
-        console.log("staffs", this.staffs);
 
-        // TODO: if backend returns pagination { next, previous, count } handle it here
-      } catch (err) {
-        console.error("Failed to fetch staffs:", err);
-        this.staffs = [];
-        this.currentPage = 1;
-        this.totalPages = 1;
-        this.next = null;
-        this.previous = null;
-      }
-    },
+    console.log("params",params);
+
+    const res = await this.$apiGet(url, params);
+
+    console.log("staffs result", res);
+
+    this.staffs = Array.isArray(res.data) ? res.data : [];
+
+    console.log("staffs", this.staffs);
+
+    // TODO: handle pagination if backend returns { next, previous, count }
+  } catch (err) {
+    console.error("Failed to fetch staffs:", err);
+    this.staffs = [];
+    this.currentPage = 1;
+    this.totalPages = 1;
+    this.next = null;
+    this.previous = null;
+  }
+},
     sortBy(key) {
       if (this.sortKey === key) this.sortAsc = !this.sortAsc;
       else {

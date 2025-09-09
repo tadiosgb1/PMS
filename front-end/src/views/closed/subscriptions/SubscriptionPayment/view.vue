@@ -1,12 +1,12 @@
 <template>
   <div>
     <Toast ref="toast" />
-    <div class="min-h-screen bg-gray-100 p-6">
+    <div class="min-h-screen bg-gray-100">
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
         <div
           class="bg-orange-500 text-white px-6 py-4 text-xl font-bold flex justify-between items-center"
         >
-          Subscription Payments 
+          Subscription Payments
           <button
             @click="visible = true"
             class="bg-white text-blue-700 font-semibold px-1 lg:px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300"
@@ -105,10 +105,10 @@
                     {{ p.transaction_id }}
                   </td>
                   <td class="border border-gray-300 px-4 py-2">
-                    {{ p.created_at || '-' }}
+                    {{ p.created_at || "-" }}
                   </td>
                   <td class="border border-gray-300 px-4 py-2">
-                    {{ p.end_date || '-' }}
+                    {{ p.end_date || "-" }}
                   </td>
                   <td class="border border-gray-300 px-4 py-2">
                     {{ p.user_id }}
@@ -116,7 +116,9 @@
                   <td class="border border-gray-300 px-4 py-2">
                     {{ p.subscription_id }}
                   </td>
-                  <td class="border border-gray-300 px-4 py-2 text-center space-x-2">
+                  <td
+                    class="border border-gray-300 px-4 py-2 text-center space-x-2"
+                  >
                     <button
                       @click="editPayment(p)"
                       class="text-blue-600 hover:text-blue-800 focus:outline-none"
@@ -134,10 +136,7 @@
                   </td>
                 </tr>
                 <tr v-if="filteredAndSortedPayments.length === 0">
-                  <td
-                    colspan="9"
-                    class="text-center py-6 text-gray-500"
-                  >
+                  <td colspan="9" class="text-center py-6 text-gray-500">
                     No subscription payments found.
                   </td>
                 </tr>
@@ -148,7 +147,7 @@
       </div>
 
       <!-- Modals -->
-     <!-- <AddSubscriptionPayment
+      <!-- <AddSubscriptionPayment
         v-if="visible"
         :visible="visible"
         :subscriptionId="this.$route.params.id"
@@ -169,7 +168,7 @@
         :payment="paymentToEdit"
         @close="updateVisible = false"
         @refresh="fetchPayments"
-      /> --> 
+      /> -->
     </div>
   </div>
 </template>
@@ -249,29 +248,30 @@ export default {
   methods: {
     async fetchPayments() {
       try {
-       // const params = {subscription_id__user_id__id:localStorage.getItem('userId') };
-        let params={};
-       if(this.$route.params.id){
-            params={
-      // user_id:localStorage.getItem("userId"),
-        subscription_id:this.$route.params.id,
+        // const params = {subscription_id__user_id__id:localStorage.getItem('userId') };
+        let params = {};
+        if (this.$route.params.id) {
+          params = {
+            // user_id:localStorage.getItem("userId"),
+            subscription_id: this.$route.params.id,
+          };
+        } else {
+          params = {
+            user_id: localStorage.getItem("userId"),
+            //subscription_id:this.$route.params.id,
+          };
         }
 
-       }else{
-         params={
-         user_id:localStorage.getItem("userId"),
-        //subscription_id:this.$route.params.id,
+        if (localStorage.getItem("is_superuser") == "true") {
+          params = {};
+          // alert("hii")
         }
-       }
-       
-       if(localStorage.getItem('is_superuser')=='true'){
-          params={}
-         // alert("hii")
-       }
 
-
-        console.log("params",params);
-        const response = await this.$apiGet(`/get_subscription_payment`,params);
+        console.log("params", params);
+        const response = await this.$apiGet(
+          `/get_subscription_payment`,
+          params
+        );
         if (Array.isArray(response.data)) {
           this.payments = response.data;
         } else {

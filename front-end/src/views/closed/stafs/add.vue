@@ -110,7 +110,7 @@
             type="submit"
             class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
           >
-            Save Manager
+            Save Staff
           </button>
         </div>
       </form>
@@ -138,6 +138,7 @@ export default {
         property_zone: "",
         owner_id:localStorage.getItem('userId'),
         password: "",
+        is_staff:true
       }
     };
   },
@@ -154,9 +155,8 @@ export default {
     },
     async submitForm() {
       console.log("this.form",this.form)
-      const res = await this.$apiPost('/create_staff',this.form);
+      const res = await this.$apiPost('/sign_up',this.form);
       console.log("res manager add",res);
-
       this.resetForm();
       this.close();
     },

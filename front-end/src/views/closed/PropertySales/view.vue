@@ -241,21 +241,28 @@ export default {
   },
   methods: {
     goToPayment(proprety_sale_id) {
-  this.$router.push({
-    path: '/sales_payments',
-    query: {
-      id: proprety_sale_id
-    }
-  });
-},
+      this.$router.push({
+        path: "/sales_payments",
+        query: {
+          id: proprety_sale_id,
+        },
+      });
+    },
 
     async fetchSales(
       url = `/get_property_sales?page=1&page_size=${this.pageSize}`
     ) {
       try {
-        const params = {
-          seller__id: localStorage.getItem("userId"),
-        };
+        let params = {};
+        if (localStorage.getItem("is_superuser") == "true") {
+          params = {};
+        } else {
+          params = {
+            seller__id: localStorage.getItem("userId"),
+          };
+        }
+
+        console.log("params", params);
         const res = await this.$apiGet(url, params);
         console.log("res", res);
         this.sales = res.data || [];

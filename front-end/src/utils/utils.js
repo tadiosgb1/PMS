@@ -508,10 +508,7 @@ export function hasPermission(permission) {
 
   return userPermissions.includes(permission);
 }
-
-
 const userCache = {};
-
 export async function getFullNameById(id) {
   if (!id) return "";
 
@@ -556,6 +553,12 @@ export async function getZones(url = null, pageSize = 10) {
       } else if (groups.includes("owner")) {
         params = { owner_id__email: email };
       }
+       else if (groups.includes("staff")) {
+        params = { staff_id__email: email };
+      }
+      else if (groups.includes("super_staff")) {
+        params = { };
+      }
     }
 
     const apiUrl = url || `/get_property_zones?page=1&page_size=${pageSize}`;
@@ -595,42 +598,34 @@ export async function getManagers() {
       localStorage.getItem("is_superuser") == "true";
 
     const groups = JSON.parse(localStorage.getItem("groups") || "[]");
-    const email = localStorage.getItem("email");
+    const userId = localStorage.getItem("userId");
 
     let params = {};
-    let apiUrl = "/get_managers?page=1&page_size=10"; // default URL
+    let apiUrl = "/get_managers?page=1&page_size=1000"; // default URL
 
     if (isSuperUser || groups.includes("staff")) {
       // Superuser or staff: empty params, default URL
       params = {};
-      apiUrl = "/get_managers?page=1&page_size=10";
+      apiUrl = "/get_managers?page=1&page_size=1000";
     } else if (groups.includes("owner")) {
       // Owner: use owner-specific URL and params
-      apiUrl = "/get_owner_managers?page=1&page_size=10";
-      params = { owner_id__email: email };
-    } else if (groups.includes("manager")) {
+      apiUrl = "/get_owner_managers?page=1&page_size=1000";
+      params = { owner__id: userId };
+    
+    } else if (groups.includes("staff")) {
       // Manager: default URL with manager filter
       apiUrl = "/get_managers?page=1&page_size=10";
-      params = { manager_id__email: email };
+      params = { staff_id__id: userId };
     }
+
+
+    console.log("params are ",params);
 
     const response = await this.$apiGet(apiUrl, params);
 
 
     console.log("Response managers", response);
     let managers = response.data || [];
-    if (groups.includes("owner")) {
-      let ownerManagers = [];
-      managers.forEach(element => {
-        ownerManagers.push(element.manager);
-      });
-      managers = ownerManagers;
-    }
-    // Optionally populate full names
-    for (const manager of managers) {
-      if (manager.owner_id) manager.ownerName = await this.$getFullNameById(manager.owner_id);
-      if (manager.manager_id) manager.managerName = await this.$getFullNameById(manager.manager_id);
-    }
 
     return {
       managers,
@@ -666,22 +661,30 @@ export async function getProperties(
       localStorage.getItem("is_superuser") === "true";
 
     const groups = JSON.parse(localStorage.getItem("groups") || "[]");
+
+    console.log("groups",groups);
+
     const email = localStorage.getItem("email");
 
     let params = {};
 
-    if (isSuperUser || groups.includes("staff")) {
+    if (isSuperUser) {
       params = {};
     } else if (groups.includes("owner")) {
       params = { property_zone_id__owner_id__email: email };
     } else if (groups.includes("manager")) {
       params = { property_zone_id__manager_id__email: email };
     }
-
+    else if (groups.includes("staff")) {
+      params = { property_zone_id__staff_id__email: email };
+      console.log("params for the staff",params);
+    }
     // merge with extra params if provided
     if (extraParams && typeof extraParams === "object") {
       params = { ...params, ...extraParams };
     }
+
+    console.log("Params in prperties",params);
 
     const response = await this.$apiGet(url, params);
     console.log("response in global pro", response);
@@ -707,4 +710,58 @@ export async function getProperties(
 }
 
 
+export async function getTenants(url = null, pageSize = 10) {
+  try {
+    const isSuperUser =
+      localStorage.getItem("is_superuser") === "1" ||
+      localStorage.getItem("is_superuser") === "true";
 
+    const groups = JSON.parse(localStorage.getItem("groups") || "[]");
+    const email = localStorage.getItem("email");
+
+    let params = {};
+
+    if (!isSuperUser) {
+      if (groups.includes("manager")) {
+        params = { manager_id__email: email };
+      } else if (groups.includes("owner")) {
+        params = { owner_id__email: email };
+      }
+       else if (groups.includes("staff")) {
+        params = { staff_id__email: email };
+      }
+      else if (groups.includes("super_staff")) {
+        params = { };
+      }
+    }
+
+
+    console.log("params",params);
+
+
+    const apiUrl = url || `/get_tenants?page=1&page_size=${pageSize}`;
+
+    const response = await this.$apiGet(apiUrl, params);
+
+    const tenants = response.data || [];
+    
+    console.log("tenants",tenants);
+  
+    return {
+      tenants,
+      currentPage: response.current_page || 1,
+      totalPages: response.total_pages || 1,
+      next: response.next || null,
+      previous: response.previous || null,
+    };
+  } catch (err) {
+    console.error("Error fetching zones:", err);
+    return {
+      zones: [],
+      currentPage: 1,
+      totalPages: 1,
+      next: null,
+      previous: null,
+    };
+  }
+}
