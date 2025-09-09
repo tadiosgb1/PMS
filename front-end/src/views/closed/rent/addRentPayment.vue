@@ -1,19 +1,24 @@
 <template>
   <div
-    class="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50"
+  v-if="visible"
+   class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4 overflow-auto"
   >
-    <div class="bg-white rounded-lg shadow-lg w-full max-w-lg p-6 relative">
+    <div class="bg-white w-full sm:w-auto sm:max-w-[700px] md:max-w-[850px] lg:max-w-[950px] xl:max-w-[1050px] rounded-lg shadow-lg overflow-hidden relative mx-auto">
       <!-- Close button (X) -->
-      <button
-        @click="$emit('close')"
-        class="absolute top-2 right-2 text-gray-500 hover:text-gray-700"
-      >
-        ✕
-      </button>
+       <div
+          class="bg-primary text-white px-6 py-4 text-2xl font-semibold flex justify-between items-center"
+        >
+          Pay Rent
+          <button
+            @click="$emit('close')"
+            class="text-white hover:text-gray-200 text-lg font-bold"
+          >
+            ✕
+          </button>
+        </div>
+     
 
-      <h2 class="text-lg font-bold mb-4">Make Payment</h2>
-
-      <form @submit.prevent="submitPayment" class="space-y-4">
+      <form @submit.prevent="submitPayment" class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 max-h-[80vh] overflow-y-auto">
         <!-- Rent ID (hidden) -->
         <input type="hidden" v-model="form.rent_id" />
 
@@ -65,13 +70,13 @@
           <button
             type="button"
             @click="$emit('close')"
-            class="px-4 py-2 bg-gray-300 rounded hover:bg-gray-400"
+            class="px-4 py-2 bg-orange-300 rounded hover:bg-orange-400"
           >
             Cancel
           </button>
           <button
             type="submit"
-            class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+            class="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600"
           >
             Submit
           </button>
@@ -89,6 +94,10 @@ export default {
       type: Number,
       required: true,
     },
+    visible:{
+      type:Boolean,
+      required:true
+    }
   },
   data() {
     return {
