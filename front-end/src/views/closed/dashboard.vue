@@ -32,21 +32,56 @@
           </div>
         </div>
 
-        <!-- Right side: Welcome + Username + Profile -->
+        <!-- Right side: Notifications + Welcome + Profile -->
         <div class="flex items-center space-x-4 text-blue-500">
-<div class="relative inline-block">
-  <!-- Bell Icon -->
-  <i class="fas fa-bell text-gray-700 text-xl cursor-pointer"></i>
+          <!-- Notifications Dropdown -->
+          <div class="relative inline-block" @click.stop="toggleNotificationDropdown">
+            <!-- Bell -->
+            <i class="fas fa-bell text-gray-700 text-xl cursor-pointer"></i>
 
-  <!-- Notification Badge -->
-  <span
-    class="absolute -top-3 -right-2 bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow"
-  >
-    5
-  </span>
-</div>
+            <!-- Notification Badge -->
+            <span
+              v-if="notifications.length > 0"
+              class="absolute -top-3 -right-2 bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow"
+            >
+              {{ notifications.length }}
+            </span>
 
+            <!-- Dropdown -->
+            <transition name="fade">
+              <ul
+                v-show="isNotificationDropdownOpen"
+                class="absolute right-0 mt-2 w-72 bg-white shadow-md z-50 text-sm py-2 rounded max-h-80 overflow-y-auto"
+                @click.outside="isNotificationDropdownOpen = false"
+              >
+                <li
+                  v-for="(notif, index) in notifications"
+                  :key="index"
+                  class="px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-start space-x-2"
+                  @click="openNotification(notif)"
+                >
+                  <i class="fas fa-info-circle text-yellow-500 mt-1"></i>
+                  <div class="flex-1">
+                    <p class="text-gray-700 font-medium">
+                      {{ notif.notification_type }} {{ notif.created_at }}
+                    </p>
+                    <p class="text-xs text-gray-500">
+                      {{ notif.message }}
+                    </p>
+                  </div>
+                </li>
 
+                <li
+                  v-if="notifications.length === 0"
+                  class="px-4 py-2 text-gray-500 text-center"
+                >
+                  No notifications
+                </li>
+              </ul>
+            </transition>
+          </div>
+
+          <!-- Welcome -->
           <span class="whitespace-nowrap hidden sm:block">Welcome,</span>
           <h1
             class="font-extrabold text-blue-400 hidden sm:block"
@@ -141,11 +176,12 @@ export default {
   components: { Sidebar },
   data() {
     return {
-      notifications:[],
+      notifications: [],
       name: localStorage.getItem("name"),
       showSidebar: false,
       isLangOpen: false,
       isProfileDropdownOpen: false,
+      isNotificationDropdownOpen: false,
       screenWidth: window.innerWidth,
       currentLanguage: "English",
       showToggleButton: window.innerWidth < 1024,
@@ -154,17 +190,12 @@ export default {
   async created() {
     window.addEventListener("resize", this.handleResize);
     this.name = localStorage.getItem("name");
-    const params={
-      page_size:1000000,
-    }
-    const res=await this.$apiGet(`/get_unread_notifications`,params);
-    this.notifications=res.data;
+
+    const params = { page_size: 1000000 };
+    const res = await this.$apiGet(`/get_unread_notifications`, params);
+    this.notifications = res.data;
     console.log("notifications", this.notifications);
-    console.log("length",this.notifications.length);
   },
-  // mounted(){
-  //    this.$router.push("/dashboard/first-dash");
-  // },
   unmounted() {
     window.removeEventListener("resize", this.handleResize);
   },
@@ -178,6 +209,28 @@ export default {
     },
     toggleProfileDropdown() {
       this.isProfileDropdownOpen = !this.isProfileDropdownOpen;
+    },
+    toggleNotificationDropdown() {
+      this.isNotificationDropdownOpen = !this.isNotificationDropdownOpen;
+    },
+    getNotificationText(notif) {
+      if (notif.user_id) return "New user activity";
+      if (notif.maintenance_request_id) return "New maintenance request";
+      if (notif.payment_id) return "New payment notification";
+      if (notif.rent_id) return "New rent notification";
+      return "General notification";
+    },
+    openNotification(notif) {
+      if (notif.user_id) {
+        this.$router.push(`/users/${notif.user_id}`);
+      } else if (notif.maintenance_request_id) {
+        this.$router.push(`/maintenance/${notif.maintenance_request_id}`);
+      } else if (notif.payment_id) {
+        this.$router.push(`/payments/${notif.payment_id}`);
+      } else if (notif.rent_id) {
+        this.$router.push(`/rents/${notif.rent_id}`);
+      }
+      this.isNotificationDropdownOpen = false;
     },
     changeLang(lang) {
       this.currentLanguage = lang;
