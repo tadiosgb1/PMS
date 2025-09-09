@@ -1,7 +1,7 @@
 <template>
   <div>
     <Toast ref="toast" />
-    <div class="min-h-screen bg-gray-100 p-6">
+    <div class="min-h-screen bg-gray-100 ">
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
         <!-- Header -->
         <div
@@ -250,8 +250,9 @@ export default {
   methods: {
     async fetchTenants(url = null) {
       try {
-        const pageUrl = url || `/get_tenants?page=1&page_size=${this.pageSize}`;
-        const response = await this.$apiGet(pageUrl);
+       // const pageUrl = url || `/get_tenants?page=1&page_size=${this.pageSize}`;
+
+        const response = await this.$getTenants();
         console.log("response", response);
         this.tenants = response.tenants || response.data || [];
         this.currentPage = response.currentPage || 1;

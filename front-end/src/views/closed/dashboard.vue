@@ -141,6 +141,7 @@ export default {
   components: { Sidebar },
   data() {
     return {
+      notifications:[],
       name: localStorage.getItem("name"),
       showSidebar: false,
       isLangOpen: false,
@@ -150,9 +151,16 @@ export default {
       showToggleButton: window.innerWidth < 1024,
     };
   },
-  created() {
+  async created() {
     window.addEventListener("resize", this.handleResize);
     this.name = localStorage.getItem("name");
+    const params={
+      page_size:1000000,
+    }
+    const res=await this.$apiGet(`/get_unread_notifications`,params);
+    this.notifications=res.data;
+    console.log("notifications", this.notifications);
+    console.log("length",this.notifications.length);
   },
   // mounted(){
   //    this.$router.push("/dashboard/first-dash");

@@ -5,7 +5,7 @@ import {
   apiPatch, apiDelete, isStrongPassword, validateField,
   gregorianToEthiopian, getPdfBlobUrl, base64ToFile,
   processFilesToAdd, triggerFileInput, handleFileInput, toggleDragState, removeAttachment,
-  handleAnyFileInput, convertImageToBase64, getFullNameById, getZones, getProperties, getManagers, hasPermission
+  handleAnyFileInput, convertImageToBase64, getFullNameById, getZones, getProperties, getManagers, hasPermission,getTenants
 } from "../utils/utils"; // Adjust the path to match your project structure
 export default {
 
@@ -89,8 +89,8 @@ export default {
       $getZones: getZones,
       $getProperties: getProperties,
       $getManagers: getManagers,
-      $hasPermission: hasPermission
-
+      $hasPermission: hasPermission,
+      $getTenants:getTenants
     };
     // Assign to the global properties in the Vue app
     app.config.globalProperties = {

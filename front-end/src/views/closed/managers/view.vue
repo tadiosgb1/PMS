@@ -60,7 +60,9 @@
                     :sort-asc="sortAsc"
                   />
                 </th>
-                <th class="border border-gray-300 px-4 py-2">Groups</th>
+                  <th class="border border-gray-300 px-4 py-2">Owner</th>
+                      <th class="border border-gray-300 px-4 py-2">Groups</th>
+               
                 <th class="border border-gray-300 px-4 py-2">Active</th>
                 <th class="border border-gray-300 px-4 py-2 text-center">
                   Actions
@@ -74,11 +76,18 @@
                 class="hover:bg-gray-100"
               >
                 <td class="border border-gray-300 px-4 py-2">
-                  {{ manager.first_name }} {{ manager.middle_name }}
-                  {{ manager.last_name }}
+              
+                  {{ manager.manager.first_name }} {{ manager.manager.middle_name }}
+                  {{ manager.manager.last_name }}
                 </td>
-                <td class="border border-gray-300 px-4 py-2">
-                  {{ manager.groups.join(", ") }}
+
+                  <td class="border border-gray-300 px-4 py-2">
+                {{ manager.owner.first_name }} {{ manager.owner.middle_name }}
+                  {{ manager.owner.last_name }}
+                  
+                </td>
+               <td class="border border-gray-300 px-4 py-2">
+                  {{ manager.manager.groups.join(", ") }}
                 </td>
                 <td class="border border-gray-300 px-4 py-2">
                   {{ manager.is_active ? "Yes" : "No" }}
@@ -224,8 +233,8 @@ export default {
       try {
         const result = await this.$getManagers(); // Global function handles URL & params
         console.log("result", result);
-
         this.managers = result.managers;
+        console.log("accepted managers",this.managers);
         this.currentPage = result.currentPage;
         this.totalPages = result.totalPages;
         this.next = result.next;
