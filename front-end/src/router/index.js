@@ -45,6 +45,7 @@ import Property_sales from '../views/closed/PropertySales/view.vue'
 import Sales_Payments from '../views/closed/SalesPayment/view.vue'
 import Rent_Payments from '../views/closed/rent/RentPayments.vue'
 import staffs from '../views/closed/stafs/view.vue'
+import Notifications from '../views/closed/notifications/view.vue'
 
 const routes = [
   {
@@ -96,6 +97,7 @@ const routes = [
       { path: '/reports', name: 'reports', component: Reports },
       { path: '/messages', name: 'messages', component: Messages },
       { path: '/settings', name: 'settings', component: Settings },
+     { path: '/notifications', name: 'notifications', component: Notifications },
 
       {path: '/rents', name: 'rents', component: Rents },
 
