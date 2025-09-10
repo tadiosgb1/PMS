@@ -99,7 +99,6 @@ export default {
   },
   data() {
     const is_superuser = localStorage.getItem("is_superuser") === "true";
-
     // set default tab based on role/permissions
     let defaultTab = "tenants"; // fallback for normal users
 
