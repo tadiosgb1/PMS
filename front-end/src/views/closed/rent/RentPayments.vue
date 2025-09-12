@@ -24,36 +24,36 @@
             :key="payment.id"
             class="border-t"
           >
-            <td class="px-3 py-2">{{ index + 1 }}</td>
-            <td class="px-3 py-2">{{ payment.amount }} ETB</td>
-            <td class="px-3 py-2">{{ formatDate(payment.due_date) }}</td>
-            <td class="px-3 py-2">{{ payment.payment_method }}</td>
-            <td class="px-3 py-2">{{ payment.transaction_id }}</td>
-            <td class="px-3 py-2">
-              <span
-                class="px-2 py-1 rounded text-xs font-semibold"
-                :class="{
-                  'bg-green-100 text-green-800': payment.status === 'paid',
-                  'bg-red-100 text-red-800': payment.status === 'pending',
-                }"
-              >
-                {{ payment.status }}
-              </span>
-            </td>
-          </tr>
-          <tr v-if="payments.length === 0">
-            <td colspan="6" class="px-3 py-4 text-center text-gray-500">
-              No payments found
-            </td>
-          </tr>
-        </tbody>
-      </table>
+              <td class="px-3 py-2">{{ index + 1 }}</td>
+              <td class="px-3 py-2">{{ payment.amount }} ETB</td>
+              <td class="px-3 py-2">{{ formatDate(payment.due_date) }}</td>
+              <td class="px-3 py-2">{{ payment.payment_method }}</td>
+              <td class="px-3 py-2">{{ payment.transaction_id }}</td>
+              <td class="px-3 py-2">
+                <span
+                  class="px-2 py-1 rounded text-xs font-semibold"
+                  :class="{
+                    'bg-green-100 text-green-800': payment.status === 'paid',
+                    'bg-red-100 text-red-800': payment.status === 'pending',
+                  }"
+                >
+                  {{ payment.status }}
+                </span>
+              </td>
+            </tr>
+            <tr v-if="payments.length === 0">
+              <td colspan="6" class="px-3 py-4 text-center text-gray-500">
+                No payments found
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
     </div>
-  </div>
-</template>
+  </template>
 
-<script>
-export default {
+  <script>
+  export default {
   name: "RentPayments",
   data() {
     return {

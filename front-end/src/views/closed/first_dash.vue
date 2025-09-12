@@ -11,9 +11,7 @@
       </div>
       <div class="bg-white p-6 rounded-lg shadow-md">
         <h2 class="text-gray-600">Total Property Zones</h2>
-        <p class="text-2xl font-semibold ">
-          {{ stats.totalZones }}
-        </p>
+        <p class="text-2xl font-semibold">{{ stats.totalZones }}</p>
       </div>
       <div class="bg-white p-6 rounded-lg shadow-md">
         <h2 class="text-gray-600">Total Subscriptions</h2>
@@ -61,18 +59,14 @@
 </template>
 
 <script>
-
 export default {
   data() {
     return {
       stats: {
         totalProperties: 0,
-        totalZones:0,
-        totalSubscriptions:0,
-        totalTenants:0,
-        monthlyRevenue: 45200,
-        occupancyRate: 89,
-        newTenants: 6,
+        totalZones: 0,
+        totalSubscriptions: 0,
+        totalTenants: 0,
       },
       incomeSeries: [
         {
@@ -85,28 +79,16 @@ export default {
         },
       ],
       incomeChartOptions: {
-        chart: {
-          id: "income-chart",
-          toolbar: { show: false },
-        },
-        xaxis: {
-          categories: ["Apr", "May", "Jun", "Jul", "Aug"],
-        },
-        plotOptions: {
-          bar: {
-            horizontal: false,
-            columnWidth: "55%",
-          },
-        },
+        chart: { id: "income-chart", toolbar: { show: false } },
+        xaxis: { categories: ["Apr", "May", "Jun", "Jul", "Aug"] },
+        plotOptions: { bar: { horizontal: false, columnWidth: "55%" } },
         dataLabels: { enabled: false },
         legend: { position: "top" },
       },
       userSeries: [60, 30, 10],
       userChartOptions: {
         labels: ["Tenants", "Owners", "Agents"],
-        legend: {
-          position: "bottom",
-        },
+        legend: { position: "bottom" },
         responsive: [
           {
             breakpoint: 480,
@@ -118,118 +100,119 @@ export default {
         ],
       },
       pricingSeries: [
-        {
-          name: "Users",
-          type: "column",
-          data: [250, 120, 80, 15], // Number of users per plan
-        },
-        {
-          name: "Revenue ($)",
-          type: "line",
-          data: [0, 100000, 4560000, 4568000], // Accumulated revenue per plan
-        },
+        { name: "Users", type: "column", data: [] },
+        { name: "Revenue ($)", type: "line", data: [] },
       ],
       pricingChartOptions: {
-        chart: {
-          height: 350,
-          type: "line",
-          toolbar: { show: false },
-        },
-        stroke: {
-          width: [0, 4],
-        },
-        title: {
-          text: "Plan Adoption and Revenue",
-          align: "left",
-        },
-        xaxis: {
-          categories: ["Free", "Basic", "Pro", "Enterprise"],
-        },
+        chart: { height: 350, type: "line", toolbar: { show: false } },
+        stroke: { width: [0, 4] },
+        title: { text: "Plan Adoption and Revenue", align: "left" },
+        xaxis: { categories: [] }, // will be updated dynamically
         yaxis: [
-          {
-            title: {
-              text: "Users",
-            },
-          },
-          {
-            opposite: true,
-            title: {
-              text: "Revenue ($)",
-            },
-          },
+          { title: { text: "Users" } },
+          { opposite: true, title: { text: "Revenue ($)" } },
         ],
-        dataLabels: {
-          enabled: true,
-          enabledOnSeries: [1],
-        },
-        colors: ["#60a5fa", "#34d399"], // blue for users, green for revenue
-        legend: {
-          position: "top",
-        },
+        dataLabels: { enabled: true, enabledOnSeries: [1] },
+        colors: ["#60a5fa", "#34d399"],
+        legend: { position: "top" },
       },
     };
   },
   mounted() {
     this.fetchTotalProperties();
     this.fetchTotalZones();
-     this.fetchTotalSubscriptions();
-     this.fetchTotalTenants();
-    // console.log("add_user", this.$hasPermission("pms.add_user"));
+    this.fetchTotalSubscriptions();
+    this.fetchTotalTenants();
+    this.fetchPricingAnalytics();
   },
   methods: {
-   async fetchTotalProperties() {
-  try {
-    const response = await this.$apiGet("/get_properties");
-    console.log("API response:", response);
-    if (response && response.count !== undefined) {
-      this.stats.totalProperties = response.count;
-    } else {
-      console.warn("Unexpected response format:", response);
-    }
-  } catch (error) {
-    console.error("Failed to fetch total properties:", error);
-  }
-},
- async fetchTotalZones() {
-  try {
-    const response = await this.$apiGet("/get_property_zones");
-    console.log("API response:", response);
-    if (response && response.count !== undefined) {
-      this.stats.totalZones = response.count;
-    } else {
-      console.warn("Unexpected response format:", response);
-    }
-  } catch (error) {
-    console.error("Failed to fetch total properties:", error);
-  }
-},
- async fetchTotalSubscriptions() {
-  try {
-    const response = await this.$apiGet("/get_subscription");
-    console.log("API response:", response);
-    if (response && response.count !== undefined) {
-      this.stats.totalSubscriptions = response.count;
-    } else {
-      console.warn("Unexpected response format:", response);
-    }
-  } catch (error) {
-    console.error("Failed to fetch total properties:", error);
-  }
-},
- async fetchTotalTenants() {
-  try {
-    const response = await this.$apiGet("/get_tenants");
-    console.log("API response:", response);
-    if (response && response.count !== undefined) {
-      this.stats.totalTenants = response.count;
-    } else {
-      console.warn("Unexpected response format:", response);
-    }
-  } catch (error) {
-    console.error("Failed to fetch total properties:", error);
-  }
-}
+    async fetchTotalProperties() {
+      try {
+        const response = await this.$apiGet("/get_properties");
+        if (response && response.count !== undefined) {
+          this.stats.totalProperties = response.count;
+        }
+      } catch (error) {
+        console.error("Failed to fetch total properties:", error);
+      }
+    },
+    async fetchTotalZones() {
+      try {
+        const response = await this.$apiGet("/get_property_zones");
+        if (response && response.count !== undefined) {
+          this.stats.totalZones = response.count;
+        }
+      } catch (error) {
+        console.error("Failed to fetch total zones:", error);
+      }
+    },
+    async fetchTotalSubscriptions() {
+      try {
+        const response = await this.$apiGet("/get_subscription");
+        if (response && response.count !== undefined) {
+          this.stats.totalSubscriptions = response.count;
+        }
+      } catch (error) {
+        console.error("Failed to fetch total subscriptions:", error);
+      }
+    },
+    async fetchTotalTenants() {
+      try {
+        const response = await this.$apiGet("/get_tenants");
+        if (response && response.count !== undefined) {
+          this.stats.totalTenants = response.count;
+        }
+      } catch (error) {
+        console.error("Failed to fetch total tenants:", error);
+      }
+    },
 
+    async fetchPricingAnalytics() {
+      try {
+        const response = await this.$apiGet("/get_subscription");
+
+        if (response && response.data) {
+          // Plans to include
+          const plans = ["Basic Plan", "Profectional", "Enterprise"];
+
+          // Initialize counters
+          const usersPerPlan = { "Basic Plan": 0, Profectional: 0, Enterprise: 0 };
+          const revenuePerPlan = { "Basic Plan": 0, Profectional: 0, Enterprise: 0 };
+
+          // Aggregate data
+          response.data.forEach((sub) => {
+            if (plans.includes(sub.plan_name)) {
+              usersPerPlan[sub.plan_name] += 1;
+              revenuePerPlan[sub.plan_name] += sub.price || 0;
+            }
+          });
+
+          // ✅ Replace options object to trigger reactivity
+          this.pricingChartOptions = {
+            ...this.pricingChartOptions,
+            xaxis: {
+              categories: plans, // "Basic Plan", "Profectional", "Enterprise"
+            },
+          };
+
+          // Update chart series
+          this.pricingSeries = [
+            {
+              name: "Users",
+              type: "column",
+              data: plans.map((p) => usersPerPlan[p]),
+            },
+            {
+              name: "Revenue ($)",
+              type: "line",
+              data: plans.map((p) => revenuePerPlan[p]),
+            },
+          ];
+        }
+      } catch (error) {
+        console.error("Failed to fetch pricing analytics:", error);
+      }
+    },
   },
 };
 </script>
