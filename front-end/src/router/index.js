@@ -1,6 +1,8 @@
 import { createRouter, createWebHistory } from "vue-router";
 import Home from '../views/opened/landing/Home.vue'
 import Login from '../views/opened/auth/login.vue'
+import ResetPassword from '../views/opened/auth/ResetPassword.vue'
+
 import Registration from '../views/opened/auth/login.vue'
 import ForgotPassword from '../views/opened/auth/forgotPassword.vue';
 import Reset from '../views/opened/auth/reset.vue';
@@ -22,10 +24,10 @@ const Reports = { template: '<div class="p-6 text-gray-800">Reports Page</div>' 
 const Messages = { template: '<div class="p-6 text-gray-800">Messages Page</div>' };
 const Settings = { template: '<div class="p-6 text-gray-800">Settings Page</div>' };
 
-import Rents from  '../views/closed/rent/view.vue';
-import RentDetail from  '../views/closed/rent/rentDetail.vue';
+import Rents from '../views/closed/rent/view.vue';
+import RentDetail from '../views/closed/rent/rentDetail.vue';
 
-import  MaintenanceRequests from  '../views/closed/maintenanceRequests/view1.vue';
+import MaintenanceRequests from '../views/closed/maintenanceRequests/view1.vue';
 
 import User_view from '../views/closed/users/view.vue';
 
@@ -68,23 +70,36 @@ const routes = [
     meta:
       { requiresGuest: true }
   },
+
+  // router/index.js
+  {
+    path: '/en/reset-password/:token',
+    name: 'ResetPassword',
+    component: ResetPassword,
+    props: true
+  },
+
+
+
+  ,
+
   {
     path: "/dashboard", name: "dashboard",
     component: dashboard,
     meta:
       { requiresGuest: true },
     children: [
-      
+
       {
         path: "first-dash", name: "first-dash",
         component: first_dash,
       },
-       {
-    path: '/rent-detail/:id',   // Route param :id
-    name: 'rent-detail',
-    component: RentDetail,
-    props: true,              // optional: allows you to receive `id` as a prop
-  },
+      {
+        path: '/rent-detail/:id',   // Route param :id
+        name: 'rent-detail',
+        component: RentDetail,
+        props: true,              // optional: allows you to receive `id` as a prop
+      },
       { path: '/properties', name: 'properties', component: Properties },
       { path: 'properties/:id', name: 'PropertyDetail', component: PropertyDetail, props: true },
       { path: 'properties/rentPay/:id', name: 'rentPay', component: rentPay, props: true },
@@ -97,9 +112,9 @@ const routes = [
       { path: '/reports', name: 'reports', component: Reports },
       { path: '/messages', name: 'messages', component: Messages },
       { path: '/settings', name: 'settings', component: Settings },
-     { path: '/notifications', name: 'notifications', component: Notifications },
+      { path: '/notifications', name: 'notifications', component: Notifications },
 
-      {path: '/rents', name: 'rents', component: Rents },
+      { path: '/rents', name: 'rents', component: Rents },
 
       { path: '/property_sales', name: 'property_sales', component: Property_sales },
       { path: '/sales_payments', name: 'sales_payments', component: Sales_Payments },
@@ -130,7 +145,7 @@ const routes = [
       { path: '/groups', name: 'groups', component: view_groups },
       { path: '/managers', name: 'managers', component: view_managers },
       { path: '/owners', name: 'owners', component: view_owners },
-      { path: '/staffs', name: 'staffs', component: staffs},
+      { path: '/staffs', name: 'staffs', component: staffs },
     ]
   },
   { path: "/forgot-password", name: "forgotPassword", component: ForgotPassword },
