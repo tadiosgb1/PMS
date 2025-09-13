@@ -111,28 +111,22 @@
                     {{ p.end_date || "-" }}
                   </td>
                   <td class="border border-gray-300 px-4 py-2">
-                    {{ p.user_id }}
+                    {{ p.ownerName }}
                   </td>
                   <td class="border border-gray-300 px-4 py-2">
-                    {{ p.subscription_id }}
+                    {{ p.planName }}
                   </td>
                   <td
                     class="border border-gray-300 px-4 py-2 text-center space-x-2"
                   >
-                    <button
+                    <button v-if="p.status!='paid'"
                       @click="approve(p)"
                       class="text-blue-600 hover:text-blue-800 focus:outline-none"
                       title="Edit"
                     >
                      Approve
                     </button>
-                    <button
-                      @click="askDeleteConfirmation(p)"
-                      class="text-red-600 hover:text-red-800 focus:outline-none"
-                      title="Delete"
-                    >
-                      <i class="fas fa-trash-alt"></i>
-                    </button>
+
                   </td>
                 </tr>
                 <tr v-if="filteredAndSortedPayments.length === 0">
@@ -268,44 +262,55 @@ export default {
     }
    
   },
-    async fetchPayments() {
-      try {
-        // const params = {subscription_id__user_id__id:localStorage.getItem('userId') };
-        let params = {};
-        if (this.$route.params.id) {
-          params = {
-            // user_id:localStorage.getItem("userId"),
-            subscription_id: this.$route.params.id,
-          };
-        } else {
-          params = {
-            user_id: localStorage.getItem("userId"),
-            //subscription_id:this.$route.params.id,
-          };
-        }
+   async fetchPayments() {
+  try {
+    let params = {};
 
-        if (localStorage.getItem("is_superuser") == "true") {
-          params = {};
-          // alert("hii")
-        }
+    if (this.$route.params.id) {
+      params = { subscription_id: this.$route.params.id };
+    } else {
+      params = { user_id: localStorage.getItem("userId") };
+    }
 
-        console.log("params", params);
-        const response = await this.$apiGet(
-          `/get_subscription_payment`,
-          params
-        );
-        if (Array.isArray(response.data)) {
-          this.payments = response.data;
-        } else {
-          this.payments = [];
-          console.warn("Unexpected response:", response);
-        }
-      } catch (error) {
-        console.error("Failed to fetch subscription payments:", error);
-        this.payments = [];
-        alert("Failed to load subscription payments.");
-      }
-    },
+    if (localStorage.getItem("is_superuser") === "true") {
+      params = {};
+    }
+
+    console.log("params", params);
+    const response = await this.$apiGet(`/get_subscription_payment`, params);
+
+    if (Array.isArray(response.data)) {
+      this.payments = response.data;
+
+      // Fetch owner and plan name for each payment
+      await Promise.all(
+        this.payments.map(async (payment) => {
+          // Fetch owner
+          if (payment.user_id) {
+            const ownerRes = await this.$apiGetById('get_user', payment.user_id);
+            payment.ownerName = ownerRes.first_name || 'Unknown';
+          }
+
+          // Fetch plan name
+          if (payment.subscription_id) {
+            const planRes = await this.$apiGetById('get_subscription', payment.subscription_id);
+            payment.planName = planRes.plan_name || 'Unknown Plan';
+          }
+        })
+      );
+
+    } else {
+      this.payments = [];
+      console.warn("Unexpected response:", response);
+    }
+
+  } catch (error) {
+    console.error("Failed to fetch subscription payments:", error);
+    this.payments = [];
+    alert("Failed to load subscription payments.");
+  }
+},
+
     sortBy(key) {
       if (this.sortKey === key) {
         this.sortAsc = !this.sortAsc;
