@@ -89,17 +89,17 @@
          animate-glow" title="Pay Rent">
                       <i class="fas fa-credit-card mr-2"></i> Pay
                     </button>
-                      <button @click="rentDetail(rent.id)" class="text-blue-600 hover:text-blue-800 focus:outline-none" title="Edit">
-                      <i class=""></i>Detail
+                      <button @click="rentDetail(rent.id)" class="text-green-600 hover:text-green-800 focus:outline-none" title="Edit">
+                      <i class="fas fa-info-circle"></i>
                     </button>
           
-                     <button @click="addPictureVisible=true;selectedRentId=rent.id" class="text-green-600 hover:text-red-800 focus:outline-none" title="Delete">
+                     <!-- <button @click="addPictureVisible=true;selectedRentId=rent.id" class="text-green-600 hover:text-red-800 focus:outline-none" title="Delete">
                       <i class=""></i> Add picture
-                    </button>
+                    </button> -->
 
-                     <button @click="payments(rent)" class="text-blue-600 hover:text-blue-800 focus:outline-none" title="Delete">
+                     <!-- <button @click="payments(rent)" class="text-blue-600 hover:text-blue-800 focus:outline-none" title="Delete">
                       <i class=""></i> Payments
-                    </button>
+                    </button> -->
                   </td>
                 </tr>
                 <tr v-if="filteredAndSortedRents.length === 0">
@@ -229,7 +229,7 @@ export default {
     },
     async fetchRents() {
       const params={
-
+  page_size:1000,
       }
       console.log("params",params);
       try {
