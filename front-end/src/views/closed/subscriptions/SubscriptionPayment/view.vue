@@ -120,11 +120,11 @@
                     class="border border-gray-300 px-4 py-2 text-center space-x-2"
                   >
                     <button
-                      @click="editPayment(p)"
+                      @click="approve(p)"
                       class="text-blue-600 hover:text-blue-800 focus:outline-none"
                       title="Edit"
                     >
-                      <i class="fas fa-edit"></i>
+                     Approve
                     </button>
                     <button
                       @click="askDeleteConfirmation(p)"
@@ -246,6 +246,28 @@ export default {
     this.fetchPayments();
   },
   methods: {
+  async approve(payment){
+    console.log("Payment",payment);
+    const payload={
+      id:payment.id,
+      status:"paid",
+    }
+    const res=await this.$apiPatch(`/update_subscription_payment`,payment.id,payload);
+    console.log("res",res);
+    if(res){
+      alert("approved")
+      console.log("subscription id",res.subscription_id);
+      const subPayload={
+        id:res.subscription_id,
+        status:"active",
+      }
+      const resSub=await this.$apiPatch(`/update_subscription`,res.subscription_id,subPayload);
+      if(resSub){
+        alert("Subscription activated");
+      }
+    }
+   
+  },
     async fetchPayments() {
       try {
         // const params = {subscription_id__user_id__id:localStorage.getItem('userId') };
