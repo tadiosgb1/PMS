@@ -119,20 +119,14 @@
                   <td
                     class="border border-gray-300 px-4 py-2 text-center space-x-2"
                   >
-                    <button
+                    <button v-if="p.status!='paid'"
                       @click="approve(p)"
                       class="text-blue-600 hover:text-blue-800 focus:outline-none"
                       title="Edit"
                     >
                      Approve
                     </button>
-                    <button
-                      @click="askDeleteConfirmation(p)"
-                      class="text-red-600 hover:text-red-800 focus:outline-none"
-                      title="Delete"
-                    >
-                      <i class="fas fa-trash-alt"></i>
-                    </button>
+
                   </td>
                 </tr>
                 <tr v-if="filteredAndSortedPayments.length === 0">

@@ -653,17 +653,12 @@ export async function getProperties(
   url = "/get_properties?page=1&page_size=10",
   extraParams = null
 ) {
-
-  console.log("extraparams", extraParams);
   try {
     const isSuperUser =
       localStorage.getItem("is_superuser") === "1" ||
       localStorage.getItem("is_superuser") === "true";
 
     const groups = JSON.parse(localStorage.getItem("groups") || "[]");
-
-    console.log("groups",groups);
-
     const email = localStorage.getItem("email");
 
     let params = {};
@@ -674,21 +669,48 @@ export async function getProperties(
       params = { property_zone_id__owner_id__email: email };
     } else if (groups.includes("manager")) {
       params = { property_zone_id__manager_id__email: email };
-    }
-    else if (groups.includes("staff")) {
+    } else if (groups.includes("staff")) {
       params = { property_zone_id__staff_id__email: email };
-      console.log("params for the staff",params);
     }
-    // merge with extra params if provided
+
+    // Merge extra params
     if (extraParams && typeof extraParams === "object") {
       params = { ...params, ...extraParams };
     }
 
-    console.log("Params in prperties",params);
+    console.log("Params in properties:", params);
 
     const response = await this.$apiGet(url, params);
-    console.log("response in global pro", response);
     const properties = response.data || [];
+
+    // Fetch owner, manager, and zone name for each property
+    await Promise.all(
+      properties.map(async (property) => {
+        // Owner
+        if (property.owner_id) {
+          const ownerRes = await this.$apiGetById("get_user", property.owner_id);
+          property.ownerName = ownerRes.first_name || "-";
+        } else {
+          property.ownerName = "-";
+        }
+
+        // Manager
+        if (property.manager_id) {
+          const managerRes = await this.$apiGetById("get_user", property.manager_id);
+          property.managerName = managerRes.first_name || "-";
+        } else {
+          property.managerName = "-";
+        }
+
+        // Zone Name
+        if (property.property_zone_id) {
+          const zoneRes = await this.$apiGetById("get_property_zone", property.property_zone_id);
+          property.zoneName = zoneRes.name || "-";
+        } else {
+          property.zoneName = "-";
+        }
+      })
+    );
 
     return {
       properties,

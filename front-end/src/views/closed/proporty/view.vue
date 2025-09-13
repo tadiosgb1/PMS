@@ -125,17 +125,17 @@
                   <td
                     class="border border-gray-300 px-3 py-2 whitespace-nowrap"
                   >
-                    {{ property.owner_id }}
+                    {{ property.ownerName }}
                   </td>
                   <td
                     class="border border-gray-300 px-3 py-2 whitespace-nowrap"
                   >
-                    {{ property.manager_id }}
+                    {{ property.managerName }}
                   </td>
                   <td
                     class="border border-gray-300 px-3 py-2 whitespace-nowrap"
                   >
-                    {{ property.property_zone_id }}
+                    {{ property.zoneName }}
                   </td>
                   <td
                     class="border border-gray-300 px-3 py-2 whitespace-nowrap"
