@@ -212,6 +212,11 @@ console.log("form",this.form);
     async submitForm() {
       try {
         const response = await this.$apiPost("/post_rent", this.form);
+        if(response.error){
+          this.$root.$refs.toast.showToast(response.error);
+
+        }
+
         this.$root.$refs.toast.showToast(response.message || "Rent added successfully", "success");
 
         // Reset form (keep property_id if provided from route)

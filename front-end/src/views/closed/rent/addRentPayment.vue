@@ -1,4 +1,8 @@
 <template>
+  <div>
+ <Toast ref="toast" />
+
+  </div>
   <div
     v-if="visible"
     class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4 overflow-auto"
@@ -104,8 +108,10 @@
 </template>
 
 <script>
+import Toast from "../../../components/Toast.vue";
 export default {
   name: "MakePaymentModal",
+    components: { Toast },
   props: {
     rentId: {
       type: Number,
@@ -156,7 +162,10 @@ export default {
       try {
         console.log("cycles",this.form)
         const response = await this.$apiPost("make_payment", this.form);
-
+ this.$root.$refs.toast.showToast(
+          "Rent Payed successfully ",
+          "success"
+        );
         this.$emit("success", response);
         this.$emit("close");
       } catch (error) {

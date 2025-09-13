@@ -229,11 +229,7 @@ export default {
     },
     async fetchRents() {
       const params={
-<<<<<<< HEAD
-  page_size:1000,
-=======
-       
->>>>>>> 3ff1cd4c429817c87e524ba0f91688d4873b4a2c
+       page_size:1000,
       }
       console.log("params",params);
       try {
