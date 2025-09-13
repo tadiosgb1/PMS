@@ -76,26 +76,26 @@
                 class="hover:bg-gray-100"
               >
                 <td class="border border-gray-300 px-4 py-2">
-                  {{ staff.first_name }} {{ staff.middle_name }}
-                  {{ staff.last_name }}
+                  {{ staff.staff.first_name }} {{ staff.middle_name }}
+                  {{ staff.staff.last_name }}
                 </td>
                 <td class="border border-gray-300 px-4 py-2">
-                  {{ staff.email }}
+                  {{ staff.staff.email }}
                 </td>
                 <td class="border border-gray-300 px-4 py-2">
-                  {{ staff.phone_number }}
+                  {{ staff.staff.phone_number }}
                 </td>
                 <td class="border border-gray-300 px-4 py-2">
-                  {{ staff.groups.join(", ") }}
+                  {{ staff.staff.groups.join(",") }}
                 </td>
                 <td class="border border-gray-300 px-4 py-2">
-                  {{ staff.is_active ? "Yes" : "No" }}
+                  {{ staff.staff.is_active ? "Yes" : "No" }}
                 </td>
                 <td
                   class="border border-gray-300 px-4 py-2 text-center space-x-2"
                 >
                   <router-link
-                    :to="`/user_detail/${staff.id}`"
+                    :to="`/user_detail/${staff.staff.id}`"
                     class="text-green-600 hover:text-green-800"
                     title="View"
                   >
@@ -246,10 +246,10 @@ export default {
     }
 
 
-    console.log("params",params);
+    console.log("params for staff by owner",params);
 
     const res = await this.$apiGet(url, params);
-
+    
     console.log("staffs result", res);
 
     this.staffs = Array.isArray(res.data) ? res.data : [];

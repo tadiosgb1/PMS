@@ -156,7 +156,10 @@ export default {
     async submitForm() {
       console.log("this.form",this.form)
       const res = await this.$apiPost('/sign_up',this.form);
-      console.log("res manager add",res);
+      console.log("res staff add",res);
+      if(res){
+        alert("Successfully registered")
+      }
       this.resetForm();
       this.close();
     },
