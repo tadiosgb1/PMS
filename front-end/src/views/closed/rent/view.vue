@@ -229,7 +229,7 @@ export default {
     },
     async fetchRents() {
       const params={
-
+       
       }
       console.log("params",params);
       try {
