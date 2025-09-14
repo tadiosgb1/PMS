@@ -249,47 +249,61 @@ export default {
       });
     },
 
-   async fetchSales(url = `/get_property_sales?page=1&page_size=${this.pageSize}`) {
-  try {
-    let params = {};
+    async fetchSales(
+      url = `/get_property_sales?page=1&page_size=${this.pageSize}`
+    ) {
+      try {
+        let params = {};
 
-    if (localStorage.getItem("is_superuser") === "true") {
-      params = {};
-    } else {
-      params = { seller__id: localStorage.getItem("userId") };
-    }
-
-    console.log("params", params);
-    const res = await this.$apiGet(url, params);
-    console.log("res", res);
-
-    this.sales = res.data || [];
-    this.currentPage = res.current_page || 1;
-    this.totalPages = res.total_pages || 1;
-    this.next = res.next || null;
-    this.previous = res.previous || null;
-
-    // Fetch property name for each sale
-    await Promise.all(
-      this.sales.map(async (sale) => {
-        if (sale.property_id) {
-          const propertyRes = await this.$apiGetById("get_property", sale.property_id);
-          sale.propertyName = propertyRes.name || "-";
+        if (localStorage.getItem("is_superuser") === "true") {
+          params = {};
         } else {
-          sale.propertyName = "-";
+          params = { seller__id: localStorage.getItem("userId") };
         }
-      })
-    );
-  } catch (err) {
-    console.error("Error fetching sales:", err);
-    this.sales = [];
-    this.currentPage = 1;
-    this.totalPages = 1;
-    this.next = null;
-    this.previous = null;
-  }
-}
-,
+
+        console.log("params", params);
+        const res = await this.$apiGet(url, params);
+        console.log("res", res);
+
+        this.sales = res.data || [];
+        console.log("sales", this.sales);
+        this.currentPage = res.current_page || 1;
+        this.totalPages = res.total_pages || 1;
+        this.next = res.next || null;
+        this.previous = res.previous || null;
+
+        // Safely fetch property name for each sale
+        await Promise.all(
+          this.sales.map(async (sale) => {
+            if (sale.property_id) {
+              try {
+                const propertyRes = await this.$apiGetById(
+                  "get_property",
+                  sale.property_id
+                );
+                sale.propertyName = propertyRes.name || "-";
+              } catch (err) {
+                console.warn(
+                  `Failed to fetch property ${sale.property_id} for sale ${sale.id}`,
+                  err
+                );
+                sale.propertyName = "-";
+              }
+            } else {
+              sale.propertyName = "-";
+            }
+          })
+        );
+      } catch (err) {
+        console.error("Error fetching sales:", err);
+        this.sales = [];
+        this.currentPage = 1;
+        this.totalPages = 1;
+        this.next = null;
+        this.previous = null;
+      }
+    },
+
     sortBy(key) {
       this.sortKey = key;
       this.sortAsc = this.sortKey === key ? !this.sortAsc : true;

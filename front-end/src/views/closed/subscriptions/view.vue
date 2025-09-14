@@ -74,19 +74,17 @@
                   </td>
                   <td class="px-4 py-2 border">{{ subscription.status }}</td>
 
-                  <td class="px-4 py-2 border">   {{ subscription.ownerName }}    </td>
+                  <td class="px-4 py-2 border">{{ subscription.ownerName }}</td>
 
                   <td class="px-4 py-2 border text-center space-x-2">
-                <button v-if="subscription.status=='pending'"
-                  @click="pay(subscription)"
-                  class="relative px-4 py-2 text-green-600 border border-green-600 rounded-lg
-                        hover:text-white hover:bg-green-600
-                        transition duration-300 ease-in-out
-                        animate-glow"
-                  title="Pay"
-                >
-                  <i class="fas fa-credit-card mr-2"></i> Pay
-                </button>
+                    <button
+                      v-if="subscription.status == 'pending'"
+                      @click="pay(subscription)"
+                      class="relative px-4 py-2 text-green-600 border border-green-600 rounded-lg hover:text-white hover:bg-green-600 transition duration-300 ease-in-out animate-glow"
+                      title="Pay"
+                    >
+                      <i class="fas fa-credit-card mr-2"></i> Pay
+                    </button>
 
                     <button
                       @click="payment(subscription.id)"
@@ -207,7 +205,6 @@ export default {
       paymentPayload: null,
       editing: null,
       deleting: null,
-    
 
       // ✅ Pagination state
       currentPage: 1,
@@ -232,65 +229,80 @@ export default {
     this.fetchSubscriptions();
   },
   methods: {
- async fetchSubscriptions(url = null) {
-  try {
-    let params = {
-      user_id: localStorage.getItem("userId"),
-    };
+    async fetchSubscriptions(url = null) {
+      try {
+        let params = {
+          user_id: localStorage.getItem("userId"),
+        };
 
-    if (localStorage.getItem("is_superuser") === "true") {
-      params = {}; 
-    }
+        if (localStorage.getItem("is_superuser") === "true") {
+          params = {};
+        }
 
-    const pageUrl = url || `/get_subscription?page=1&page_size=${this.pageSize}`;
-    const res = await this.$apiGet(pageUrl, params);
+        const pageUrl =
+          url || `/get_subscription?page=1&page_size=${this.pageSize}`;
+        const res = await this.$apiGet(pageUrl, params);
+        console.log("res", res);
 
-    this.subscriptions = res.data || [];
-    this.currentPage = res.currentPage || 1;
-    this.totalPages = res.totalPages || 1;
-    this.next = res.next || null;
-    this.previous = res.previous || null;
+        this.subscriptions = res.data || [];
+        this.currentPage = res.currentPage || 1;
+        this.totalPages = res.totalPages || 1;
+        this.next = res.next || null;
+        this.previous = res.previous || null;
 
-    // Fetch owner for each subscription
-    await Promise.all(
-      this.subscriptions.map(async (sub) => {
-        const ownerRes = await this.$apiGetById('get_user', sub.user_id);
-        sub.ownerName = ownerRes.first_name; // attach owner name directly
-      })
-    );
+        // Fetch owner for each subscription (handle missing IDs)
+        await Promise.all(
+          this.subscriptions.map(async (sub) => {
+            if (sub.user_id) {
+              try {
+                const ownerRes = await this.$apiGetById(
+                  "get_user",
+                  sub.user_id
+                );
+                sub.ownerName = ownerRes.first_name || "Unknown";
+              } catch (err) {
+                console.warn(`Failed to fetch user ${sub.user_id}`, err);
+                sub.ownerName = "Unknown";
+              }
+            } else {
+              sub.ownerName = "Unknown"; // fallback if no user_id
+            }
+          })
+        );
 
-  } catch (e) {
-    console.error("Error fetching subscriptions", e);
-    this.subscriptions = [];
-    this.currentPage = 1;
-    this.totalPages = 1;
-    this.next = null;
-    this.previous = null;
-  }
-},
+        console.log("subscriptions", this.subscriptions);
+      } catch (e) {
+        console.error("Error fetching subscriptions", e);
+        this.subscriptions = [];
+        this.currentPage = 1;
+        this.totalPages = 1;
+        this.next = null;
+        this.previous = null;
+      }
+    },
 
-//   async fetch() {
-//   let params = {};
+    //   async fetch() {
+    //   let params = {};
 
-//   try {
-//     const isSuperuser = localStorage.getItem("is_superuser") === "true"; 
-//     // convert to boolean
-//     if (!isSuperuser) {
-//       params = {
-//         user_id__id: localStorage.getItem("userId"),
-//       };
-//     }
+    //   try {
+    //     const isSuperuser = localStorage.getItem("is_superuser") === "true";
+    //     // convert to boolean
+    //     if (!isSuperuser) {
+    //       params = {
+    //         user_id__id: localStorage.getItem("userId"),
+    //       };
+    //     }
 
-//     console.log("params", params);
+    //     console.log("params", params);
 
-//     const res = await this.$apiGet("/get_subscription", params);
+    //     const res = await this.$apiGet("/get_subscription", params);
 
-//     this.subscriptions = res.data || [];
-//   } catch (e) {
-//     console.error("Error fetching subscriptions", e);
-//     this.subscriptions = [];
-//   }
-// },
+    //     this.subscriptions = res.data || [];
+    //   } catch (e) {
+    //     console.error("Error fetching subscriptions", e);
+    //     this.subscriptions = [];
+    //   }
+    // },
 
     formatDate(dateStr) {
       if (!dateStr) return "";
