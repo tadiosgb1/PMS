@@ -216,10 +216,10 @@ export default {
       this.confirmVisible = false;
       try {
         await this.$apiDelete(`/delete_property_zone/${this.zoneToDelete.id}`);
-        this.$refs.toast.showToast("Zone deleted successfully", "success");
+        this.$root.$refs.toast.showToast("Zone deleted successfully", "success");
         await this.fetchZones();
       } catch (err) {
-        this.$refs.toast.showToast("Failed to delete zone", "error");
+        this.$root.$refs.toast.showToast("Failed to delete zone", "error");
         console.error(err);
       }
       this.zoneToDelete = null;

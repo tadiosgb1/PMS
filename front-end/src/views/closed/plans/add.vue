@@ -131,6 +131,15 @@ export default {
     async submitForm() {
       console.log("Submitted Plan:", this.form);
       await this.$apiPost("/post_plan", this.form).then(response=>{
+
+        console.log("response.namejh,jkljkllllllllllllllllllllllllllllllllllllllllllllllllllllllllll",response.name);
+    
+          if (response.name) {
+      // Show validation error from backend
+      this.$root.$refs.toast.showToast(response.name[0], "error");
+      return; // stop further execution
+    }
+
      this.$root.$refs.toast.showToast('Plan saved successfully ', 'success');
 
       })
