@@ -151,6 +151,12 @@ export default {
           icon: "fas fa-money-bill-wave",
           color: "#22c55e",
         },
+        {
+          name: "Reports",
+          route: "reports",
+          icon: "fas fa-file-alt",
+          color: "#22c55e",
+        },
 
        
       ],

@@ -20,7 +20,6 @@ import PropertyPicture from '../views/closed/proportyPicture/view.vue';
 import Payments from '../views/closed/payments/view.vue'
 const Maintenance = { template: '<div class="p-6 text-gray-800">Maintenance Page</div>' };
 const Leases = { template: '<div class="p-6 text-gray-800">Leases Page</div>' };
-const Reports = { template: '<div class="p-6 text-gray-800">Reports Page</div>' };
 const Messages = { template: '<div class="p-6 text-gray-800">Messages Page</div>' };
 const Settings = { template: '<div class="p-6 text-gray-800">Settings Page</div>' };
 
@@ -48,6 +47,8 @@ import Sales_Payments from '../views/closed/SalesPayment/view.vue'
 import Rent_Payments from '../views/closed/rent/RentPayments.vue'
 import staffs from '../views/closed/stafs/view.vue'
 import Notifications from '../views/closed/notifications/view.vue'
+import Reports from '../views/closed/report/view.vue'
+
 
 const routes = [
   {
