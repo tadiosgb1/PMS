@@ -13,7 +13,7 @@
           @click="downloadProperties"
           class="mt-4 px-4 py-2 bg-green-600 text-white rounded hover:bg-green-700"
         >
-          ⬇ Download
+          ⬇ Export
         </button>
       </div>
 
@@ -25,7 +25,7 @@
           @click="downloadZones"
           class="mt-4 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
         >
-          ⬇ Download
+          ⬇ Export
         </button>
       </div>
 
@@ -33,11 +33,20 @@
       <div class="bg-white p-6 rounded-lg shadow-md">
         <h2 class="text-gray-600">Total Subscriptions</h2>
         <p class="text-2xl font-semibold">{{ stats.totalSubscriptions }}</p>
+
+        <!-- Date Filters -->
+        <div class="mt-4 flex flex-col space-y-2">
+          <strong>From</strong>
+          <input type="date" v-model="subscriptionFilter.from" class="border rounded p-2" />
+          <strong>To</strong>
+          <input type="date" v-model="subscriptionFilter.to" class="border rounded p-2" />
+        </div>
+
         <button 
           @click="downloadSubscriptions"
           class="mt-4 px-4 py-2 bg-purple-600 text-white rounded hover:bg-purple-700"
         >
-          ⬇ Download
+          ⬇ Export
         </button>
       </div>
 
@@ -49,7 +58,67 @@
           @click="downloadTenants"
           class="mt-4 px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700"
         >
-          ⬇ Download
+          ⬇ Export
+        </button>
+      </div>
+
+      <!-- Total Subscription Payments Card -->
+      <div class="bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-gray-600">Subscription Payments</h2>
+        <p class="text-2xl font-semibold">{{ stats.totalSubscriptionPayments }}</p>
+
+        <div class="mt-4 flex flex-col space-y-2">
+          <strong>From</strong>
+          <input type="date" v-model="subscriptionPaymentFilter.from" class="border rounded p-2" />
+          <strong>To</strong>
+          <input type="date" v-model="subscriptionPaymentFilter.to" class="border rounded p-2" />
+        </div>
+
+        <button 
+          @click="downloadSubscriptionPayments"
+          class="mt-4 px-4 py-2 bg-teal-600 text-white rounded hover:bg-teal-700"
+        >
+          ⬇ Export
+        </button>
+      </div>
+
+      <!-- Total Sales Payments Card -->
+      <div class="bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-gray-600">Sales Payments</h2>
+        <p class="text-2xl font-semibold">{{ stats.totalSalesPayments }}</p>
+
+        <div class="mt-4 flex flex-col space-y-2">
+          <strong>From</strong>
+          <input type="date" v-model="salesPaymentFilter.from" class="border rounded p-2" />
+          <strong>To</strong>
+          <input type="date" v-model="salesPaymentFilter.to" class="border rounded p-2" />
+        </div>
+
+        <button 
+          @click="downloadSalesPayments"
+          class="mt-4 px-4 py-2 bg-orange-600 text-white rounded hover:bg-orange-700"
+        >
+          ⬇ Export
+        </button>
+      </div>
+
+      <!-- Total Rent Payments Card -->
+      <div class="bg-white p-6 rounded-lg shadow-md">
+        <h2 class="text-gray-600">Rent Payments</h2>
+        <p class="text-2xl font-semibold">{{ stats.totalRentPayments }}</p>
+
+        <div class="mt-4 flex flex-col space-y-2">
+          <strong>From</strong>
+          <input type="date" v-model="rentPaymentFilter.from" class="border rounded p-2" />
+          <strong>To</strong>
+          <input type="date" v-model="rentPaymentFilter.to" class="border rounded p-2" />
+        </div>
+
+        <button 
+          @click="downloadRentPayments"
+          class="mt-4 px-4 py-2 bg-indigo-600 text-white rounded hover:bg-indigo-700"
+        >
+          ⬇ Export
         </button>
       </div>
 
@@ -57,9 +126,7 @@
         v-if="totalPropertiesVisible"
         :totalPropertiesVisible="totalPropertiesVisible"
         @close="totalPropertiesVisible = false"
-       
       />
-
     </div>
   </div>
 </template>
@@ -69,10 +136,7 @@ import * as XLSX from "xlsx";
 import TotalProperties from "@/views/closed/report/totalProperties.vue";
 
 export default {
-
-  components:{
-TotalProperties
-  },
+  components: { TotalProperties },
   data() {
     return {
       stats: {
@@ -80,12 +144,24 @@ TotalProperties
         totalZones: 0,
         totalSubscriptions: 0,
         totalTenants: 0,
+        totalSubscriptionPayments: 0,
+        totalSalesPayments: 0,
+        totalRentPayments: 0,
       },
       properties: [],
       zones: [],
       subscriptions: [],
       tenants: [],
-      totalPropertiesVisible:false
+      subscriptionPayments: [],
+      salesPayments: [],
+      rentPayments: [],
+      totalPropertiesVisible: false,
+
+      // Filters
+      subscriptionFilter: { from: "", to: "" },
+      subscriptionPaymentFilter: { from: "", to: "" },
+      salesPaymentFilter: { from: "", to: "" },
+      rentPaymentFilter: { from: "", to: "" },
     };
   },
   mounted() {
@@ -93,29 +169,34 @@ TotalProperties
     this.fetchTotalZones();
     this.fetchTotalSubscriptions();
     this.fetchTotalTenants();
+    this.fetchTotalSubscriptionPayments();
+    this.fetchTotalSalesPayments();
+    this.fetchTotalRentPayments();
   },
   methods: {
-    /** ------------------ FETCH DATA WITH PAGINATION ------------------ **/
+    /** ------------------ FETCH DATA ------------------ **/
+    async fetchAllPaginated(endpoint) {
+      let results = [];
+      let nextUrl = endpoint;
+      while (nextUrl) {
+        const pageRes = await this.$apiGet(nextUrl);
+        if (pageRes && pageRes.data) {
+          results.push(...pageRes.data);
+          nextUrl = pageRes.next
+            ? pageRes.next.replace("https://alphapms.sunriseworld.org/api", "")
+            : null;
+        } else {
+          nextUrl = null;
+        }
+      }
+      return results;
+    },
+
     async fetchTotalProperties() {
       try {
         const response = await this.$apiGet("/get_properties");
-        if (response) {
-          this.stats.totalProperties = response.count ?? 0;
-
-          this.properties = [];
-          let nextUrl = "/get_properties";
-          while (nextUrl) {
-            const pageRes = await this.$apiGet(nextUrl);
-            if (pageRes && pageRes.data) {
-              this.properties.push(...pageRes.data);
-              nextUrl = pageRes.next
-                ? pageRes.next.replace("https://alphapms.sunriseworld.org/api", "")
-                : null;
-            } else {
-              nextUrl = null;
-            }
-          }
-        }
+        this.stats.totalProperties = response?.count ?? 0;
+        this.properties = await this.fetchAllPaginated("/get_properties");
       } catch (error) {
         console.error("Failed to fetch total properties:", error);
       }
@@ -124,23 +205,8 @@ TotalProperties
     async fetchTotalZones() {
       try {
         const response = await this.$apiGet("/get_property_zones");
-        if (response) {
-          this.stats.totalZones = response.count ?? 0;
-
-          this.zones = [];
-          let nextUrl = "/get_property_zones";
-          while (nextUrl) {
-            const pageRes = await this.$apiGet(nextUrl);
-            if (pageRes && pageRes.data) {
-              this.zones.push(...pageRes.data);
-              nextUrl = pageRes.next
-                ? pageRes.next.replace("https://alphapms.sunriseworld.org/api", "")
-                : null;
-            } else {
-              nextUrl = null;
-            }
-          }
-        }
+        this.stats.totalZones = response?.count ?? 0;
+        this.zones = await this.fetchAllPaginated("/get_property_zones");
       } catch (error) {
         console.error("Failed to fetch total zones:", error);
       }
@@ -149,23 +215,8 @@ TotalProperties
     async fetchTotalSubscriptions() {
       try {
         const response = await this.$apiGet("/get_subscription");
-        if (response) {
-          this.stats.totalSubscriptions = response.count ?? 0;
-
-          this.subscriptions = [];
-          let nextUrl = "/get_subscription";
-          while (nextUrl) {
-            const pageRes = await this.$apiGet(nextUrl);
-            if (pageRes && pageRes.data) {
-              this.subscriptions.push(...pageRes.data);
-              nextUrl = pageRes.next
-                ? pageRes.next.replace("https://alphapms.sunriseworld.org/api", "")
-                : null;
-            } else {
-              nextUrl = null;
-            }
-          }
-        }
+        this.stats.totalSubscriptions = response?.count ?? 0;
+        this.subscriptions = await this.fetchAllPaginated("/get_subscription");
       } catch (error) {
         console.error("Failed to fetch total subscriptions:", error);
       }
@@ -174,25 +225,40 @@ TotalProperties
     async fetchTotalTenants() {
       try {
         const response = await this.$apiGet("/get_tenants");
-        if (response) {
-          this.stats.totalTenants = response.count ?? 0;
-
-          this.tenants = [];
-          let nextUrl = "/get_tenants";
-          while (nextUrl) {
-            const pageRes = await this.$apiGet(nextUrl);
-            if (pageRes && pageRes.data) {
-              this.tenants.push(...pageRes.data);
-              nextUrl = pageRes.next
-                ? pageRes.next.replace("https://alphapms.sunriseworld.org/api", "")
-                : null;
-            } else {
-              nextUrl = null;
-            }
-          }
-        }
+        this.stats.totalTenants = response?.count ?? 0;
+        this.tenants = await this.fetchAllPaginated("/get_tenants");
       } catch (error) {
         console.error("Failed to fetch total tenants:", error);
+      }
+    },
+
+    async fetchTotalSubscriptionPayments() {
+      try {
+        const response = await this.$apiGet("/get_subscription_payment");
+        this.stats.totalSubscriptionPayments = response?.count ?? 0;
+        this.subscriptionPayments = await this.fetchAllPaginated("/get_subscription_payment");
+      } catch (error) {
+        console.error("Failed to fetch subscription payments:", error);
+      }
+    },
+
+    async fetchTotalSalesPayments() {
+      try {
+        const response = await this.$apiGet("/get_sales_payments");
+        this.stats.totalSalesPayments = response?.count ?? 0;
+        this.salesPayments = await this.fetchAllPaginated("/get_sales_payments");
+      } catch (error) {
+        console.error("Failed to fetch sales payments:", error);
+      }
+    },
+
+    async fetchTotalRentPayments() {
+      try {
+        const response = await this.$apiGet("/get_payments");
+        this.stats.totalRentPayments = response?.count ?? 0;
+        this.rentPayments = await this.fetchAllPaginated("/get_payments");
+      } catch (error) {
+        console.error("Failed to fetch rent payments:", error);
       }
     },
 
@@ -233,7 +299,10 @@ TotalProperties
 
     downloadSubscriptions() {
       if (!this.subscriptions.length) return alert("No subscription data available.");
-      const cleaned = this.subscriptions.map(s => ({
+      let filtered = this.applyDateFilter(this.subscriptions, this.subscriptionFilter, "start_date");
+      if (!filtered.length) return alert("No subscriptions found for the selected date range.");
+
+      const cleaned = filtered.map(s => ({
         ID: s.id,
         Plan: s.plan_name,
         BillingCycle: s.billing_cycle,
@@ -261,7 +330,70 @@ TotalProperties
       this.exportExcel(cleaned, "Tenants.xlsx", "Tenants");
     },
 
-    /** ------------------ HELPER ------------------ **/
+    downloadSubscriptionPayments() {
+      if (!this.subscriptionPayments.length) return alert("No subscription payment data available.");
+      let filtered = this.applyDateFilter(this.subscriptionPayments, this.subscriptionPaymentFilter, "payment_date");
+      if (!filtered.length) return alert("No subscription payments found for the selected date range.");
+
+      const cleaned = filtered.map(p => ({
+        ID: p.id,
+        SubscriptionID: p.subscription_id,
+        Amount: p.amount,
+        Method: p.payment_method,
+        Date: p.payment_date,
+        Status: p.status,
+        CreatedAt: p.created_at,
+      }));
+      this.exportExcel(cleaned, "SubscriptionPayments.xlsx", "SubscriptionPayments");
+    },
+
+    downloadSalesPayments() {
+      if (!this.salesPayments.length) return alert("No sales payment data available.");
+      let filtered = this.applyDateFilter(this.salesPayments, this.salesPaymentFilter, "payment_date");
+      if (!filtered.length) return alert("No sales payments found for the selected date range.");
+
+      const cleaned = filtered.map(p => ({
+        ID: p.id,
+        SaleID: p.sale_id,
+        Amount: p.amount,
+        Method: p.payment_method,
+        Date: p.payment_date,
+        Status: p.status,
+        CreatedAt: p.created_at,
+      }));
+      this.exportExcel(cleaned, "SalesPayments.xlsx", "SalesPayments");
+    },
+
+    downloadRentPayments() {
+      if (!this.rentPayments.length) return alert("No rent payment data available.");
+      let filtered = this.applyDateFilter(this.rentPayments, this.rentPaymentFilter, "due_date");
+      if (!filtered.length) return alert("No rent payments found for the selected date range.");
+
+      const cleaned = filtered.map(p => ({
+        ID: p.id,
+        TenantID: p.tenant_id,
+        PropertyID: p.property_id,
+        Amount: p.amount,
+        Status: p.status,
+        DueDate: p.due_date,
+        CreatedAt: p.created_at,
+      }));
+      this.exportExcel(cleaned, "RentPayments.xlsx", "RentPayments");
+    },
+
+    /** ------------------ HELPERS ------------------ **/
+    applyDateFilter(data, filter, field) {
+      if (filter.from && filter.to) {
+        const fromDate = new Date(filter.from);
+        const toDate = new Date(filter.to);
+        return data.filter(item => {
+          const d = new Date(item[field]);
+          return d >= fromDate && d <= toDate;
+        });
+      }
+      return data;
+    },
+
     exportExcel(data, fileName, sheetName) {
       const ws = XLSX.utils.json_to_sheet(data);
       const wb = XLSX.utils.book_new();
