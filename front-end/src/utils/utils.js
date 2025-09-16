@@ -552,12 +552,10 @@ export async function getZones(url = null, pageSize = 10) {
         params = { manager_id__email: email };
       } else if (groups.includes("owner")) {
         params = { owner_id__email: email };
-      }
-       else if (groups.includes("staff")) {
+      } else if (groups.includes("staff")) {
         params = { staff_id__email: email };
-      }
-      else if (groups.includes("super_staff")) {
-        params = { };
+      } else if (groups.includes("super_staff")) {
+        params = {};
       }
     }
 
@@ -565,10 +563,25 @@ export async function getZones(url = null, pageSize = 10) {
     const response = await this.$apiGet(apiUrl, params);
     const zones = response.data || [];
 
-    // Fetch owner and manager names
+    // Safely fetch owner and manager names
     for (const zone of zones) {
-      zone.ownerName = zone.owner_id ? await this.$getFullNameById(zone.owner_id) : "-";
-      zone.managerName = zone.manager_id ? await this.$getFullNameById(zone.manager_id) : "-";
+      try {
+        zone.ownerName = zone.owner_id
+          ? await this.$getFullNameById(zone.owner_id)
+          : "-";
+      } catch (err) {
+        console.warn(`Failed to fetch owner for zone ${zone.id}`, err);
+        zone.ownerName = "-";
+      }
+
+      try {
+        zone.managerName = zone.manager_id
+          ? await this.$getFullNameById(zone.manager_id)
+          : "-";
+      } catch (err) {
+        console.warn(`Failed to fetch manager for zone ${zone.id}`, err);
+        zone.managerName = "-";
+      }
     }
 
     return {
@@ -591,6 +604,7 @@ export async function getZones(url = null, pageSize = 10) {
 }
 
 
+
 export async function getManagers() {
   try {
     const isSuperUser =
@@ -611,7 +625,7 @@ export async function getManagers() {
       // Owner: use owner-specific URL and params
       apiUrl = "/get_owner_managers?page=1&page_size=1000";
       params = { owner__id: userId };
-    
+
     } else if (groups.includes("staff")) {
       // Manager: default URL with manager filter
       apiUrl = "/get_managers?page=1&page_size=10";
@@ -619,7 +633,7 @@ export async function getManagers() {
     }
 
 
-    console.log("params are ",params);
+    console.log("params are ", params);
 
     const response = await this.$apiGet(apiUrl, params);
 
@@ -749,16 +763,16 @@ export async function getTenants(url = null, pageSize = 10) {
       } else if (groups.includes("owner")) {
         params = { owner_id__email: email };
       }
-       else if (groups.includes("staff")) {
+      else if (groups.includes("staff")) {
         params = { staff_id__email: email };
       }
       else if (groups.includes("super_staff")) {
-        params = { };
+        params = {};
       }
     }
 
 
-    console.log("params",params);
+    console.log("params", params);
 
 
     const apiUrl = url || `/get_tenants?page=1&page_size=${pageSize}`;
@@ -766,9 +780,9 @@ export async function getTenants(url = null, pageSize = 10) {
     const response = await this.$apiGet(apiUrl, params);
 
     const tenants = response.data || [];
-    
-    console.log("tenants",tenants);
-  
+
+    console.log("tenants", tenants);
+
     return {
       tenants,
       currentPage: response.current_page || 1,

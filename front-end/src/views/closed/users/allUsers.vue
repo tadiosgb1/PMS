@@ -1,30 +1,33 @@
 <template>
   <div>
     <Toast ref="toast" />
-    <div class="min-h-screen bg-gray-100 ">
+    <button
+      @click="$router.back()"
+      class="mb-4 ml-5 mt-5 px-4 py-2 bg-orange-300 rounded hover:bg-orange-400"
+    >
+      &larr; Back
+    </button>
+    <div class="min-h-screen bg-gray-100 p-6">
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
-        <!-- Header -->
         <div
-          class="bg-primary text-white px-6 py-4 text-xl font-bold flex justify-between items-center"
+          class="bg-orange-500 text-white px-6 py-4 text-xl font-bold flex justify-between items-center"
         >
-          Users
+          Rents
           <button
-            @click="showAddUser = true"
-            class="bg-white text-blue-700 font-semibold px-2 lg:px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300 flex items-center"
+            @click="visible = true"
+            class="bg-white text-blue-700 font-semibold px-1 lg:px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300"
           >
-            <span class="text-primary mr-1">+</span> Add
+            <span class="text-primary">+</span> Add
           </button>
         </div>
-
-
         <div class="p-6">
           <!-- Search & Page Size -->
           <div class="flex justify-between items-center mb-6">
             <input
               v-model="searchTerm"
               type="search"
-              @input="fetchUsers(`/get_users?page=1&page_size=${pageSize} &search=${searchTerm}`)"
-              placeholder="Search User..."
+              @input="fetchRents(`/get_rents?page=1&page_size=${pageSize}&search=${searchTerm}`)"
+              placeholder="Search Rent..."
               class="w-full max-w-md px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
 
@@ -34,7 +37,7 @@
               <select
                 id="pageSize"
                 v-model="pageSize"
-                @change="fetchUsers(`/get_users?page=1&page_size=${pageSize}`)"
+                @change="fetchRents(`/get_rents?page=1&page_size=${pageSize}`)"
                 class="border px-2 py-1 rounded"
               >
                 <option v-for="size in pageSizes" :key="size" :value="size">
@@ -48,76 +51,102 @@
           <!-- Table -->
           <div class="overflow-x-auto">
             <table
-              class="min-w-full table-auto border-collapse border border-gray-300 text-sm"
+              class="min-w-full table-auto border-collapse border border-gray-300"
             >
               <thead>
                 <tr class="bg-gray-200 text-gray-700">
                   <th
                     class="border border-gray-300 px-4 py-2 cursor-pointer"
-                    @click="sortBy('fullName')"
+                    @click="sortBy('property_id')"
                   >
-                    Full Name
+                    Property
                     <SortIcon
-                      :field="'fullName'"
+                      :field="'property_id'"
                       :sort-key="sortKey"
                       :sort-asc="sortAsc"
                     />
                   </th>
-                  <th class="border border-gray-300 px-4 py-2">Groups</th>
-                  <th class="border border-gray-300 px-4 py-2">Active</th>
-                  <th class="border border-gray-300 px-4 py-2 text-center">
-                    Actions
+                  <th
+                    class="border border-gray-300 px-4 py-2 cursor-pointer"
+                    @click="sortBy('user_id')"
+                  >
+                    Tenant
+                    <SortIcon
+                      :field="'user_id'"
+                      :sort-key="sortKey"
+                      :sort-asc="sortAsc"
+                    />
                   </th>
+                  <th
+                    class="border border-gray-300 px-4 py-2 cursor-pointer"
+                    @click="sortBy('rent_type')"
+                  >
+                    Rent Type
+                    <SortIcon
+                      :field="'rent_type'"
+                      :sort-key="sortKey"
+                      :sort-asc="sortAsc"
+                    />
+                  </th>
+                  <th
+                    class="border border-gray-300 px-4 py-2 cursor-pointer"
+                    @click="sortBy('status')"
+                  >
+                    Status
+                    <SortIcon
+                      :field="'status'"
+                      :sort-key="sortKey"
+                      :sort-asc="sortAsc"
+                    />
+                  </th>
+                  <th class="px-4 py-2 border text-center">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 <tr
-                  v-for="user in users"
-                  :key="user.id"
+                  v-for="rent in filteredAndSortedRents"
+                  :key="rent.id"
                   class="hover:bg-gray-100"
                 >
                   <td class="border border-gray-300 px-4 py-2">
-                    {{ user.first_name }} {{ user.middle_name }}
-                    {{ user.last_name }}
+                    {{ rent.property_id?.name }}
                   </td>
                   <td class="border border-gray-300 px-4 py-2">
-                    {{ user.groups.join(", ") }}
+                    {{ rent.user_id?.first_name }}
                   </td>
                   <td class="border border-gray-300 px-4 py-2">
-                    {{ user.is_active ? "Yes" : "No" }}
+                    {{ rent.rent_type }}
+                  </td>
+                  <td class="border border-gray-300 px-4 py-2">
+                    {{ rent.status }}
                   </td>
                   <td
                     class="border border-gray-300 px-4 py-2 text-center space-x-2"
                   >
-                    <router-link
-                      :to="`/user_detail/${user.id}`"
-                      class="text-green-600 hover:text-green-800 focus:outline-none"
-                      title="View"
-                    >
-                      <i class="fas fa-eye"></i>
-                    </router-link>
-
                     <button
-                      v-if="!user.is_active"
-                      @click="activateUser(user.id)"
-                      class="text-blue-600 hover:text-blue-800 focus:outline-none"
-                      title="Delete"
+                      @click="selectedRentId = rent.id; showModal = true"
+                      class="relative px-4 py-2 text-green-600 border border-green-600 rounded-lg
+                        hover:text-white hover:bg-green-600
+                        transition duration-300 ease-in-out"
+                      title="Pay Rent"
                     >
-                      <i class="fas fa-trash-alt"></i> Activate user
+                      <i class="fas fa-credit-card mr-2"></i> Pay
                     </button>
                     <button
-                      v-if="user.is_active"
-                      @click="deactivateUser(user.id)"
-                      class="text-blue-600 hover:text-blue-800 focus:outline-none"
-                      title="Delete"
+                      @click="rentDetail(rent.id)"
+                      class="text-green-600 hover:text-green-800 focus:outline-none"
+                      title="Detail"
                     >
-                      Deactivate User
+                      <i class="fas fa-info-circle"></i>
                     </button>
                   </td>
                 </tr>
-                <tr v-if="users.length==0">
-                  <td colspan="4" class="text-center py-6 text-gray-500">
-                    No users found.
+                <tr v-if="filteredAndSortedRents.length === 0">
+                  <td
+                    colspan="10"
+                    class="text-center py-6 text-gray-500"
+                  >
+                    No rents found.
                   </td>
                 </tr>
               </tbody>
@@ -128,7 +157,7 @@
           <div class="flex justify-between items-center mt-4">
             <button
               :disabled="!previous"
-              @click="fetchUsers(previous)"
+              @click="fetchRents(previous)"
               class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
             >
               Previous
@@ -138,7 +167,7 @@
             </span>
             <button
               :disabled="!next"
-              @click="fetchUsers(next)"
+              @click="fetchRents(next)"
               class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
             >
               Next
@@ -147,91 +176,129 @@
         </div>
       </div>
 
-      <!-- Confirm Modal -->
+      <!-- Modals -->
+      <AddPictureModal
+        v-if="addPictureVisible"
+        :visible="addPictureVisible"
+        :rentId="selectedRentId"
+        @close="addPictureVisible = false"
+        @refresh="fetchRents"
+      />
+      <MakePaymentModal
+        v-if="showModal"
+        :visible="showModal"
+        :rentId="selectedRentId"
+        @close="showModal = false"
+        @success="handlePaymentSuccess"
+      />
+      <AddRent
+        v-if="visible"
+        :propertyId="$route.params.id"
+        :visible="visible"
+        @close="visible = false"
+        @refresh="fetchRents"
+      />
+      <UpdateRent
+        v-if="updateVisible"
+        :visible="updateVisible"
+        :rent="rentToEdit"
+        @close="updateVisible = false"
+        @refresh="fetchRents"
+      />
       <ConfirmModal
         v-if="confirmVisible"
         :visible="confirmVisible"
         title="Confirm Deletion"
-        message="Are you sure you want to delete this user?"
+        message="Are you sure you want to delete this rent?"
         @confirm="confirmDelete"
         @cancel="confirmVisible = false"
-      />
-
-      <Adduser
-        :visible="showAddUser"
-        @close="showAddUser = false"
-        @success="fetchUsers()"
       />
     </div>
   </div>
 </template>
 
 <script>
+import AddRent from "@/views/closed/rent/add.vue";
+import UpdateRent from "@/views/closed/rent/update.vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
 import Toast from "@/components/Toast.vue";
-import Adduser from "./add.vue";
+import AddPictureModal from "@/views/closed/rent/addRentPicture.vue";
+import MakePaymentModal from "@/views/closed/rent/addRentPayment.vue";
+
 const SortIcon = {
   props: ["field", "sortKey", "sortAsc"],
-  template: `
-    <span class="inline-block ml-1 text-gray-500">
-      <svg v-if="sortKey !== field" xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"/>
-      </svg>
-      <svg v-else-if="sortAsc" xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 13l4 4 4-4m0-6l-4-4-4 4"/>
-      </svg>
-      <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"/>
-      </svg>
-    </span>
-  `,
+  template: `<span class="inline-block ml-1 text-gray-500">
+    <svg v-if="sortKey !== field" xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"/>
+    </svg>
+    <svg v-else-if="sortAsc" xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 13l4 4 4-4m0-6l-4-4-4 4"/>
+    </svg>
+    <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"/>
+    </svg>
+  </span>`,
 };
 
 export default {
-  name: "usersView",
-  components: { SortIcon, ConfirmModal, Toast, Adduser },
+  name: "RentsView",
+  components: {
+    SortIcon,
+    AddRent,
+    UpdateRent,
+    ConfirmModal,
+    Toast,
+    AddPictureModal,
+    MakePaymentModal,
+  },
   data() {
     return {
-      is_superuser:localStorage.getItem("is_superuser"),
+      selectedRentId: "",
+      addPictureVisible: false,
       searchTerm: "",
+      visible: false,
+      updateVisible: false,
       confirmVisible: false,
-      userToDelete: null,
-      sortKey: "first_name",
+      rentToEdit: null,
+      rentToDelete: null,
+      sortKey: "property_id",
       sortAsc: true,
-      users: [],
+      rents: [],
+      showModal: false,
+      // pagination
       currentPage: 1,
       totalPages: 1,
       next: null,
       previous: null,
-      // page size feature
       pageSize: 10,
       pageSizes: [5, 10, 20, 50, 100],
-      showAddUser: false,
     };
   },
   computed: {
-    filteredAndSortedUsersg() {
+    filteredAndSortedRents() {
       const term = this.searchTerm.toLowerCase();
-      let filtered = this.users.filter(
-        (user) =>
-          `${user.first_name} ${user.middle_name} ${user.last_name}`
-            .toLowerCase()
-            .includes(term) ||
-          user.groups.join(", ").toLowerCase().includes(term) ||
-          (user.is_active ? "yes" : "no").includes(term)
+      let filtered = this.rents.filter((r) =>
+        (r.property_id?.name || "").toLowerCase().includes(term) ||
+        (r.user_id?.first_name || "").toLowerCase().includes(term) ||
+        (r.rent_type || "").toLowerCase().includes(term) ||
+        (r.status || "").toLowerCase().includes(term)
       );
 
       filtered.sort((a, b) => {
-        let aVal =
-          this.sortKey === "fullName"
-            ? `${a.first_name} ${a.middle_name} ${a.last_name}`.toLowerCase()
-            : a[this.sortKey];
-        let bVal =
-          this.sortKey === "fullName"
-            ? `${b.first_name} ${b.middle_name} ${b.last_name}`.toLowerCase()
-            : b[this.sortKey];
-        if (aVal < bVal) return this.sortAsc ? -1 : 1;
-        if (aVal > bVal) return this.sortAsc ? 1 : -1;
+        let valA = a[this.sortKey];
+        let valB = b[this.sortKey];
+
+        if (this.sortKey === "property_id") {
+          valA = a.property_id?.name || "";
+          valB = b.property_id?.name || "";
+        }
+        if (this.sortKey === "user_id") {
+          valA = a.user_id?.first_name || "";
+          valB = b.user_id?.first_name || "";
+        }
+
+        if (valA < valB) return this.sortAsc ? -1 : 1;
+        if (valA > valB) return this.sortAsc ? 1 : -1;
         return 0;
       });
 
@@ -239,63 +306,66 @@ export default {
     },
   },
   mounted() {
-    this.fetchUsers(`/get_users?page=1&page_size=${this.pageSize}`);
-    console.log("is_superuser",this.is_superuser)
+    this.fetchRents();
   },
   methods: {
-    async fetchUsers(url = `/get_users?page=1&page_size=${this.pageSize}`) {
+    rentDetail(rent_id) {
+      this.$router.push({ name: "rent-detail", params: { id: rent_id } });
+    },
+    async fetchRents(url = `/get_rents?page=1&page_size=${this.pageSize}`) {
       try {
-        const res = await this.$apiGet(url);
-        console.log("res users", res);
-        this.users = res.data || [];
-        this.currentPage = res.current_page;
-        this.totalPages = res.total_pages;
-        this.next = res.next;
-        this.previous = res.previous;
-      } catch (err) {
-        console.error(err);
-        this.users = [];
+        const response = await this.$apiGet(url);
+        if (Array.isArray(response.data)) {
+          this.rents = response.data;
+          this.currentPage = response.current_page;
+          this.totalPages = response.total_pages;
+          this.next = response.next;
+          this.previous = response.previous;
+        } else {
+          this.rents = [];
+          this.currentPage = 1;
+          this.totalPages = 1;
+          this.next = null;
+          this.previous = null;
+        }
+      } catch (error) {
+        console.error("Failed to fetch rents:", error);
+        this.rents = [];
+        this.currentPage = 1;
+        this.totalPages = 1;
+        this.next = null;
+        this.previous = null;
+        alert("Failed to load rents. Please try again later.");
       }
     },
     sortBy(key) {
-      this.sortKey = key === "fullName" ? "fullName" : key;
       if (this.sortKey === key) this.sortAsc = !this.sortAsc;
-      else this.sortAsc = true;
+      else {
+        this.sortKey = key;
+        this.sortAsc = true;
+      }
     },
-    askDeleteConfirmation(user) {
-      this.userToDelete = user;
+    editRent(rent) {
+      this.rentToEdit = rent;
+      this.updateVisible = true;
+    },
+    askDeleteConfirmation(rent) {
+      this.rentToDelete = rent;
       this.confirmVisible = true;
     },
     async confirmDelete() {
       this.confirmVisible = false;
       try {
-        await this.$apiDelete(`/delete_user/${this.userToDelete.id}`);
-        this.$refs.toast.showToast("User deleted", "success");
-        this.fetchUsers(`/get_users?page=1&page_size=${this.pageSize}`);
-      } catch (err) {
-        console.error(err);
-        this.$refs.toast.showToast("Failed to delete user", "error");
+        const response = await this.$apiDelete(
+          `/delete_rent/${this.rentToDelete.id}`
+        );
+        this.$refs.toast.showToast(response.message, "success");
+        this.fetchRents();
+      } catch (error) {
+        console.error(error);
+        alert("Failed to delete rent.");
       }
-    },
-
-    activateUser(id) {
-      console.log("id", id);
-      // alert("activate user");
-      const payload = {
-        id: id,
-      };
-      console.log("payload", payload);
-      this.$apiPost(`/activate_user/${id}`, payload).then((res) => {
-        this.$root.$refs.toast.showToast(res.message, "success");
-        this.fetchUsers(`/get_users?page=1&page_size=${this.pageSize}`);
-      });
-    },
-    deactivateUser(id) {
-      this.$apiDelete(`/deactivate_user`, id).then((res) => {
-        console.log("res", res);
-        this.$root.$refs.toast.showToast(res.message, "success");
-        this.fetchUsers(`/get_users?page=1&page_size=${this.pageSize}`);
-      });
+      this.rentToDelete = null;
     },
   },
 };
