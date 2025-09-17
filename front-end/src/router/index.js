@@ -48,7 +48,10 @@ import Rent_Payments from '../views/closed/rent/RentPayments.vue'
 import staffs from '../views/closed/stafs/view.vue'
 import Notifications from '../views/closed/notifications/view.vue'
 import Reports from '../views/closed/report/view.vue'
-
+import CowrkingSpaces from '../views/closed/coworkingSpace/view.vue'
+import CowrkingSpaceRental from '../views/closed/workspaceRental/view.vue'
+import Commissions from '../views/closed/commissions/view.vue'
+import Configurations from '../views/closed/Configurations/view.vue'
 
 const routes = [
   {
@@ -114,18 +117,18 @@ const routes = [
       { path: '/messages', name: 'messages', component: Messages },
       { path: '/settings', name: 'settings', component: Settings },
       { path: '/notifications', name: 'notifications', component: Notifications },
-
+      { path: '/commissions', name: 'commissions', component:Commissions },
+      { path: '/configurations', name: 'configurations', component:Configurations },
       { path: '/rents', name: 'rents', component: Rents },
-
       { path: '/property_sales', name: 'property_sales', component: Property_sales },
       { path: '/sales_payments', name: 'sales_payments', component: Sales_Payments },
       { path: '/rents_payments', name: 'rents_payments', component: Rent_Payments },
       { path: '/maintenance-requests', name: 'maintenance-requests', component: MaintenanceRequests },
 
       { path: '/user_view', name: 'user_view', component: User_view },
-
+      { path: '/coworking-spaces', name: 'coworking-spaces', component: CowrkingSpaces },
+      { path: '/coworking-space-rentals', name: 'coworking-space-rentals', component:CowrkingSpaceRental },
       { path: '/user_add', name: 'user_add', component: User_add },
-
       {
         path: "/user_edit/:id",
         name: "UserEdit",

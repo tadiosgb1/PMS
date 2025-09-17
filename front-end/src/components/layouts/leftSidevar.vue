@@ -60,8 +60,8 @@ export default {
           color: "#f97316",
         },
           {
-          name: "Plans",
-          route: "plans_view",
+          name: "Configurations",
+          route: "configurations",
           icon: "fas fa-tags",
           color: "#f59e0b",
           permission: "pms.view_plan",
@@ -95,8 +95,6 @@ export default {
           color: "#60a5fa",
           permission: "pms.view_user",
         },
-      
-         
       
         {
           name: "Zones",
@@ -154,6 +152,22 @@ export default {
         {
           name: "Reports",
           route: "reports",
+          icon: "fas fa-file-alt",
+          color: "#22c55e",
+        },
+
+
+
+         {
+          name: "Coworking Spaces",
+          route: "coworking-spaces",
+          icon: "fas fa-file-alt",
+          color: "#22c55e",
+        },
+
+         {
+          name: "Coworking-space-rentals",
+          route: "coworking-space-rentals",
           icon: "fas fa-file-alt",
           color: "#22c55e",
         },
