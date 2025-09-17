@@ -44,21 +44,12 @@
 
         <!-- Table -->
         <div class="overflow-x-auto p-6">
-          <table
-            class="min-w-full table-auto border-collapse border border-gray-300 text-sm"
-          >
+          <table class="min-w-full table-auto border-collapse border border-gray-300 text-sm">
             <thead>
               <tr class="bg-gray-200 text-gray-700">
-                <th
-                  class="border border-gray-300 px-4 py-2 cursor-pointer"
-                  @click="sortBy('guest_name')"
-                >
+                <th class="border border-gray-300 px-4 py-2 cursor-pointer" @click="sortBy('guest_name')">
                   Guest Name
-                  <SortIcon
-                    :field="'guest_name'"
-                    :sort-key="sortKey"
-                    :sort-asc="sortAsc"
-                  />
+                  <SortIcon :field="'guest_name'" :sort-key="sortKey" :sort-asc="sortAsc" />
                 </th>
                 <th class="border border-gray-300 px-4 py-2">Email</th>
                 <th class="border border-gray-300 px-4 py-2">Phone</th>
@@ -66,9 +57,7 @@
                 <th class="border border-gray-300 px-4 py-2">Start Date</th>
                 <th class="border border-gray-300 px-4 py-2">Active</th>
                 <th class="border border-gray-300 px-4 py-2">Space</th>
-                <th class="border border-gray-300 px-4 py-2 text-center">
-                  Actions
-                </th>
+                <th class="border border-gray-300 px-4 py-2 text-center">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -86,13 +75,13 @@
                 <td class="border border-gray-300 px-4 py-2">{{ rental.space_name || rental.space }}</td>
                 <td class="border border-gray-300 px-4 py-2 text-center space-x-2">
                   <button
-                    @click="editRental(rental.id)"
+                    @click="editRental(rental)"
                     class="text-green-600 hover:text-green-800"
                   >
                     <i class="fas fa-edit"></i>
                   </button>
                   <button
-                    @click="deleteRental(rental.id)"
+                    @click="askDeleteConfirmation(rental)"
                     class="text-red-600 hover:text-red-800"
                   >
                     <i class="fas fa-trash"></i>
@@ -130,11 +119,26 @@
         </div>
       </div>
 
-      <!-- Add Rental Modal -->
+      <!-- Add & Update Modals -->
       <AddRental
         :visible="showAddRental"
         @close="showAddRental = false"
-        @success="fetchRentals()"
+        @success="fetchRentals"
+      />
+      <WorkspaceRentalUpdate
+        :visible="updateVisible"
+        :rental="rentalToEdit"
+        @close="updateVisible = false"
+        @refresh="fetchRentals"
+      />
+
+      <!-- Delete Confirmation Modal -->
+      <ConfirmModal
+        :visible="confirmVisible"
+        title="Confirm Deletion"
+        message="Are you sure you want to delete this rental?"
+        @confirm="confirmDelete"
+        @cancel="confirmVisible = false"
       />
     </div>
   </div>
@@ -143,6 +147,8 @@
 <script>
 import Toast from "@/components/Toast.vue";
 import AddRental from "./Add.vue";
+import WorkspaceRentalUpdate from "./update.vue";
+import ConfirmModal from "@/components/ConfirmModal.vue";
 
 const SortIcon = {
   props: ["field", "sortKey", "sortAsc"],
@@ -162,13 +168,11 @@ const SortIcon = {
 };
 
 export default {
-  name: "WorkspaceRentalsView",
-  components: { SortIcon, Toast, AddRental },
+  name: "WorkspaceRentalView",
+  components: { Toast, AddRental, WorkspaceRentalUpdate, ConfirmModal, SortIcon },
   data() {
     return {
       searchTerm: "",
-      sortKey: "guest_name",
-      sortAsc: true,
       rentals: [],
       currentPage: 1,
       totalPages: 1,
@@ -177,13 +181,19 @@ export default {
       pageSize: 10,
       pageSizes: [5, 10, 20, 50, 100],
       showAddRental: false,
+      updateVisible: false,
+      rentalToEdit: null,
+      confirmVisible: false,
+      rentalToDelete: null,
+      sortKey: "guest_name",
+      sortAsc: true,
     };
   },
   computed: {
     filteredAndSortedRentals() {
       const term = this.searchTerm.toLowerCase();
-      let filtered = this.rentals.filter(
-        (r) =>
+      return this.rentals
+        .filter(r =>
           r.guest_name.toLowerCase().includes(term) ||
           r.guest_email.toLowerCase().includes(term) ||
           r.guest_phone.toLowerCase().includes(term) ||
@@ -191,21 +201,16 @@ export default {
           r.start_date.toLowerCase().includes(term) ||
           String(r.is_active).toLowerCase().includes(term) ||
           String(r.space_name || r.space).toLowerCase().includes(term)
-      );
-
-      filtered.sort((a, b) => {
-        let aVal = a[this.sortKey];
-        let bVal = b[this.sortKey];
-
-        if (typeof aVal === "string") aVal = aVal.toLowerCase();
-        if (typeof bVal === "string") bVal = bVal.toLowerCase();
-
-        if (aVal < bVal) return this.sortAsc ? -1 : 1;
-        if (aVal > bVal) return this.sortAsc ? 1 : -1;
-        return 0;
-      });
-
-      return filtered;
+        )
+        .sort((a, b) => {
+          let aVal = a[this.sortKey];
+          let bVal = b[this.sortKey];
+          if (typeof aVal === "string") aVal = aVal.toLowerCase();
+          if (typeof bVal === "string") bVal = bVal.toLowerCase();
+          if (aVal < bVal) return this.sortAsc ? -1 : 1;
+          if (aVal > bVal) return this.sortAsc ? 1 : -1;
+          return 0;
+        });
     },
   },
   mounted() {
@@ -216,8 +221,8 @@ export default {
       try {
         const url = customUrl || "get_workspace_rentals";
         const res = await this.$apiGet(url, { page_size: this.pageSize });
-        const data = res.data || {};
-        this.rentals = data|| [];
+        const data = res.data || [];
+        this.rentals = data.results || data;
         this.currentPage = data.current_page || 1;
         this.totalPages = data.total_pages || 1;
         this.next = data.next;
@@ -225,10 +230,6 @@ export default {
       } catch (err) {
         console.error("Failed to fetch rentals:", err);
         this.rentals = [];
-        this.currentPage = 1;
-        this.totalPages = 1;
-        this.next = null;
-        this.previous = null;
       }
     },
     sortBy(key) {
@@ -238,11 +239,26 @@ export default {
         this.sortAsc = true;
       }
     },
-    editRental(id) {
-      console.log("Edit rental", id);
+    editRental(rental) {
+      this.rentalToEdit = rental;
+      this.updateVisible = true;
     },
-    deleteRental(id) {
-      console.log("Delete rental", id);
+    askDeleteConfirmation(rental) {
+      this.rentalToDelete = rental;
+      this.confirmVisible = true;
+    },
+    async confirmDelete() {
+      this.confirmVisible = false;
+      try {
+        await this.$apiDelete(`/delete_workspace_rental/${this.rentalToDelete.id}`);
+        this.$root.$refs.toast.showToast("Rental deleted successfully", "success");
+        this.fetchRentals();
+      } catch (err) {
+        console.error(err);
+        this.$refs.toast.showToast("Failed to delete rental", "error");
+      } finally {
+        this.rentalToDelete = null;
+      }
     },
   },
 };
