@@ -101,7 +101,7 @@
             <label class="block text-sm font-medium mb-1">User</label>
             <select
               v-model.number="form.user"
-              required
+              
               class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
             >
               <option disabled value="">Select User</option>
@@ -119,7 +119,7 @@
             <label class="block text-sm font-medium mb-1">Space</label>
             <select
               v-model.number="form.space"
-              required
+             
               class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
             >
               <option disabled value="">Select Space</option>
@@ -165,8 +165,8 @@ export default {
         cycle: "",
         start_date: "",
         is_active: true,
-        user: 0,
-        space: 0,
+        user: 52,
+        space: 1,
       },
       users: [],
       spaces: [],

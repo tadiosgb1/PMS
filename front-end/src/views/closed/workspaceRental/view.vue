@@ -217,7 +217,7 @@ export default {
         const url = customUrl || "get_workspace_rentals";
         const res = await this.$apiGet(url, { page_size: this.pageSize });
         const data = res.data || {};
-        this.rentals = data.data || [];
+        this.rentals = data|| [];
         this.currentPage = data.current_page || 1;
         this.totalPages = data.total_pages || 1;
         this.next = data.next;
