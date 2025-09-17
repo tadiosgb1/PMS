@@ -276,13 +276,6 @@ export default {
       this.$router.push({ name: "rent-detail", params: { id: rent_id } });
     },
     async fetchRents() {
-<<<<<<< HEAD
-      const params={
-       
-      }
-      console.log("params",params);
-=======
->>>>>>> f8080f9c235358062bfdc91bcd1f3588b44e1126
       try {
         const response = await this.$apiGet("/get_rents");
         if (Array.isArray(response.data)) {
