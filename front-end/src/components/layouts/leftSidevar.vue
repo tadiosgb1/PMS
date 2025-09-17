@@ -172,7 +172,12 @@ export default {
           color: "#22c55e",
         },
 
-       
+         {
+          name: "Coworking-payments",
+          route: "coworking-payments",
+          icon: "fas fa-file-alt",
+          color: "#22c55e",
+        },
       ],
     };
   },
