@@ -1,7 +1,7 @@
 <template>
   <div>
     <Toast ref="toast" />
-    <div class="min-h-screen bg-gray-100">
+    <div class="min-h-screen bg-gray-100 m-3">
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
         <!-- Header -->
         <div

@@ -33,9 +33,7 @@
               <select
                 id="pageSize"
                 v-model="pageSize"
-                @change="
-                  fetchSales(`/get_property_sales?page=1&page_size=${pageSize}`)
-                "
+                @change="fetchSales(`/get_property_zone_sales?page=1&page_size=${pageSize}`)"
                 class="border px-2 py-1 rounded"
               >
                 <option v-for="size in pageSizes" :key="size" :value="size">
@@ -55,18 +53,22 @@
                 <tr class="bg-gray-200 text-gray-700">
                   <th
                     class="border border-gray-300 px-4 py-2 cursor-pointer"
-                    @click="sortBy('property_name')"
+                    @click="sortBy('property_id.name')"
                   >
                     Property
                     <SortIcon
-                      :field="'property_name'"
+                      :field="'property_id.name'"
                       :sort-key="sortKey"
                       :sort-asc="sortAsc"
                     />
                   </th>
-                  <th class="border border-gray-300 px-4 py-2">Buyer</th>
-                  <th class="border border-gray-300 px-4 py-2">Price</th>
-                  <th class="border border-gray-300 px-4 py-2">Date</th>
+                  <th class="border border-gray-300 px-4 py-2">Zone</th>
+                  <th class="border border-gray-300 px-4 py-2">Broker</th>
+                  <th class="border border-gray-300 px-4 py-2">Listing Price</th>
+                  <th class="border border-gray-300 px-4 py-2">Selling Price</th>
+                  <th class="border border-gray-300 px-4 py-2">Status</th>
+                  <th class="border border-gray-300 px-4 py-2">Created</th>
+                  <th class="border border-gray-300 px-4 py-2">Updated</th>
                   <th class="border border-gray-300 px-4 py-2 text-center">
                     Actions
                   </th>
@@ -79,53 +81,58 @@
                   class="hover:bg-gray-100"
                 >
                   <td class="border border-gray-300 px-4 py-2">
-                    {{ sale.propertyName }}
+                    {{ sale.property_id?.name || "-" }}
                   </td>
                   <td class="border border-gray-300 px-4 py-2">
-                    {{ sale.buyer.first_name }}
+                    {{ sale.property_zone_id?.name || "-" }}
+                  </td>
+                  <td class="border border-gray-300 px-4 py-2">
+                    {{ sale.broker || "-" }}
+                  </td>
+                  <td class="border border-gray-300 px-4 py-2">
+                    {{ sale.listing_price | currency }}
                   </td>
                   <td class="border border-gray-300 px-4 py-2">
                     {{ sale.selling_price | currency }}
                   </td>
                   <td class="border border-gray-300 px-4 py-2">
-                    {{ sale.updated_at }}
+                    <span
+                      :class="{
+                        'text-green-600': sale.status === 'active',
+                        'text-yellow-600': sale.status === 'pending',
+                        'text-red-600': sale.status === 'inactive',
+                      }"
+                    >
+                      {{ sale.status }}
+                    </span>
+                  </td>
+                  <td class="border border-gray-300 px-4 py-2">
+                    {{ formatDate(sale.created_at) }}
+                  </td>
+                  <td class="border border-gray-300 px-4 py-2">
+                    {{ formatDate(sale.updated_at) }}
                   </td>
                   <td
                     class="border border-gray-300 px-4 py-2 text-center space-x-2"
                   >
-                    <!-- <router-link
-                      :to="`/property_sale_detail/${sale.id}`"
-                      class="text-green-600 hover:text-green-800 focus:outline-none"
-                      title="View"
-                    >
-                      <i class="fas fa-eye"></i>
-                    </router-link> -->
-
-                    <!-- <button
-                      @click="askDeleteConfirmation(sale)"
-                      class="text-red-600 hover:text-red-800 focus:outline-none"
-                      title="Delete"
-                    >
-                      <i class="fas fa-trash-alt"></i>
-                    </button> -->
                     <button
-                      @click="approve(sale.property_id)"
+                      @click="approve(sale.id)"
                       class="text-green-600 hover:text-green-800 focus:outline-none"
-                      title="Delete"
+                      title="Approve"
                     >
-                      <i class=""></i> Approve
+                      Approve
                     </button>
                     <button
                       @click="goToPayment(sale.id)"
-                      class="text-green-600 hover:text-green-800 focus:outline-none"
-                      title="Delete"
+                      class="text-blue-600 hover:text-blue-800 focus:outline-none"
+                      title="View Payment"
                     >
-                      <i class=""></i> View Payment
+                      View Payment
                     </button>
                   </td>
                 </tr>
                 <tr v-if="filteredAndSortedSales.length === 0">
-                  <td colspan="5" class="text-center py-6 text-gray-500">
+                  <td colspan="9" class="text-center py-6 text-gray-500">
                     No property sales found.
                   </td>
                 </tr>
@@ -205,14 +212,13 @@ export default {
       searchTerm: "",
       confirmVisible: false,
       saleToDelete: null,
-      sortKey: "property_name",
+      sortKey: "property_id.name",
       sortAsc: true,
       sales: [],
       currentPage: 1,
       totalPages: 1,
       next: null,
       previous: null,
-      // page size feature
       pageSize: 10,
       pageSizes: [5, 10, 20, 50, 100],
       showAddSale: false,
@@ -221,13 +227,16 @@ export default {
   computed: {
     filteredAndSortedSales() {
       const term = this.searchTerm.toLowerCase();
-      let filtered = this.sales.filter((sale) =>
-        sale.buyer.first_name.toLowerCase().includes(term)
+      let filtered = this.sales.filter(
+        (sale) =>
+          sale.property_id?.name?.toLowerCase().includes(term) ||
+          sale.property_zone_id?.name?.toLowerCase().includes(term) ||
+          sale.status?.toLowerCase().includes(term)
       );
 
       filtered.sort((a, b) => {
-        let aVal = a[this.sortKey]?.toString().toLowerCase();
-        let bVal = b[this.sortKey]?.toString().toLowerCase();
+        let aVal = a.property_id?.name?.toString().toLowerCase() || "";
+        let bVal = b.property_id?.name?.toString().toLowerCase() || "";
         if (aVal < bVal) return this.sortAsc ? -1 : 1;
         if (aVal > bVal) return this.sortAsc ? 1 : -1;
         return 0;
@@ -240,12 +249,10 @@ export default {
     this.fetchSales(`/get_property_zone_sales?page=1&page_size=${this.pageSize}`);
   },
   methods: {
-    goToPayment(proprety_sale_id) {
+    goToPayment(saleId) {
       this.$router.push({
         path: "/sales_payments",
-        query: {
-          id: proprety_sale_id,
-        },
+        query: { id: saleId },
       });
     },
 
@@ -253,47 +260,14 @@ export default {
       url = `/get_property_zone_sales?page=1&page_size=${this.pageSize}`
     ) {
       try {
-        let params = {};
-
-        if (localStorage.getItem("is_superuser") === "true") {
-          params = {};
-        } else {
-          params = { seller__id: localStorage.getItem("userId") };
-        }
-
-        console.log("params", params);
-        const res = await this.$apiGet(url, params);
-        console.log("res", res);
-
+        const res = await this.$apiGet(url);
+        console.log("res",res);
+        
         this.sales = res.data || [];
-        console.log("sales", this.sales);
         this.currentPage = res.current_page || 1;
         this.totalPages = res.total_pages || 1;
         this.next = res.next || null;
         this.previous = res.previous || null;
-
-        // Safely fetch property name for each sale
-        await Promise.all(
-          this.sales.map(async (sale) => {
-            if (sale.property_id) {
-              try {
-                const propertyRes = await this.$apiGetById(
-                  "get_property",
-                  sale.property_id
-                );
-                sale.propertyName = propertyRes.name || "-";
-              } catch (err) {
-                console.warn(
-                  `Failed to fetch property ${sale.property_id} for sale ${sale.id}`,
-                  err
-                );
-                sale.propertyName = "-";
-              }
-            } else {
-              sale.propertyName = "-";
-            }
-          })
-        );
       } catch (err) {
         console.error("Error fetching sales:", err);
         this.sales = [];
@@ -308,22 +282,18 @@ export default {
       this.sortKey = key;
       this.sortAsc = this.sortKey === key ? !this.sortAsc : true;
     },
-    askDeleteConfirmation(sale) {
-      this.saleToDelete = sale;
-      this.confirmVisible = true;
+
+    approve(id) {
+      this.$refs.toast.showToast(`Approved sale ${id}`, "success");
     },
-    async confirmDelete() {
-      this.confirmVisible = false;
-      try {
-        await this.$apiDelete(`/delete_property_sale/${this.saleToDelete.id}`);
-        this.$refs.toast.showToast("Property sale deleted", "success");
-        this.fetchSales(
-          `/get_property_sales?page=1&page_size=${this.pageSize}`
-        );
-      } catch (err) {
-        console.error(err);
-        this.$refs.toast.showToast("Failed to delete property sale", "error");
-      }
+
+    confirmDelete() {
+      this.$refs.toast.showToast("Delete not implemented yet", "error");
+    },
+
+    formatDate(date) {
+      if (!date) return "-";
+      return new Date(date).toLocaleDateString();
     },
   },
   filters: {
