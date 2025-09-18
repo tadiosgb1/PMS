@@ -40,6 +40,14 @@
     >
       <rent-payments />
     </div>
+
+    <!-- Cowork Space Payments -->
+    <div
+      v-if="activeTab === 'Cowork Space Payments'"
+      class="bg-white rounded-lg shadow p-6"
+    >
+      <coworkspacepayments />
+    </div>
   </div>
 </template>
 
@@ -47,17 +55,24 @@
 import subscriptionPayments from "../subscriptions/SubscriptionPayment/view.vue";
 import rentPayments from "../rent/RentPayments.vue";
 import salesPayments from "../SalesPayment/view.vue";
+import coworkspacepayments from "../workspacePayment/view.vue";
 
 export default {
   components: {
     rentPayments,
     salesPayments,
     subscriptionPayments,
+    coworkspacepayments,
   },
   data() {
     return {
       activeTab: "Subscription Payments",
-      tabs: ["Subscription Payments", "Sales Payments", "Rent Payments"],
+      tabs: [
+        "Subscription Payments",
+        "Sales Payments",
+        "Rent Payments",
+        "Cowork Space Payments", // added new tab
+      ],
       subscriptionPayments: [
         { user: "Alice", plan: "Gold", amount: "$50", date: "2025-09-01" },
         { user: "Bob", plan: "Silver", amount: "$30", date: "2025-08-28" },
