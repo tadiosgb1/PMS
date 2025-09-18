@@ -90,13 +90,13 @@
                 <td class="border border-gray-300 px-4 py-2">{{ space.zone }}</td>
                 <td class="border border-gray-300 px-4 py-2 text-center space-x-2">
                   <button
-                    @click="editSpace(space.id)"
+                    @click="editSpace(space)"
                     class="text-green-600 hover:text-green-800"
                   >
                     <i class="fas fa-edit"></i>
                   </button>
                   <button
-                    @click="deleteSpace(space.id)"
+                    @click="askDeleteConfirmation(space);"
                     class="text-red-600 hover:text-red-800"
                   >
                     <i class="fas fa-trash"></i>
@@ -134,11 +134,27 @@
         </div>
       </div>
 
-      <!-- Add Space Modal -->
+      <!-- Add & Update Modals -->
       <AddSpace
         :visible="showAddSpace"
         @close="showAddSpace = false"
         @success="fetchSpaces()"
+      />
+      <UpdateCoworkspace
+        :visible="updateVisible"
+        :space="spaceToEdit"
+        @close="updateVisible = false"
+        @refresh="fetchSpaces"
+      />
+
+      <!-- Delete Confirmation Modal -->
+      <ConfirmModal
+        v-if="confirmVisible"
+        :visible="confirmVisible"
+        title="Confirm Deletion"
+        message="Are you sure you want to delete this co-working space?"
+        @confirm="confirmDelete"
+        @cancel="confirmVisible = false"
       />
     </div>
   </div>
@@ -147,6 +163,8 @@
 <script>
 import Toast from "@/components/Toast.vue";
 import AddSpace from "./Add.vue";
+import UpdateCoworkspace from "./update.vue";
+import ConfirmModal from "@/components/ConfirmModal.vue";
 
 const SortIcon = {
   props: ["field", "sortKey", "sortAsc"],
@@ -167,7 +185,7 @@ const SortIcon = {
 
 export default {
   name: "CoworkingSpacesView",
-  components: { SortIcon, Toast, AddSpace },
+  components: { SortIcon, Toast, AddSpace, UpdateCoworkspace, ConfirmModal },
   data() {
     return {
       searchTerm: "",
@@ -181,6 +199,10 @@ export default {
       pageSize: 10,
       pageSizes: [5, 10, 20, 50, 100],
       showAddSpace: false,
+      updateVisible: false,
+      spaceToEdit: null,
+      confirmVisible: false,
+      spaceToDelete: null,
     };
   },
   computed: {
@@ -221,16 +243,9 @@ export default {
     async fetchSpaces(customUrl = null) {
       try {
         let url = customUrl || "get_coworking_spaces";
-
         const res = await this.$apiGet(url, { page_size: this.pageSize });
-      
-        console.log("res",res);
-
         const data = res.data || {};
         this.spaces = res.data;
-
-        console.log("spaces",this.spaces);
-
         this.currentPage = data.current_page || 1;
         this.totalPages = data.total_pages || 1;
         this.next = data.next;
@@ -238,26 +253,34 @@ export default {
       } catch (err) {
         console.error("Failed to fetch spaces:", err);
         this.spaces = [];
-        this.currentPage = 1;
-        this.totalPages = 1;
-        this.next = null;
-        this.previous = null;
       }
     },
     sortBy(key) {
       if (this.sortKey === key) this.sortAsc = !this.sortAsc;
-      else {
-        this.sortKey = key;
-        this.sortAsc = true;
+      else this.sortKey = key;
+    },
+    editSpace(space) {
+      this.spaceToEdit = space;
+      this.updateVisible = true;
+    },
+    askDeleteConfirmation(space) {
+       
+      this.spaceToDelete = space;
+       this.confirmVisible = true;
+    
+    },
+    async confirmDelete() {
+      this.confirmVisible = false;
+      try {
+        await this.$apiDelete(`/delete_coworking_space/${this.spaceToDelete.id}`);
+        this.$root.$refs.toast.showToast("Co-Working Space deleted successfully", "success");
+        this.fetchSpaces();
+      } catch (err) {
+        console.error(err);
+        this.$refs.toast.showToast("Failed to delete co-working space", "error");
+      } finally {
+        this.spaceToDelete = null;
       }
-    },
-    editSpace(id) {
-      console.log("Edit space", id);
-      // Implement modal or navigation to edit
-    },
-    deleteSpace(id) {
-      console.log("Delete space", id);
-      // Implement delete API call
     },
   },
 };
