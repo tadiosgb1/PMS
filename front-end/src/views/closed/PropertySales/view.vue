@@ -237,7 +237,7 @@ export default {
     },
   },
   mounted() {
-    this.fetchSales(`/get_property_sales?page=1&page_size=${this.pageSize}`);
+    this.fetchSales(`/get_property_zone_sales?page=1&page_size=${this.pageSize}`);
   },
   methods: {
     goToPayment(proprety_sale_id) {
@@ -250,7 +250,7 @@ export default {
     },
 
     async fetchSales(
-      url = `/get_property_sales?page=1&page_size=${this.pageSize}`
+      url = `/get_property_zone_sales?page=1&page_size=${this.pageSize}`
     ) {
       try {
         let params = {};
