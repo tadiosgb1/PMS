@@ -143,12 +143,7 @@ export default {
           icon: "fas fa-money-bill-wave",
           color: "#22c55e",
         },
-            {
-          name: "Notifications",
-          route: "notifications",
-          icon: "fas fa-money-bill-wave",
-          color: "#22c55e",
-        },
+          
         {
           name: "Reports",
           route: "reports",
@@ -176,6 +171,12 @@ export default {
           name: "Coworking-payments",
           route: "coworking-payments",
           icon: "fas fa-file-alt",
+          color: "#22c55e",
+        },
+          {
+          name: "Notifications",
+          route: "notifications",
+          icon: "fas fa-money-bill-wave",
           color: "#22c55e",
         },
       ],
