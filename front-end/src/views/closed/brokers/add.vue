@@ -63,22 +63,42 @@
             />
           </div>
 
-          <!-- User ID (readonly) -->
-          <div>
-            <label class="block text-gray-700 mb-1">User ID</label>
+          <!-- User Search -->
+          <div class="relative">
+            <label class="block text-gray-700 mb-1">User</label>
             <input
-              v-model="form.user"
-              type="number"
-              class="custom-input bg-gray-100 cursor-not-allowed"
-              readonly
+              v-model="userQuery"
+              @input="searchUsers"
+              type="text"
+              class="custom-input"
+              placeholder="Search user by name or email"
+              autocomplete="off"
             />
+            <!-- Dropdown results -->
+            <ul
+              v-if="userResults.length > 0"
+              class="absolute bg-white border rounded w-full max-h-40 overflow-auto z-50 mt-1"
+            >
+              <li
+                v-for="user in userResults"
+                :key="user.id"
+                @click="selectUser(user)"
+                class="px-4 py-2 hover:bg-gray-200 cursor-pointer"
+              >
+                {{ user.first_name }} ({{ user.email }})
+              </li>
+            </ul>
           </div>
+
+          <!-- Hidden User ID -->
+          <input type="hidden" v-model="form.user" />
 
           <!-- Actions -->
           <div class="md:col-span-2 text-right pt-4">
             <button
               type="submit"
               class="bg-primary hover:bg-orange-600 text-white font-semibold px-6 py-2 rounded shadow transition-all duration-200"
+              :disabled="!form.user"
             >
               Save Broker
             </button>
@@ -104,14 +124,44 @@ export default {
         license_number: "",
         commission_rate: "",
         wallet: "",
-        user: Number(localStorage.getItem("userId")) || 0,
+        user: null,
       },
+      userQuery: "",
+      userResults: [],
+      searchTimeout: null,
     };
   },
   methods: {
+    async searchUsers() {
+      if (this.searchTimeout) clearTimeout(this.searchTimeout);
+
+      this.searchTimeout = setTimeout(async () => {
+        if (this.userQuery.trim() === "") {
+          this.userResults = [];
+          return;
+        }
+        try {
+          const response = await this.$apiGet(`/get_users?search=${this.userQuery}`);
+          console.log("response for search",response)
+          this.userResults = response.data || [];
+        } catch (error) {
+          console.error("User search failed", error);
+          this.userResults = [];
+        }
+      }, 300); // debounce 300ms
+    },
+    selectUser(user) {
+      this.form.user = user.id;
+      this.userQuery = `${user.first_name} (${user.email})`;
+      this.userResults = [];
+    },
     async submitForm() {
+      if (!this.form.user) {
+        this.$refs.toast.showToast("Please select a user", "error");
+        return;
+      }
       try {
-        const response = await this.$apiPost("/post_broker", this.form);
+        const response = await this.$apiPost("/post_broker_profile", this.form);
         this.$root.$refs.toast.showToast(
           response.message || "Broker added successfully",
           "success"
@@ -121,8 +171,9 @@ export default {
           this.$emit("success"); // refresh parent list
         }, 1500);
       } catch (error) {
-        console.error(error);
-        this.$refs.toast.showToast("Failed to add broker", "error");
+        console.error("error is",error);
+        this.$root.$refs.toast.showToast
+            ("falied to add broker", "error");
       }
     },
   },

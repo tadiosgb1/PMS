@@ -1,371 +1,174 @@
 <template>
   <div>
     <Toast ref="toast" />
-    <button
-      @click="$router.back()"
-      class="mb-4 ml-5 mt-5 px-4 py-2 bg-orange-300 rounded hover:bg-orange-400"
-    >
-      &larr; Back
-    </button>
+
     <div class="min-h-screen bg-gray-100 p-6">
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <!-- Header -->
         <div
-          class="bg-orange-500 text-white px-6 py-4 text-xl font-bold flex justify-between items-center"
+          class="bg-primary text-white px-6 py-4 text-xl font-bold flex justify-between items-center"
         >
-          Rents
+          <span>Users List</span>
           <button
-            @click="visible = true"
-            class="bg-white text-blue-700 font-semibold px-1 lg:px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300"
+            @click="showAddModal = true"
+            class="bg-white text-primary px-4 py-1 rounded shadow hover:bg-gray-100 font-semibold"
           >
-            <span class="text-primary">+</span> Add
+            ➕ Add
           </button>
         </div>
-        <div class="p-6">
-          <!-- Search & Page Size -->
-          <div class="flex justify-between items-center mb-6">
-            <input
-              v-model="searchTerm"
-              type="search"
-              @input="fetchRents(`/get_rents?page=1&page_size=${pageSize}&search=${searchTerm}`)"
-              placeholder="Search Rent..."
-              class="w-full max-w-md px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
 
-            <!-- Page Size Dropdown -->
-            <div class="ml-4">
-              <label for="pageSize" class="mr-2 text-gray-700">Show</label>
-              <select
-                id="pageSize"
-                v-model="pageSize"
-                @change="fetchRents(`/get_rents?page=1&page_size=${pageSize}`)"
-                class="border px-2 py-1 rounded"
+        <!-- Search -->
+        <div class="p-4 flex gap-3">
+          <input
+            v-model="search"
+            @input="fetchUsers"
+            type="text"
+            placeholder="Search by name, email, or phone..."
+            class="w-full px-4 py-2 border rounded-lg focus:ring focus:ring-orange-400"
+          />
+        </div>
+
+        <!-- Table -->
+        <div class="overflow-x-auto">
+          <table class="w-full border-collapse">
+            <thead class="bg-gray-100 text-left">
+              <tr>
+                <th class="px-4 py-2">ID</th>
+                <th class="px-4 py-2">Name</th>
+                <th class="px-4 py-2">Email</th>
+                <th class="px-4 py-2">Phone</th>
+                <th class="px-4 py-2">Groups</th>
+                <th class="px-4 py-2">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="user in users"
+                :key="user.id"
+                class="hover:bg-gray-50"
               >
-                <option v-for="size in pageSizes" :key="size" :value="size">
-                  {{ size }}
-                </option>
-              </select>
-              <span class="ml-1 text-gray-700">per page</span>
-            </div>
-          </div>
+                <td class="px-4 py-2">{{ user.id }}</td>
+                <td class="px-4 py-2">
+                  {{ user.first_name }} {{ user.middle_name }} {{ user.last_name }}
+                </td>
+                <td class="px-4 py-2">{{ user.email }}</td>
+                <td class="px-4 py-2">{{ user.phone_number }}</td>
+                <td class="px-4 py-2">
+                  <span
+                    v-if="user.groups.length > 0"
+                    class="bg-gray-200 px-2 py-1 rounded text-sm"
+                  >
+                    {{ user.groups.join(", ") }}
+                  </span>
+                  <span v-else class="text-gray-400">No groups</span>
+                </td>
+                <td class="px-4 py-2 flex gap-2">
+                  <!-- Edit -->
+                  <button
+                    class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
+                    @click="editUser(user)"
+                  >
+                    ✎ Edit
+                  </button>
 
-          <!-- Table -->
-          <div class="overflow-x-auto">
-            <table
-              class="min-w-full table-auto border-collapse border border-gray-300"
-            >
-              <thead>
-                <tr class="bg-gray-200 text-gray-700">
-                  <th
-                    class="border border-gray-300 px-4 py-2 cursor-pointer"
-                    @click="sortBy('property_id')"
+                  <!-- Details -->
+                  <button
+                    class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+                    @click="goToDetail(user.id)"
                   >
-                    Property
-                    <SortIcon
-                      :field="'property_id'"
-                      :sort-key="sortKey"
-                      :sort-asc="sortAsc"
-                    />
-                  </th>
-                  <th
-                    class="border border-gray-300 px-4 py-2 cursor-pointer"
-                    @click="sortBy('user_id')"
-                  >
-                    Tenant
-                    <SortIcon
-                      :field="'user_id'"
-                      :sort-key="sortKey"
-                      :sort-asc="sortAsc"
-                    />
-                  </th>
-                  <th
-                    class="border border-gray-300 px-4 py-2 cursor-pointer"
-                    @click="sortBy('rent_type')"
-                  >
-                    Rent Type
-                    <SortIcon
-                      :field="'rent_type'"
-                      :sort-key="sortKey"
-                      :sort-asc="sortAsc"
-                    />
-                  </th>
-                  <th
-                    class="border border-gray-300 px-4 py-2 cursor-pointer"
-                    @click="sortBy('status')"
-                  >
-                    Status
-                    <SortIcon
-                      :field="'status'"
-                      :sort-key="sortKey"
-                      :sort-asc="sortAsc"
-                    />
-                  </th>
-                  <th class="px-4 py-2 border text-center">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="rent in filteredAndSortedRents"
-                  :key="rent.id"
-                  class="hover:bg-gray-100"
-                >
-                  <td class="border border-gray-300 px-4 py-2">
-                    {{ rent.property_id?.name }}
-                  </td>
-                  <td class="border border-gray-300 px-4 py-2">
-                    {{ rent.user_id?.first_name }}
-                  </td>
-                  <td class="border border-gray-300 px-4 py-2">
-                    {{ rent.rent_type }}
-                  </td>
-                  <td class="border border-gray-300 px-4 py-2">
-                    {{ rent.status }}
-                  </td>
-                  <td
-                    class="border border-gray-300 px-4 py-2 text-center space-x-2"
-                  >
-                    <button
-                      @click="selectedRentId = rent.id; showModal = true"
-                      class="relative px-4 py-2 text-green-600 border border-green-600 rounded-lg
-                        hover:text-white hover:bg-green-600
-                        transition duration-300 ease-in-out"
-                      title="Pay Rent"
-                    >
-                      <i class="fas fa-credit-card mr-2"></i> Pay
-                    </button>
-                    <button
-                      @click="rentDetail(rent.id)"
-                      class="text-green-600 hover:text-green-800 focus:outline-none"
-                      title="Detail"
-                    >
-                      <i class="fas fa-info-circle"></i>
-                    </button>
-                  </td>
-                </tr>
-                <tr v-if="filteredAndSortedRents.length === 0">
-                  <td
-                    colspan="10"
-                    class="text-center py-6 text-gray-500"
-                  >
-                    No rents found.
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+                    🔍 Detail
+                  </button>
+                </td>
+              </tr>
+              <tr v-if="users.length === 0">
+                <td colspan="6" class="text-center py-4 text-gray-500">
+                  No users found
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-          <!-- Pagination -->
-          <div class="flex justify-between items-center mt-4">
-            <button
-              :disabled="!previous"
-              @click="fetchRents(previous)"
-              class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
-            >
-              Previous
-            </button>
-            <span class="text-gray-600">
-              Page {{ currentPage }} of {{ totalPages }}
-            </span>
-            <button
-              :disabled="!next"
-              @click="fetchRents(next)"
-              class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
-            >
-              Next
-            </button>
-          </div>
+        <!-- Pagination -->
+        <div class="p-4 flex justify-between items-center">
+          <button
+            :disabled="!pagination.previous"
+            @click="changePage(pagination.current_page - 1)"
+            class="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+          >
+            Previous
+          </button>
+          <span>Page {{ pagination.current_page }} of {{ pagination.total_pages }}</span>
+          <button
+            :disabled="!pagination.next"
+            @click="changePage(pagination.current_page + 1)"
+            class="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+          >
+            Next
+          </button>
         </div>
       </div>
-
-      <!-- Modals -->
-      <AddPictureModal
-        v-if="addPictureVisible"
-        :visible="addPictureVisible"
-        :rentId="selectedRentId"
-        @close="addPictureVisible = false"
-        @refresh="fetchRents"
-      />
-      <MakePaymentModal
-        v-if="showModal"
-        :visible="showModal"
-        :rentId="selectedRentId"
-        @close="showModal = false"
-        @success="handlePaymentSuccess"
-      />
-      <AddRent
-        v-if="visible"
-        :propertyId="$route.params.id"
-        :visible="visible"
-        @close="visible = false"
-        @refresh="fetchRents"
-      />
-      <UpdateRent
-        v-if="updateVisible"
-        :visible="updateVisible"
-        :rent="rentToEdit"
-        @close="updateVisible = false"
-        @refresh="fetchRents"
-      />
-      <ConfirmModal
-        v-if="confirmVisible"
-        :visible="confirmVisible"
-        title="Confirm Deletion"
-        message="Are you sure you want to delete this rent?"
-        @confirm="confirmDelete"
-        @cancel="confirmVisible = false"
-      />
     </div>
+
+    <!-- Add Modal -->
+    <Add
+      v-if="showAddModal"
+      :visible="showAddModal"
+      @close="showAddModal = false"
+      @success="fetchUsers"
+    />
   </div>
 </template>
 
 <script>
-import AddRent from "@/views/closed/rent/add.vue";
-import UpdateRent from "@/views/closed/rent/update.vue";
-import ConfirmModal from "@/components/ConfirmModal.vue";
 import Toast from "@/components/Toast.vue";
-import AddPictureModal from "@/views/closed/rent/addRentPicture.vue";
-import MakePaymentModal from "@/views/closed/rent/addRentPayment.vue";
-
-const SortIcon = {
-  props: ["field", "sortKey", "sortAsc"],
-  template: `<span class="inline-block ml-1 text-gray-500">
-    <svg v-if="sortKey !== field" xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"/>
-    </svg>
-    <svg v-else-if="sortAsc" xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 13l4 4 4-4m0-6l-4-4-4 4"/>
-    </svg>
-    <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"/>
-    </svg>
-  </span>`,
-};
+import Add from "./add.vue";
 
 export default {
-  name: "RentsView",
-  components: {
-    SortIcon,
-    AddRent,
-    UpdateRent,
-    ConfirmModal,
-    Toast,
-    AddPictureModal,
-    MakePaymentModal,
-  },
+  name: "UsersView",
+  components: { Toast, Add },
   data() {
     return {
-      selectedRentId: "",
-      addPictureVisible: false,
-      searchTerm: "",
-      visible: false,
-      updateVisible: false,
-      confirmVisible: false,
-      rentToEdit: null,
-      rentToDelete: null,
-      sortKey: "property_id",
-      sortAsc: true,
-      rents: [],
-      showModal: false,
-      // pagination
-      currentPage: 1,
-      totalPages: 1,
-      next: null,
-      previous: null,
-      pageSize: 10,
-      pageSizes: [5, 10, 20, 50, 100],
+      users: [],
+      search: "",
+      pagination: {
+        current_page: 1,
+        total_pages: 1,
+        next: null,
+        previous: null,
+      },
+      showAddModal: false,
     };
   },
-  computed: {
-    filteredAndSortedRents() {
-      const term = this.searchTerm.toLowerCase();
-      let filtered = this.rents.filter((r) =>
-        (r.property_id?.name || "").toLowerCase().includes(term) ||
-        (r.user_id?.first_name || "").toLowerCase().includes(term) ||
-        (r.rent_type || "").toLowerCase().includes(term) ||
-        (r.status || "").toLowerCase().includes(term)
-      );
-
-      filtered.sort((a, b) => {
-        let valA = a[this.sortKey];
-        let valB = b[this.sortKey];
-
-        if (this.sortKey === "property_id") {
-          valA = a.property_id?.name || "";
-          valB = b.property_id?.name || "";
-        }
-        if (this.sortKey === "user_id") {
-          valA = a.user_id?.first_name || "";
-          valB = b.user_id?.first_name || "";
-        }
-
-        if (valA < valB) return this.sortAsc ? -1 : 1;
-        if (valA > valB) return this.sortAsc ? 1 : -1;
-        return 0;
-      });
-
-      return filtered;
-    },
-  },
   mounted() {
-    this.fetchRents();
+    this.fetchUsers();
   },
   methods: {
-    rentDetail(rent_id) {
-      this.$router.push({ name: "rent-detail", params: { id: rent_id } });
-    },
-    async fetchRents(url = `/get_rents?page=1&page_size=${this.pageSize}`) {
+    async fetchUsers(page = 1) {
       try {
-        const response = await this.$apiGet(url);
-        if (Array.isArray(response.data)) {
-          this.rents = response.data;
-          this.currentPage = response.current_page;
-          this.totalPages = response.total_pages;
-          this.next = response.next;
-          this.previous = response.previous;
-        } else {
-          this.rents = [];
-          this.currentPage = 1;
-          this.totalPages = 1;
-          this.next = null;
-          this.previous = null;
-        }
-      } catch (error) {
-        console.error("Failed to fetch rents:", error);
-        this.rents = [];
-        this.currentPage = 1;
-        this.totalPages = 1;
-        this.next = null;
-        this.previous = null;
-        alert("Failed to load rents. Please try again later.");
-      }
-    },
-    sortBy(key) {
-      if (this.sortKey === key) this.sortAsc = !this.sortAsc;
-      else {
-        this.sortKey = key;
-        this.sortAsc = true;
-      }
-    },
-    editRent(rent) {
-      this.rentToEdit = rent;
-      this.updateVisible = true;
-    },
-    askDeleteConfirmation(rent) {
-      this.rentToDelete = rent;
-      this.confirmVisible = true;
-    },
-    async confirmDelete() {
-      this.confirmVisible = false;
-      try {
-        const response = await this.$apiDelete(
-          `/delete_rent/${this.rentToDelete.id}`
-        );
-        this.$refs.toast.showToast(response.message, "success");
-        this.fetchRents();
+        const response = await this.$apiGet("/get_users", {
+          params: { search: this.search, page },
+        });
+        this.users = response.data || [];
+        this.pagination = {
+          current_page: response.current_page,
+          total_pages: response.total_pages,
+          next: response.next,
+          previous: response.previous,
+        };
       } catch (error) {
         console.error(error);
-        alert("Failed to delete rent.");
+        this.$refs.toast.showToast("Failed to load users", "error");
       }
-      this.rentToDelete = null;
+    },
+    changePage(page) {
+      this.fetchUsers(page);
+    },
+    editUser(user) {
+      this.$refs.toast.showToast(`Edit user ${user.first_name}`, "info");
+    },
+    goToDetail(id) {
+      this.$router.push(`/user_detail/${id}`);
     },
   },
 };
