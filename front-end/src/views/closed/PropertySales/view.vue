@@ -129,6 +129,20 @@
                     >
                       View Payment
                     </button>
+                    <button
+                      @click="openUpdateModal(sale)"
+                      class="text-blue-600 hover:text-blue-800 focus:outline-none"
+                    title="Edit"
+                  >
+                    <i class="fas fa-edit"></i>
+                    </button>
+                    <button
+                      @click="confirmDeleteSale(sale.id)"
+                       class="text-red-600 hover:text-red-800 focus:outline-none"
+                    title="Delete"
+                  >
+                    <i class="fas fa-trash-alt"></i>
+                    </button>
                   </td>
                 </tr>
                 <tr v-if="filteredAndSortedSales.length === 0">
@@ -163,7 +177,7 @@
         </div>
       </div>
 
-      <!-- Confirm Modal -->
+      <!-- Confirm Delete Modal -->
       <ConfirmModal
         v-if="confirmVisible"
         :visible="confirmVisible"
@@ -173,9 +187,17 @@
         @cancel="confirmVisible = false"
       />
 
+      <!-- Add & Update Modals -->
       <AddSale
         :visible="showAddSale"
         @close="showAddSale = false"
+        @success="fetchSales()"
+      />
+
+      <UpdateSale
+        :visible="showUpdateSale"
+        :sale="selectedSale"
+        @close="showUpdateSale = false"
         @success="fetchSales()"
       />
     </div>
@@ -186,6 +208,7 @@
 import ConfirmModal from "@/components/ConfirmModal.vue";
 import Toast from "@/components/Toast.vue";
 import AddSale from "./add.vue";
+import UpdateSale from "./update.vue";
 
 const SortIcon = {
   props: ["field", "sortKey", "sortAsc"],
@@ -206,7 +229,7 @@ const SortIcon = {
 
 export default {
   name: "propertySalesView",
-  components: { SortIcon, ConfirmModal, Toast, AddSale },
+  components: { SortIcon, ConfirmModal, Toast, AddSale, UpdateSale },
   data() {
     return {
       searchTerm: "",
@@ -222,6 +245,8 @@ export default {
       pageSize: 10,
       pageSizes: [5, 10, 20, 50, 100],
       showAddSale: false,
+      showUpdateSale: false,
+      selectedSale: null,
     };
   },
   computed: {
@@ -261,8 +286,9 @@ export default {
     ) {
       try {
         const res = await this.$apiGet(url);
-        console.log("res",res);
-        
+        console.log("sale",res)
+        console.log("property sale",res.data.property_id
+)
         this.sales = res.data || [];
         this.currentPage = res.current_page || 1;
         this.totalPages = res.total_pages || 1;
@@ -287,8 +313,28 @@ export default {
       this.$refs.toast.showToast(`Approved sale ${id}`, "success");
     },
 
-    confirmDelete() {
-      this.$refs.toast.showToast("Delete not implemented yet", "error");
+    confirmDeleteSale(id) {
+      this.saleToDelete = id;
+      this.confirmVisible = true;
+    },
+
+    async confirmDelete() {
+      try {
+        const response = await this.$apiDelete(`/delete_property_zone_sale/${this.saleToDelete}`);
+        console.log("delete property sale", response)
+
+        this.$root.$refs.toast.showToast("Sale deleted successfully", "success");
+        this.confirmVisible = false;
+        this.fetchSales();
+      } catch (err) {
+        console.error("Delete failed:", err);
+        this.$root.$refs.toast.showToast("Failed to delete sale", "error");
+      }
+    },
+
+    openUpdateModal(sale) {
+      this.selectedSale = { ...sale };
+      this.showUpdateSale = true;
     },
 
     formatDate(date) {

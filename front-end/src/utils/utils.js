@@ -203,6 +203,7 @@ export async function apiPatch(url, id, data, customHeaders = {}) {
 }
 
 export async function apiDelete(url, id = null, customHeaders = {}) {
+  console.log("url and id",url,id)
   const apiClient = getApiClient(); // Get the API client instance
   try {
     const headers = getDefaultHeaders(customHeaders);

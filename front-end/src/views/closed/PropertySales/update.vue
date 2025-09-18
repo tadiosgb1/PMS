@@ -1,20 +1,18 @@
 <template>
   <div>
-    <!-- ✅ Toast Component -->
     <Toast ref="toast" />
-
     <div
       v-if="visible"
-      class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4 overflow-auto"
+      class="fixed inset-0 w-full z-50 bg-black bg-opacity-50 flex items-center justify-center p-4 overflow-auto"
     >
       <div
         class="bg-white w-full sm:w-auto sm:max-w-[700px] md:max-w-[850px] lg:max-w-[950px] xl:max-w-[1050px] rounded-lg shadow-lg overflow-hidden relative mx-auto"
       >
         <!-- Header -->
         <div
-          class="bg-primary hover:bg-primary text-white px-6 py-4 text-xl font-semibold flex justify-between items-center"
+          class="bg-primary text-white px-6 py-4 text-2xl font-semibold flex justify-between items-center"
         >
-          Add New Sale
+          Edit Property Sale
           <button
             @click="$emit('close')"
             class="text-white hover:text-gray-200 text-lg font-bold"
@@ -26,9 +24,39 @@
         <!-- Form -->
         <form
           @submit.prevent="submitForm"
-          class="p-4 sm:p-6 grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[80vh] overflow-y-auto"
+          class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 max-h-[80vh] overflow-y-auto"
         >
-          <!-- Property Zone -->
+          <!-- Listing Price -->
+          <div>
+            <label class="block text-gray-700">Listing Price</label>
+            <input
+              v-model.number="form.listing_price"
+              type="number"
+              class="custom-input"
+            />
+          </div>
+
+          <!-- Selling Price -->
+          <div>
+            <label class="block text-gray-700">Selling Price</label>
+            <input
+              v-model.number="form.selling_price"
+              type="number"
+              class="custom-input"
+            />
+          </div>
+
+          <!-- Status -->
+          <div>
+            <label class="block text-gray-700 mb-1">Status</label>
+            <select v-model="form.status" class="custom-input">
+              <option value="pending">Pending</option>
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
+
+          <!-- Property Zone with Dropdown -->
           <div class="relative">
             <label class="block text-gray-700 mb-1">Property Zone</label>
             <input
@@ -39,7 +67,6 @@
               @input="searchZones"
               @focus="zoneDropdown = true"
               @blur="hideDropdown('zone')"
-              required
             />
             <ul
               v-if="zones.length > 0 && zoneDropdown"
@@ -56,7 +83,7 @@
             </ul>
           </div>
 
-          <!-- Property -->
+          <!-- Property with Dropdown -->
           <div class="relative">
             <label class="block text-gray-700 mb-1">Property</label>
             <input
@@ -67,7 +94,6 @@
               @input="searchProperties"
               @focus="propertyDropdown = true"
               @blur="hideDropdown('property')"
-              required
             />
             <ul
               v-if="properties.length > 0 && propertyDropdown"
@@ -84,7 +110,7 @@
             </ul>
           </div>
 
-          <!-- Broker -->
+          <!-- Broker with Dropdown -->
           <div class="relative">
             <label class="block text-gray-700 mb-1">Broker</label>
             <input
@@ -95,7 +121,6 @@
               @input="searchBrokers"
               @focus="brokerDropdown = true"
               @blur="hideDropdown('broker')"
-              required
             />
             <ul
               v-if="brokers.length > 0 && brokerDropdown"
@@ -112,48 +137,13 @@
             </ul>
           </div>
 
-          <!-- Listing Price -->
-          <div>
-            <label class="block text-gray-700 mb-1">Listing Price</label>
-            <input
-              v-model="form.listing_price"
-              type="number"
-              class="custom-input"
-              required
-            />
-          </div>
-
-          <!-- Selling Price -->
-          <div>
-            <label class="block text-gray-700 mb-1">Selling Price</label>
-            <input
-              v-model="form.selling_price"
-              type="number"
-              class="custom-input"
-              required
-            />
-          </div>
-
-          <!-- Status Dropdown -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700">Status</label>
-            <select
-              v-model="form.status"
-              class="custom-select mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
-            >
-              <option value="pending">Pending</option>
-              <option value="completed">Completed</option>
-              <option value="cancelled">Cancelled</option>
-            </select>
-          </div>
-
-          <!-- Actions -->
-          <div class="md:col-span-2 text-right pt-2">
+          <!-- Submit -->
+          <div class="md:col-span-2 text-right mt-4">
             <button
               type="submit"
-              class="bg-primary hover:bg-orange-600 text-white font-semibold px-6 py-2 rounded border-orange-100 focus:ring-orange-300 shadow"
+              class="bg-primary hover:bg-primary-dark text-white font-semibold px-6 py-3 rounded shadow"
             >
-              Save Sale
+              Update Sale
             </button>
           </div>
         </form>
@@ -166,21 +156,22 @@
 import Toast from "@/components/Toast.vue";
 
 export default {
-  name: "AddSale",
+  name: "PropertySaleUpdate",
   components: { Toast },
   props: {
     visible: Boolean,
-    propertyId: [String, Number],
+    sale: Object,
   },
   data() {
     return {
       form: {
-        property_id: this.propertyId || "",
-        property_zone_id: "",
-        broker: "",
-        listing_price: "",
-        selling_price: "",
+        id: null,
+        listing_price: 0,
+        selling_price: 0,
         status: "pending",
+        property_zone_id: 0,
+        property_id: 0,
+        broker: 0,
       },
       zones: [],
       properties: [],
@@ -192,6 +183,27 @@ export default {
       propertyDropdown: false,
       brokerDropdown: false,
     };
+  },
+  watch: {
+    sale: {
+      immediate: true,
+      handler(val) {
+        if (val) {
+          this.form = {
+            id: val.id,
+            listing_price: val.listing_price || 0,
+            selling_price: val.selling_price || 0,
+            status: val.status || "pending",
+            property_zone_id: val.property_zone_id?.id || 0,
+            property_id: val.property_id?.id || 0,
+            broker: val.broker?.id || 0,
+          };
+          this.zoneSearch = val.property_zone_id?.name || "";
+          this.propertySearch = val.property_id?.name || "";
+          this.brokerSearch = val.broker?.license_number || "";
+        }
+      },
+    },
   },
   mounted() {
     this.fetchZones();
@@ -209,10 +221,10 @@ export default {
     },
     async fetchProperties() {
       try {
-        const res = await this.$apiGet("get_properties");
+        const res = await this.$apiGet("/get_properties");
         this.properties = res.data || [];
       } catch (err) {
-        console.error("Error fetching properties:", err);
+        console.error("Failed to fetch properties:", err);
       }
     },
     async fetchBrokers() {
@@ -277,22 +289,19 @@ export default {
     },
     async submitForm() {
       try {
-        const response = await this.$apiPost(
-          "/post_property_zone_sale",
-          this.form
-        );
-        this.$refs.toast.showToast(
-          response.message || "Sale added successfully",
+        await this.$apiPut(`/update_property_zone_sale`, this.form.id, this.form);
+        this.$root.$refs.toast.showToast(
+          "Property sale updated successfully",
           "success"
         );
-
-        setTimeout(() => {
-          this.$emit("close");
-          this.$emit("refresh");
-        }, 1500);
-      } catch (error) {
-        console.error(error);
-        this.$refs.toast.showToast("Failed to add sale.", "error");
+        this.$emit("refresh");
+        setTimeout(() => this.$emit("close"), 1500);
+      } catch (err) {
+        console.error("Update failed:", err);
+        this.$root.$refs.toast.showToast(
+          err?.response?.data?.message || "Failed to update sale",
+          "error"
+        );
       }
     },
   },
