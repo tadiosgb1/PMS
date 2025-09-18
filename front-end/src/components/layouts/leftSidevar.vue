@@ -95,7 +95,7 @@ export default {
           color: "#60a5fa",
           permission: "pms.view_user",
         },
-      
+          
         {
           name: "Zones",
           route: "zones",
@@ -127,7 +127,6 @@ export default {
           permission: "pms.view_rent",
         },
       
-
         {
           name: "Maintenance Requests",
           route: "maintenance-requests",
@@ -136,7 +135,6 @@ export default {
           permission: "pms.view_maintenancerequest",
         },
 
-       
         {
           name: "Payments",
           route: "payments",
@@ -144,14 +142,7 @@ export default {
           color: "#22c55e",
         },
           
-        {
-          name: "Reports",
-          route: "reports",
-          icon: "fas fa-file-alt",
-          color: "#22c55e",
-        },
-
-
+       
 
          {
           name: "Coworking Spaces",
@@ -167,18 +158,21 @@ export default {
           color: "#22c55e",
         },
 
+        
+
          {
-          name: "Coworking-payments",
-          route: "coworking-payments",
-          icon: "fas fa-file-alt",
-          color: "#22c55e",
-        },
-          {
           name: "Notifications",
           route: "notifications",
           icon: "fas fa-money-bill-wave",
           color: "#22c55e",
         },
+          {
+          name: "Reports",
+          route: "reports",
+          icon: "fas fa-file-alt",
+          color: "#22c55e",
+        },
+
       ],
     };
   },

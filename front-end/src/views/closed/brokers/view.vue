@@ -8,9 +8,9 @@
         <div
           class="bg-primary text-white px-6 py-4 text-xl font-bold flex justify-between items-center"
         >
-          Workspace Rentals
+          Brokers
           <button
-            @click="showAddRental = true"
+            @click="showAddBroker = true"
             class="bg-white text-blue-700 font-semibold px-2 lg:px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300 flex items-center"
           >
             <span class="text-primary mr-1">+</span> Add
@@ -22,7 +22,8 @@
           <input
             v-model="searchTerm"
             type="search"
-            placeholder="Search Rentals..."
+            placeholder="Search Brokers..."
+            @input="onSearchInput"
             class="w-full max-w-md px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 
@@ -31,7 +32,7 @@
             <select
               id="pageSize"
               v-model="pageSize"
-              @change="fetchRentals()"
+              @change="fetchBrokers"
               class="border px-2 py-1 rounded"
             >
               <option v-for="size in pageSizes" :key="size" :value="size">
@@ -47,50 +48,44 @@
           <table class="min-w-full table-auto border-collapse border border-gray-300 text-sm">
             <thead>
               <tr class="bg-gray-200 text-gray-700">
-                <th class="border border-gray-300 px-4 py-2 cursor-pointer" @click="sortBy('guest_name')">
-                  Guest Name
-                  <SortIcon :field="'guest_name'" :sort-key="sortKey" :sort-asc="sortAsc" />
+                <th class="border border-gray-300 px-4 py-2 cursor-pointer" @click="sortBy('name')">
+                  Name/Owner
+                  <SortIcon :field="'name'" :sort-key="sortKey" :sort-asc="sortAsc" />
                 </th>
-                <th class="border border-gray-300 px-4 py-2">Email</th>
-                <th class="border border-gray-300 px-4 py-2">Phone</th>
-                <th class="border border-gray-300 px-4 py-2">Cycle</th>
-                <th class="border border-gray-300 px-4 py-2">Start Date</th>
-                <th class="border border-gray-300 px-4 py-2">Active</th>
-                <th class="border border-gray-300 px-4 py-2">Space</th>
+                <th class="border border-gray-300 px-4 py-2">License Number</th>
+                <th class="border border-gray-300 px-4 py-2">Commission Rate</th>
+                <th class="border border-gray-300 px-4 py-2">Wallet</th>
                 <th class="border border-gray-300 px-4 py-2 text-center">Actions</th>
               </tr>
             </thead>
             <tbody>
               <tr
-                v-for="rental in filteredAndSortedRentals"
-                :key="rental.id"
+                v-for="broker in brokers"
+                :key="broker.id"
                 class="hover:bg-gray-100"
               >
-                <td class="border border-gray-300 px-4 py-2">{{ rental.guest_name }}</td>
-                <td class="border border-gray-300 px-4 py-2">{{ rental.guest_email }}</td>
-                <td class="border border-gray-300 px-4 py-2">{{ rental.guest_phone }}</td>
-                <td class="border border-gray-300 px-4 py-2">{{ rental.cycle }}</td>
-                <td class="border border-gray-300 px-4 py-2">{{ rental.start_date }}</td>
-                <td class="border border-gray-300 px-4 py-2">{{ rental.is_active ? 'Yes' : 'No' }}</td>
-                <td class="border border-gray-300 px-4 py-2">{{ rental.space_name || rental.space }}</td>
+                <td class="border border-gray-300 px-4 py-2">{{ broker.user }}</td>
+                <td class="border border-gray-300 px-4 py-2">{{ broker.license_number }}</td>
+                <td class="border border-gray-300 px-4 py-2">{{ broker.commission_rate }}</td>
+                <td class="border border-gray-300 px-4 py-2">{{ broker.wallet }}</td>
                 <td class="border border-gray-300 px-4 py-2 text-center space-x-2">
                   <button
-                    @click="editRental(rental)"
+                    @click="editBroker(broker)"
                     class="text-green-600 hover:text-green-800"
                   >
                     <i class="fas fa-edit"></i>
                   </button>
                   <button
-                    @click="askDeleteConfirmation(rental)"
+                    @click="askDeleteConfirmation(broker)"
                     class="text-red-600 hover:text-red-800"
                   >
                     <i class="fas fa-trash"></i>
                   </button>
                 </td>
               </tr>
-              <tr v-if="filteredAndSortedRentals.length === 0">
-                <td colspan="8" class="text-center py-6 text-gray-500">
-                  No workspace rentals found.
+              <tr v-if="brokers.length === 0">
+                <td colspan="5" class="text-center py-6 text-gray-500">
+                  No brokers found.
                 </td>
               </tr>
             </tbody>
@@ -101,7 +96,7 @@
         <div class="flex justify-between items-center p-6">
           <button
             :disabled="!previous"
-            @click="fetchRentals(previous)"
+            @click="fetchBrokers(previous)"
             class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
           >
             Previous
@@ -111,7 +106,7 @@
           </span>
           <button
             :disabled="!next"
-            @click="fetchRentals(next)"
+            @click="fetchBrokers(next)"
             class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
           >
             Next
@@ -120,23 +115,23 @@
       </div>
 
       <!-- Add & Update Modals -->
-      <AddRental
-        :visible="showAddRental"
-        @close="showAddRental = false"
-        @success="fetchRentals"
+      <AddBroker
+        :visible="showAddBroker"
+        @close="showAddBroker = false"
+        @success="fetchBrokers"
       />
-      <WorkspaceRentalUpdate
+      <BrokerUpdate
         :visible="updateVisible"
-        :rental="rentalToEdit"
+        :broker="brokerToEdit"
         @close="updateVisible = false"
-        @refresh="fetchRentals"
+        @refresh="fetchBrokers"
       />
 
       <!-- Delete Confirmation Modal -->
       <ConfirmModal
         :visible="confirmVisible"
         title="Confirm Deletion"
-        message="Are you sure you want to delete this rental?"
+        message="Are you sure you want to delete this broker?"
         @confirm="confirmDelete"
         @cancel="confirmVisible = false"
       />
@@ -146,8 +141,8 @@
 
 <script>
 import Toast from "@/components/Toast.vue";
-import AddRental from "./Add.vue";
-import WorkspaceRentalUpdate from "./update.vue";
+import AddBroker from "./Add.vue";
+import BrokerUpdate from "./Update.vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
 
 const SortIcon = {
@@ -168,73 +163,61 @@ const SortIcon = {
 };
 
 export default {
-  name: "WorkspaceRentalView",
-  components: { Toast, AddRental, WorkspaceRentalUpdate, ConfirmModal, SortIcon },
+  name: "BrokersView",
+  components: { Toast, AddBroker, BrokerUpdate, ConfirmModal, SortIcon },
   data() {
     return {
       searchTerm: "",
-      rentals: [],
+      brokers: [],
       currentPage: 1,
       totalPages: 1,
       next: null,
       previous: null,
       pageSize: 10,
       pageSizes: [5, 10, 20, 50, 100],
-      showAddRental: false,
+      showAddBroker: false,
       updateVisible: false,
-      rentalToEdit: null,
+      brokerToEdit: null,
       confirmVisible: false,
-      rentalToDelete: null,
-      sortKey: "guest_name",
+      brokerToDelete: null,
+      sortKey: "name",
       sortAsc: true,
+      searchTimeout: null, // for debounce
     };
   },
-  computed: {
-    filteredAndSortedRentals() {
-      const term = this.searchTerm.toLowerCase();
-      return this.rentals
-        .filter(r =>
-          r.guest_name.toLowerCase().includes(term) ||
-          r.guest_email.toLowerCase().includes(term) ||
-          r.guest_phone.toLowerCase().includes(term) ||
-          r.cycle.toLowerCase().includes(term) ||
-          r.start_date.toLowerCase().includes(term) ||
-          String(r.is_active).toLowerCase().includes(term) ||
-          String(r.space_name || r.space).toLowerCase().includes(term)
-        )
-        .sort((a, b) => {
-          let aVal = a[this.sortKey];
-          let bVal = b[this.sortKey];
-          if (typeof aVal === "string") aVal = aVal.toLowerCase();
-          if (typeof bVal === "string") bVal = bVal.toLowerCase();
-          if (aVal < bVal) return this.sortAsc ? -1 : 1;
-          if (aVal > bVal) return this.sortAsc ? 1 : -1;
-          return 0;
-        });
-    },
-  },
   mounted() {
-    this.fetchRentals();
+    this.fetchBrokers();
   },
   methods: {
-    async fetchRentals(customUrl = null) {
+    // Debounced search input
+    onSearchInput() {
+      clearTimeout(this.searchTimeout);
+      this.searchTimeout = setTimeout(() => {
+        this.fetchBrokers();
+      }, 300); // wait 300ms after typing stops
+    },
+
+    async fetchBrokers(customUrl = null) {
       try {
-        const url = customUrl || "get_workspace_rentals";
-        const res = await this.$apiGet(url, { page_size: this.pageSize });
-        
-        console.log("res",res);
+        let url = customUrl || "get_broker_profiles";
+        const params = {
+          page_size: this.pageSize,
+          search: this.searchTerm || "", // ensure empty search fetches all
+        };
+        const res = await this.$apiGet(url, params);
 
         const data = res.data || [];
-        this.rentals = data.results || data;
+        this.brokers = data.results || data;
         this.currentPage = data.current_page || 1;
         this.totalPages = data.total_pages || 1;
         this.next = data.next;
         this.previous = data.previous;
       } catch (err) {
-        console.error("Failed to fetch rentals:", err);
-        this.rentals = [];
+        console.error("Failed to fetch brokers:", err);
+        this.brokers = [];
       }
     },
+
     sortBy(key) {
       if (this.sortKey === key) this.sortAsc = !this.sortAsc;
       else {
@@ -242,25 +225,28 @@ export default {
         this.sortAsc = true;
       }
     },
-    editRental(rental) {
-      this.rentalToEdit = rental;
+
+    editBroker(broker) {
+      this.brokerToEdit = broker;
       this.updateVisible = true;
     },
-    askDeleteConfirmation(rental) {
-      this.rentalToDelete = rental;
+
+    askDeleteConfirmation(broker) {
+      this.brokerToDelete = broker;
       this.confirmVisible = true;
     },
+
     async confirmDelete() {
       this.confirmVisible = false;
       try {
-        await this.$apiDelete(`/delete_workspace_rental/${this.rentalToDelete.id}`);
-        this.$root.$refs.toast.showToast("Rental deleted successfully", "success");
-        this.fetchRentals();
+        await this.$apiDelete(`/delete_broker/${this.brokerToDelete.id}`);
+        this.$root.$refs.toast.showToast("Broker deleted successfully", "success");
+        this.fetchBrokers();
       } catch (err) {
         console.error(err);
-        this.$refs.toast.showToast("Failed to delete rental", "error");
+        this.$refs.toast.showToast("Failed to delete broker", "error");
       } finally {
-        this.rentalToDelete = null;
+        this.brokerToDelete = null;
       }
     },
   },

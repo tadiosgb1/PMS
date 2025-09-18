@@ -53,6 +53,7 @@ import CowrkingSpaceRental from '../views/closed/workspaceRental/view.vue'
 import Commissions from '../views/closed/commissions/view.vue'
 import Configurations from '../views/closed/Configurations/view.vue'
 import CoworkspacePayments from '../views/closed/workspacePayment/view.vue'
+import brokers from '../views/closed/brokers/view.vue'
 
 const routes = [
   {
@@ -131,6 +132,7 @@ const routes = [
       { path: '/coworking-space-rentals', name: 'coworking-space-rentals', component:CowrkingSpaceRental },
       { path: '/coworking-payments', name: 'coworking-payments', component:CoworkspacePayments },
       { path: '/user_add', name: 'user_add', component: User_add },
+
       {
         path: "/user_edit/:id",
         name: "UserEdit",
@@ -152,6 +154,7 @@ const routes = [
       { path: '/managers', name: 'managers', component: view_managers },
       { path: '/owners', name: 'owners', component: view_owners },
       { path: '/staffs', name: 'staffs', component: staffs },
+       { path: '/brokers', name: 'brokers', component: brokers },
     ]
   },
   { path: "/forgot-password", name: "forgotPassword", component: ForgotPassword },

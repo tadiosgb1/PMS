@@ -7,13 +7,29 @@
       <div class="bg-white rounded-xl shadow-lg w-full max-w-lg p-6 relative">
         <!-- Header -->
         <div class="flex justify-between items-center mb-4">
-          <h2 class="text-xl font-bold text-gray-800">Add Rental Cycle</h2>
+          <h2 class="text-xl font-bold text-gray-800">Add Cowork space Rental Payment</h2>
           <button @click="$emit('close')" class="text-gray-400 hover:text-gray-600">&times;</button>
         </div>
 
         <!-- Form -->
         <form @submit.prevent="submitForm" class="space-y-4">
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <!-- Rental Selection -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Select Rental</label>
+              <select
+                v-model="form.rental"
+                class="mt-1 block w-full border border-gray-300 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-orange-400"
+                required
+              >
+                <option value="" disabled>Select a rental</option>
+                <option v-for="r in rentals" :key="r.id" :value="r.id">
+                  {{ r.guest_name }} - {{ r.space.name }} ({{ r.cycle }})
+                </option>
+              </select>
+            </div>
+
+            <!-- Amount -->
             <div>
               <label class="block text-sm font-medium text-gray-700">Amount</label>
               <input
@@ -23,6 +39,8 @@
                 required
               />
             </div>
+
+            <!-- Cycle Start -->
             <div>
               <label class="block text-sm font-medium text-gray-700">Cycle Start</label>
               <input
@@ -32,6 +50,8 @@
                 required
               />
             </div>
+
+            <!-- Cycle End -->
             <div>
               <label class="block text-sm font-medium text-gray-700">Cycle End</label>
               <input
@@ -70,39 +90,55 @@ export default {
   name: "AddRental",
   props: {
     visible: { type: Boolean, default: false },
-    rental: { type: [Number, String], required: true }, // rental ID from parent
   },
   data() {
     return {
+      rentals: [],
       form: {
         amount: "",
         cycle_start: "",
         cycle_end: "",
-        rental: this.rental,
+        rental: "",
       },
     };
   },
   watch: {
-    rental(newVal) {
-      this.form.rental = newVal;
+    visible(val) {
+      if (val) this.fetchRentals();
     },
   },
   methods: {
-   async submitForm() {
-  try {
-    await this.$apiPost("/post_rental_payment", this.form); // <-- correct endpoint
-    this.$emit("success"); // tell parent to refresh list
-    this.$emit("close");
-    this.resetForm();
-  } catch (err) {
-    console.error("Failed to save rental payment:", err);
-  }
-}
-,
+    async fetchRentals() {
+      try {
+        const params={
+           page_size: 1000 
+        }
+        const res = await this.$apiGet(`/get_workspace_rentals`,params);
+        console.log("res work space rentals",res)
+        this.rentals = res.data || [];
+        console.log("rentals",this.rentals)
+        
+      } catch (err) {
+        console.error("Failed to fetch rentals:", err);
+      }
+    },
+
+    async submitForm() {
+      try {
+        await this.$apiPost("/post_rental_payment", this.form);
+        this.$emit("success");
+        this.$emit("close");
+        this.resetForm();
+      } catch (err) {
+        console.error("Failed to save rental payment:", err);
+      }
+    },
+
     resetForm() {
       this.form.amount = "";
       this.form.cycle_start = "";
       this.form.cycle_end = "";
+      this.form.rental = "";
     },
   },
 };

@@ -61,6 +61,15 @@
               Managers
             </button>
 
+            <!-- New Brokers Tab -->
+            <button
+              @click="activeTab = 'brokers'"
+              class="tab-link"
+              :class="{ 'tab-active': activeTab === 'brokers' }"
+            >
+              Brokers
+            </button>
+
             <button
               @click="activeTab = 'tenants'"
               class="tab-link"
@@ -88,6 +97,9 @@ import owners from "../owners/view.vue";
 import tenants from "../tenant/view.vue";
 import superStaffs from "./superStaf.vue";
 
+// import your Brokers component
+import brokers from "../brokers/view.vue";
+
 export default {
   components: {
     allUsers,
@@ -96,6 +108,7 @@ export default {
     managers,
     owners,
     tenants,
+    brokers, // add Brokers here
   },
   data() {
     const is_superuser = localStorage.getItem("is_superuser") === "true";

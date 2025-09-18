@@ -49,7 +49,7 @@
 </template>
 
 <script>
-import AddRentalPayment from "./Add.vue"; // your modal component
+import AddRentalPayment from "./add.vue"; // your modal component
 
 export default {
   name: "RentalPaymentsView",
