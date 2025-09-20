@@ -2,7 +2,7 @@
   <div class="p-6 min-h-screen bg-gray-100">
     <!-- Card Header -->
     <div class="flex justify-between items-center mb-6">
-      <h1 class="text-2xl font-bold">Rental Payments</h1>
+      <h1 class="text-2xl font-bold">Work space  Payments</h1>
       <button
         @click="showModal = true"
         class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
@@ -32,7 +32,7 @@
             <td class="px-4 py-2">{{ payment.cycle_start | formatDate }}</td>
             <td class="px-4 py-2">{{ payment.cycle_end | formatDate }}</td>
             <td class="px-4 py-2">{{ payment.rental_name || payment.rental }}</td>
-            <td class="px-4 py-2">{{ payment.created_at | formatDate }}</td>
+            <td class="px-4 py-2">{{ payment.created_at }}</td>
           </tr>
         </tbody>
       </table>
@@ -74,6 +74,8 @@ export default {
     async fetchPayments() {
       try {
         const res = await this.$apiGet("/get_rental_payments");
+        console.log("res payments workspae",res);
+
         this.payments = res.data || [];
       } catch (err) {
         console.error("Failed to fetch rental payments:", err);

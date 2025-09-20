@@ -16,7 +16,6 @@
             <span class="text-primary mr-1">+</span> Add
           </button>
         </div>
-
         <!-- Search & Page Size -->
         <div class="p-6 flex justify-between items-center mb-6">
           <input
@@ -41,7 +40,6 @@
             <span class="ml-1 text-gray-700">per page</span>
           </div>
         </div>
-
         <!-- Table -->
         <div class="overflow-x-auto p-6">
           <table class="min-w-full table-auto border-collapse border border-gray-300 text-sm">
@@ -72,7 +70,7 @@
                 <td class="border border-gray-300 px-4 py-2">{{ rental.cycle }}</td>
                 <td class="border border-gray-300 px-4 py-2">{{ rental.start_date }}</td>
                 <td class="border border-gray-300 px-4 py-2">{{ rental.is_active ? 'Yes' : 'No' }}</td>
-                <td class="border border-gray-300 px-4 py-2">{{ rental.space_name || rental.space }}</td>
+                <td class="border border-gray-300 px-4 py-2">{{ rental.space.name || rental.space }}</td>
                 <td class="border border-gray-300 px-4 py-2 text-center space-x-2">
                   <button
                     @click="editRental(rental)"
@@ -80,12 +78,22 @@
                   >
                     <i class="fas fa-edit"></i>
                   </button>
+
                   <button
                     @click="askDeleteConfirmation(rental)"
                     class="text-red-600 hover:text-red-800"
                   >
                     <i class="fas fa-trash"></i>
                   </button>
+
+                  <button
+                    @click="goToPayments(rental.id)"
+                    class="text-green-600 hover:text-green-800"
+                  >
+                    Payments
+                  </button>
+
+
                 </td>
               </tr>
               <tr v-if="filteredAndSortedRentals.length === 0">
@@ -217,6 +225,12 @@ export default {
     this.fetchRentals();
   },
   methods: {
+   goToPayments(rental_id) {
+  this.$router.push({
+    path: "/coworking-payments",
+    query: { rental_id }
+  });
+},
     async fetchRentals(customUrl = null) {
       try {
         const url = customUrl || "get_workspace_rentals";

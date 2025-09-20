@@ -127,6 +127,13 @@
                     >
                       <i class="fas fa-info-circle"></i>
                     </button>
+                     <button
+                      @click="goToPayments(rent.id)"
+                      class="text-green-600 hover:text-green-800 focus:outline-none"
+                      title="Detail"
+                    >
+                    Payments
+                    </button>
                   </td>
                 </tr>
                 <tr v-if="filteredAndSortedRents.length === 0">
@@ -272,6 +279,12 @@ export default {
     this.fetchRents();
   },
   methods: {
+    goToPayments(rental_id){
+    this.$router.push({
+      path: "/rents_payments",
+      //query: { rental_id }
+    });
+    },
     rentDetail(rent_id) {
       this.$router.push({ name: "rent-detail", params: { id: rent_id } });
     },

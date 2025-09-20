@@ -77,6 +77,8 @@
               >
                 <td class="border border-gray-300 px-4 py-2">
               
+
+             
                   {{ manager.manager.first_name }} {{ manager.manager.middle_name }}
                   {{ manager.manager.last_name }}
                 </td>
