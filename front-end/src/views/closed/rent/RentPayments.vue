@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white shadow rounded-lg">
+  <div class="bg-white shadow rounded-lg m-3">
     <!-- Header -->
     <div class="bg-primary text-white px-6 py-3 text-lg font-bold">
       Rent Payments

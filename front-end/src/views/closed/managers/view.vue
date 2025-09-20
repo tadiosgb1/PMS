@@ -78,14 +78,14 @@
                 <td class="border border-gray-300 px-4 py-2">
               
 
-               
-                  {{ manager.first_name }} {{ manager.middle_name }}
-                  {{ manager.last_name }}
+             
+                  {{ manager.manager.first_name }} {{ manager.manager.middle_name }}
+                  {{ manager.manager.last_name }}
                 </td>
 
                   <td class="border border-gray-300 px-4 py-2">
-                {{ owner.first_name }} {{ middle_name }}
-                  {{ owner.last_name }}
+                {{ manager.owner.first_name }} {{ manager.owner.middle_name }}
+                  {{ manager.owner.last_name }}
                   
                 </td>
                <td class="border border-gray-300 px-4 py-2">
