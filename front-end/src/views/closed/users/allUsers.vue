@@ -67,8 +67,9 @@
                   <button
                     class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
                     @click="editUser(user)"
+                  title="Edit"
                   >
-                    ✎ Edit
+                    <i class="fas fa-edit"></i>
                   </button>
 
                   <!-- Details -->
@@ -76,7 +77,23 @@
                     class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
                     @click="goToDetail(user.id)"
                   >
-                    🔍 Detail
+                     <i class="fas fa-info-circle"></i>
+                  </button>
+                  <button
+                    v-if="!user.is_active"
+                    @click="activateUser(user.id)"
+                    class="text-blue-600 hover:text-blue-800"
+                    title="Activate Manager"
+                  >
+                    Activate
+                  </button>
+                  <button
+                    v-if="user.is_active"
+                    @click="deactivateUser(user.id)"
+                    class="text-blue-600 hover:text-blue-800"
+                    title="Deactivate Manager"
+                  >
+                    Deactivate
                   </button>
                 </td>
               </tr>
@@ -160,6 +177,18 @@ export default {
         console.error(error);
         this.$refs.toast.showToast("Failed to load users", "error");
       }
+    },
+    activateUser(id) {
+      this.$apiPost(`/activate_user/${id}`, { id }).then((res) => {
+        this.$root.$refs.toast.showToast("Activate User successfully ", "success");
+        this.fetchUsers();
+      });
+    },
+    deactivateUser(id) {
+      this.$apiDelete(`/deactivate_user/${id}`, { id }).then((res) => {
+        this.$root.$refs.toast.showToast("Deactive saved successfully ", "success");
+        this.fetchUsers();
+      });
     },
     changePage(page) {
       this.fetchUsers(page);
