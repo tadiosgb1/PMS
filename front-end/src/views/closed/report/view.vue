@@ -5,6 +5,7 @@
 
     <!-- Users Tabs + Chart -->
     <div class="bg-white rounded-lg shadow-md p-4 mb-6 flex flex-col md:flex-row md:space-x-6">
+      
       <div class="flex-1">
         <div class="flex space-x-2 mb-4">
           <button
@@ -109,7 +110,7 @@
               <button @click="applyRentFilter" class="self-end px-3 py-1 bg-indigo-600 text-white rounded hover:bg-indigo-700 text-sm">Apply</button>
             </div>
             <p class="text-xl font-bold mb-2">{{ filteredRentPayments.length }}</p>
-            <button @click="downloadRentPayments" class="px-3 py-1 text-sm bg-indigo-600 text-white rounded hover:bg-indigo-700">⬇ Export</button>
+            <button @click="downloadRentPayments" class="px-3 py-1 text-sm bg-primary text-white rounded hover:bg-indigo-700">⬇ Export</button>
           </div>
 
           <div v-if="activePaymentTab === 'rental'">
@@ -126,7 +127,7 @@
               <button @click="applyRentalFilter" class="self-end px-3 py-1 bg-purple-600 text-white rounded hover:bg-purple-700 text-sm">Apply</button>
             </div>
             <p class="text-xl font-bold mb-2">{{ filteredRentalPayments.length }}</p>
-            <button @click="downloadRentalPayments" class="px-3 py-1 text-sm bg-purple-600 text-white rounded hover:bg-purple-700">⬇ Export</button>
+            <button @click="downloadRentalPayments" class="px-3 py-1 text-sm bg-primary text-white rounded hover:bg-purple-700">⬇ Export</button>
           </div>
         </div>
       </div>
