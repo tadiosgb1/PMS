@@ -62,14 +62,7 @@
                   <span v-else class="text-gray-400">No groups</span>
                 </td>
                 <td class="px-4 py-2 flex gap-2">
-                  <!-- Edit -->
-                  <button
-                    class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600"
-                    @click="editUser(user)"
-                  >
-                    ✎ Edit
-                  </button>
-
+            
                   <!-- Details -->
                   <button
                     class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
