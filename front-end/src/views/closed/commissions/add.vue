@@ -47,22 +47,31 @@
             />
           </div>
 
-          <div>
+          <!-- Property Sale Autocomplete -->
+          <div class="relative">
             <label class="block text-sm font-medium mb-1">Property Sale</label>
-            <select
-              v-model.number="form.property_sale"
-              required
+            <input
+              v-model="searchTerm"
+              @input="searchPropertySales"
+              type="text"
+              placeholder="Search property..."
               class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+            />
+
+            <!-- Suggestions -->
+            <ul
+              v-if="propertySales.length && showSuggestions"
+              class="absolute z-10 bg-white border rounded-lg shadow-md mt-1 w-full max-h-48 overflow-auto"
             >
-              <option disabled value="">Select Property Sale</option>
-              <option
+              <li
                 v-for="sale in propertySales"
                 :key="sale.id"
-                :value="sale.id"
+                @click="selectPropertySale(sale)"
+                class="px-3 py-2 hover:bg-gray-100 cursor-pointer"
               >
                 {{ sale.name || sale.code }}
-              </option>
-            </select>
+              </li>
+            </ul>
           </div>
         </div>
 
@@ -92,24 +101,46 @@ export default {
         saas_commission: "",
         broker_commission: "",
         total_commission: "",
-        property_sale: 0,
+        property_sale: 0, // ID of selected property
       },
+      searchTerm: "",
       propertySales: [],
+      showSuggestions: false,
+      searchTimeout: null,
     };
   },
 
-  
-  async mounted() {
-    try {
-      const res = await this.$apiGet("/get_property_sales");
-      this.propertySales = res.data || [];
-    } catch (err) {
-      console.error("Failed to fetch property sales:", err);
-    }
-  },
-
-
   methods: {
+    async searchPropertySales() {
+      this.showSuggestions = true;
+
+      // debounce API calls
+      clearTimeout(this.searchTimeout);
+      this.searchTimeout = setTimeout(async () => {
+        if (!this.searchTerm) {
+          this.propertySales = [];
+          return;
+        }
+
+        try {
+          const res = await this.$apiGet(
+            `/get_property_zone_sales?search=${encodeURIComponent(this.searchTerm)}`
+          );
+          console.log("search res",res);
+          this.propertySales = res.data || [];
+        } catch (err) {
+          console.error("Failed to fetch property sales:", err);
+        }
+      }, 400); // wait 400ms after typing
+    },
+
+    selectPropertySale(sale) {
+      this.form.property_sale = sale.id; // store ID
+      this.searchTerm = sale.name || sale.code; // show name in input
+      this.propertySales = [];
+      this.showSuggestions = false;
+    },
+
     async submitForm() {
       try {
         const payload = { ...this.form };
@@ -123,6 +154,7 @@ export default {
         alert("Failed to add commission.");
       }
     },
+
     resetForm() {
       this.form = {
         saas_commission: "",
@@ -130,6 +162,9 @@ export default {
         total_commission: "",
         property_sale: 0,
       };
+      this.searchTerm = "";
+      this.propertySales = [];
+      this.showSuggestions = false;
     },
   },
 };

@@ -1,15 +1,15 @@
 <template>
   <div class="p-6 min-h-screen bg-gray-100">
     <!-- Card -->
-    <div class="bg-primary shadow-lg rounded-xl overflow-hidden ">
+    <div class="bg-white shadow-lg overflow-hidden rounded-lg">
       <!-- Header -->
-      <div class="flex flex-col sm:flex-row justify-between items-center px-6 py-4 border-b">
+      <div class="flex flex-col sm:flex-row justify-between items-center px-6 py-4 bg-primary">
         <h1 class="text-2xl font-bold text-white mb-2 sm:mb-0">Commissions</h1>
         <button
           @click="showModal = true"
-          class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 transition"
+          class="px-4 py-2 text-white rounded-lg hover:bg-orange-600 transition"
         >
-        <i class="fas fa-plus text-white mr-3"></i>  Add Commission
+          <i class="fas fa-plus text-white mr-3"></i> Add Commission
         </button>
       </div>
 
@@ -34,7 +34,9 @@
               <td class="px-4 py-2">{{ commission.saas_commission }}</td>
               <td class="px-4 py-2">{{ commission.broker_commission }}</td>
               <td class="px-4 py-2">{{ commission.total_commission }}</td>
-              <td class="px-4 py-2">{{ commission.property_sale_name || commission.property_sale }}</td>
+              <td class="px-4 py-2">
+                {{ commission.property_sale_name || commission.property_sale }}
+              </td>
               <td class="px-4 py-2">{{ commission.created_at | formatDate }}</td>
             </tr>
           </tbody>
@@ -50,6 +52,7 @@
     />
   </div>
 </template>
+
 
 <script>
 import AddCommission from "./Add.vue";

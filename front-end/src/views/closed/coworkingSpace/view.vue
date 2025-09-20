@@ -101,6 +101,14 @@
                   >
                     <i class="fas fa-trash"></i>
                   </button>
+
+             
+                  <button
+                    @click="goToRentals(space.id);"
+                    class="text-blue-600 hover:text-blue-800"
+                      >
+                    Payments
+                  </button>
                 </td>
               </tr>
               <tr v-if="filteredAndSortedSpaces.length === 0">
@@ -240,6 +248,12 @@ export default {
     this.fetchSpaces();
   },
   methods: {
+      goToRentals(workspace_id) {
+        this.$router.push({
+          path: "/coworking-space-rentals",
+          query: { workspace_id }
+        });
+      },
     async fetchSpaces(customUrl = null) {
       try {
         let url = customUrl || "get_coworking_spaces";
