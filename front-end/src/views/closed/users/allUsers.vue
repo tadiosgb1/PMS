@@ -62,13 +62,31 @@
                   <span v-else class="text-gray-400">No groups</span>
                 </td>
                 <td class="px-4 py-2 flex gap-2">
-            
+                  <!-- Edit -->
+                 
+
                   <!-- Details -->
                   <button
                     class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
                     @click="goToDetail(user.id)"
                   >
-                    🔍 Detail
+                     <i class="fas fa-info-circle"></i>
+                  </button>
+                  <button
+                    v-if="!user.is_active"
+                    @click="activateUser(user.id)"
+                    class="text-blue-600 hover:text-blue-800"
+                    title="Activate Manager"
+                  >
+                    Activate
+                  </button>
+                  <button
+                    v-if="user.is_active"
+                    @click="deactivateUser(user.id)"
+                    class="text-blue-600 hover:text-blue-800"
+                    title="Deactivate Manager"
+                  >
+                    Deactivate
                   </button>
                 </td>
               </tr>
@@ -152,6 +170,18 @@ export default {
         console.error(error);
         this.$refs.toast.showToast("Failed to load users", "error");
       }
+    },
+    activateUser(id) {
+      this.$apiPost(`/activate_user/${id}`, { id }).then((res) => {
+        this.$root.$refs.toast.showToast("Activate User successfully ", "success");
+        this.fetchUsers();
+      });
+    },
+    deactivateUser(id) {
+      this.$apiDelete(`/deactivate_user`, id ).then((res) => {
+        this.$root.$refs.toast.showToast("Deactive saved successfully ", "success");
+        this.fetchUsers();
+      });
     },
     changePage(page) {
       this.fetchUsers(page);
