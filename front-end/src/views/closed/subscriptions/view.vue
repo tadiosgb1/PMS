@@ -8,7 +8,7 @@
           class="bg-orange-500 text-white px-6 py-4 text-xl font-bold flex justify-between items-center"
         >
           Subscriptions
-          <button
+          <button v-if="addSubsc"
             @click="visible = true"
             class="bg-white text-blue-700 font-semibold px-1 lg:px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300"
           >

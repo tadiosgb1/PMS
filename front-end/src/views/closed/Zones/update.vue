@@ -57,7 +57,8 @@ export default {
   methods: {
     async submitForm() {
       try {
-        await this.$apiPut("/update_property_zone", this.form.id, this.form);
+        const response= await this.$apiPut("/update_property_zone", this.form.id, this.form);
+        
        if(response && response.error){
        this.$root.$refs.toast.showToast(response.error || "Failed to update property zone", "error");
         }else {
