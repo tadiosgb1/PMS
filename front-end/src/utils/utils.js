@@ -502,6 +502,9 @@ export async function loadPermissions($apiPost) {
 
 
 
+
+
+
 export function hasPermission(permission) {
   const userPermissions = JSON.parse(localStorage.getItem("permissions") || "[]");
 
@@ -618,7 +621,7 @@ export async function getManagers() {
     let params = {};
     let apiUrl = "/get_managers?page=1&page_size=1000"; // default URL
 
-    if (isSuperUser || groups.includes("staff")) {
+    if (isSuperUser || groups.includes("super_staff")) {
       // Superuser or staff: empty params, default URL
       params = {};
       apiUrl = "/get_managers?page=1&page_size=1000";

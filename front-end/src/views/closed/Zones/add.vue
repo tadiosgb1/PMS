@@ -76,15 +76,16 @@ export default {
       console.log("Payload zone",this.form);
 
       try {
-        await this.$apiPost("post_property_zone", this.form);
-        this.$root.$refs.toast.showToast('Property saved successfully ', 'success');
-        setTimeout(() => {
-  this.$emit("close");
-}, 3000); // 3000 milliseconds = 3 seconds
-        this.$emit("refresh");
+       const response = await this.$apiPost("post_property_zone", this.form);
+       if(response && response.error){
+       this.$root.$refs.toast.showToast(response.error || "Failed to add property zone", "error");
+        }else {
+        this.$root.$refs.toast.showToast('Property zone saved successfully ', 'success');
+        }
+        
       } catch (err) {
         console.error("Failed to add zone:", err);
-        alert("Failed to add zone");
+         this.$root.$refs.toast.showToast("Failed to add property zone", "error");
       }
     }
   }

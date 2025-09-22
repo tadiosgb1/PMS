@@ -71,6 +71,7 @@
             </button>
 
             <button
+             v-if="$hasPermission('pms.view_rentcycle') || is_superuser"
               @click="activeTab = 'tenants'"
               class="tab-link"
               :class="{ 'tab-active': activeTab === 'tenants' }"

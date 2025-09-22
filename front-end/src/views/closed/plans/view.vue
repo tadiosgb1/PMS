@@ -1,5 +1,5 @@
 <template>
-  <div >
+  <div  >
     <Toast ref="toast"/>
   <div class="min-h-screen bg-gray-100 p-6">
     <div class="bg-white shadow-md rounded-lg overflow-hidden">

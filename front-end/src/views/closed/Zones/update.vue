@@ -58,14 +58,15 @@ export default {
     async submitForm() {
       try {
         await this.$apiPut("/update_property_zone", this.form.id, this.form);
-       this.$root.$refs.toast.showToast('Zone Updated successfully', 'success');
-        setTimeout(() => {
-  this.$emit("close");
-}, 3000); // 3000 milliseconds = 3 seconds
-        this.$emit("refresh");
+       if(response && response.error){
+       this.$root.$refs.toast.showToast(response.error || "Failed to update property zone", "error");
+        }else {
+        this.$root.$refs.toast.showToast('Property zone updated successfully ', 'success');
+        }
+        
       } catch (err) {
-        console.error("Failed to update zone:", err);
-        alert("Failed to update zone");
+        console.error("Failed to update property zone:", err);
+         this.$root.$refs.toast.showToast("Failed to update property zone", "error");
       }
     }
   }

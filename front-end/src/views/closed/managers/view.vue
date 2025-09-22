@@ -228,6 +228,13 @@ export default {
     },
   },
   mounted() {
+    if(this.$hasPermission('pms.view_ownermanager')){
+      const a=this.$hasPermission('pms.view_ownermanager');
+      console.log("a",a);
+      console.log("true")
+    }else{
+      console.log("false")
+    }
     this.fetchManagers();
   },
   methods: {

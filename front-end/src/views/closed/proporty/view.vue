@@ -364,7 +364,7 @@ export default {
         const res = await this.$apiDelete(
           `/delete_property/${this.propertyToDelete.id}`
         );
-        this.$refs.toast.showToast(res.message, "success");
+        this.$root.$refs.toast.showToast(res.message, "success");
         await this.fetchProperties();
       } catch (err) {
         console.error(err);

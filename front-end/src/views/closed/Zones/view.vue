@@ -7,6 +7,7 @@
         <div class="bg-primary text-white px-6 py-4 text-xl font-bold flex justify-between items-center">
           Property Zones
           <button
+            v-if="$hasPermission('pms.add_propertyzone')"
             @click="visible = true"
             class="bg-white text-blue-700 font-semibold px-1 lg:px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300"
           >
@@ -20,6 +21,7 @@
           <div class="flex justify-between items-center mb-6">
             <input
               v-model="searchTerm"
+              @input="onSearch"
               type="search"
               placeholder="Search Zone..."
               class="w-full max-w-md px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -74,10 +76,10 @@
                   <td class="border px-4 py-2">{{ zone.ownerName }}</td>
                   <td class="border px-4 py-2">{{ zone.managerName }}</td>
                   <td class="border px-4 py-2 text-center space-x-2">
-                    <button @click="editZone(zone)" class="text-blue-600 hover:text-blue-800">
+                    <button v-if="$hasPermission('pms.change_propertyzone')" @click="editZone(zone)" class="text-blue-600 hover:text-blue-800">
                       <i class="fas fa-edit"></i>
                     </button>
-                    <button @click="askDeleteConfirmation(zone)" class="text-red-600 hover:text-red-800">
+                    <button v-if="$hasPermission('pms.delete_propertyzone')" @click="askDeleteConfirmation(zone)" class="text-red-600 hover:text-red-800">
                       <i class="fas fa-trash-alt"></i>
                     </button>
                     <button @click="properties(zone.id)" class="text-blue-600 hover:text-blue-800">
@@ -94,11 +96,19 @@
 
           <!-- Pagination -->
           <div class="flex justify-between items-center mt-4">
-            <button :disabled="!previous" @click="fetchZones(previous)" class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50">
+            <button
+              :disabled="currentPage <= 1"
+              @click="changePage(currentPage - 1)"
+              class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+            >
               Previous
             </button>
             <span class="text-gray-600">Page {{ currentPage }} of {{ totalPages }}</span>
-            <button :disabled="!next" @click="fetchZones(next)" class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50">
+            <button
+              :disabled="currentPage >= totalPages"
+              @click="changePage(currentPage + 1)"
+              class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+            >
               Next
             </button>
           </div>
@@ -158,51 +168,53 @@ export default {
       sortAsc: true,
       currentPage: 1,
       totalPages: 1,
-      next: null,
-      previous: null,
       pageSize: 10,
-      pageSizes: [1,5, 10, 20, 50, 100],
+      pageSizes: [1, 5, 10, 20, 50, 100],
     };
   },
   computed: {
     filteredAndSortedZones() {
-      const term = this.searchTerm.toLowerCase();
-      let filtered = this.globalZones.filter(
-        (z) =>
-          z.name.toLowerCase().includes(term) ||
-          z.address.toLowerCase().includes(term) ||
-          z.city.toLowerCase().includes(term) ||
-          z.state.toLowerCase().includes(term)
-      );
-      filtered.sort((a, b) => {
+      let sorted = [...this.globalZones];
+      sorted.sort((a, b) => {
         let res = 0;
         if (a[this.sortKey] < b[this.sortKey]) res = -1;
         if (a[this.sortKey] > b[this.sortKey]) res = 1;
         return this.sortAsc ? res : -res;
       });
-      return filtered;
+      return sorted;
     },
   },
   async mounted() {
     await this.fetchZones();
   },
   methods: {
-    async fetchZones(url = `/get_property_zones?page=1&page_size=${this.pageSize}`) {
+    async fetchZones() {
       try {
-        const result = await this.$getZones(url); // use global function
+      const params = {
+            ordering: "-id",
+          };
+            console.log("params in fetching zones",params);
+        const url = `/get_property_zones?page=${this.currentPage}&page_size=${this.pageSize}&search=${this.searchTerm}`;
+      
+        const result = await this.$getZones(url,params);
+        console.log("result for zones",result)
         this.globalZones = result.zones;
         this.currentPage = result.currentPage;
         this.totalPages = result.totalPages;
-        this.next = result.next;
-        this.previous = result.previous;
       } catch (err) {
         console.error("Error fetching zones:", err);
         this.globalZones = [];
         this.currentPage = 1;
         this.totalPages = 1;
-        this.next = null;
-        this.previous = null;
       }
+    },
+    onSearch() {
+      this.currentPage = 1;
+      this.fetchZones();
+    },
+    changePage(page) {
+      this.currentPage = page;
+      this.fetchZones();
     },
     editZone(zone) {
       this.zoneToEdit = zone;
@@ -215,9 +227,14 @@ export default {
     async confirmDelete() {
       this.confirmVisible = false;
       try {
-        await this.$apiDelete(`/delete_property_zone/${this.zoneToDelete.id}`);
-        this.$root.$refs.toast.showToast("Zone deleted successfully", "success");
+        const response =await this.$apiDelete(`/delete_property_zone/${this.zoneToDelete.id}`);
+        if(response && response.error){
+       this.$root.$refs.toast.showToast(response.error || "Failed to delete zone", "error");
+        }else {
+       this.$root.$refs.toast.showToast("Zone deleted successfully", "success");
         await this.fetchZones();
+
+        }
       } catch (err) {
         this.$root.$refs.toast.showToast("Failed to delete zone", "error");
         console.error(err);
@@ -229,7 +246,10 @@ export default {
     },
     sortBy(key) {
       if (this.sortKey === key) this.sortAsc = !this.sortAsc;
-      else { this.sortKey = key; this.sortAsc = true; }
+      else {
+        this.sortKey = key;
+        this.sortAsc = true;
+      }
     },
   },
 };
