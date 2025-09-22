@@ -140,7 +140,7 @@ export default {
         email: this.email,
       };
 
-      this.$apiPost("/auth/forgot", payload)
+      this.$apiPost("/send_password_reset_email", payload)
         .then((response) => {
           this.showForm = false;
           this.showRestInfo = true;

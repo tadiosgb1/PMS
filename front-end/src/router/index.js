@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import Home from '../views/opened/landing/Home.vue'
 import Login from '../views/opened/auth/login.vue'
 import ResetPassword from '../views/opened/auth/ResetPassword.vue'
+import ForgotPasssword from '../views/opened/auth/forgotPassword.vue'
 
 import Registration from '../views/opened/auth/login.vue'
 import ForgotPassword from '../views/opened/auth/forgotPassword.vue';
@@ -78,17 +79,22 @@ const routes = [
   },
 
   // router/index.js
+   {
+    path: '/forgot-password',
+    name: 'ForgotPassword',
+    component: ForgotPasssword,
+    props: true
+  },
+
   {
-    path: '/en/reset-password/:token',
+    path: '/reset-password',
     name: 'ResetPassword',
     component: ResetPassword,
     props: true
   },
 
 
-
   ,
-
   {
     path: "/dashboard", name: "dashboard",
     component: dashboard,
@@ -126,7 +132,6 @@ const routes = [
       { path: '/sales_payments', name: 'sales_payments', component: Sales_Payments },
       { path: '/rents_payments', name: 'rents_payments', component: Rent_Payments },
       { path: '/maintenance-requests', name: 'maintenance-requests', component: MaintenanceRequests },
-
       { path: '/user_view', name: 'user_view', component: User_view },
       { path: '/coworking-spaces', name: 'coworking-spaces', component: CowrkingSpaces },
       { path: '/coworking-space-rentals', name: 'coworking-space-rentals', component:CowrkingSpaceRental },

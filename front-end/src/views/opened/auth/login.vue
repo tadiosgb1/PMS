@@ -54,6 +54,16 @@
               class="text-black w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-orange-400"
               minlength="2"
             />
+            <!-- Forgot Password Link -->
+            <div class="text-right mt-1">
+              <a
+                @click="$emit('close')"
+                href="/forgot-password"
+                class="text-sm text-orange-600 font-semibold hover:underline"
+              >
+                Forgot your password?
+              </a>
+            </div>
           </div>
 
           <!-- Error -->
@@ -156,7 +166,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-/* Optional: Add transition for smoother appearance */
-</style>
