@@ -116,7 +116,7 @@
                     </button>
 
                     <!-- Delete -->
-                    <button
+                    <button v-if="showDelete"
                       @click="confirmDelete(subscription)"
                       class="flex items-center px-3 py-1.5 bg-red-50 text-red-700 text-sm font-medium rounded-lg border border-red-200 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-200 transition"
                       title="Delete"
