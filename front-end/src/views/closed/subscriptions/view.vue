@@ -54,7 +54,7 @@
                   <th class="px-4 py-2 border">Start Date</th>
                   <th class="px-4 py-2 border">End Date</th>
                   <th class="px-4 py-2 border">Status</th>
-                  <th class="px-4 py-2 border">User ID</th>
+                  <th class="px-4 py-2 border">Owner</th>
                   <th class="px-4 py-2 border text-center">Actions</th>
                 </tr>
               </thead>
@@ -76,38 +76,57 @@
 
                   <td class="px-4 py-2 border">{{ subscription.ownerName }}</td>
 
-                  <td class="px-4 py-2 border text-center space-x-2">
+                 <td class="px-4 py-2 border text-center">
+                  <div class="flex flex-wrap justify-center gap-2">
+                    <!-- Pay Button -->
                     <button
-                      v-if="subscription.status == 'pending'"
+                      v-if="subscription.status === 'pending'"
                       @click="pay(subscription)"
-                      class="relative px-4 py-2 text-green-600 border border-green-600 rounded-lg hover:text-white hover:bg-green-600 transition duration-300 ease-in-out animate-glow"
+                      class="flex items-center px-3 py-1.5 bg-green-600 text-white text-sm font-medium rounded-lg border border-green-700 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 transition"
                       title="Pay"
                     >
-                      <i class="fas fa-credit-card mr-2"></i> Pay
+                      <i class="fas fa-credit-card mr-1"></i> Pay
                     </button>
 
+                    <!-- Payments Info -->
                     <button
                       @click="payment(subscription.id)"
-                      class="text-green-600 hover:text-green-800"
+                      class="flex items-center px-3 py-1.5 bg-green-50 text-green-700 text-sm font-medium rounded-lg border border-green-200 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-200 transition"
                       title="Subscription payments"
                     >
-                      <i class="fas fa-info-circle"></i>Payments
+                      <i class="fas fa-info-circle mr-1"></i> Payments
                     </button>
+
+                    <!-- Edit -->
+                
+
+                    <!-- Upgrade/Downgrade -->
                     <button
+                      @click="openUpgradeModal(subscription)"
+                      class="flex items-center px-3 py-1.5 bg-orange-50 text-orange-700 text-sm font-medium rounded-lg border border-orange-200 hover:bg-orange-100 focus:outline-none focus:ring-2 focus:ring-orange-200 transition"
+                    >
+                      <i class="fas fa-exchange-alt mr-1"></i> Upgrade/Downgrade
+                    </button>
+                     <button
                       @click="edit(subscription)"
-                      class="text-blue-600 hover:text-blue-800"
+                      class="flex items-center px-3 py-1.5 bg-blue-50 text-blue-700 text-sm font-medium rounded-lg border border-blue-200 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-200 transition"
                       title="Edit"
                     >
-                      <i class="fas fa-edit"></i>
+                      <i class="fas fa-edit mr-1"></i> Edit
                     </button>
-                    <button
+
+                    <!-- Delete -->
+                    <button v-if="showDelete"
                       @click="confirmDelete(subscription)"
-                      class="text-red-600 hover:text-red-800"
+                      class="flex items-center px-3 py-1.5 bg-red-50 text-red-700 text-sm font-medium rounded-lg border border-red-200 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-200 transition"
                       title="Delete"
                     >
-                      <i class="fas fa-trash-alt"></i>
+                      <i class="fas fa-trash-alt mr-1"></i> Delete
                     </button>
-                  </td>
+                  </div>
+                </td>
+
+
                 </tr>
                 <tr v-if="filteredSubscriptions.length === 0">
                   <td colspan="7" class="text-center text-gray-500 py-6">
@@ -174,7 +193,16 @@
         @confirm="deleteSubscription"
         @cancel="confirmVisible = false"
       />
+
+<UpgradeSubscriptionModal
+  v-if="showUpgradeModal"
+  :visible="showUpgradeModal"
+  :subscription-id="selectedSubscriptionId"  
+  @close="showUpgradeModal = false;fetchSubscriptions()"
+  @plan-upgraded="handlePlanUpgrade"
+/>
     </div>
+
   </div>
 </template>
 
@@ -182,6 +210,7 @@
 import AddSubscription from "./add.vue";
 import UpdateSubscription from "./update.vue";
 import PaymentModal from "./Payment.vue";
+import UpgradeSubscriptionModal from './upgradePlan.vue'
 import ConfirmModal from "@/components/ConfirmModal.vue";
 import Toast from "@/components/Toast.vue";
 
@@ -193,6 +222,7 @@ export default {
     ConfirmModal,
     Toast,
     PaymentModal,
+    UpgradeSubscriptionModal
   },
   data() {
     return {
@@ -201,11 +231,12 @@ export default {
       visible: false,
       updateVisible: false,
       confirmVisible: false,
+      showUpgradeModal: false,
       paymentVisible: false,
       paymentPayload: null,
       editing: null,
       deleting: null,
-
+      selectedSubscriptionId: null,
       // ✅ Pagination state
       currentPage: 1,
       totalPages: 1,
@@ -229,14 +260,21 @@ export default {
     this.fetchSubscriptions();
   },
   methods: {
+    openUpgradeModal(subscription) {
+    this.selectedSubscriptionId = subscription.id; // store the subscription ID
+    this.showUpgradeModal = true;                  // open the modal
+   },
     async fetchSubscriptions(url = null) {
       try {
         let params = {
           user_id: localStorage.getItem("userId"),
+          ordering: "-id",
         };
 
         if (localStorage.getItem("is_superuser") === "true") {
-          params = {};
+          params = {
+            ordering: "-id",
+          };
         }
 
         const pageUrl =

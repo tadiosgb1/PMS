@@ -1,18 +1,12 @@
 <template>
-  <div>
-    <Toast ref="toast" />
+  <div class="m-3">
+    <Toast ref="toast"  />
     <div class="min-h-screen bg-gray-100">
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
         <div
           class="bg-orange-500 text-white px-6 py-4 text-xl font-bold flex justify-between items-center"
         >
           Subscription Payments
-          <button
-            @click="visible = true"
-            class="bg-white text-blue-700 font-semibold px-1 lg:px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300"
-          >
-            <span class="text-primary">+</span> Add
-          </button>
         </div>
 
         <div class="p-6">
@@ -77,9 +71,9 @@
                   </th>
                   <th class="border border-gray-300 px-4 py-2">Created At</th>
                   <th class="border border-gray-300 px-4 py-2">End Date</th>
-                  <th class="border border-gray-300 px-4 py-2">User ID</th>
+                  <th class="border border-gray-300 px-4 py-2">Owner</th>
                   <th class="border border-gray-300 px-4 py-2">
-                    Subscription ID
+                    Plan
                   </th>
                   <th class="border border-gray-300 px-4 py-2 text-center">
                     Actions
@@ -127,6 +121,14 @@
                      Approve
                     </button>
 
+                     <button v-else
+                      @click="disApprove(p)"
+                      class="text-blue-600 hover:text-blue-800 focus:outline-none"
+                      title="Edit"
+                    >
+                     Dis Approve
+                    </button>
+                    
                   </td>
                 </tr>
                 <tr v-if="filteredAndSortedPayments.length === 0">
@@ -249,7 +251,7 @@ export default {
     const res=await this.$apiPatch(`/update_subscription_payment`,payment.id,payload);
     console.log("res",res);
     if(res){
-      alert("approved")
+     this.$root.$refs.toast.showToast(`Payment Approved Successfully`, 'success');
       console.log("subscription id",res.subscription_id);
       const subPayload={
         id:res.subscription_id,
@@ -257,7 +259,31 @@ export default {
       }
       const resSub=await this.$apiPatch(`/update_subscription`,res.subscription_id,subPayload);
       if(resSub){
-        alert("Subscription activated");
+       this.$root.$refs.toast.showToast(`Subscription activated successfully!`, 'success');
+        this.$reloadPage();
+      }
+    }
+   
+  },
+    async disApprove(payment){
+    console.log("Payment",payment);
+    const payload={
+      id:payment.id,
+      status:"pending",
+    }
+    const res=await this.$apiPatch(`/update_subscription_payment`,payment.id,payload);
+    console.log("res",res);
+    if(res){
+     this.$root.$refs.toast.showToast(`Payment DisApproved Successfully`, 'success');
+      console.log("subscription id",res.subscription_id);
+      const subPayload={
+        id:res.subscription_id,
+        status:"pending",
+      }
+      const resSub=await this.$apiPatch(`/update_subscription`,res.subscription_id,subPayload);
+      if(resSub){
+       this.$root.$refs.toast.showToast(`Subscription activated successfully!`, 'success');
+        this.$reloadPage();
       }
     }
    
@@ -278,10 +304,9 @@ export default {
 
     console.log("params", params);
     const response = await this.$apiGet(`/get_subscription_payment`, params);
-
+    console.log("subscription payments",response);
     if (Array.isArray(response.data)) {
       this.payments = response.data;
-
       // Fetch owner and plan name for each payment
       await Promise.all(
         this.payments.map(async (payment) => {
@@ -290,11 +315,11 @@ export default {
             const ownerRes = await this.$apiGetById('get_user', payment.user_id);
             payment.ownerName = ownerRes.first_name || 'Unknown';
           }
-
           // Fetch plan name
           if (payment.subscription_id) {
             const planRes = await this.$apiGetById('get_subscription', payment.subscription_id);
             payment.planName = planRes.plan_name || 'Unknown Plan';
+            //payment.end_date=planRes.end_date 
           }
         })
       );
@@ -307,7 +332,9 @@ export default {
   } catch (error) {
     console.error("Failed to fetch subscription payments:", error);
     this.payments = [];
-    alert("Failed to load subscription payments.");
+    this.$root.$refs.toast.showToast(`Something went wrong`, 'error');
+
+   // alert("Failed to load subscription payments.");
   }
 },
 
