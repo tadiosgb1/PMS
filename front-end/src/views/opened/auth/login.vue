@@ -39,10 +39,7 @@
 
           <!-- Password -->
           <div>
-            <label
-              class="block text-gray-700 font-semibold mb-1"
-              for="password"
-            >
+            <label class="block text-gray-700 font-semibold mb-1" for="password">
               Password
             </label>
             <input
@@ -74,9 +71,17 @@
           <!-- Submit Button -->
           <button
             type="submit"
-            class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 rounded-md transition"
+            class="w-full bg-orange-600 hover:bg-orange-700 text-white font-bold py-3 rounded-md transition flex items-center justify-center"
+            :disabled="loading"
           >
-            Login
+            <span v-if="!loading">Login</span>
+            <span v-else class="flex items-center">
+              <svg class="animate-spin h-5 w-5 mr-2 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"></path>
+              </svg>
+              Logging in...
+            </span>
           </button>
         </form>
 
@@ -115,10 +120,14 @@ export default {
         password: "",
       },
       error: "",
+      loading: false, // Added loading state
     };
   },
   methods: {
     async login() {
+      this.error = "";
+      this.loading = true; // start loading
+
       const payload = {
         email: this.form.email,
         password: this.form.password,
@@ -126,8 +135,6 @@ export default {
 
       try {
         const response = await this.$apiPost("/token", payload);
-
-        console.log("response during login", response);
 
         const {
           refresh,
@@ -143,14 +150,13 @@ export default {
         localStorage.setItem("access", access);
         localStorage.setItem("permissions", JSON.stringify(permissions));
         localStorage.setItem("groups", JSON.stringify(groups));
-
         localStorage.setItem("userId", id);
         localStorage.setItem("is_superuser", is_superuser);
         localStorage.setItem("email", email);
 
         const user = await this.$apiGetById(`/get_user`, id);
-        const name = user.first_name;
-        localStorage.setItem("name", name);
+        localStorage.setItem("name", user.first_name);
+
         this.$refs.toast?.showSuccessToastMessage("Login successful!");
         setTimeout(() => {
           this.$emit("close"); // Close the modal
@@ -161,6 +167,8 @@ export default {
         this.error =
           error.response?.data?.message ||
           "Login failed. Please check your credentials.";
+      } finally {
+        this.loading = false; // stop loading
       }
     },
   },
