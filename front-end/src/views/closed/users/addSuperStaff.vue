@@ -8,7 +8,7 @@
       <div
         class="bg-primary text-white px-6 py-4 text-xl font-semibold flex justify-between items-center"
       >
-        Add New Tenant
+        Add New Super Staff User
         <button
           @click="$emit('close')"
           class="text-white hover:text-gray-200 text-2xl"
@@ -172,7 +172,7 @@ export default {
         // 2. Assign to super_staff group
         const groupPayload = {
           user_id: res.id,
-          groups: ["tenant"],
+          groups: ["super_staff"],
         };
 
         console.log("Assigning groups:", groupPayload);

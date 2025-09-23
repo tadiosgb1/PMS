@@ -34,7 +34,7 @@
               @change="fetchUsers(1)"
               class="border px-2 py-1 rounded-lg focus:ring focus:ring-orange-400"
             >
-              <option v-for="size in [5,10,20,50,100]" :key="size" :value="size">
+              <option v-for="size in [5,10,20,50,100,1000]" :key="size" :value="size">
                 {{ size }}
               </option>
             </select>
