@@ -128,6 +128,17 @@
                     <span>Logout</span>
                   </a>
                 </li>
+
+                <li>
+  <a
+    href="#"
+    @click="openProfile"
+    class="flex items-center px-4 py-2 hover:bg-gray-100 text-gray-700"
+  >
+    <i class="fas fa-user-cog text-yellow-500 mr-2"></i>
+    <span>Change Profile</span>
+  </a>
+</li>
               </ul>
             </transition>
           </div>
@@ -166,17 +177,25 @@
         <router-view />
       </main>
     </div>
+
+    <Profile
+  :visible="showProfileModal"
+  @close="closeProfile"
+  @updated="onProfileUpdated"
+/>
   </div>
 </template>
 
 <script>
 import Sidebar from "@/components/layouts/leftSidevar.vue";
+import Profile from "./Profile.vue";
 
 export default {
   name: "AppLayout",
-  components: { Sidebar },
+  components: { Sidebar, Profile },
   data() {
     return {
+      showProfileModal: false,
       notifications: [],
       name: localStorage.getItem("name"),
       showSidebar: false,
@@ -201,6 +220,19 @@ export default {
     window.removeEventListener("resize", this.handleResize);
   },
   methods: {
+     openProfile() {
+    this.showProfileModal = true;
+    this.isProfileDropdownOpen = false; // close dropdown when opening
+  },
+  closeProfile() {
+    this.showProfileModal = false;
+  },
+   onProfileUpdated(updatedUser) {
+    if (updatedUser?.name) {
+      this.name = updatedUser.name;
+      localStorage.setItem("name", updatedUser.name);
+    }
+  },
     handleResize() {
       this.screenWidth = window.innerWidth;
       this.showToggleButton = this.screenWidth < 1024;
