@@ -153,7 +153,7 @@ async   mounted() {
 
   },
   methods: {
-       activateUser(id) {
+      activateUser(id) {
       this.$apiPost(`/activate_user/${id}`, { id }).then(() => {
         this.$root.$refs.toast.showToast("User activated successfully", "success");
         this.fetchUsers(this.pagination.current_page);

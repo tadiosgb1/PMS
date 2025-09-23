@@ -18,7 +18,7 @@ import rentPay from '../views/closed/rent/view.vue'
 import PropertyZone from '../views/closed/Zones/view.vue';
 import PropertyPicture from '../views/closed/proportyPicture/view.vue';
 
-import Payments from '../views/closed/payments/view.vue'
+import Payments from '../views/closed/payments/view.vue';
 const Maintenance = { template: '<div class="p-6 text-gray-800">Maintenance Page</div>' };
 const Leases = { template: '<div class="p-6 text-gray-800">Leases Page</div>' };
 const Messages = { template: '<div class="p-6 text-gray-800">Messages Page</div>' };
@@ -48,6 +48,7 @@ import Sales_Payments from '../views/closed/SalesPayment/view.vue'
 import Rent_Payments from '../views/closed/rent/RentPayments.vue'
 import staffs from '../views/closed/stafs/view.vue'
 import Notifications from '../views/closed/notifications/view.vue'
+import notificationDetail from '../views/closed/notifications/notificationDeatil.vue'
 import Reports from '../views/closed/report/view.vue'
 import CowrkingSpaces from '../views/closed/coworkingSpace/view.vue'
 import CowrkingSpaceRental from '../views/closed/workspaceRental/view.vue'
@@ -113,7 +114,10 @@ const routes = [
         props: true,              // optional: allows you to receive `id` as a prop
       },
       { path: '/properties', name: 'properties', component: Properties },
+
       { path: 'properties/:id', name: 'PropertyDetail', component: PropertyDetail, props: true },
+
+
       { path: 'properties/rentPay/:id', name: 'rentPay', component: rentPay, props: true },
       { path: '/zones', name: 'zones', component: PropertyZone },
       { path: '/pictures', name: 'pictures', component: PropertyPicture },
@@ -125,6 +129,7 @@ const routes = [
       { path: '/messages', name: 'messages', component: Messages },
       { path: '/settings', name: 'settings', component: Settings },
       { path: '/notifications', name: 'notifications', component: Notifications },
+      { path: 'notification/:id', name: 'notificationDetail', component: notificationDetail, props: true },
       { path: '/commissions', name: 'commissions', component:Commissions },
       { path: '/configurations', name: 'configurations', component:Configurations },
       { path: '/rents', name: 'rents', component: Rents },

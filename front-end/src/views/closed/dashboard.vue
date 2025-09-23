@@ -58,7 +58,7 @@
                   v-for="(notif, index) in notifications"
                   :key="index"
                   class="px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-start space-x-2"
-                  @click="openNotification(notif)"
+                  @click="goToNotification(notif.id)"
                 >
                   <i class="fas fa-info-circle text-yellow-500 mt-1"></i>
                   <div class="flex-1">
@@ -220,19 +220,22 @@ export default {
     window.removeEventListener("resize", this.handleResize);
   },
   methods: {
-     openProfile() {
+    openProfile() {
+    this.isProfileDropdownOpen = false; // close dropdown
     this.showProfileModal = true;
-    this.isProfileDropdownOpen = false; // close dropdown when opening
   },
   closeProfile() {
     this.showProfileModal = false;
   },
-   onProfileUpdated(updatedUser) {
+  onProfileUpdated(updatedUser) {
     if (updatedUser?.name) {
       this.name = updatedUser.name;
       localStorage.setItem("name", updatedUser.name);
     }
   },
+     goToNotification(id) {
+    this.$router.push({ name: 'notificationDetail', params: { id } });
+   },
     handleResize() {
       this.screenWidth = window.innerWidth;
       this.showToggleButton = this.screenWidth < 1024;
