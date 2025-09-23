@@ -298,11 +298,16 @@ export default {
         const res = await this.$apiDelete(
           `/delete_property/${this.propertyToDelete.id}`
         );
+        if (res && res.error){
+      this.$root.$refs.toast.showToast(res.error || "Failed to delete property", "error");
+
+        } else{
         this.$root.$refs.toast.showToast(res.message, "success");
         await this.fetchProperties();
+        }
       } catch (err) {
         console.error(err);
-        alert("Failed to delete property.");
+       this.$root.$refs.toast.showToast("Failed to delete property", "error");
       }
       this.propertyToDelete = null;
     },
