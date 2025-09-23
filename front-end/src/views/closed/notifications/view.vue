@@ -2,7 +2,7 @@
   <div>
     <Toast ref="toast" />
 
-    <div class="min-h-screen bg-gray-100">
+    <div class="min-h-screen bg-gray-100 m-3">
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
         <!-- Header -->
         <div
@@ -79,6 +79,16 @@
                   >
                     Mark as Read
                   </button>
+
+                  <button
+                    
+                    @click="goToNotification(notif.id)"
+                    class="text-blue-600 hover:text-blue-800"
+                    title="Mark as Read"
+                  >
+                   Detail
+                  </button>
+
                   <router-link
                     v-if="notif.user_id"
                     :to="`/users/${notif.user_id}`"
@@ -180,6 +190,9 @@ export default {
     this.fetchNotifications();
   },
   methods: {
+    goToNotification(id) {
+    this.$router.push({ name: 'notificationDetail', params: { id } });
+   },
     async fetchNotifications(customUrl = null) {
       try {
         const params = { page_size: this.pageSize, page: this.currentPage };
@@ -197,14 +210,18 @@ export default {
         this.notifications = [];
       }
     },
-    async markAsRead(id) {
+   async markAsRead(id) {
+
+    console.log("id",id);
+
       try {
-        await this.$apiPost(`/notifications/${id}/mark_read`, { id });
-        this.$root.$refs.toast.showToast("Notification marked as read", "success");
-        this.fetchNotifications();
+        const payload = { is_read: true };
+        const res = await this.$apiPatch(`/update_notification`, id, payload);
+       
+        this.$root.$refs.toast.showToast("Successfully marked as red", "success");
+        
       } catch (err) {
         console.error("Failed to mark as read:", err);
-        this.$root.$refs.toast.showToast("Failed to update", "error");
       }
     },
     formatDate(date) {
