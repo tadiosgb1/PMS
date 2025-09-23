@@ -139,14 +139,18 @@ export default {
   methods: {
     async submitForm() {
       try {
-        await this.$apiPut('/update_property', this.form.id, this.form);
+        const res = await this.$apiPut('/update_property', this.form.id, this.form);
+       if(res & res.error){
+         this.$root.$refs.toast.showToast(res.error || 'Failed to update property ', 'error');
+       }else{
         this.$root.$refs.toast.showToast('Property Updated successfully ', 'success');
         this.$emit('refresh');
-          setTimeout(() => {
-  this.$emit("close");
-}, 3000); // 3000 milliseconds = 3 seconds
+       }
+//           setTimeout(() => {
+//   this.$emit("close");
+// }, 3000); // 3000 milliseconds = 3 seconds
       } catch (err) {
-        alert('Failed to update property');
+        this.$root.$refs.toast.showToast( 'Failed to update property ', 'error');
       }
     }
   }

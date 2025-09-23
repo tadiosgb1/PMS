@@ -233,18 +233,30 @@ export default {
       console.log("Payload proporty", this.form);
 
       try {
-        await this.$apiPost("/post_property", this.form);
+       const res = await this.$apiPost("/post_property", this.form);
+        if(res && res.error){
+ this.$root.$refs.toast.showToast(
+          res.error || "Failed to save property ",
+          "error"
+        );
+
+        } else {
         this.$root.$refs.toast.showToast(
           "Property saved successfully ",
           "success"
         );
-        this.$emit("refresh");
-        setTimeout(() => {
-          this.$emit("close");
-        }, 3000); // 3000 milliseconds = 3 seconds
         this.resetForm();
+        }
+        // this.$emit("refresh");
+        // setTimeout(() => {
+        //   this.$emit("close");
+        // }, 3000); // 3000 milliseconds = 3 seconds
+        
       } catch (err) {
-        alert("Failed to save property");
+        this.$root.$refs.toast.showToast(
+           "Failed to save property ",
+          "error"
+        );
       }
     },
     // async fetchUser() {
