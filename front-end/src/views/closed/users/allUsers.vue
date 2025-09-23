@@ -178,6 +178,7 @@ export default {
           search: this.search,
           page,
           page_size: this.pageSize,
+          ordering:"-id"
         };
 
         const response = await this.$apiGet("/get_users", params);

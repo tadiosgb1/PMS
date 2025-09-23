@@ -58,7 +58,7 @@
                   v-for="(notif, index) in notifications"
                   :key="index"
                   class="px-4 py-2 hover:bg-gray-100 cursor-pointer flex items-start space-x-2"
-                  @click="openNotification(notif)"
+                  @click="goToNotification(notif.id)"
                 >
                   <i class="fas fa-info-circle text-yellow-500 mt-1"></i>
                   <div class="flex-1">
@@ -201,6 +201,9 @@ export default {
     window.removeEventListener("resize", this.handleResize);
   },
   methods: {
+     goToNotification(id) {
+    this.$router.push({ name: 'notificationDetail', params: { id } });
+   },
     handleResize() {
       this.screenWidth = window.innerWidth;
       this.showToggleButton = this.screenWidth < 1024;
