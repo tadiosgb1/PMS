@@ -70,7 +70,7 @@
                 <td class="border border-gray-300 px-4 py-2">{{ broker.wallet }}</td>
                 <td class="border border-gray-300 px-4 py-2 text-center space-x-2">
                   <button
-                    @click="editBroker(broker)"
+                    @click="openUpdateModal(broker.id)"
                     class="text-green-600 hover:text-green-800"
                   >
                     <i class="fas fa-edit"></i>
@@ -120,12 +120,12 @@
         @close="showAddBroker = false"
         @success="fetchBrokers"
       />
-      <BrokerUpdate
-        :visible="updateVisible"
-        :broker="brokerToEdit"
-        @close="updateVisible = false"
-        @refresh="fetchBrokers"
-      />
+     <UpdateBroker
+      :visible="showUpdateModal"
+      :brokerId="selectedBrokerId"
+      @close="showUpdateModal = false"
+      @success="fetchBrokers"
+    />
 
       <!-- Delete Confirmation Modal -->
       <ConfirmModal
@@ -142,7 +142,7 @@
 <script>
 import Toast from "@/components/Toast.vue";
 import AddBroker from "./Add.vue";
-import BrokerUpdate from "./Update.vue";
+import UpdateBroker from "./Update.vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
 
 const SortIcon = {
@@ -164,9 +164,10 @@ const SortIcon = {
 
 export default {
   name: "BrokersView",
-  components: { Toast, AddBroker, BrokerUpdate, ConfirmModal, SortIcon },
+  components: { Toast, AddBroker, UpdateBroker, ConfirmModal, SortIcon },
   data() {
     return {
+      selectedBrokerId: null,
       searchTerm: "",
       brokers: [],
       currentPage: 1,
@@ -189,6 +190,10 @@ export default {
     this.fetchBrokers();
   },
   methods: {
+    openUpdateModal(id) {
+      this.selectedBrokerId = id;
+      this.showUpdateModal = true;
+    },
     // Debounced search input
     onSearchInput() {
       clearTimeout(this.searchTimeout);
