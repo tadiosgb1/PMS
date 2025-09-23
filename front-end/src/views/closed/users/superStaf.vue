@@ -54,32 +54,35 @@
               <td class="border border-gray-300 px-4 py-2">
                 {{ user.is_active ? "Yes" : "No" }}
               </td>
-              <td class="border border-gray-300 px-4 py-2 text-center space-x-2">
-                <router-link
-                  :to="`/user_detail/${user.id}`"
-                  class="text-green-600 hover:text-green-800 focus:outline-none"
-                  title="View"
-                >
-                  <i class="fas fa-eye"></i>
-                </router-link>
+              <td class="flex flex row border border-gray-300 px-4 py-2 text-center space-x-2">
+                <button
+                    class="flex items-center px-3 py-1.5 bg-blue-50 text-blue-700 text-sm font-medium rounded-lg border border-blue-200 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-200 transition"
+                    @click="goToDetail(user.id)"
+                  >
+                    <i class="fas fa-info-circle"></i> Details
+                  </button>
 
-                <button
-                  v-if="!user.is_active"
-                  @click="activateUser(user.id)"
-                  class="text-blue-600 hover:text-blue-800 focus:outline-none"
-                  title="Activate"
-                >
-                  Activate
-                </button>
-                <button
-                  v-if="user.is_active"
-                  @click="deactivateUser(user.id)"
-                  class="text-blue-600 hover:text-blue-800 focus:outline-none"
-                  title="Deactivate"
-                >
-                  Deactivate
-                </button>
+                  <!-- Activate / Deactivate -->
+                  <button
+                    v-if="!user.is_active"
+                    @click="activateUser(user.id)"
+                    class="flex items-center px-3 py-1.5 bg-green-50 text-green-700 text-sm font-medium rounded-lg border border-green-200 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-blue-200 transition"
+                  >
+                    <i class="fas fa-check-circle"></i> Activate
+                  </button>
+                  <button
+                    v-else
+                    @click="deactivateUser(user.id)"
+                    class="flex items-center px-3 py-1.5 bg-orange-50 text-orange-700 text-sm font-medium rounded-lg border border-orange-200 hover:bg-orange-100 focus:outline-none focus:ring-2 focus:ring-orange-200 transition"
+                  >
+                    <i class="fas fa-ban mr-1"></i> Deactivate
+                  </button>
+
+
+                
               </td>
+
+
             </tr>
             <tr v-if="superStaffs.length === 0">
               <td colspan="4" class="text-center py-6 text-gray-500">
@@ -165,11 +168,23 @@ export default {
       if (this.sortKey === key) this.sortAsc = !this.sortAsc;
       else this.sortKey = key;
     },
-    activateUser(id) {
-      this.$apiPost(`/activate_user/${id}`).then(() => this.fetchUsers());
+     activateUser(id) {
+      this.$apiPost(`/activate_user/${id}`, { id }).then(() => {
+        this.$root.$refs.toast.showToast("User activated successfully", "success");
+        this.fetchUsers(this.pagination.current_page);
+      });
     },
+
     deactivateUser(id) {
-      this.$apiDelete(`/deactivate_user/${id}`).then(() => this.fetchUsers());
+      this.$apiDelete(`/deactivate_user`, id).then(() => {
+        this.$root.$refs.toast.showToast("User deactivated successfully", "success");
+        this.fetchUsers(this.pagination.current_page);
+      });
+    },
+
+    
+    goToDetail(id) {
+      this.$router.push(`/user_detail/${id}`);
     },
   },
 };

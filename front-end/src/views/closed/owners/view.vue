@@ -42,13 +42,29 @@
                   class="hover:bg-gray-100"
                 >
                   <td class="border border-gray-300 px-4 py-2">{{ owner.full_name }}</td>
-                  <td class="border border-gray-300 px-4 py-2 text-center space-x-2">
-                    <button v-if="showEdit" @click="editOwner(owner)" class="text-blue-600 hover:text-blue-800" title="Edit">
-                      <i class="fas fa-edit"></i>
-                    </button>
-                    <button @click="deleteOwner(owner)" class="text-red-600 hover:text-red-800" title="Delete">
-                      <i class="fas fa-trash-alt"></i>
-                    </button>
+                  <td class="flex flex-row border border-gray-300 px-4 py-2 text-center space-x-2">
+                   <button
+                    class="flex items-center px-3 py-1.5 bg-blue-50 text-blue-700 text-sm font-medium rounded-lg border border-blue-200 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-200 transition"
+                    @click="goToDetail(owner.id)"
+                  >
+                    <i class="fas fa-info-circle"></i> Details
+                  </button>
+
+                  <!-- Activate / Deactivate -->
+                  <button
+                    v-if="!owner.is_active"
+                    @click="activateUser(owner.id)"
+                    class="flex items-center px-3 py-1.5 bg-green-50 text-green-700 text-sm font-medium rounded-lg border border-green-200 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-blue-200 transition"
+                  >
+                    <i class="fas fa-check-circle"></i> Activate
+                  </button>
+                  <button
+                    v-else
+                    @click="deactivateUser(owner.id)"
+                    class="flex items-center px-3 py-1.5 bg-orange-50 text-orange-700 text-sm font-medium rounded-lg border border-orange-200 hover:bg-orange-100 focus:outline-none focus:ring-2 focus:ring-orange-200 transition"
+                  >
+                    <i class="fas fa-ban mr-1"></i> Deactivate
+                  </button>
                   </td>
                 </tr>
                 <tr v-if="filteredAndSortedOwners.length === 0">
@@ -133,10 +149,29 @@ async   mounted() {
      group:'owner'
     }
      const response = await this.$apiGetById('/get_group_permissions',payload);
-      console.log("response",response)
+      console.log("response owners",response)
 
   },
   methods: {
+       activateUser(id) {
+      this.$apiPost(`/activate_user/${id}`, { id }).then(() => {
+        this.$root.$refs.toast.showToast("User activated successfully", "success");
+        this.fetchUsers(this.pagination.current_page);
+      });
+    },
+
+    deactivateUser(id) {
+      this.$apiDelete(`/deactivate_user`, id).then(() => {
+        this.$root.$refs.toast.showToast("User deactivated successfully", "success");
+        this.fetchUsers(this.pagination.current_page);
+      });
+    },
+
+   
+
+    goToDetail(id) {
+      this.$router.push(`/user_detail/${id}`);
+    },
     async fetchOwners() {
       try {
         const response = await this.$apiGet('/get_owners');

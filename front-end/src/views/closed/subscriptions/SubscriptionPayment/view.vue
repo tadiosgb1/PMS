@@ -1,8 +1,9 @@
 <template>
   <div class="m-3">
-    <Toast ref="toast"  />
+    <Toast ref="toast" />
     <div class="min-h-screen bg-gray-100">
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <!-- Header -->
         <div
           class="bg-orange-500 text-white px-6 py-4 text-xl font-bold flex justify-between items-center"
         >
@@ -10,13 +11,31 @@
         </div>
 
         <div class="p-6">
-          <!-- Search -->
-          <input
-            v-model="searchTerm"
-            type="search"
-            placeholder="Search Payment..."
-            class="w-full max-w-md px-4 py-2 mb-6 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+          <!-- Search + Show Dropdown -->
+          <div class="flex justify-between items-center mb-6">
+            <!-- Search -->
+            <input
+              v-model="searchTerm"
+              type="search"
+              placeholder="Search Payment..."
+              class="w-full max-w-md px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              @input="fetchPayments(1)"
+            />
+
+            <!-- Show Dropdown -->
+            <div class="ml-4">
+              <label class="mr-2 text-sm text-gray-600">Show</label>
+              <select
+                v-model.number="perPage"
+                @change="fetchPayments(1)"
+                class="px-2 py-1 border rounded-md text-sm"
+              >
+                <option v-for="n in [5, 10, 20, 50, 100]" :key="n" :value="n">
+                  {{ n }}
+                </option>
+              </select>
+            </div>
+          </div>
 
           <!-- Table -->
           <div class="overflow-x-auto">
@@ -72,9 +91,7 @@
                   <th class="border border-gray-300 px-4 py-2">Created At</th>
                   <th class="border border-gray-300 px-4 py-2">End Date</th>
                   <th class="border border-gray-300 px-4 py-2">Owner</th>
-                  <th class="border border-gray-300 px-4 py-2">
-                    Plan
-                  </th>
+                  <th class="border border-gray-300 px-4 py-2">Plan</th>
                   <th class="border border-gray-300 px-4 py-2 text-center">
                     Actions
                   </th>
@@ -110,25 +127,22 @@
                   <td class="border border-gray-300 px-4 py-2">
                     {{ p.planName }}
                   </td>
-                  <td
-                    class="border border-gray-300 px-4 py-2 text-center space-x-2"
-                  >
-                    <button v-if="p.status!='paid'"
+                  <td class="border border-gray-300 px-4 py-2 text-center">
+                    <button
+                      v-if="p.status != 'paid'"
                       @click="approve(p)"
                       class="text-blue-600 hover:text-blue-800 focus:outline-none"
-                      title="Edit"
                     >
-                     Approve
+                      Approve
                     </button>
 
-                     <button v-else
+                    <button
+                      v-else
                       @click="disApprove(p)"
-                      class="text-blue-600 hover:text-blue-800 focus:outline-none"
-                      title="Edit"
+                      class="text-red-600 hover:text-red-800 focus:outline-none"
                     >
-                     Dis Approve
+                      Disapprove
                     </button>
-                    
                   </td>
                 </tr>
                 <tr v-if="filteredAndSortedPayments.length === 0">
@@ -139,41 +153,37 @@
               </tbody>
             </table>
           </div>
+
+          <!-- Pagination -->
+          <div
+            class="flex justify-between items-center mt-4 text-sm text-gray-600"
+          >
+            <button
+              @click="fetchUrl(previous)"
+              :disabled="!previous"
+              class="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+            >
+              Previous
+            </button>
+            <span>
+              Page {{ currentPage }} of {{ totalPages }}
+            </span>
+            <button
+              @click="fetchUrl(next)"
+              :disabled="!next"
+              class="px-3 py-1 bg-gray-200 rounded disabled:opacity-50"
+            >
+              Next
+            </button>
+          </div>
         </div>
       </div>
-
-      <!-- Modals -->
-      <!-- <AddSubscriptionPayment
-        v-if="visible"
-        :visible="visible"
-        :subscriptionId="this.$route.params.id"
-        @close="visible = false"
-        @refresh="fetchPayments"
-      />  -->
-      <!-- <ConfirmModal
-        v-if="confirmVisible"
-        :visible="confirmVisible"
-        title="Confirm Deletion"
-        message="Are you sure you want to delete this payment?"
-        @confirm="confirmDelete"
-        @cancel="confirmVisible = false"
-      />
-      <UpdateSubscriptionPayment
-        v-if="updateVisible"
-        :visible="updateVisible"
-        :payment="paymentToEdit"
-        @close="updateVisible = false"
-        @refresh="fetchPayments"
-      /> -->
     </div>
   </div>
 </template>
 
 <script>
 import Toast from "@/components/Toast.vue";
-// import ConfirmModal from "@/components/ConfirmModal.vue";
-//import AddSubscriptionPayment from "@/views/closed/subscriptions/SubscriptionPayment/add.vue";
-// import UpdateSubscriptionPayment from "@/views/closed/subscriptions/SubscriptionPayment/update.vue";
 
 const SortIcon = {
   props: ["field", "sortKey", "sortAsc"],
@@ -194,27 +204,18 @@ const SortIcon = {
 
 export default {
   name: "subscriptionPaymentView",
-  components: {
-    Toast,
-    // ConfirmModal,
-    //AddSubscriptionPayment,
-    // UpdateSubscriptionPayment,
-    SortIcon,
-  },
+  components: { Toast, SortIcon },
   data() {
     return {
       payments: [],
       searchTerm: "",
-      visible: false,
-
-      confirmVisible: false,
-      paymentToDelete: null,
-
-      updateVisible: false,
-      paymentToEdit: null,
-
       sortKey: "payment_method",
       sortAsc: true,
+      perPage: 10,
+      currentPage: 1,
+      totalPages: 1,
+      next: null,
+      previous: null,
     };
   },
   computed: {
@@ -222,9 +223,7 @@ export default {
       const term = this.searchTerm.toLowerCase();
       let filtered = this.payments.filter((p) =>
         Object.values(p).some((val) =>
-          String(val || "")
-            .toLowerCase()
-            .includes(term)
+          String(val || "").toLowerCase().includes(term)
         )
       );
 
@@ -239,105 +238,61 @@ export default {
     },
   },
   mounted() {
-    this.fetchPayments();
+    this.fetchPayments(1);
   },
   methods: {
-  async approve(payment){
-    console.log("Payment",payment);
-    const payload={
-      id:payment.id,
-      status:"paid",
-    }
-    const res=await this.$apiPatch(`/update_subscription_payment`,payment.id,payload);
-    console.log("res",res);
-    if(res){
-     this.$root.$refs.toast.showToast(`Payment Approved Successfully`, 'success');
-      console.log("subscription id",res.subscription_id);
-      const subPayload={
-        id:res.subscription_id,
-        status:"active",
+    async fetchPayments(page = 1) {
+      try {
+        const params = {
+          page: page,
+          page_size: this.perPage,
+        };
+
+        const response = await this.$apiGet("/get_subscription_payment", params);
+
+        this.payments = response.data || [];
+        this.currentPage = response.current_page;
+        this.totalPages = response.total_pages;
+        this.next = response.next;
+        this.previous = response.previous;
+
+        // fetch owner + plan names
+        await Promise.all(
+          this.payments.map(async (payment) => {
+            if (payment.user_id) {
+              const ownerRes = await this.$apiGetById(
+                "get_user",
+                payment.user_id
+              );
+              payment.ownerName = ownerRes.first_name || "Unknown";
+            }
+            if (payment.subscription_id) {
+              const planRes = await this.$apiGetById(
+                "get_subscription",
+                payment.subscription_id
+              );
+              payment.planName = planRes.plan_name || "Unknown Plan";
+            }
+          })
+        );
+      } catch (error) {
+        console.error("Failed to fetch subscription payments:", error);
+        this.payments = [];
       }
-      const resSub=await this.$apiPatch(`/update_subscription`,res.subscription_id,subPayload);
-      if(resSub){
-       this.$root.$refs.toast.showToast(`Subscription activated successfully!`, 'success');
-        this.$reloadPage();
+    },
+    async fetchUrl(url) {
+      if (!url) return;
+      try {
+        const response = await this.$apiGet(url); // direct URL
+        this.payments = response.data || [];
+        this.currentPage = response.current_page;
+        this.totalPages = response.total_pages;
+        this.next = response.next;
+        this.previous = response.previous;
+      } catch (error) {
+        console.error("Failed to fetch page:", error);
       }
-    }
-   
-  },
-    async disApprove(payment){
-    console.log("Payment",payment);
-    const payload={
-      id:payment.id,
-      status:"pending",
-    }
-    const res=await this.$apiPatch(`/update_subscription_payment`,payment.id,payload);
-    console.log("res",res);
-    if(res){
-     this.$root.$refs.toast.showToast(`Payment DisApproved Successfully`, 'success');
-      console.log("subscription id",res.subscription_id);
-      const subPayload={
-        id:res.subscription_id,
-        status:"pending",
-      }
-      const resSub=await this.$apiPatch(`/update_subscription`,res.subscription_id,subPayload);
-      if(resSub){
-       this.$root.$refs.toast.showToast(`Subscription activated successfully!`, 'success');
-        this.$reloadPage();
-      }
-    }
-   
-  },
-   async fetchPayments() {
-  try {
-    let params = {};
-
-    if (this.$route.params.id) {
-      params = { subscription_id: this.$route.params.id };
-    } else {
-      params = { user_id: localStorage.getItem("userId") };
-    }
-
-    if (localStorage.getItem("is_superuser") === "true") {
-      params = {};
-    }
-
-    console.log("params", params);
-    const response = await this.$apiGet(`/get_subscription_payment`, params);
-    console.log("subscription payments",response);
-    if (Array.isArray(response.data)) {
-      this.payments = response.data;
-      // Fetch owner and plan name for each payment
-      await Promise.all(
-        this.payments.map(async (payment) => {
-          // Fetch owner
-          if (payment.user_id) {
-            const ownerRes = await this.$apiGetById('get_user', payment.user_id);
-            payment.ownerName = ownerRes.first_name || 'Unknown';
-          }
-          // Fetch plan name
-          if (payment.subscription_id) {
-            const planRes = await this.$apiGetById('get_subscription', payment.subscription_id);
-            payment.planName = planRes.plan_name || 'Unknown Plan';
-            //payment.end_date=planRes.end_date 
-          }
-        })
-      );
-
-    } else {
-      this.payments = [];
-      console.warn("Unexpected response:", response);
-    }
-
-  } catch (error) {
-    console.error("Failed to fetch subscription payments:", error);
-    this.payments = [];
-    this.$root.$refs.toast.showToast(`Something went wrong`, 'error');
-
-   // alert("Failed to load subscription payments.");
-  }
-},
-
+    },
     sortBy(key) {
       if (this.sortKey === key) {
         this.sortAsc = !this.sortAsc;
@@ -346,27 +301,35 @@ export default {
         this.sortAsc = true;
       }
     },
-    editPayment(payment) {
-      this.paymentToEdit = payment;
-      this.updateVisible = true;
-    },
-    askDeleteConfirmation(payment) {
-      this.paymentToDelete = payment;
-      this.confirmVisible = true;
-    },
-    async confirmDelete() {
-      this.confirmVisible = false;
-      try {
-        const response = await this.$apiDelete(
-          `/delete_subscription_payment/${this.paymentToDelete.id}`
-        );
-        this.$root.$refs.toast.showToast(response.message, "success");
-        this.fetchPayments();
-      } catch (error) {
-        alert("Failed to delete subscription payment.");
-        console.error(error);
+    async approve(payment) {
+      console.log("Payment", payment);
+      const payload = { id: payment.id, status: "paid" };
+      const res = await this.$apiPatch(`/update_subscription_payment`, payment.id, payload);
+      console.log("res", res);
+      if (res) {
+        this.$root.$refs.toast.showToast(`Payment Approved Successfully`, 'success');
+        const subPayload = { id: res.subscription_id, status: "active" };
+        const resSub = await this.$apiPatch(`/update_subscription`, res.subscription_id, subPayload);
+        if (resSub) {
+          this.$root.$refs.toast.showToast(`Subscription activated successfully!`, 'success');
+          this.$reloadPage();
+        }
       }
-      this.paymentToDelete = null;
+    },
+    async disApprove(payment) {
+      console.log("Payment", payment);
+      const payload = { id: payment.id, status: "pending" };
+      const res = await this.$apiPatch(`/update_subscription_payment`, payment.id, payload);
+      console.log("res", res);
+      if (res) {
+        this.$root.$refs.toast.showToast(`Payment DisApproved Successfully`, 'success');
+        const subPayload = { id: res.subscription_id, status: "pending" };
+        const resSub = await this.$apiPatch(`/update_subscription`, res.subscription_id, subPayload);
+        if (resSub) {
+          this.$root.$refs.toast.showToast(`Subscription status updated successfully!`, 'success');
+          this.$reloadPage();
+        }
+      }
     },
   },
 };
