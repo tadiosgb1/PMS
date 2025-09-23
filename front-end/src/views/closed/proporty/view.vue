@@ -9,6 +9,7 @@
         >
           Properties
           <button
+            v-if="$hasPermission('pms.add_property')"
             @click="visible = true"
             class="bg-white text-blue-700 font-semibold px-1 lg:px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300"
           >
@@ -22,6 +23,7 @@
           <div class="flex justify-between items-center mb-6">
             <input
               v-model="searchTerm"
+              @input="fetchProperties()"
               type="search"
               placeholder="Search properties..."
               class="w-full max-w-md px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -66,46 +68,16 @@
                 <tr class="bg-gray-200 text-gray-700 text-left">
                   <th
                     class="border border-gray-300 px-3 py-2 cursor-pointer"
-                    @click="sortBy('name')"
+                    @click="changeOrdering('name')"
                   >
                     Name
                   </th>
-                  <th
-                    class="border border-gray-300 px-3 py-2 cursor-pointer"
-                    @click="sortBy('owner')"
-                  >
-                    Owner
-                  </th>
-                  <th
-                    class="border border-gray-300 px-3 py-2 cursor-pointer"
-                    @click="sortBy('manager')"
-                  >
-                    Manager
-                  </th>
-                  <th
-                    class="border border-gray-300 px-3 py-2 cursor-pointer"
-                    @click="sortBy('zone')"
-                  >
-                    Zone
-                  </th>
-                  <th
-                    class="border border-gray-300 px-3 py-2 cursor-pointer"
-                    @click="sortBy('property_type')"
-                  >
-                    Type
-                  </th>
-                  <th
-                    class="border border-gray-300 px-3 py-2 cursor-pointer"
-                    @click="sortBy('city')"
-                  >
-                    City
-                  </th>
-                  <th
-                    class="border border-gray-300 px-3 py-2 cursor-pointer"
-                    @click="sortBy('status')"
-                  >
-                    Status
-                  </th>
+                  <th class="border border-gray-300 px-3 py-2">Owner</th>
+                  <th class="border border-gray-300 px-3 py-2">Manager</th>
+                  <th class="border border-gray-300 px-3 py-2">Zone</th>
+                  <th class="border border-gray-300 px-3 py-2">Type</th>
+                  <th class="border border-gray-300 px-3 py-2">City</th>
+                  <th class="border border-gray-300 px-3 py-2">Status</th>
                   <th class="border border-gray-300 px-3 py-2 text-center">
                     Actions
                   </th>
@@ -113,43 +85,29 @@
               </thead>
               <tbody>
                 <tr
-                  v-for="property in filteredAndSorted"
+                  v-for="property in properties"
                   :key="property.id"
                   class="hover:bg-gray-100"
                 >
-                  <td
-                    class="border border-gray-300 px-3 py-2 whitespace-nowrap"
-                  >
+                  <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
                     {{ property.name }}
                   </td>
-                  <td
-                    class="border border-gray-300 px-3 py-2 whitespace-nowrap"
-                  >
+                  <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
                     {{ property.ownerName }}
                   </td>
-                  <td
-                    class="border border-gray-300 px-3 py-2 whitespace-nowrap"
-                  >
+                  <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
                     {{ property.managerName }}
                   </td>
-                  <td
-                    class="border border-gray-300 px-3 py-2 whitespace-nowrap"
-                  >
+                  <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
                     {{ property.zoneName }}
                   </td>
-                  <td
-                    class="border border-gray-300 px-3 py-2 whitespace-nowrap"
-                  >
+                  <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
                     {{ property.property_type }}
                   </td>
-                  <td
-                    class="border border-gray-300 px-3 py-2 whitespace-nowrap"
-                  >
+                  <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
                     {{ property.city }}
                   </td>
-                  <td
-                    class="border border-gray-300 px-3 py-2 whitespace-nowrap"
-                  >
+                  <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
                     {{ property.status }}
                   </td>
                   <td
@@ -164,6 +122,7 @@
                       <i class="fas fa-info-circle"></i>
                     </button>
                     <button
+                      v-if="$hasPermission('pms.change_property')"
                       @click="editProperty(property)"
                       class="text-blue-600 hover:text-blue-800"
                       title="Edit"
@@ -171,6 +130,7 @@
                       <i class="fas fa-edit"></i>
                     </button>
                     <button
+                      v-if="$hasPermission('pms.delete_property')"
                       @click="askDeleteConfirmation(property)"
                       class="text-red-600 hover:text-red-800"
                       title="Delete"
@@ -187,7 +147,7 @@
                     </button>
                   </td>
                 </tr>
-                <tr v-if="filteredAndSorted.length === 0">
+                <tr v-if="properties.length === 0">
                   <td colspan="8" class="text-center py-6 text-gray-500">
                     No properties found.
                   </td>
@@ -205,9 +165,9 @@
             >
               Previous
             </button>
-            <span class="text-gray-600"
-              >Page {{ currentPage }} of {{ totalPages }}</span
-            >
+            <span class="text-gray-600">
+              Page {{ currentPage }} of {{ totalPages }}
+            </span>
             <button
               :disabled="!next"
               @click="fetchProperties(next)"
@@ -267,44 +227,21 @@ export default {
       propertyToEdit: null,
       propertyToDelete: null,
       searchTerm: "",
-      sortKey: "name",
-      sortAsc: true,
       currentPage: 1,
       totalPages: 1,
       next: null,
       previous: null,
       pageSize: 10,
       pageSizes: [5, 10, 20, 50, 100],
+      ordering: "-id", // default ordering
     };
   },
-  computed: {
-    filteredAndSorted() {
-      const term = this.searchTerm.toLowerCase();
-      let filtered = this.properties.filter((p) =>
-        ["name", "property_type", "city", "status", "zone"].some((key) =>
-          String(p[key] || "")
-            .toLowerCase()
-            .includes(term)
-        )
-      );
-      filtered.sort((a, b) => {
-        let res = 0;
-        if (a[this.sortKey] < b[this.sortKey]) res = -1;
-        if (a[this.sortKey] > b[this.sortKey]) res = 1;
-        return this.sortAsc ? res : -res;
-      });
-      return filtered;
-    },
-  },
   async mounted() {
-    // Fetch zones first
-    if(this.$route.query.zone_id){
-      this.zone_id_query_set=true;
+    if (this.$route.query.zone_id) {
+      this.zone_id_query_set = true;
     }
     const resultZones = await this.$getZones();
     this.zones = resultZones.zones;
-
-    // Fetch properties
 
     await this.fetchProperties();
   },
@@ -312,23 +249,19 @@ export default {
     async fetchProperties(url = null) {
       try {
         const pageUrl =
-          url || `/get_properties?page=1&page_size=${this.pageSize}`;
+          url ||
+          `/get_properties?page=${this.currentPage}&page_size=${this.pageSize}&search=${this.searchTerm}&ordering=${this.ordering}`;
 
-       // let result = await this.$getProperties(pageUrl, this.zone_id);
-       let result=[];
-        if (this.$route.query.zone_id ||this.zone_id) {
-          //alert("hii")
+        let result = [];
+        if (this.$route.query.zone_id || this.zone_id) {
           const params = {
             property_zone_id: this.$route.query.zone_id || this.zone_id,
           };
-          console.log("custom params",params);
           result = await this.$getProperties(pageUrl, params);
-        }else{
-          //alert("else")
-           result = await this.$getProperties(pageUrl);
+        } else {
+          result = await this.$getProperties(pageUrl);
         }
 
-        console.log("result", result);
         this.properties = result.properties;
         this.currentPage = result.currentPage;
         this.totalPages = result.totalPages;
@@ -343,12 +276,13 @@ export default {
         this.previous = null;
       }
     },
-    sortBy(key) {
-      if (this.sortKey === key) this.sortAsc = !this.sortAsc;
-      else {
-        this.sortKey = key;
-        this.sortAsc = true;
+    changeOrdering(field) {
+      if (this.ordering === field) {
+        this.ordering = `-${field}`;
+      } else {
+        this.ordering = field;
       }
+      this.fetchProperties();
     },
     editProperty(property) {
       this.propertyToEdit = property;
