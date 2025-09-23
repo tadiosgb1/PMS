@@ -1,11 +1,13 @@
 <template>
-  <div class="min-h-screen bg-gray-100 p-6">
+  <div class="min-h-screen bg-gray-100">
     <div class="bg-white shadow-md rounded-lg overflow-hidden">
       <!-- Header with Add button -->
-      <div class="bg-primary text-white px-6 py-4 text-xl font-bold flex justify-between items-center">
+      <div
+        class="bg-primary text-white px-6 py-4 text-xl font-bold flex justify-between items-center"
+      >
         Super Staff Users
         <button
-          @click="showAddUser = true"
+          @click="showAddModal = true"
           class="bg-white text-blue-700 font-semibold px-2 lg:px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300 flex items-center"
         >
           <span class="text-primary mr-1">+</span> Add
@@ -14,7 +16,9 @@
 
       <!-- Table -->
       <div class="p-6 overflow-x-auto">
-        <table class="min-w-full table-auto border-collapse border border-gray-300 text-sm">
+        <table
+          class="min-w-full table-auto border-collapse border border-gray-300 text-sm"
+        >
           <thead>
             <tr class="bg-gray-200 text-gray-700">
               <th
@@ -22,11 +26,17 @@
                 @click="sortBy('fullName')"
               >
                 Full Name
-                <SortIcon :field="'fullName'" :sort-key="sortKey" :sort-asc="sortAsc" />
+                <SortIcon
+                  :field="'fullName'"
+                  :sort-key="sortKey"
+                  :sort-asc="sortAsc"
+                />
               </th>
               <th class="border border-gray-300 px-4 py-2">Groups</th>
               <th class="border border-gray-300 px-4 py-2">Active</th>
-              <th class="border border-gray-300 px-4 py-2 text-center">Actions</th>
+              <th class="border border-gray-300 px-4 py-2 text-center">
+                Actions
+              </th>
             </tr>
           </thead>
           <tbody>
@@ -80,10 +90,20 @@
         </table>
       </div>
     </div>
+
+    <!-- Add User Modal -->
+    <Addsuperstaff
+      v-if="showAddModal"
+      :visible="showAddModal"
+      @close="showAddModal = false"
+      @success="fetchUsers"
+    />
   </div>
 </template>
 
 <script>
+import Addsuperstaff from "./addSuperStaff.vue";
+
 const SortIcon = {
   props: ["field", "sortKey", "sortAsc"],
   template: `
@@ -102,12 +122,16 @@ const SortIcon = {
 };
 
 export default {
+  components: {
+    Addsuperstaff,
+    SortIcon,
+  },
   data() {
     return {
       users: [],
       sortKey: "fullName",
       sortAsc: true,
-      showAddUser: false,
+      showAddModal: false, // ✅ only one variable now
     };
   },
   computed: {
@@ -148,7 +172,6 @@ export default {
       this.$apiDelete(`/deactivate_user/${id}`).then(() => this.fetchUsers());
     },
   },
-  components: { SortIcon },
 };
 </script>
 

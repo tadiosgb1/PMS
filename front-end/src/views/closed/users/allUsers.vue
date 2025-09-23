@@ -1,7 +1,7 @@
 <template>
   <div>
     <Toast ref="toast" />
-    <div class="min-h-screen bg-gray-100 p-6">
+    <div class="min-h-screen bg-gray-100 ">
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
         <!-- Header -->
         <div
@@ -10,21 +10,36 @@
           <span>Users List</span>
           <button
             @click="showAddModal = true"
-            class="bg-white text-primary px-4 py-1 rounded shadow hover:bg-gray-100 font-semibold"
+            class="bg-white text-primary px-4 py-1 rounded shadow hover:bg-gray-100 font-semibold flex items-center gap-2"
           >
-            ➕ Add
+            <i class="fas fa-user-plus"></i> Add User
           </button>
         </div>
 
-        <!-- Search -->
-        <div class="p-4 flex gap-3">
+        <!-- Search + Page Size -->
+        <div class="p-4 flex flex-col md:flex-row gap-3 md:items-center">
           <input
             v-model="search"
-            @input="fetchUsers"
+            @input="fetchUsers(1)"
             type="text"
             placeholder="Search by name, email, or phone..."
-            class="w-full px-4 py-2 border rounded-lg focus:ring focus:ring-orange-400"
+            class="flex-1 px-4 py-2 border rounded-lg focus:ring focus:ring-orange-400"
           />
+
+          <!-- Page Size -->
+          <div class="flex items-center gap-2">
+            <label class="text-gray-600 text-sm">Show</label>
+            <select
+              v-model="pageSize"
+              @change="fetchUsers(1)"
+              class="border px-2 py-1 rounded-lg focus:ring focus:ring-orange-400"
+            >
+              <option v-for="size in [5,10,20,50,100,1000]" :key="size" :value="size">
+                {{ size }}
+              </option>
+            </select>
+            <span class="text-gray-600 text-sm">per page</span>
+          </div>
         </div>
 
         <!-- Table -->
@@ -62,31 +77,28 @@
                   <span v-else class="text-gray-400">No groups</span>
                 </td>
                 <td class="px-4 py-2 flex gap-2">
-                  <!-- Edit -->
-                 
-
-                  <!-- Details -->
+                  <!-- View -->
                   <button
-                    class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600"
+                    class="bg-blue-500 text-white px-3 py-1 rounded hover:bg-blue-600 flex items-center gap-1"
                     @click="goToDetail(user.id)"
                   >
-                     <i class="fas fa-info-circle"></i>
+                    <i class="fas fa-info-circle"></i> Details
                   </button>
+
+                  <!-- Activate / Deactivate -->
                   <button
                     v-if="!user.is_active"
                     @click="activateUser(user.id)"
-                    class="text-blue-600 hover:text-blue-800"
-                    title="Activate Manager"
+                    class="bg-green-500 text-white px-3 py-1 rounded hover:bg-green-600 flex items-center gap-1"
                   >
-                    Activate
+                    <i class="fas fa-check-circle"></i> Activate
                   </button>
                   <button
-                    v-if="user.is_active"
+                    v-else
                     @click="deactivateUser(user.id)"
-                    class="text-blue-600 hover:text-blue-800"
-                    title="Deactivate Manager"
+                    class="bg-red-500 text-white px-3 py-1 rounded hover:bg-red-600 flex items-center gap-1"
                   >
-                    Deactivate
+                    <i class="fas fa-ban"></i> Deactivate
                   </button>
                 </td>
               </tr>
@@ -108,7 +120,7 @@
           >
             Previous
           </button>
-          <span>Page {{ pagination.current_page }} of {{ pagination.total_pages }}</span>
+          <span class="text-gray-700">Page {{ pagination.current_page }} of {{ pagination.total_pages }}</span>
           <button
             :disabled="!pagination.next"
             @click="changePage(pagination.current_page + 1)"
@@ -141,6 +153,7 @@ export default {
     return {
       users: [],
       search: "",
+      pageSize: 10,
       pagination: {
         current_page: 1,
         total_pages: 1,
@@ -156,10 +169,16 @@ export default {
   methods: {
     async fetchUsers(page = 1) {
       try {
-        const response = await this.$apiGet("/get_users", {
-          params: { search: this.search, page },
-        });
+        const params = {
+          search: this.search,
+          page,
+          page_size: this.pageSize,
+        };
+
+        const response = await this.$apiGet("/get_users", params);
+
         this.users = response.data || [];
+
         this.pagination = {
           current_page: response.current_page,
           total_pages: response.total_pages,
@@ -168,27 +187,28 @@ export default {
         };
       } catch (error) {
         console.error(error);
-        this.$refs.toast.showToast("Failed to load users", "error");
+        this.$root.$refs.toast.showToast("Failed to load users", "error");
       }
     },
+
     activateUser(id) {
-      this.$apiPost(`/activate_user/${id}`, { id }).then((res) => {
-        this.$root.$refs.toast.showToast("Activate User successfully ", "success");
-        this.fetchUsers();
+      this.$apiPost(`/activate_user/${id}`, { id }).then(() => {
+        this.$root.$refs.toast.showToast("User activated successfully", "success");
+        this.fetchUsers(this.pagination.current_page);
       });
     },
+
     deactivateUser(id) {
-      this.$apiDelete(`/deactivate_user`, id ).then((res) => {
-        this.$root.$refs.toast.showToast("Deactive saved successfully ", "success");
-        this.fetchUsers();
+      this.$apiDelete(`/deactivate_user`, id).then(() => {
+        this.$root.$refs.toast.showToast("User deactivated successfully", "success");
+        this.fetchUsers(this.pagination.current_page);
       });
     },
+
     changePage(page) {
       this.fetchUsers(page);
     },
-    editUser(user) {
-      this.$refs.toast.showToast(`Edit user ${user.first_name}`, "info");
-    },
+
     goToDetail(id) {
       this.$router.push(`/user_detail/${id}`);
     },
