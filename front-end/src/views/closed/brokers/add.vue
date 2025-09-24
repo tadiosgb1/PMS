@@ -14,93 +14,88 @@
           class="bg-primary text-white px-6 py-4 text-xl font-semibold flex justify-between items-center"
         >
           Add New Broker
-          <button
-            @click="$emit('close')"
-            class="text-white hover:text-gray-200 text-lg font-bold"
-          >
+          <button @click="$emit('close')" class="text-white hover:text-gray-200 text-lg font-bold">
             ✕
           </button>
         </div>
 
         <!-- Form -->
-        <form
-          @submit.prevent="submitForm"
-          class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[80vh] overflow-y-auto"
-        >
-          <!-- License Number -->
+        <form @submit.prevent="submitUser" class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[80vh] overflow-y-auto">
+          <!-- User Fields -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div>
+              <label class="block mb-1 font-medium text-gray-700">First Name</label>
+              <input v-model="userForm.first_name" type="text" required placeholder="John"
+                class="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-600" />
+            </div>
+            <div>
+              <label class="block mb-1 font-medium text-gray-700">Middle Name</label>
+              <input v-model="userForm.middle_name" type="text" placeholder="Michael"
+                class="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-600" />
+            </div>
+            <div>
+              <label class="block mb-1 font-medium text-gray-700">Last Name</label>
+              <input v-model="userForm.last_name" type="text" required placeholder="Doe"
+                class="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-600" />
+            </div>
+          </div>
+
+          <!-- Row 2 -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block mb-1 font-medium text-gray-700">Email</label>
+              <input v-model="userForm.email" type="email" required placeholder="john@example.com"
+                class="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-600" />
+            </div>
+            <div>
+              <label class="block mb-1 font-medium text-gray-700">Phone Number</label>
+              <input v-model="userForm.phone_number" type="text" placeholder="+251912345678"
+                class="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-600" />
+            </div>
+          </div>
+
+          <!-- Row 3 -->
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div>
+              <label class="block mb-1 font-medium text-gray-700">Password</label>
+              <input v-model="userForm.password" type="password" required placeholder="••••••••"
+                class="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-600" />
+            </div>
+            <div>
+              <label class="block mb-1 font-medium text-gray-700">Address</label>
+              <input v-model="userForm.address" type="text" placeholder="Addis Ababa, Ethiopia"
+                class="w-full px-3 py-2 border rounded-md focus:ring-2 focus:ring-blue-600" />
+            </div>
+          </div>
+
+          <div class="md:col-span-2 text-right pt-4">
+            <button type="submit" class="bg-primary hover:bg-orange-600 text-white font-semibold px-6 py-2 rounded shadow transition-all duration-200">
+              Create User
+            </button>
+          </div>
+        </form>
+
+        <!-- Broker Form (User ID is given) -->
+        <form @submit.prevent="submitBroker" class="p-6 grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[80vh] overflow-y-auto mt-6">
           <div>
             <label class="block text-gray-700 mb-1">License Number</label>
-            <input
-              v-model="form.license_number"
-              type="text"
-              class="custom-input"
-              placeholder="Enter license number"
-              required
-            />
+            <input v-model="brokerForm.license_number" type="text" class="custom-input" placeholder="Enter license number" required />
           </div>
-
-          <!-- Commission Rate -->
           <div>
             <label class="block text-gray-700 mb-1">Commission Rate</label>
-            <input
-              v-model="form.commission_rate"
-              type="text"
-              class="custom-input"
-              placeholder="Enter commission rate"
-              required
-            />
+            <input v-model="brokerForm.commission_rate" type="text" class="custom-input" placeholder="Enter commission rate" required />
           </div>
-
-          <!-- Wallet -->
           <div>
             <label class="block text-gray-700 mb-1">Wallet</label>
-            <input
-              v-model="form.wallet"
-              type="text"
-              class="custom-input"
-              placeholder="Enter wallet ID or address"
-              required
-            />
+            <input v-model="brokerForm.wallet" type="text" class="custom-input" placeholder="Enter wallet ID or address" required />
           </div>
 
-          <!-- User Search -->
-          <div class="relative">
-            <label class="block text-gray-700 mb-1">User</label>
-            <input
-              v-model="userQuery"
-              @input="searchUsers"
-              type="text"
-              class="custom-input"
-              placeholder="Search user by name or email"
-              autocomplete="off"
-            />
-            <!-- Dropdown results -->
-            <ul
-              v-if="userResults.length > 0"
-              class="absolute bg-white border rounded w-full max-h-40 overflow-auto z-50 mt-1"
-            >
-              <li
-                v-for="user in userResults"
-                :key="user.id"
-                @click="selectUser(user)"
-                class="px-4 py-2 hover:bg-gray-200 cursor-pointer"
-              >
-                {{ user.first_name }} ({{ user.email }})
-              </li>
-            </ul>
-          </div>
+          <!-- Hidden User ID from backend -->
+          <input type="hidden" v-model="brokerForm.user" />
 
-          <!-- Hidden User ID -->
-          <input type="hidden" v-model="form.user" />
-
-          <!-- Actions -->
           <div class="md:col-span-2 text-right pt-4">
-            <button
-              type="submit"
-              class="bg-primary hover:bg-orange-600 text-white font-semibold px-6 py-2 rounded shadow transition-all duration-200"
-              :disabled="!form.user"
-            >
-              Save Broker
+            <button type="submit" class="bg-primary hover:bg-orange-600 text-white font-semibold px-6 py-2 rounded shadow transition-all duration-200">
+              Create Broker
             </button>
           </div>
         </form>
@@ -117,63 +112,58 @@ export default {
   components: { Toast },
   props: {
     visible: Boolean,
+    userId: Number, // user ID provided from backend
   },
   data() {
     return {
-      form: {
+      userForm: {
+        first_name: "",
+        middle_name: "",
+        last_name: "",
+        email: "",
+        phone_number: "",
+        password: "",
+        address: "",
+      },
+      brokerForm: {
         license_number: "",
         commission_rate: "",
         wallet: "",
-        user: null,
+        user: this.userId || null, // prefill from backend
       },
-      userQuery: "",
-      userResults: [],
-      searchTimeout: null,
     };
   },
   methods: {
-    async searchUsers() {
-      if (this.searchTimeout) clearTimeout(this.searchTimeout);
+    async submitUser() {
+      try {
+        const response = await this.$apiPost("/post_user", this.userForm);
 
-      this.searchTimeout = setTimeout(async () => {
-        if (this.userQuery.trim() === "") {
-          this.userResults = [];
-          return;
+        
+        console.log("response",response);
+
+
+        this.$refs.toast.showToast(response.message || "User created successfully", "success");
+        // Get user ID from backend response
+        if (response.data && response.data.id) {
+          this.brokerForm.user = response.data.id;
         }
-        try {
-          const response = await this.$apiGet(`/get_users?search=${this.userQuery}`);
-          console.log("response for search",response)
-          this.userResults = response.data || [];
-        } catch (error) {
-          console.error("User search failed", error);
-          this.userResults = [];
-        }
-      }, 300); // debounce 300ms
+      } catch (error) {
+        console.error(error);
+        this.$refs.toast.showToast("Failed to create user", "error");
+      }
     },
-    selectUser(user) {
-      this.form.user = user.id;
-      this.userQuery = `${user.first_name} (${user.email})`;
-      this.userResults = [];
-    },
-    async submitForm() {
-      if (!this.form.user) {
-        this.$refs.toast.showToast("Please select a user", "error");
+    async submitBroker() {
+      if (!this.brokerForm.user) {
+        this.$refs.toast.showToast("User ID is required for broker", "error");
         return;
       }
       try {
-        const response = await this.$apiPost("/post_broker_profile", this.form);
-        this.$root.$refs.toast.showToast(
-          response.message || "Broker added successfully",
-          "success"
-        );
-        setTimeout(() => {
-          this.$emit("close");
-          this.$emit("success"); // refresh parent list
-        }, 1500);
+        const response = await this.$apiPost("/post_broker_profile", this.brokerForm);
+        this.$refs.toast.showToast(response.message || "Broker added successfully", "success");
+        setTimeout(() => this.$emit("close"), 1500);
       } catch (error) {
-        console.error("error is",error);
-        this.$root.$refs.toast.showToast
-            ("falied to add broker", "error");
+        console.error(error);
+        this.$refs.toast.showToast("Failed to create broker", "error");
       }
     },
   },
