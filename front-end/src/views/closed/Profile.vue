@@ -1,4 +1,6 @@
 <template>
+  <div>
+     <Toast ref="toast" />
   <div
     v-if="visible"
    class="fixed inset-0 z-10 bg-black bg-opacity-50 flex justify-center items-center p-4 overflow-auto"
@@ -59,11 +61,15 @@
 
     </div>
   </div>
+  </div>
 </template>
 
 <script>
+
+import Toast from "../../components/Toast.vue";
 export default {
   name: "Profile",
+    components:{Toast},
   props: {
     visible: {
       type: Boolean,
@@ -114,13 +120,29 @@ export default {
 
         console.log("this form",this.form);
 
-        await this.$apiPatch(`/old_update_user`, id, this.form);
-        this.$emit("updated", this.form);
+       const res = await this.$apiPatch(`/old_update_user`, id, this.form);
+         if(res && res.error){
+ this.$root.$refs.toast.showToast(
+          res.error || "Failed to update profile ",
+          "error"
+        );
+         this.$emit("close");
+        } else {
+        this.$root.$refs.toast.showToast(
+          "Profile updated successfully ",
+          "success"
+        );
+      this.$emit("updated", this.form);
         this.$emit("close");
-        this.$toast?.success("Profile updated successfully");
+        }
+        
+       
       } catch (err) {
         console.error("Update failed", err);
-        this.$toast?.error("Failed to update profile");
+       this.$root.$refs.toast.showToast(
+         "Failed to update profile ",
+          "error"
+        );
       }
     },
   },
