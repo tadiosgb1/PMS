@@ -16,6 +16,7 @@ import rentPay from '../views/closed/rent/view.vue'
 
 
 import PropertyZone from '../views/closed/Zones/view.vue';
+import PropertyZoneDetail from '../views/closed/Zones/propertyZoneDetail.vue';
 import PropertyPicture from '../views/closed/proportyPicture/view.vue';
 
 import Payments from '../views/closed/payments/view.vue';
@@ -120,6 +121,7 @@ const routes = [
 
       { path: 'properties/rentPay/:id', name: 'rentPay', component: rentPay, props: true },
       { path: '/zones', name: 'zones', component: PropertyZone },
+      { path: '/zones/:id', name: 'zoneDetail', component: PropertyZoneDetail, props: true },
       { path: '/pictures', name: 'pictures', component: PropertyPicture },
       { path: '/tenants', name: 'tenants', component: Tenants },
       { path: '/payments', name: 'payments', component: Payments },

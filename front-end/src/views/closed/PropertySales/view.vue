@@ -33,7 +33,11 @@
               <select
                 id="pageSize"
                 v-model="pageSize"
-                @change="fetchSales(`/get_property_zone_sales?page=1&page_size=${pageSize}`)"
+                @change="
+                  fetchSales(
+                    `/get_property_zone_sales?page=1&page_size=${pageSize}`
+                  )
+                "
                 class="border px-2 py-1 rounded"
               >
                 <option v-for="size in pageSizes" :key="size" :value="size">
@@ -64,8 +68,12 @@
                   </th>
                   <th class="border border-gray-300 px-4 py-2">Zone</th>
                   <th class="border border-gray-300 px-4 py-2">Broker</th>
-                  <th class="border border-gray-300 px-4 py-2">Listing Price</th>
-                  <th class="border border-gray-300 px-4 py-2">Selling Price</th>
+                  <th class="border border-gray-300 px-4 py-2">
+                    Listing Price
+                  </th>
+                  <th class="border border-gray-300 px-4 py-2">
+                    Selling Price
+                  </th>
                   <th class="border border-gray-300 px-4 py-2">Status</th>
                   <th class="border border-gray-300 px-4 py-2">Created</th>
                   <th class="border border-gray-300 px-4 py-2">Updated</th>
@@ -81,10 +89,24 @@
                   class="hover:bg-gray-100"
                 >
                   <td class="border border-gray-300 px-4 py-2">
-                    {{ sale.property_id?.name || "-" }}
+                    <button
+                      @click="goToDetail(sale.property_id?.id)"
+                      class="text-green-600 hover:text-green-800"
+                      title="Detail"
+                      :disabled="!sale.property_id?.id"
+                    >
+                       {{ sale.property_id?.name || "-" }}
+                    </button>
                   </td>
                   <td class="border border-gray-300 px-4 py-2">
-                    {{ sale.property_zone_id?.name || "-" }}
+                    <button
+                      @click="goToZoneDetail(sale.property_zone_id?.id)"
+                      class="text-green-600 hover:text-green-800"
+                      title="Detail"
+                      :disabled="!sale.property_zone_id?.id"
+                    >
+                       {{ sale.property_zone_id?.name || "-" }}
+                    </button>
                   </td>
                   <td class="border border-gray-300 px-4 py-2">
                     {{ sale.broker || "-" }}
@@ -132,16 +154,25 @@
                     <button
                       @click="openUpdateModal(sale)"
                       class="text-blue-600 hover:text-blue-800 focus:outline-none"
-                    title="Edit"
-                  >
-                    <i class="fas fa-edit"></i>
+                      title="Edit"
+                    >
+                      <i class="fas fa-edit"></i>
                     </button>
+
+                    <button
+                      @click=""
+                      class="text-blue-600 hover:text-blue-800 focus:outline-none"
+                      title="Edit"
+                    >
+                      Add broker
+                    </button>
+
                     <button
                       @click="confirmDeleteSale(sale.id)"
-                       class="text-red-600 hover:text-red-800 focus:outline-none"
-                    title="Delete"
-                  >
-                    <i class="fas fa-trash-alt"></i>
+                      class="text-red-600 hover:text-red-800 focus:outline-none"
+                      title="Delete"
+                    >
+                      <i class="fas fa-trash-alt"></i>
                     </button>
                   </td>
                 </tr>
@@ -271,7 +302,9 @@ export default {
     },
   },
   mounted() {
-    this.fetchSales(`/get_property_zone_sales?page=1&page_size=${this.pageSize}`);
+    this.fetchSales(
+      `/get_property_zone_sales?page=1&page_size=${this.pageSize}`
+    );
   },
   methods: {
     goToPayment(saleId) {
@@ -286,9 +319,8 @@ export default {
     ) {
       try {
         const res = await this.$apiGet(url);
-        console.log("sale",res)
-        console.log("property sale",res.data.property_id
-)
+        console.log("sale", res);
+        console.log("property sale", res.data.property_id);
         this.sales = res.data || [];
         this.currentPage = res.current_page || 1;
         this.totalPages = res.total_pages || 1;
@@ -320,10 +352,15 @@ export default {
 
     async confirmDelete() {
       try {
-        const response = await this.$apiDelete(`/delete_property_zone_sale/${this.saleToDelete}`);
-        console.log("delete property sale", response)
+        const response = await this.$apiDelete(
+          `/delete_property_zone_sale/${this.saleToDelete}`
+        );
+        console.log("delete property sale", response);
 
-        this.$root.$refs.toast.showToast("Sale deleted successfully", "success");
+        this.$root.$refs.toast.showToast(
+          "Sale deleted successfully",
+          "success"
+        );
         this.confirmVisible = false;
         this.fetchSales();
       } catch (err) {
@@ -340,6 +377,21 @@ export default {
     formatDate(date) {
       if (!date) return "-";
       return new Date(date).toLocaleDateString();
+    },
+     goToDetail(propertyId) {
+      if (propertyId)
+        this.$router.push({
+          name: "PropertyDetail",
+          params: { id: propertyId },
+        });
+    },
+
+     goToZoneDetail(propertyZoneId) {
+      if (propertyZoneId)
+        this.$router.push({
+          name: "zoneDetail",
+          params: { id: propertyZoneId },
+        });
     },
   },
   filters: {

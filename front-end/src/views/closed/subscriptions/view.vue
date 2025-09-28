@@ -8,7 +8,8 @@
           class="bg-orange-500 text-white px-6 py-4 text-xl font-bold flex justify-between items-center"
         >
           Subscriptions
-          <button v-if="addSubsc"
+          <button
+            v-if="addSubsc"
             @click="visible = true"
             class="bg-white text-blue-700 font-semibold px-1 lg:px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300"
           >
@@ -76,57 +77,58 @@
 
                   <td class="px-4 py-2 border">{{ subscription.ownerName }}</td>
 
-                 <td class="px-4 py-2 border text-center">
-                  <div class="flex flex-wrap justify-center gap-2">
-                    <!-- Pay Button -->
-                    <button
-                      v-if="subscription.status === 'pending'"
-                      @click="pay(subscription)"
-                      class="flex items-center px-3 py-1.5 bg-green-600 text-white text-sm font-medium rounded-lg border border-green-700 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 transition"
-                      title="Pay"
-                    >
-                      <i class="fas fa-credit-card mr-1"></i> Pay
-                    </button>
+                  <td class="px-4 py-2 border text-center">
+                    <div class="flex flex-wrap justify-center gap-2">
+                      <!-- Pay Button -->
+                      <button
+                        v-if="subscription.status === 'pending'"
+                        @click="pay(subscription)"
+                        class="flex items-center px-3 py-1.5 bg-green-600 text-white text-sm font-medium rounded-lg border border-green-700 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 transition"
+                        title="Pay"
+                      >
+                        <i class="fas fa-credit-card mr-1"></i> Pay
+                      </button>
 
-                    <!-- Payments Info -->
-                    <button
-                      @click="payment(subscription.id)"
-                      class="flex items-center px-3 py-1.5 bg-green-50 text-green-700 text-sm font-medium rounded-lg border border-green-200 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-200 transition"
-                      title="Subscription payments"
-                    >
-                      <i class="fas fa-info-circle mr-1"></i> Payments
-                    </button>
+                      <!-- Payments Info -->
+                      <button
+                        @click="payment(subscription.id)"
+                        class="flex items-center px-3 py-1.5 bg-green-50 text-green-700 text-sm font-medium rounded-lg border border-green-200 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-green-200 transition"
+                        title="Subscription payments"
+                      >
+                        <i class="fas fa-info-circle mr-1"></i> Payments
+                      </button>
 
-                    <!-- Edit -->
-                
+                      <!-- Edit -->
 
-                    <!-- Upgrade/Downgrade -->
-                    <button
-                      @click="openUpgradeModal(subscription)"
-                      class="flex items-center px-3 py-1.5 bg-orange-50 text-orange-700 text-sm font-medium rounded-lg border border-orange-200 hover:bg-orange-100 focus:outline-none focus:ring-2 focus:ring-orange-200 transition"
-                    >
-                      <i class="fas fa-exchange-alt mr-1"></i> Upgrade/Downgrade
-                    </button>
-                     <button
-                      @click="edit(subscription)"
-                      class="flex items-center px-3 py-1.5 bg-blue-50 text-blue-700 text-sm font-medium rounded-lg border border-blue-200 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-200 transition"
-                      title="Edit"
-                    >
-                      <i class="fas fa-edit mr-1"></i> Edit
-                    </button>
+                      <!-- Upgrade/Downgrade -->
+                      <button
+                        @click="openUpgradeModal(subscription)"
+                        class="flex items-center px-3 py-1.5 bg-orange-50 text-orange-700 text-sm font-medium rounded-lg border border-orange-200 hover:bg-orange-100 focus:outline-none focus:ring-2 focus:ring-orange-200 transition"
+                      >
+                        <i class="fas fa-exchange-alt mr-1"></i>
+                        Upgrade/Downgrade
+                      </button>
+                      
+                      <button
+                        v-if="showEdit"
+                        @click="edit(subscription)"
+                        class="flex items-center px-3 py-1.5 bg-blue-50 text-blue-700 text-sm font-medium rounded-lg border border-blue-200 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-200 transition"
+                        title="Edit"
+                      >
+                        <i class="fas fa-edit mr-1"></i> Edit
+                      </button>
 
-                    <!-- Delete -->
-                    <button v-if="showDelete"
-                      @click="confirmDelete(subscription)"
-                      class="flex items-center px-3 py-1.5 bg-red-50 text-red-700 text-sm font-medium rounded-lg border border-red-200 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-200 transition"
-                      title="Delete"
-                    >
-                      <i class="fas fa-trash-alt mr-1"></i> Delete
-                    </button>
-                  </div>
-                </td>
-
-
+                      <!-- Delete -->
+                      <button
+                        v-if="showDelete"
+                        @click="confirmDelete(subscription)"
+                        class="flex items-center px-3 py-1.5 bg-red-50 text-red-700 text-sm font-medium rounded-lg border border-red-200 hover:bg-red-100 focus:outline-none focus:ring-2 focus:ring-red-200 transition"
+                        title="Delete"
+                      >
+                        <i class="fas fa-trash-alt mr-1"></i> Delete
+                      </button>
+                    </div>
+                  </td>
                 </tr>
                 <tr v-if="filteredSubscriptions.length === 0">
                   <td colspan="7" class="text-center text-gray-500 py-6">
@@ -194,15 +196,17 @@
         @cancel="confirmVisible = false"
       />
 
-<UpgradeSubscriptionModal
-  v-if="showUpgradeModal"
-  :visible="showUpgradeModal"
-  :subscription-id="selectedSubscriptionId"  
-  @close="showUpgradeModal = false;fetchSubscriptions()"
-  @plan-upgraded="handlePlanUpgrade"
-/>
+      <UpgradeSubscriptionModal
+        v-if="showUpgradeModal"
+        :visible="showUpgradeModal"
+        :subscription-id="selectedSubscriptionId"
+        @close="
+          showUpgradeModal = false;
+          fetchSubscriptions();
+        "
+        @plan-upgraded="handlePlanUpgrade"
+      />
     </div>
-
   </div>
 </template>
 
@@ -210,7 +214,7 @@
 import AddSubscription from "./add.vue";
 import UpdateSubscription from "./update.vue";
 import PaymentModal from "./Payment.vue";
-import UpgradeSubscriptionModal from './upgradePlan.vue'
+import UpgradeSubscriptionModal from "./upgradePlan.vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
 import Toast from "@/components/Toast.vue";
 
@@ -222,7 +226,7 @@ export default {
     ConfirmModal,
     Toast,
     PaymentModal,
-    UpgradeSubscriptionModal
+    UpgradeSubscriptionModal,
   },
   data() {
     return {
@@ -261,9 +265,9 @@ export default {
   },
   methods: {
     openUpgradeModal(subscription) {
-    this.selectedSubscriptionId = subscription.id; // store the subscription ID
-    this.showUpgradeModal = true;                  // open the modal
-   },
+      this.selectedSubscriptionId = subscription.id; // store the subscription ID
+      this.showUpgradeModal = true; // open the modal
+    },
     async fetchSubscriptions(url = null) {
       try {
         let params = {
