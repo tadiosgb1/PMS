@@ -289,10 +289,15 @@ export default {
       this.$router.push({ name: "rent-detail", params: { id: rent_id } });
     },
     async fetchRents() {
+      const params={
+        page_size:1000,
+        ordering:"-id"
+      }
       try {
-        const response = await this.$apiGet("/get_rents");
+        const response = await this.$apiGet("/get_rents",params);
         if (Array.isArray(response.data)) {
           this.rents = response.data;
+          console.log("rents are ",this.rents);
         } else {
           this.rents = [];
         }

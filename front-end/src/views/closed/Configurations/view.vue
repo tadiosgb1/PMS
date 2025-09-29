@@ -24,17 +24,34 @@
       <!-- Configure Commissions Card -->
       <div class="bg-white rounded-xl shadow-md overflow-hidden">
         <div class="bg-white text-black px-6 py-4 font-semibold text-lg">
-          Configure Commissions
+          Configure Sale Commissions
         </div>
         <div class="p-6">
           <p class="text-gray-700 mb-4">
             Set SaaS, broker, and total commissions for property sales.
           </p>
           <router-link
-            to="/commissions"
+            to="/sale-commissions"
             class="inline-block px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition"
           >
-            Go to Commissions
+            Go to Sale Commissions
+          </router-link>
+        </div>
+      </div>
+
+         <div class="bg-white rounded-xl shadow-md overflow-hidden">
+        <div class="bg-white text-black px-6 py-4 font-semibold text-lg">
+          Configure Rent Commissions
+        </div>
+        <div class="p-6">
+          <p class="text-gray-700 mb-4">
+            Set SaaS, broker, and total commissions for property sales.
+          </p>
+          <router-link
+            to="/rent-commissions"
+            class="inline-block px-4 py-2 bg-primary text-white rounded-lg hover:bg-primary-dark transition"
+          >
+            Go to Rent Commissions
           </router-link>
         </div>
       </div>

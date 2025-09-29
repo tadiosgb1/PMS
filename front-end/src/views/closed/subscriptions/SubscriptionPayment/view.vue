@@ -11,8 +11,8 @@
         </div>
 
         <div class="p-6">
-          <!-- Search + Show Dropdown -->
-          <div class="flex justify-between items-center mb-6">
+          <!-- Search + Filters -->
+          <div class="flex flex-wrap justify-between items-center mb-6 gap-4">
             <!-- Search -->
             <input
               v-model="searchTerm"
@@ -22,8 +22,22 @@
               @input="fetchPayments(1)"
             />
 
+            <!-- Status Filter -->
+            <div class="flex items-center">
+              <label class="mr-2 text-sm text-gray-600">Status</label>
+              <select
+                v-model="statusFilter"
+                class="px-2 py-1 border rounded-md text-sm"
+              >
+                <option value="">All</option>
+                <option value="paid">Paid</option>
+                <option value="pending">Pending</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+            </div>
+
             <!-- Show Dropdown -->
-            <div class="ml-4">
+            <div>
               <label class="mr-2 text-sm text-gray-600">Show</label>
               <select
                 v-model.number="perPage"
@@ -35,6 +49,12 @@
                 </option>
               </select>
             </div>
+          </div>
+
+          <!-- Amount Summary -->
+          <div v-if="statusFilter" class="mb-4 text-sm font-semibold text-gray-700">
+            Total {{ statusFilter }} Amount:
+            <span class="text-orange-600">{{ totalAmountByStatus }}</span>
           </div>
 
           <!-- Table -->
@@ -209,6 +229,7 @@ export default {
     return {
       payments: [],
       searchTerm: "",
+      statusFilter: "", // added filter
       sortKey: "payment_method",
       sortAsc: true,
       perPage: 10,
@@ -221,12 +242,20 @@ export default {
   computed: {
     filteredAndSortedPayments() {
       const term = this.searchTerm.toLowerCase();
+
+      // search
       let filtered = this.payments.filter((p) =>
         Object.values(p).some((val) =>
           String(val || "").toLowerCase().includes(term)
         )
       );
 
+      // status filter
+      if (this.statusFilter) {
+        filtered = filtered.filter((p) => p.status === this.statusFilter);
+      }
+
+      // sort
       filtered.sort((a, b) => {
         let res = 0;
         if (a[this.sortKey] < b[this.sortKey]) res = -1;
@@ -235,6 +264,14 @@ export default {
       });
 
       return filtered;
+    },
+
+    // total amount based on status filter
+    totalAmountByStatus() {
+      return this.filteredAndSortedPayments.reduce(
+        (sum, p) => sum + (parseFloat(p.amount) || 0),
+        0
+      );
     },
   },
   mounted() {
@@ -302,10 +339,8 @@ export default {
       }
     },
     async approve(payment) {
-      console.log("Payment", payment);
       const payload = { id: payment.id, status: "paid" };
       const res = await this.$apiPatch(`/update_subscription_payment`, payment.id, payload);
-      console.log("res", res);
       if (res) {
         this.$root.$refs.toast.showToast(`Payment Approved Successfully`, 'success');
         const subPayload = { id: res.subscription_id, status: "active" };
@@ -317,10 +352,8 @@ export default {
       }
     },
     async disApprove(payment) {
-      console.log("Payment", payment);
       const payload = { id: payment.id, status: "pending" };
       const res = await this.$apiPatch(`/update_subscription_payment`, payment.id, payload);
-      console.log("res", res);
       if (res) {
         this.$root.$refs.toast.showToast(`Payment DisApproved Successfully`, 'success');
         const subPayload = { id: res.subscription_id, status: "pending" };

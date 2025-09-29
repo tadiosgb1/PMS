@@ -1,33 +1,37 @@
 <template>
   <div
     v-if="visible"
-   class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4 overflow-auto"
+    class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4 overflow-auto"
   >
-    <div class="bg-white  w-full sm:w-auto sm:max-w-[700px] md:max-w-[850px] lg:max-w-[950px] xl:max-w-[1050px]  rounded-lg shadow-lg overflow-hidden relative mx-auto">
+    <div
+      class="bg-white w-full sm:w-auto sm:max-w-[700px] md:max-w-[850px] lg:max-w-[950px] xl:max-w-[1050px] rounded-lg shadow-lg overflow-hidden relative mx-auto"
+    >
       <!-- Close Button -->
-      <div class="bg-primary text-white px-6 py-4 text-2xl font-semibold flex justify-between items-center">
+      <div
+        class="bg-primary text-white px-6 py-4 text-2xl font-semibold flex justify-between items-center"
+      >
         Add New Manager
-        <button @click="$emit('close')" class="text-white hover:text-gray-200 text-lg font-bold">✕</button>
+        <button
+          @click="$emit('close')"
+          class="text-white hover:text-gray-200 text-lg font-bold"
+        >
+          ✕
+        </button>
       </div>
 
       <!-- Form -->
       <form @submit.prevent="submitForm" class="space-y-4 px-4 py-4">
         <!-- Row 1: Email & Phone -->
 
-          <!-- Property Zone -->
+        <!-- Property Zone -->
         <div>
           <label class="block text-sm font-medium mb-1">Property Zone</label>
           <select
             v-model="form.property_zone"
-            required
             class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
           >
             <option disabled value="">Select Zone</option>
-            <option
-              v-for="zone in zones"
-              :key="zone.id"
-              :value="zone.id"
-            >
+            <option v-for="zone in zones" :key="zone.id" :value="zone.id">
               {{ zone.name }}
             </option>
           </select>
@@ -95,7 +99,7 @@
           ></textarea>
         </div>
 
-          <div>
+        <div>
           <label class="block text-sm font-medium mb-1">Password</label>
           <input
             v-model="form.password"
@@ -103,7 +107,6 @@
             class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
           />
         </div>
-      
 
         <!-- Actions -->
         <div class="flex justify-end space-x-3 pt-4 border-t mt-4">
@@ -128,7 +131,7 @@ export default {
   data() {
     return {
       managerVisible: false,
-      zones:[],
+      zones: [],
       form: {
         email: "",
         first_name: "",
@@ -137,28 +140,27 @@ export default {
         phone_number: "",
         address: "",
         property_zone: "",
-        owner_id:localStorage.getItem('userId'),
-        is_manager:true,
+        owner_id: localStorage.getItem("userId"),
+        is_manager: true,
         password: "",
-      }
+      },
     };
   },
- async  mounted(){
-  const result = await this.$getZones();
-  this.zones=result.zones;
-  console.log("zones",this.zones);
+  async mounted() {
+    const result = await this.$getZones();
+    this.zones = result.zones;
+    console.log("zones", this.zones);
   },
   methods: {
-   
     close() {
       this.resetForm();
       this.managerVisible = false;
     },
     async submitForm() {
-      console.log("this.form",this.form)
-      const res = await this.$apiPost('/sign_up',this.form);
+      console.log("this.form", this.form);
+      const res = await this.$apiPost("/sign_up", this.form);
 
-      console.log("res manager add",res);
+      console.log("res manager add", res);
 
       this.resetForm();
       this.close();
@@ -171,12 +173,12 @@ export default {
         last_name: "",
         phone_number: "",
         address: "",
-        owner_id:localStorage.getItem('userId'),
+        owner_id: localStorage.getItem("userId"),
         property_zone: "",
-        is_manager:true,
+        is_manager: true,
         password: "",
       };
-    }
-  }
+    },
+  },
 };
 </script>

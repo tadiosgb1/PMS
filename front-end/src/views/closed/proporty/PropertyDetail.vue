@@ -73,6 +73,7 @@
             :src="pic.property_image"
             :alt="pic.description"
             class="object-cover w-full h-32"
+            @click="previewImage(pic.property_image)"
           />
           <p class="text-sm p-2">{{ pic.description }}</p>
 
@@ -105,24 +106,6 @@
         </div>
       </div>
       <div v-else class="mb-8 text-gray-500">No pictures available.</div>
-
-      <!-- Actions -->
-      <!-- <div v-if="property">
-        <button
-          @click="saleProperty()"
-          class="bg-primary text-white ml-14 px-4 py-1 rounded hover:bg-primary-dark"
-        >
-          Sale this property
-        </button>
-      </div>
-      <div v-if="property">
-        <button
-          @click="rentProperty()"
-          class="mt-5 bg-primary text-white ml-14 px-4 py-1 rounded hover:bg-primary-dark"
-        >
-          Rent this property
-        </button>
-      </div> -->
 
       <!-- ================== EXTRA SECTIONS ================== -->
       <div v-if="property" class="mt-10 flex-4">
@@ -162,6 +145,27 @@
         @confirm="confirmDeletePicture"
         @cancel="confirmDeleteVisible = false"
       />
+
+      <!-- ================= IMAGE PREVIEW MODAL ================= -->
+      <div
+        v-if="imagePreviewVisible"
+        class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
+        @click="imagePreviewVisible = false"
+      >
+        <img
+          :src="imageToPreview"
+          alt="Preview"
+          class="max-h-[90%] max-w-[90%] rounded shadow-lg"
+          @click.stop
+        />
+        <button
+          @click="imagePreviewVisible = false"
+          class="absolute top-4 right-4 bg-white text-black px-3 py-1 rounded hover:bg-gray-200"
+        >
+          ✕
+        </button>
+      </div>
+      <!-- ===================================================== -->
     </div>
   </div>
 </template>
@@ -199,6 +203,8 @@ export default {
       showAllPictures: false,
       maintenanceView: false,
       visible: false,
+      imagePreviewVisible: false,
+      imageToPreview: null,
     };
   },
   computed: {
@@ -227,7 +233,6 @@ export default {
         );
         this.property = res.data || res;
       } catch (err) {
-        
         console.error("Failed to fetch property details", err);
         alert("Could not load property details.");
       }
@@ -257,6 +262,10 @@ export default {
         alert("Failed to delete picture.");
       }
       this.pictureToDelete = null;
+    },
+    previewImage(imageUrl) {
+      this.imageToPreview = imageUrl;
+      this.imagePreviewVisible = true;
     },
   },
 };

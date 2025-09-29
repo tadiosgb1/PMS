@@ -23,7 +23,7 @@
        
 
            <div>
-            <label class="block text-gray-700 mb-1">Property ID</label>
+            <label class="block text-gray-700 mb-1">Property</label>
             <input 
               v-model="form.property_id" 
               type="text"
@@ -33,18 +33,18 @@
           </div>
 
          <div class="mt-2 border rounded bg-white shadow w-full" v-if="pr_length > 0">
-  <div
-    v-for="property in properties"
-    :key="property.id"
-    class="p-2 hover:bg-gray-100 cursor-pointer flex items-center justify-between"
-    @click="selectProperty(property.id)"
-  >
-    <span>{{ property.name }}</span>
+          <div
+            v-for="property in properties"
+            :key="property.id"
+            class="p-2 hover:bg-gray-100 cursor-pointer flex items-center justify-between"
+            @click="selectProperty(property.id)"
+          >
+            <span>{{ property.name }}</span>
 
-    <!-- Show check icon only for the selected one -->
-    <i v-if="form.property_id === property.id" class="fas fa-check text-green-500"></i>
-  </div>
-</div>
+            <!-- Show check icon only for the selected one -->
+            <i v-if="form.property_id === property.id" class="fas fa-check text-green-500"></i>
+          </div>
+        </div>
 
 
     
@@ -69,7 +69,32 @@
   </div>
 </div>
 
-
+     <div class="relative">
+            <label class="block text-gray-700 mb-1">Broker</label>
+            <input
+              v-model="brokerSearch"
+              type="text"
+              class="custom-input"
+              placeholder="Search Broker..."
+              @input="searchBrokers"
+              @focus="brokerDropdown = true"
+              @blur="hideDropdown('broker')"
+              required
+            />
+            <ul
+              v-if="brokers.length > 0 && brokerDropdown"
+              class="absolute z-50 w-full max-h-48 overflow-y-auto bg-white border border-gray-300 rounded shadow mt-1"
+            >
+              <li
+                v-for="broker in brokers"
+                :key="broker.id"
+                class="p-2 hover:bg-gray-100 cursor-pointer"
+                @mousedown.prevent="selectBroker(broker)"
+              >
+                {{ broker.license_number }}
+              </li>
+            </ul>
+          </div>
 
           <div>
         <label class="block text-sm font-medium text-gray-700">Rent Type</label>
@@ -167,15 +192,48 @@ export default {
         payment_cycle: "",
         rent_amount: "",
         deposit_amount: "",
-        status: ""
+        status: "",
+        broker: "",
       },
       properties:[],
       pr_length:0,
       user_length:0,
       users:[],
+
+      brokers: [],
+      brokerSearch: "",
+      brokerDropdown: false,
     };
   },
+  mounted(){
+  this.fetchBrokers();
+  },
   methods: {
+        async fetchBrokers() {
+      try {
+        const res = await this.$apiGet("/get_broker_profiles");
+        this.brokers = res.data || [];
+      } catch (err) {
+        console.error("Failed to fetch brokers:", err);
+      }
+    },
+    searchBrokers() {
+      if (this.brokerSearch === "") {
+        this.fetchBrokers();
+      } else {
+        this.brokers = this.brokers.filter((b) =>
+          b.license_number
+            .toString()
+            .toLowerCase()
+            .includes(this.brokerSearch.toLowerCase())
+        );
+      }
+    },
+      selectBroker(broker) {
+      this.form.broker = broker.id;
+      this.brokerSearch = broker.license_number;
+      this.brokerDropdown = false;
+    },
 selectUser(user_id){
 this.form.user_id=user_id
 console.log("form",this.form);
@@ -188,6 +246,7 @@ console.log("form",this.form);
       const params={
         search:this.form.property_id,
         page_size:100000000,
+        user__first_name:this.brokerSearch
       }
       console.log("Searching for:", this.form.property_id);
        const res=await this.$apiGet(`get_properties`,params);

@@ -35,14 +35,17 @@
         <!-- Right side: Notifications + Welcome + Profile -->
         <div class="flex items-center space-x-4 text-blue-500">
           <!-- Notifications Dropdown -->
-          <div class="relative inline-block" @click.stop="toggleNotificationDropdown">
+          <div
+            class="relative inline-block"
+            @click.stop="toggleNotificationDropdown"
+          >
             <!-- Bell -->
             <i class="fas fa-bell text-gray-700 text-xl cursor-pointer"></i>
 
             <!-- Notification Badge -->
             <span
               v-if="notifications.length > 0"
-              class="absolute -top-3 -right-2 bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow"
+              class="curosr-pointer absolute -top-3 -right-2 bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow"
             >
               {{ notifications.length }}
             </span>
@@ -117,7 +120,16 @@
                     <span>Change Password</span>
                   </a>
                 </li>
-             
+                <li>
+                  <a
+                    href="#"
+                    @click="openProfile"
+                    class="flex items-center px-4 py-2 hover:bg-gray-100 text-gray-700"
+                  >
+                    <i class="fas fa-user-cog text-yellow-500 mr-2"></i>
+                    <span>Change Profile</span>
+                  </a>
+                </li>
                 <li>
                   <a
                     @click="logout"
@@ -128,17 +140,6 @@
                     <span>Logout</span>
                   </a>
                 </li>
-
-                <li>
-  <a
-    href="#"
-    @click="openProfile"
-    class="flex items-center px-4 py-2 hover:bg-gray-100 text-gray-700"
-  >
-    <i class="fas fa-user-cog text-yellow-500 mr-2"></i>
-    <span>Change Profile</span>
-  </a>
-</li>
               </ul>
             </transition>
           </div>
@@ -179,10 +180,10 @@
     </div>
 
     <Profile
-  :visible="showProfileModal"
-  @close="closeProfile"
-  @updated="onProfileUpdated"
-/>
+      :visible="showProfileModal"
+      @close="closeProfile"
+      @updated="onProfileUpdated"
+    />
   </div>
 </template>
 
@@ -221,21 +222,21 @@ export default {
   },
   methods: {
     openProfile() {
-    this.isProfileDropdownOpen = false; // close dropdown
-    this.showProfileModal = true;
-  },
-  closeProfile() {
-    this.showProfileModal = false;
-  },
-  onProfileUpdated(updatedUser) {
-    if (updatedUser?.name) {
-      this.name = updatedUser.name;
-      localStorage.setItem("name", updatedUser.name);
-    }
-  },
-     goToNotification(id) {
-    this.$router.push({ name: 'notificationDetail', params: { id } });
-   },
+      this.isProfileDropdownOpen = false; // close dropdown
+      this.showProfileModal = true;
+    },
+    closeProfile() {
+      this.showProfileModal = false;
+    },
+    onProfileUpdated(updatedUser) {
+      if (updatedUser?.name) {
+        this.name = updatedUser.name;
+        localStorage.setItem("name", updatedUser.name);
+      }
+    },
+    goToNotification(id) {
+      this.$router.push({ name: "notificationDetail", params: { id } });
+    },
     handleResize() {
       this.screenWidth = window.innerWidth;
       this.showToggleButton = this.screenWidth < 1024;
