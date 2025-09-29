@@ -169,13 +169,13 @@
                       <i class="fas fa-edit"></i>
                     </button>
 
-                    <button
+                    <!-- <button
                       @click=""
                       class="text-blue-600 hover:text-blue-800 focus:outline-none"
                       title="Edit"
                     >
                       Add broker
-                    </button>
+                    </button> -->
 
                     <button
                       @click="confirmDeleteSale(sale.id)"
