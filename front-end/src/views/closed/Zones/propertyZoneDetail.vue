@@ -1,41 +1,41 @@
 <template>
   <div>
     <Toast ref="toast" />
-    <div
-      class="max-w-7xl p-4 mx-auto bg-white shadow rounded-lg overflow-hidden"
-    >
-      <!-- Back Button -->
-      <button
-        @click="$router.back()"
-         class="mb-4 px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
-      >
-        &larr; Back
-      </button>
+    <div class="min-h-screen bg-gray-100 p-6">
+      <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <!-- Header -->
+        <div class="bg-primary text-white px-6 py-4 text-xl font-bold flex justify-between items-center">
+          Zone Details
+          <!-- <button
+            @click="goBack"
+            class="bg-white text-blue-700 font-semibold px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300"
+          >
+            ← Back to Zones
+          </button> -->
+        </div>
 
-      <!-- Zone Title -->
-      <h1 v-if="zone"  class="text-2xl font-bold mb-4">
-        Zone: {{ zone.name }}
-      </h1>
-      <p v-else>Loading...</p>
+        <!-- Content -->
+        <div class="p-6">
+          <!-- Zone Title -->
+          <h1 v-if="zone" class="text-2xl font-bold mb-4">
+            Zone: {{ zone.name }}
+          </h1>
+          <p v-else>Loading...</p>
 
-      <!-- Zone Details -->
-      <div v-if="zone" class="grid grid-cols-2 gap-4 mb-6">
-        <div class="mb-2"><strong>ID:</strong> {{ zone.id }}</div>
-        <div class="mb-2"><strong>Name:</strong> {{ zone.name }}</div>
-        <div class="mb-2"><strong>Address:</strong> {{ zone.address }}</div>
-        <div class="mb-2"><strong>City:</strong> {{ zone.city }}</div>
-        <div class="mb-2"><strong>State:</strong> {{ zone.state }}</div>
-        <div class="mb-2"><strong>Owner ID:</strong> {{ zone.owner_id }}</div>
-        <div class="mb-2"><strong>Manager ID:</strong> {{ zone.manager_id }}</div>
-        <div class="mb-2"><strong>Created At:</strong> {{ zone.created_at }}</div>
-      </div>
+          <!-- Zone Details -->
+          <div v-if="zone" class="grid grid-cols-2 gap-4 mb-6">
+            <div><strong>ID:</strong> {{ zone.id }}</div>
+            <div><strong>Name:</strong> {{ zone.name }}</div>
+            <div><strong>Address:</strong> {{ zone.address }}</div>
+            <div><strong>City:</strong> {{ zone.city }}</div>
+            <div><strong>State:</strong> {{ zone.state }}</div>
+            <div><strong>Owner ID:</strong> {{ zone.owner_id }}</div>
+            <div><strong>Manager ID:</strong> {{ zone.manager_id }}</div>
+            <div><strong>Created At:</strong> {{ zone.created_at }}</div>
+          </div>
 
-      <!-- Placeholder for future sections -->
-      <div v-if="zone" class="mt-10">
-        <h2 class="text-xl font-semibold mb-2">Related Properties</h2>
-        <p class="text-gray-500">
-          Future enhancement: show all properties under this zone here.
-        </p>
+          
+        </div>
       </div>
     </div>
   </div>
@@ -45,7 +45,7 @@
 import Toast from "@/components/Toast.vue";
 
 export default {
-  name: "PropertyZoneDetail",
+  name: "ZoneDetail",
   components: { Toast },
   data() {
     return {
@@ -66,6 +66,9 @@ export default {
         console.error("Failed to fetch zone details", err);
         this.$refs.toast.showToast("Could not load zone details.", "error");
       }
+    },
+    goBack() {
+      this.$router.push({ path: "/zones" });
     },
   },
 };
