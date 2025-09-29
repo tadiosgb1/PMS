@@ -1,40 +1,39 @@
 <template>
   <div>
     <Toast ref="toast" />
-    <div
-      class="max-w-7xl p-4 mx-auto bg-white shadow rounded-lg overflow-hidden"
-    >
-      <!-- Back Button -->
-      <button
-        @click="$router.back()"
-        class="mb-4 px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
-      >
-        &larr; Back
-      </button>
+    <div class="min-h-screen bg-gray-100 p-6">
+      <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <!-- Header -->
+        <div class="bg-primary text-white px-6 py-4 text-xl font-bold flex justify-between items-center">
+          Broker Details
+          <!-- <button
+            @click="goBack"
+            class="bg-white text-blue-700 font-semibold px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300"
+          >
+            ← Back to Brokers
+          </button> -->
+        </div>
 
-      <!-- Broker Title -->
-      <h1 v-if="broker" class="text-2xl font-bold mb-4">
-        Broker Profile: {{ broker.license_number }}
-      </h1>
-      <p v-else>Loading...</p>
+        <!-- Content -->
+        <div class="p-6">
+          <!-- Broker Title -->
+          <h1 v-if="broker" class="text-2xl font-bold mb-4">
+            {{ broker.name }}
+          </h1>
+          <p v-else>Loading...</p>
 
-      <!-- Broker Details -->
-      <div v-if="broker" class="grid grid-cols-2 gap-4 mb-6">
-        <div class="mb-2"><strong>ID:</strong> {{ broker.id }}</div>
-        <div class="mb-2"><strong>License Number:</strong> {{ broker.license_number }}</div>
-        <div class="mb-2"><strong>Commission Rate:</strong> {{ broker.commission_rate }}%</div>
-        <div class="mb-2"><strong>Wallet Balance:</strong> {{ broker.wallet }}</div>
-        <div class="mb-2"><strong>Created At:</strong> {{ broker.created_at }}</div>
-        <div class="mb-2"><strong>Updated At:</strong> {{ broker.updated_at }}</div>
-        <div class="mb-2"><strong>User ID:</strong> {{ broker.user }}</div>
-      </div>
+          <!-- Broker Details -->
+          <div v-if="broker" class="grid grid-cols-2 gap-4 mb-6">
+            <div><strong>ID:</strong> {{ broker.id }}</div>
+            <div><strong>Name:</strong> {{ broker.name }}</div>
+            <div><strong>Email:</strong> {{ broker.email }}</div>
+            <div><strong>Phone:</strong> {{ broker.phone }}</div>
+            <div><strong>Company:</strong> {{ broker.company }}</div>
+            <div><strong>Created At:</strong> {{ broker.created_at }}</div>
+          </div>
 
-      <!-- Placeholder for future sections -->
-      <div v-if="broker" class="mt-10">
-        <h2 class="text-xl font-semibold mb-2">Related Transactions</h2>
-        <p class="text-gray-500">
-          Future enhancement: show broker’s transaction history here.
-        </p>
+          
+        </div>
       </div>
     </div>
   </div>
@@ -58,13 +57,16 @@ export default {
     async fetchBroker() {
       try {
         const res = await this.$apiGet(
-          `/get_broker_profile/${this.$route.params.id}`
+          `/get_broker/${this.$route.params.id}`
         );
         this.broker = res.data || res;
       } catch (err) {
         console.error("Failed to fetch broker details", err);
         this.$refs.toast.showToast("Could not load broker details.", "error");
       }
+    },
+    goBack() {
+      this.$router.push({ path: "/brokers" });
     },
   },
 };

@@ -147,13 +147,14 @@
                   <td
                     class="border border-gray-300 px-4 py-2 text-center space-x-2"
                   >
-                    <button
+                    <!-- <button
+                    v-if="showApprove=true"
                       @click="approve(sale.id)"
                       class="text-green-600 hover:text-green-800 focus:outline-none"
                       title="Approve"
                     >
                       Approve
-                    </button>
+                    </button> -->
                     <button
                       @click="goToPayment(sale.id)"
                       class="text-blue-600 hover:text-blue-800 focus:outline-none"
