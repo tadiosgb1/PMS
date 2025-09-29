@@ -73,21 +73,32 @@
                   <td class="px-4 py-2 border">
                     {{ formatDate(subscription.end_date) }}
                   </td>
-                  <td class="px-4 py-2 border">{{ subscription.status }}</td>
+                 <td
+                  class="px-4 py-2 border text-white font-medium rounded"
+                  :class="{
+                    'bg-yellow-500': subscription.status === 'pending',
+                    'bg-red-500': subscription.status === 'expired',
+                    'bg-green-500': subscription.status === 'active'
+                  }"
+                >
+                  {{ subscription.status }}
+                </td>
+
 
                   <td class="px-4 py-2 border">{{ subscription.ownerName }}</td>
 
                   <td class="px-4 py-2 border text-center">
                     <div class="flex flex-wrap justify-center gap-2">
                       <!-- Pay Button -->
-                      <button
-                        v-if="subscription.status === 'pending'"
-                        @click="pay(subscription)"
-                        class="flex items-center px-3 py-1.5 bg-green-600 text-white text-sm font-medium rounded-lg border border-green-700 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 transition"
-                        title="Pay"
-                      >
-                        <i class="fas fa-credit-card mr-1"></i> Pay
-                      </button>
+                    <button 
+                    v-if="is_super_user != 'true' && subscription.status === 'pending'"
+                    @click="pay(subscription)"
+                    class="flex items-center px-3 py-1.5 bg-green-600 text-white text-sm font-medium rounded-lg border border-green-700 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-green-400 transition"
+                    title="Pay"
+                  >
+                    <i class="fas fa-credit-card mr-1"></i> Pay
+                  </button>
+
 
                       <!-- Payments Info -->
                       <button
@@ -101,7 +112,7 @@
                       <!-- Edit -->
 
                       <!-- Upgrade/Downgrade -->
-                      <button
+                      <button v-if="is_super_user!='true'"
                         @click="openUpgradeModal(subscription)"
                         class="flex items-center px-3 py-1.5 bg-orange-50 text-orange-700 text-sm font-medium rounded-lg border border-orange-200 hover:bg-orange-100 focus:outline-none focus:ring-2 focus:ring-orange-200 transition"
                       >
@@ -227,6 +238,7 @@ export default {
     Toast,
     PaymentModal,
     UpgradeSubscriptionModal,
+    
   },
   data() {
     return {
@@ -240,6 +252,7 @@ export default {
       paymentPayload: null,
       editing: null,
       deleting: null,
+      is_super_user:false,
       selectedSubscriptionId: null,
       // ✅ Pagination state
       currentPage: 1,
@@ -261,7 +274,12 @@ export default {
     },
   },
   mounted() {
+
+    this.is_super_user=localStorage.getItem('is_superuser');
+    console.log("is super user",this.is_super_user)
+
     this.fetchSubscriptions();
+
   },
   methods: {
     openUpgradeModal(subscription) {
