@@ -232,26 +232,33 @@ export default {
       tenantToDelete: null,
     };
   },
-  computed: {
-    filteredAndSortedTenants() {
-      const term = this.searchTerm.toLowerCase();
-      let filtered = this.tenants.filter(
-        (t) =>
-          String(t.id).includes(term) ||
-          this.formatFullName(t).toLowerCase().includes(term) ||
-          t.email.toLowerCase().includes(term) ||
-          (t.phone_number || "").toLowerCase().includes(term) ||
-          t.groups.some((g) => g.toLowerCase().includes(term))
+ computed: {
+  filteredAndSortedTenants() {
+    const term = this.searchTerm.toLowerCase();
+    let filtered = this.tenants.filter((t) => {
+      const u = t.user_id || {}; // make it safe
+      return (
+        String(u.id).includes(term) ||
+        this.formatFullName(u).toLowerCase().includes(term) ||
+        (u.email || "").toLowerCase().includes(term) ||
+        (u.phone_number || "").toLowerCase().includes(term) ||
+        (u.groups || []).some((g) => g.toLowerCase().includes(term))
       );
-      filtered.sort((a, b) => {
-        let res = 0;
-        if (a[this.sortKey] < b[this.sortKey]) res = -1;
-        if (a[this.sortKey] > b[this.sortKey]) res = 1;
-        return this.sortAsc ? res : -res;
-      });
-      return filtered;
-    },
+    });
+
+    filtered.sort((a, b) => {
+      const uA = a.user_id || {};
+      const uB = b.user_id || {};
+      let res = 0;
+      if (uA[this.sortKey] < uB[this.sortKey]) res = -1;
+      if (uA[this.sortKey] > uB[this.sortKey]) res = 1;
+      return this.sortAsc ? res : -res;
+    });
+
+    return filtered;
   },
+},
+
   mounted() {
     this.fetchTenants();
   },
