@@ -61,6 +61,7 @@
                     />
                   </th>
                   <th class="border border-gray-300 px-4 py-2">Full Name</th>
+                  <th class="border border-gray-300 px-4 py-2">Property</th>
                   <th class="border border-gray-300 px-4 py-2">Email</th>
                   <th class="border border-gray-300 px-4 py-2">Phone</th>
                   <th class="border border-gray-300 px-4 py-2">Groups</th>
@@ -82,6 +83,9 @@
                   </td>
                   <td class="border border-gray-300 px-4 py-2">
                     {{ formatFullName(tenant) }}
+                  </td>
+                   <td class="border border-gray-300 px-4 py-2">
+                    {{ tenant.property_id?.name || "N/A" }}
                   </td>
                   <td class="border border-gray-300 px-4 py-2">
                     {{ tenant.email }}

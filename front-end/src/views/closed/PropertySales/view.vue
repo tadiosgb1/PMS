@@ -109,8 +109,18 @@
                     </button>
                   </td>
                   <td class="border border-gray-300 px-4 py-2">
-                    {{ sale.broker || "-" }}
+                    <button
+                      @click="goToBrokerDetail(sale.broker)"
+                      class="text-green-600 hover:text-green-800"
+                      title="Detail"
+                      :disabled="!sale.broker"
+                    >
+                       {{ sale.broker || "-" }}
+                    </button>
                   </td>
+                  <!-- <td class="border border-gray-300 px-4 py-2">
+                    {{ sale.broker || "-" }}
+                  </td> -->
                   <td class="border border-gray-300 px-4 py-2">
                     {{ sale.listing_price | currency }}
                   </td>
@@ -391,6 +401,13 @@ export default {
         this.$router.push({
           name: "zoneDetail",
           params: { id: propertyZoneId },
+        });
+    },
+     goToBrokerDetail(brokerId) {
+      if (brokerId)
+        this.$router.push({
+          name: "brokerDetail",
+          params: { id: brokerId },
         });
     },
   },

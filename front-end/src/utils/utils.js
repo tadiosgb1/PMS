@@ -761,26 +761,31 @@ export async function getTenants(url = null, pageSize = 10) {
         params = { property_id__property_zone_id__manager_id__email: email };
       } else if (groups.includes("owner")) {
         params = { property_id__property_zone_id__owner_id__email: email };
-      }
-      else if (groups.includes("staff")) {
+      } else if (groups.includes("staff")) {
         params = { staff_id__email: email };
-      }
-      else if (groups.includes("super_staff")) {
+      } else if (groups.includes("super_staff")) {
         params = {};
       }
     }
 
+    // Pick correct endpoint
+    let apiUrl = url || `/get_tenants?page=1&page_size=${pageSize}`;
+    if (groups.includes("manager") || groups.includes("owner") || groups.includes("staff")) {
+      apiUrl = url || `/get_rents?page=1&page_size=${pageSize}`;
+    }
 
     console.log("params", params);
-
-
-    let apiUrl = url || `/get_tenants?page=1&page_size=${pageSize}`;
-    // if (groups.includes("manager")) apiUrl = `/get_rents?page=1&page_size=${pageSize}`
-    // else if (groups.includes("owner")) apiUrl = `/get_rents?page=1&page_size=${pageSize}`
+    console.log("apiUrl", apiUrl);
 
     const response = await this.$apiGet(apiUrl, params);
-
-    const tenants = response.data || [];
+console.log("response rents",response)
+    // Normalize tenants
+    let tenants = [];
+    if (apiUrl.includes("/get_rents")) {
+      tenants = (response.data || []).map(r => r.user_id).filter(Boolean);
+    } else {
+      tenants = response.data || [];
+    }
 
     console.log("tenants", tenants);
 
@@ -792,9 +797,9 @@ export async function getTenants(url = null, pageSize = 10) {
       previous: response.previous || null,
     };
   } catch (err) {
-    console.error("Error fetching zones:", err);
+    console.error("Error fetching tenants:", err);
     return {
-      zones: [],
+      tenants: [],
       currentPage: 1,
       totalPages: 1,
       next: null,

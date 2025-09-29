@@ -57,6 +57,7 @@ import Commissions from '../views/closed/commissions/view.vue'
 import Configurations from '../views/closed/Configurations/view.vue'
 import CoworkspacePayments from '../views/closed/workspacePayment/view.vue'
 import brokers from '../views/closed/brokers/view.vue'
+import brokerDetail from '../views/closed/brokers/brokerDetail.vue'
 
 const routes = [
   {
@@ -167,6 +168,7 @@ const routes = [
       { path: '/owners', name: 'owners', component: view_owners },
       { path: '/staffs', name: 'staffs', component: staffs },
        { path: '/brokers', name: 'brokers', component: brokers },
+       { path: '/brokerDetail/:id', name: 'brokerDetail', component: brokerDetail, props:true },
     ]
   },
   { path: "/forgot-password", name: "forgotPassword", component: ForgotPassword },

@@ -2,32 +2,32 @@
   <div>
     <Toast ref="toast" />
     <div
-      class="max-w-5xl p-4 mx-auto bg-white shadow rounded-lg overflow-hidden"
+      class="max-w-7xl p-4 mx-auto bg-white shadow rounded-lg overflow-hidden"
     >
       <!-- Back Button -->
       <button
         @click="$router.back()"
-        class="mb-4 px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
+         class="mb-4 px-4 py-2 bg-gray-200 rounded hover:bg-gray-300"
       >
         &larr; Back
       </button>
 
       <!-- Zone Title -->
-      <h1 v-if="zone" class="text-2xl font-bold mb-4">
+      <h1 v-if="zone"  class="text-2xl font-bold mb-4">
         Zone: {{ zone.name }}
       </h1>
       <p v-else>Loading...</p>
 
       <!-- Zone Details -->
       <div v-if="zone" class="grid grid-cols-2 gap-4 mb-6">
-        <div><strong>ID:</strong> {{ zone.id }}</div>
-        <div><strong>Name:</strong> {{ zone.name }}</div>
-        <div><strong>Address:</strong> {{ zone.address }}</div>
-        <div><strong>City:</strong> {{ zone.city }}</div>
-        <div><strong>State:</strong> {{ zone.state }}</div>
-        <div><strong>Owner ID:</strong> {{ zone.owner_id }}</div>
-        <div><strong>Manager ID:</strong> {{ zone.manager_id }}</div>
-        <div><strong>Created At:</strong> {{ zone.created_at }}</div>
+        <div class="mb-2"><strong>ID:</strong> {{ zone.id }}</div>
+        <div class="mb-2"><strong>Name:</strong> {{ zone.name }}</div>
+        <div class="mb-2"><strong>Address:</strong> {{ zone.address }}</div>
+        <div class="mb-2"><strong>City:</strong> {{ zone.city }}</div>
+        <div class="mb-2"><strong>State:</strong> {{ zone.state }}</div>
+        <div class="mb-2"><strong>Owner ID:</strong> {{ zone.owner_id }}</div>
+        <div class="mb-2"><strong>Manager ID:</strong> {{ zone.manager_id }}</div>
+        <div class="mb-2"><strong>Created At:</strong> {{ zone.created_at }}</div>
       </div>
 
       <!-- Placeholder for future sections -->

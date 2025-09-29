@@ -281,7 +281,7 @@ export default {
           "/post_property_zone_sale",
           this.form
         );
-        this.$refs.toast.showToast(
+        this.$root.$refs.toast.showToast(
           response.message || "Sale added successfully",
           "success"
         );
@@ -292,7 +292,7 @@ export default {
         }, 1500);
       } catch (error) {
         console.error(error);
-        this.$refs.toast.showToast("Failed to add sale.", "error");
+        this.$root.$refs.toast.showToast("Failed to add sale.", "error");
       }
     },
   },
