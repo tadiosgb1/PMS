@@ -93,13 +93,34 @@
                     {{ property.name }}
                   </td>
                   <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
-                    {{ property.ownerName }}
+                    {{ property.ownerName }}   <button
+                      @click="goToUserDetail(property.owner_id)"
+                      class="text-green-600 hover:text-green-800"
+                      title="Detail"
+                      :disabled="!property.id"
+                    >
+                      <i class="fas fa-info-circle"></i>
+                    </button>
                   </td>
                   <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
-                    {{ property.managerName }}
+                    {{ property.managerName }}  <button
+                      @click="goToUserDetail(property.manager_id)"
+                      class="text-green-600 hover:text-green-800"
+                      title="Detail"
+                      :disabled="!property.id"
+                    >
+                      <i class="fas fa-info-circle"></i>
+                    </button>
                   </td>
                   <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
-                    {{ property.zoneName }}
+                    {{ property.zoneName }}  <button
+                      @click="goToZoneDetail(property.property_zone_id)"
+                      class="text-green-600 hover:text-green-800"
+                      title="Detail"
+                      :disabled="!property.id"
+                    >
+                      <i class="fas fa-info-circle"></i>
+                    </button>
                   </td>
                   <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
                     {{ property.property_type }}
@@ -310,6 +331,12 @@ export default {
        this.$root.$refs.toast.showToast("Failed to delete property", "error");
       }
       this.propertyToDelete = null;
+    },
+    goToUserDetail(id) {
+      this.$router.push(`/user_detail/${id}`);
+    },
+    goToZoneDetail(id) {
+      this.$router.push(`/zones/${id}`);
     },
     goToDetail(propertyId) {
       if (propertyId)

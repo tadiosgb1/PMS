@@ -319,16 +319,19 @@ export default {
     rentDetail(rent_id) {
       this.$router.push({ name: "rent-detail", params: { id: rent_id } });
     },
-    async fetchRents(
-      url = `/get_rents?page=${this.currentPage}&page_size=${this.pageSize}&search=${this.searchTerm}`
-    ) {
+    async fetchRents() {
+      const params={
+        page_size:1000,
+        ordering:"-id"
+      }
       try {
-        const response = await this.$apiGet(url);
-        this.rents = response.data || [];
-        this.currentPage = response.current_page || 1;
-        this.totalPages = response.total_pages || 1;
-        this.next = response.next || null;
-        this.previous = response.previous || null;
+        const response = await this.$apiGet("/get_rents",params);
+        if (Array.isArray(response.data)) {
+          this.rents = response.data;
+          console.log("rents are ",this.rents);
+        } else {
+          this.rents = [];
+        }
       } catch (error) {
         console.error("Failed to fetch rents:", error);
         this.rents = [];

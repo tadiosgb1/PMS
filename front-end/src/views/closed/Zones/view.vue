@@ -73,8 +73,18 @@
                   <td class="border px-4 py-2">{{ zone.address }}</td>
                   <td class="border px-4 py-2">{{ zone.city }}</td>
                   <td class="border px-4 py-2">{{ zone.state }}</td>
-                  <td class="border px-4 py-2">{{ zone.ownerName }}</td>
-                  <td class="border px-4 py-2">{{ zone.managerName }}</td>
+                  <td class="border px-4 py-2">{{ zone.ownerName }}   <button
+                    class="flex items-center px-3 py-1.5 bg-blue-50 text-blue-700 text-sm font-medium rounded-lg border border-blue-200 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-200 transition"
+                    @click="goToDetail(zone.owner_id)"
+                  >
+                    <i class="fas fa-info-circle"></i> Details
+                  </button></td>
+                  <td class="border px-4 py-2">{{ zone.managerName }}   <button
+                    class="flex items-center px-3 py-1.5 bg-blue-50 text-blue-700 text-sm font-medium rounded-lg border border-blue-200 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-200 transition"
+                    @click="goToDetail(zone.manager_id)"
+                  >
+                    <i class="fas fa-info-circle"></i> Details
+                  </button></td>
                   <td class="border px-4 py-2 text-center space-x-2">
                     <button v-if="$hasPermission('pms.change_propertyzone')" @click="editZone(zone)" class="text-blue-600 hover:text-blue-800">
                       <i class="fas fa-edit"></i>
@@ -240,6 +250,9 @@ export default {
         console.error(err);
       }
       this.zoneToDelete = null;
+    },
+    goToDetail(id) {
+      this.$router.push(`/user_detail/${id}`);
     },
     properties(zone_id) {
       this.$router.push({ path: "/properties", query: { zone_id } });

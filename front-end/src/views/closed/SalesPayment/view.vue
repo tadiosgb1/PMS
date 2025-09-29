@@ -200,6 +200,9 @@ export default {
       }
     },
     async approve(payment) {
+
+      alert("hii");
+
       const payload = { id: payment.id, status: "completed" };
       const res = await this.$apiPatch("/update_sales_payments", payment.id, payload);
       if (res) {

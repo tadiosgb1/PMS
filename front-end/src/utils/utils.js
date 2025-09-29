@@ -483,7 +483,7 @@ export function convertImageToBase64(file) {
 export async function loadPermissions($apiPost) {
   const groups = JSON.parse(localStorage.getItem("groups") || "[]");
   let allPermissions = JSON.parse(localStorage.getItem("permissions") || "[]");
-  console.log("first permissions", allPermissions);
+  //console.log("first permissions", allPermissions);
 
   for (const groupName of groups) {
     try {
@@ -508,7 +508,7 @@ export async function loadPermissions($apiPost) {
 export function hasPermission(permission) {
   const userPermissions = JSON.parse(localStorage.getItem("permissions") || "[]");
 
-  console.log("userPermissions", userPermissions);
+ // console.log("userPermissions", userPermissions);
 
   return userPermissions.includes(permission);
 }
@@ -566,6 +566,7 @@ export async function getZones(url = null, pageSize = 10) {
     const apiUrl = url || `/get_property_zones?page=1&page_size=${pageSize}`;
     const response = await this.$apiGet(apiUrl, params);
     const zones = response.data || [];
+  
 
     // Safely fetch owner and manager names
     for (const zone of zones) {

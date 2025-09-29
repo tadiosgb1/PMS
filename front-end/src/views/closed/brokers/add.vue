@@ -14,10 +14,7 @@
           class="bg-primary text-white px-6 py-4 text-xl font-semibold flex justify-between items-center"
         >
           Add New Broker
-          <button
-            @click="$emit('close')"
-            class="text-white hover:text-gray-200 text-lg font-bold"
-          >
+          <button @click="$emit('close')" class="text-white hover:text-gray-200 text-lg font-bold">
             ✕
           </button>
         </div>

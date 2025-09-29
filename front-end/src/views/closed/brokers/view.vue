@@ -49,7 +49,7 @@
             <thead>
               <tr class="bg-gray-200 text-gray-700">
                 <th class="border border-gray-300 px-4 py-2 cursor-pointer" @click="sortBy('name')">
-                  Name/Owner
+                 Broker name
                   <SortIcon :field="'name'" :sort-key="sortKey" :sort-asc="sortAsc" />
                 </th>
                 <th class="border border-gray-300 px-4 py-2">License Number</th>
@@ -64,7 +64,16 @@
                 :key="broker.id"
                 class="hover:bg-gray-100"
               >
-                <td class="border border-gray-300 px-4 py-2">{{ broker.user }}</td>
+                <td class="border border-gray-300 px-4 py-2">
+                  {{ broker.first_name }} {{ broker.middle_name }} {{ broker.last_name }}
+                  <button
+                    @click="goToUserDetail(broker.user)"
+                    class="text-green-600 hover:text-green-800 ml-2"
+                    title="Detail"
+                  >
+                    <i class="fas fa-info-circle"></i>
+                  </button>
+                </td>
                 <td class="border border-gray-300 px-4 py-2">{{ broker.license_number }}</td>
                 <td class="border border-gray-300 px-4 py-2">{{ broker.commission_rate }}</td>
                 <td class="border border-gray-300 px-4 py-2">{{ broker.wallet }}</td>
@@ -120,12 +129,12 @@
         @close="showAddBroker = false"
         @success="fetchBrokers"
       />
-     <UpdateBroker
-      :visible="showUpdateModal"
-      :brokerId="selectedBrokerId"
-      @close="showUpdateModal = false"
-      @success="fetchBrokers"
-    />
+      <UpdateBroker
+        :visible="showUpdateModal"
+        :brokerId="selectedBrokerId"
+        @close="showUpdateModal = false"
+        @success="fetchBrokers"
+      />
 
       <!-- Delete Confirmation Modal -->
       <ConfirmModal
@@ -177,19 +186,21 @@ export default {
       pageSize: 10,
       pageSizes: [5, 10, 20, 50, 100],
       showAddBroker: false,
-      updateVisible: false,
-      brokerToEdit: null,
+      showUpdateModal: false,
       confirmVisible: false,
       brokerToDelete: null,
       sortKey: "name",
       sortAsc: true,
-      searchTimeout: null, // for debounce
+      searchTimeout: null,
     };
   },
   mounted() {
     this.fetchBrokers();
   },
   methods: {
+    goToUserDetail(id) {
+      this.$router.push(`/user_detail/${id}`);
+    },
     openUpdateModal(id) {
       this.selectedBrokerId = id;
       this.showUpdateModal = true;
@@ -199,7 +210,7 @@ export default {
       clearTimeout(this.searchTimeout);
       this.searchTimeout = setTimeout(() => {
         this.fetchBrokers();
-      }, 300); // wait 300ms after typing stops
+      }, 300);
     },
 
     async fetchBrokers(customUrl = null) {
@@ -207,12 +218,32 @@ export default {
         let url = customUrl || "get_broker_profiles";
         const params = {
           page_size: this.pageSize,
-          search: this.searchTerm || "", // ensure empty search fetches all
+          search: this.searchTerm || "",
         };
         const res = await this.$apiGet(url, params);
 
         const data = res.data || [];
         this.brokers = data.results || data;
+
+        // fetch user details for each broker
+        await Promise.all(
+          this.brokers.map(async (broker) => {
+            try {
+              const userRes = await this.$apiGetById(`/get_user`,broker.user);
+              console.log("userRes",userRes);
+              broker.user = userRes.id;
+              broker.first_name=userRes.first_name;
+              broker.middle_name=userRes.middle_name;
+              broker.last_name=userRes.last_name;
+            } catch (err) {
+              console.error("Failed to fetch user", err);
+              broker.userObj = { first_name: "", middle_name: "", last_name: "" };
+            }
+          })
+        );
+
+        console.log("brokers",this.brokers);
+
         this.currentPage = data.current_page || 1;
         this.totalPages = data.total_pages || 1;
         this.next = data.next;
@@ -229,11 +260,6 @@ export default {
         this.sortKey = key;
         this.sortAsc = true;
       }
-    },
-
-    editBroker(broker) {
-      this.brokerToEdit = broker;
-      this.updateVisible = true;
     },
 
     askDeleteConfirmation(broker) {

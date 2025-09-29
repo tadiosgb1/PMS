@@ -13,10 +13,9 @@ import dashboard from '../views/closed/dashboard.vue'
 import Properties from '../views/closed/proporty/view.vue';
 import PropertyDetail from '../views/closed/proporty/PropertyDetail.vue'
 import rentPay from '../views/closed/rent/view.vue'
-
+import PropertyZoneDetail from '../views/closed/Zones/propertyZoneDetail.vue';
 
 import PropertyZone from '../views/closed/Zones/view.vue';
-import PropertyZoneDetail from '../views/closed/Zones/propertyZoneDetail.vue';
 import PropertyPicture from '../views/closed/proportyPicture/view.vue';
 
 import Payments from '../views/closed/payments/view.vue';
@@ -53,7 +52,9 @@ import notificationDetail from '../views/closed/notifications/notificationDeatil
 import Reports from '../views/closed/report/view.vue'
 import CowrkingSpaces from '../views/closed/coworkingSpace/view.vue'
 import CowrkingSpaceRental from '../views/closed/workspaceRental/view.vue'
-import Commissions from '../views/closed/commissions/view.vue'
+import saleCommissions from '../views/closed/saleCommissions/view.vue'
+import rentCommissions from '../views/closed/rentCommissions/view.vue'
+
 import Configurations from '../views/closed/Configurations/view.vue'
 import CoworkspacePayments from '../views/closed/workspacePayment/view.vue'
 import brokers from '../views/closed/brokers/view.vue'
@@ -118,11 +119,11 @@ const routes = [
       { path: '/properties', name: 'properties', component: Properties },
 
       { path: 'properties/:id', name: 'PropertyDetail', component: PropertyDetail, props: true },
-
+      
+      { path: '/zones/:id', name: 'zoneDetail', component: PropertyZoneDetail, props: true },
 
       { path: 'properties/rentPay/:id', name: 'rentPay', component: rentPay, props: true },
       { path: '/zones', name: 'zones', component: PropertyZone },
-      { path: '/zones/:id', name: 'zoneDetail', component: PropertyZoneDetail, props: true },
       { path: '/pictures', name: 'pictures', component: PropertyPicture },
       { path: '/tenants', name: 'tenants', component: Tenants },
       { path: '/payments', name: 'payments', component: Payments },
@@ -132,8 +133,11 @@ const routes = [
       { path: '/messages', name: 'messages', component: Messages },
       { path: '/settings', name: 'settings', component: Settings },
       { path: '/notifications', name: 'notifications', component: Notifications },
-      { path: 'notification/:id', name: 'notificationDetail', component: notificationDetail, props: true },
-      { path: '/commissions', name: 'commissions', component:Commissions },
+      { path: 'notification/:id', name: 'notificationDetail', component: notificationDetail },
+      { path: '/sale-commissions', name: 'sale-commissions', component:saleCommissions },
+      { path: '/rent-commissions', name: 'rent-commissions', component:rentCommissions },
+      
+   
       { path: '/configurations', name: 'configurations', component:Configurations },
       { path: '/rents', name: 'rents', component: Rents },
       { path: '/property_sales', name: 'property_sales', component: Property_sales },
