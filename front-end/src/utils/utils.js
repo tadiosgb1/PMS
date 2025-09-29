@@ -758,9 +758,9 @@ export async function getTenants(url = null, pageSize = 10) {
 
     if (!isSuperUser) {
       if (groups.includes("manager")) {
-        params = { manager_id__email: email };
+        params = { property_id__property_zone_id__manager_id__email: email };
       } else if (groups.includes("owner")) {
-        params = { owner_id__email: email };
+        params = { property_id__property_zone_id__owner_id__email: email };
       }
       else if (groups.includes("staff")) {
         params = { staff_id__email: email };
@@ -775,8 +775,8 @@ export async function getTenants(url = null, pageSize = 10) {
 
 
     let apiUrl = url || `/get_tenants?page=1&page_size=${pageSize}`;
-    if (groups.includes("manager")) apiUrl = `/get_rents?page=1&page_size=${pageSize}`
-    else if (groups.includes("owner")) apiUrl = `/get_rents?page=1&page_size=${pageSize}`
+    // if (groups.includes("manager")) apiUrl = `/get_rents?page=1&page_size=${pageSize}`
+    // else if (groups.includes("owner")) apiUrl = `/get_rents?page=1&page_size=${pageSize}`
 
     const response = await this.$apiGet(apiUrl, params);
 

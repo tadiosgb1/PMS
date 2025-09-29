@@ -21,13 +21,33 @@
           </button>
         </div>
         <div class="p-6">
-          <!-- Search -->
-          <input
-            v-model="searchTerm"
-            type="search"
-            placeholder="Search Rent..."
-            class="w-full max-w-md px-4 py-2 mb-6 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+          <!-- Search & Page Size -->
+          <div class="flex justify-between items-center mb-6">
+            <input
+              v-model="searchTerm"
+              @input="onSearch"
+              type="search"
+              placeholder="Search Rent..."
+              class="w-full max-w-md px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+
+            <!-- Page Size Dropdown -->
+            <div class="ml-4">
+              <label for="pageSize" class="mr-2 text-gray-700">Show</label>
+              <select
+                id="pageSize"
+                v-model="pageSize"
+                @change="fetchRents()"
+                class="border px-2 py-1 rounded"
+              >
+                <option v-for="size in pageSizes" :key="size" :value="size">
+                  {{ size }}
+                </option>
+              </select>
+              <span class="ml-1 text-gray-700">per page</span>
+            </div>
+          </div>
+
           <!-- Table -->
           <div class="overflow-x-auto">
             <table
@@ -68,13 +88,6 @@
                       :sort-asc="sortAsc"
                     />
                   </th>
-                  <!-- Example of more columns if you want later
-                  <th @click="sortBy('start_date')">Start Date</th>
-                  <th @click="sortBy('end_date')">End Date</th>
-                  <th @click="sortBy('payment_cycle')">Payment Cycle</th>
-                  <th @click="sortBy('rent_amount')">Rent Amount</th>
-                  <th @click="sortBy('deposit_amount')">Deposit Amount</th>
-                  -->
                   <th
                     class="border border-gray-300 px-4 py-2 cursor-pointer"
                     @click="sortBy('status')"
@@ -104,7 +117,6 @@
                   <td class="border border-gray-300 px-4 py-2">
                     {{ rent.rent_type }}
                   </td>
-                  <!-- More fields here if you want -->
                   <td class="border border-gray-300 px-4 py-2">
                     {{ rent.status }}
                   </td>
@@ -127,12 +139,12 @@
                     >
                       <i class="fas fa-info-circle"></i>
                     </button>
-                     <button
+                    <button
                       @click="goToPayments(rent.id)"
                       class="text-green-600 hover:text-green-800 focus:outline-none"
-                      title="Detail"
+                      title="Payments"
                     >
-                    Payments
+                      Payments
                     </button>
                   </td>
                 </tr>
@@ -146,6 +158,27 @@
                 </tr>
               </tbody>
             </table>
+          </div>
+
+          <!-- Pagination -->
+          <div class="flex justify-between items-center mt-4">
+            <button
+              :disabled="!previous"
+              @click="fetchRents(previous)"
+              class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+            >
+              Previous
+            </button>
+            <span class="text-gray-600">
+              Page {{ currentPage }} of {{ totalPages }}
+            </span>
+            <button
+              :disabled="!next"
+              @click="fetchRents(next)"
+              class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+            >
+              Next
+            </button>
           </div>
         </div>
       </div>
@@ -239,22 +272,21 @@ export default {
       sortAsc: true,
       rents: [],
       showModal: false,
+      // Pagination
+      pageSize: 10,
+      pageSizes: [5, 10, 20, 50, 100],
+      currentPage: 1,
+      totalPages: 1,
+      next: null,
+      previous: null,
     };
   },
   computed: {
     filteredAndSortedRents() {
-      const term = this.searchTerm.toLowerCase();
+      let sorted = [...this.rents];
 
-      // 1️⃣ Filter
-      let filtered = this.rents.filter((r) =>
-        (r.property_id?.name || "").toLowerCase().includes(term) ||
-        (r.user_id?.first_name || "").toLowerCase().includes(term) ||
-        (r.rent_type || "").toLowerCase().includes(term) ||
-        (r.status || "").toLowerCase().includes(term)
-      );
-
-      // 2️⃣ Sort
-      filtered.sort((a, b) => {
+      // Sorting by property or tenant names
+      sorted.sort((a, b) => {
         let valA = a[this.sortKey];
         let valB = b[this.sortKey];
 
@@ -272,35 +304,43 @@ export default {
         return 0;
       });
 
-      return filtered;
+      return sorted;
     },
   },
   mounted() {
     this.fetchRents();
   },
   methods: {
-    goToPayments(rental_id){
-    this.$router.push({
-      path: "/rents_payments",
-      //query: { rental_id }
-    });
+    goToPayments(rental_id) {
+      this.$router.push({
+        path: "/rents_payments",
+      });
     },
     rentDetail(rent_id) {
       this.$router.push({ name: "rent-detail", params: { id: rent_id } });
     },
-    async fetchRents() {
+    async fetchRents(
+      url = `/get_rents?page=${this.currentPage}&page_size=${this.pageSize}&search=${this.searchTerm}`
+    ) {
       try {
-        const response = await this.$apiGet("/get_rents");
-        if (Array.isArray(response.data)) {
-          this.rents = response.data;
-        } else {
-          this.rents = [];
-        }
+        const response = await this.$apiGet(url);
+        this.rents = response.data || [];
+        this.currentPage = response.current_page || 1;
+        this.totalPages = response.total_pages || 1;
+        this.next = response.next || null;
+        this.previous = response.previous || null;
       } catch (error) {
         console.error("Failed to fetch rents:", error);
         this.rents = [];
-        alert("Failed to load rents. Please try again later.");
+        this.currentPage = 1;
+        this.totalPages = 1;
+        this.next = null;
+        this.previous = null;
       }
+    },
+    onSearch() {
+      this.currentPage = 1;
+      this.fetchRents();
     },
     sortBy(key) {
       if (this.sortKey === key) this.sortAsc = !this.sortAsc;

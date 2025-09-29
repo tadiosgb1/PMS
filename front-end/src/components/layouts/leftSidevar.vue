@@ -172,6 +172,12 @@ export default {
           icon: "fas fa-money-bill-wave",
           color: "#22c55e",
         },
+         {
+          name: "Tenants",
+          route: "tenants",
+          icon: "fas fa-user",
+          color: "#22c55e",
+        },
 
       ],
     };
