@@ -625,7 +625,7 @@ export async function getManagers() {
     if (isSuperUser || groups.includes("super_staff")) {
       // Superuser or staff: empty params, default URL
       params = {};
-      apiUrl = "/get_managers?page=1&page_size=1000";
+      apiUrl = "/get_owner_managers?page=1&page_size=1000";
     } else if (groups.includes("owner")) {
       // Owner: use owner-specific URL and params
       apiUrl = "/get_owner_managers?page=1&page_size=1000";
@@ -770,7 +770,7 @@ export async function getTenants(url = null, pageSize = 10) {
     }
 
     // Pick correct endpoint
-    let apiUrl = url || `/get_tenants?page=1&page_size=${pageSize}`;
+    let apiUrl = url || `/get_rents?page=1&page_size=${pageSize}`;
     if (groups.includes("manager") || groups.includes("owner") || groups.includes("staff")) {
       apiUrl = url || `/get_rents?page=1&page_size=${pageSize}`;
     }

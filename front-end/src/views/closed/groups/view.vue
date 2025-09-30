@@ -140,6 +140,9 @@ export default {
       try {
         const response = await this.$apiGet('/get_groups', { page_size: 1000 });
         this.groups = response.data || [];
+        
+        console.log("groups",this.groups);
+
       } catch (error) {
         console.error('Failed to fetch groups:', error);
         alert('Failed to load groups. Please try again later.');

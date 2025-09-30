@@ -236,8 +236,10 @@ export default {
     let url = customUrl;
 
     if (localStorage.getItem('is_superuser') === 'true') {
-      url = 'get_staffs';   // fixed spelling
-      params = {};          // keep it object
+      url = 'get_owner_staffs';   // fixed spelling
+      params = {
+        //owner__id: localStorage.getItem('userId')
+      };          // keep it object
     } else {
       url = 'get_owner_staffs';
       params = {
