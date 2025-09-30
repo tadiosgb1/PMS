@@ -94,8 +94,12 @@ export default {
     },
     async markAsRead(id) {
       try {
-        const payload = { is_read: true };
-        const res = await this.$apiPatch(`/update_notification`, id, payload);
+        const payload = { 
+          is_read: true ,
+          id:id,
+          user_id:localStorage.getItem('userId')
+        };
+        const res = await this.$apiPost(`/post_notification_user`,  payload);
         if (res) {
           this.notification.is_read = true;
           this.notification.read_at = new Date().toISOString();
