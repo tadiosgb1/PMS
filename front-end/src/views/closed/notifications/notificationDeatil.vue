@@ -38,8 +38,8 @@
             {{ formatDate(notification.read_at) }}
           </div>
           <div v-if="notification.user_id">
-            <span class="font-semibold">User ID:</span>
-            {{ notification.user_id }}
+            <span class="font-semibold">User :</span>
+            {{ notification.user_id.first_name }}   {{ notification.user_id.middle_name }}   {{ notification.user_id.last_name }} 
           </div>
           <div v-if="notification.maintenance_request_id">
             <span class="font-semibold">Maintenance Request ID:</span>
@@ -97,7 +97,7 @@ export default {
         const payload = { 
           is_read: true ,
           id:id,
-          user_id:localStorage.getItem('userId')
+          user:localStorage.getItem('userId')
         };
         const res = await this.$apiPost(`/post_notification_user`,  payload);
         if (res) {
