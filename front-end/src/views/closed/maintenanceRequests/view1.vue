@@ -248,13 +248,13 @@ export default {
        let params=[];
       if(this.filter_by=='requested_at'){
         params={
-        requested_at__gte:new Date(this.startDate).toISOString(),
-        requested_at__lte: new Date(this.endDate).toISOString(),
+        requested_at__gte:this.startDate,
+        requested_at__lte: this.endDate
         }
       }else{
         params={
-          resolved_at__gte:new Date(this.startDate).toISOString(),
-          resolved_at__lte:new Date(this.endDate).toISOString()
+          resolved_at__gte:this.startDate,
+          resolved_at__lte:this.endDate
         }
       }
      const res=await this.$apiGet('get_maintenance_requests',params)

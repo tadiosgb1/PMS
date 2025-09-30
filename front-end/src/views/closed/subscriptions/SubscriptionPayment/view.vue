@@ -299,10 +299,17 @@ export default {
   methods: {
     async fetchPayments(page = 1) {
       try {
-        const params = {
+        let params = {
+          user_id:localStorage.getItem("userId"),
           page: page,
           page_size: this.perPage,
         };
+        if(localStorage.getItem("is_superuser"=='true')){
+         params = {
+          page: page,
+          page_size: this.perPage,
+        };
+        }
 
         const response = await this.$apiGet("/get_subscription_payment", params);
 
