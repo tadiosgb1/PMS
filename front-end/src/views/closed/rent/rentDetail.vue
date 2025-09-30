@@ -86,16 +86,36 @@
           <!-- Pictures -->
           <div class="mt-6">
             <h3 class="text-lg font-bold mb-2">Pictures</h3>
-            <div  class="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <div v-for="pic in pictures" :key="pic.id" class="border rounded overflow-hidden">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div
+                v-for="pic in pictures"
+                :key="pic.id"
+                class="border rounded overflow-hidden cursor-pointer hover:shadow-lg relative"
+              >
                 <img
                   :src="pic.rent_image"
                   :alt="'Rent picture ' + pic.id"
                   class="w-full h-32 object-cover"
+                  @click="previewImage(pic.rent_image)"
                 />
+
+                <!-- Picture Actions -->
+                <div class="absolute top-2 right-2 flex space-x-1">
+                  <button
+                    @click.stop="openUpdatePicture(pic)"
+                    class="bg-blue-600 text-white px-2 py-1 text-xs rounded hover:bg-blue-700"
+                  >
+                    Update
+                  </button>
+                  <button
+                    @click.stop="askDeletePicture(pic)"
+                    class="bg-red-600 text-white px-2 py-1 text-xs rounded hover:bg-red-700"
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
             </div>
-            
           </div>
         </div>
       </div>
@@ -114,74 +134,137 @@
       @close="addPictureVisible = false"
       @refresh="fetchPictures"
     />
+
+    <!-- Update Picture Modal -->
+    <UpdatePictureModal
+      v-if="updatePictureVisible"
+      :visible="updatePictureVisible"
+      :picture="pictureToUpdate"
+      :rentId="rentId"
+      @close="updatePictureVisible = false"
+      @refresh="fetchPictures"
+    />
+
+    <!-- Confirm Delete -->
+    <ConfirmModal
+      v-if="confirmDeleteVisible"
+      :visible="confirmDeleteVisible"
+      title="Confirm Delete"
+      message="Are you sure you want to delete this picture?"
+      @confirm="confirmDeletePicture"
+      @cancel="confirmDeleteVisible = false"
+    />
+
+    <!-- Image Preview Modal -->
+    <div
+      v-if="imagePreviewVisible"
+      class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50"
+      @click="imagePreviewVisible = false"
+    >
+      <img
+        :src="imageToPreview"
+        alt="Preview"
+        class="max-h-[90%] max-w-[90%] rounded shadow-lg"
+        @click.stop
+      />
+      <button
+        @click="imagePreviewVisible = false"
+        class="absolute top-4 right-4 bg-white text-black px-3 py-1 rounded hover:bg-gray-200"
+      >
+        ✕
+      </button>
+    </div>
   </div>
 </template>
 
 <script>
 import AddPictureModal from "@/views/closed/rent/addRentPicture.vue";
+import UpdatePictureModal from "@/views/closed/rent/updateRentPicture.vue";
+import ConfirmModal from "@/components/ConfirmModal.vue";
 import Toast from "@/components/Toast.vue";
 
 export default {
   name: "RentDetailView",
-  components: { AddPictureModal, Toast },
+  components: { AddPictureModal, UpdatePictureModal, ConfirmModal, Toast },
   data() {
     return {
       rent: null,
       pictures: [],
+      rentId: "",
       addPictureVisible: false,
-      rentId:'',
+      updatePictureVisible: false,
+      confirmDeleteVisible: false,
+      pictureToUpdate: null,
+      pictureToDelete: null,
+      imagePreviewVisible: false,
+      imageToPreview: null,
     };
   },
   mounted() {
-    this.rentId=this.$route.params.id;
+    this.rentId = this.$route.params.id;
     this.fetchRent();
     this.fetchPictures();
   },
   methods: {
     async fetchRent() {
-      const rentId = this.$route.params.id;
-      if (!rentId) {
-        console.error("No rent ID provided in route params");
-        return;
-      }
       try {
-        const response = await this.$apiGetById(`/get_rent`, rentId);
+        const response = await this.$apiGetById(`/get_rent`, this.rentId);
         this.rent = response;
       } catch (error) {
         console.error("Failed to fetch rent:", error);
         this.rent = null;
       }
     },
-
     async fetchPictures() {
-      const rentId = this.$route.params.id;
-      let param= {
-        rent_id:rentId
-      }
-      if (!rentId) return;
+      if (!this.rentId) return;
       try {
-         const response = await this.$apiGet(`/get_rent_pictures`,param);
-         console.log("pictures",response)
-    this.pictures = response ? (Array.isArray(response) ? response : [response]) : [];
-
-        console.log("pictures",this.pictures)
+        const response = await this.$apiGet(`/get_rent_pictures`, {
+          rent_id: this.rentId,
+        });
+        this.pictures = response?.data || [];
       } catch (error) {
         console.error("Failed to fetch pictures:", error);
         this.pictures = [];
       }
     },
 
+    // Picture actions
+    openUpdatePicture(picture) {
+      this.pictureToUpdate = picture;
+      this.updatePictureVisible = true;
+    },
+    askDeletePicture(picture) {
+      this.pictureToDelete = picture;
+      this.confirmDeleteVisible = true;
+    },
+    async confirmDeletePicture() {
+      this.confirmDeleteVisible = false;
+      if (!this.pictureToDelete) return;
+      try {
+        const res = await this.$apiDelete(
+          `/delete_rent_picture/${this.pictureToDelete.id}`
+        );
+        this.$root.$refs.toast.showToast(res.message || "Picture deleted", "success");
+        this.fetchPictures();
+      } catch (err) {
+        console.error(err);
+        this.$root.$refs.toast.showToast("Failed to delete picture.", "error");
+      }
+      this.pictureToDelete = null;
+    },
+
+    previewImage(imageUrl) {
+      this.imageToPreview = imageUrl;
+      this.imagePreviewVisible = true;
+    },
+
+    // Other actions
     viewPayments(rentId) {
       this.$router.push({ path: "/payments", query: { rent_id: rentId } });
     },
-
     editRent(rent) {
       console.log("Edit rent:", rent);
     },
   },
 };
 </script>
-
-<style scoped>
-/* Optional: adjust image container and card styles */
-</style>

@@ -771,22 +771,22 @@ export async function getTenants(url = null, pageSize = 10) {
 
     // Pick correct endpoint
     let apiUrl = url || `/get_rents?page=1&page_size=${pageSize}`;
-    if (groups.includes("manager") || groups.includes("owner") || groups.includes("staff")) {
-      apiUrl = url || `/get_rents?page=1&page_size=${pageSize}`;
-    }
+    // if (groups.includes("manager") || groups.includes("owner") || groups.includes("staff")) {
+    //   apiUrl = url || `/get_rents?page=1&page_size=${pageSize}`;
+    // }
 
-    console.log("params", params);
-    console.log("apiUrl", apiUrl);
+    // console.log("params", params);
+    // console.log("apiUrl", apiUrl);
 
     const response = await this.$apiGet(apiUrl, params);
 console.log("response rents",response)
     // Normalize tenants
     let tenants = [];
-    if (apiUrl.includes("/get_rents")) {
+    // if (apiUrl.includes("/get_rents")) {
       tenants = (response.data || []).map(r => r.user_id).filter(Boolean);
-    } else {
-      tenants = response.data || [];
-    }
+    // } else {
+    //   tenants = response.data || [];
+    // }
 
     console.log("tenants", tenants);
 
