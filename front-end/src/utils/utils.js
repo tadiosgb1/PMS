@@ -906,7 +906,7 @@ export async function getWorkspaceRentals(url = null, pageSize = 10) {
   }
 }
 
-export async function getWorkspacePayments(url = null, pageSize = 10) {
+export async function getWorkspacePayments(url = null, params = {}) {
   try {
     const isSuperUser =
       localStorage.getItem("is_superuser") === "1" ||
@@ -915,21 +915,23 @@ export async function getWorkspacePayments(url = null, pageSize = 10) {
     const groups = JSON.parse(localStorage.getItem("groups") || "[]");
     const email = localStorage.getItem("email");
 
-    let params = {};
+    // Always include rental_id if provided (detail mode), even for superuser
+    const rentalId = params.rental_id || null;
 
-    if (!isSuperUser) {
+    // Add access control only if not in detail mode
+    if (!rentalId && !isSuperUser) {
       if (groups.includes("manager")) {
-        params = { "rental__space__zone__manager_id__email": email };
+        params = { ...params, "rental__space__zone__manager_id__email": email };
       } else if (groups.includes("owner")) {
-        params = { "rental__space__zone__owner_id__email": email };
+        params = { ...params, "rental__space__zone__owner_id__email": email };
       } else if (groups.includes("staff")) {
-        params = { "staff_id__email": email };
+        params = { ...params, "staff_id__email": email };
       } else if (groups.includes("super_staff")) {
-        params = {}; // sees all payments
+        params = { ...params }; // sees all payments
       }
     }
 
-    let apiUrl = url || `/get_rental_payments?page=1&page_size=${pageSize}`;
+    let apiUrl = url || `/get_rental_payments?page=1&page_size=${params.page_size || 10}`;
 
     const response = await this.$apiGet(apiUrl, params);
 
@@ -953,6 +955,4 @@ export async function getWorkspacePayments(url = null, pageSize = 10) {
     };
   }
 }
-
-
 

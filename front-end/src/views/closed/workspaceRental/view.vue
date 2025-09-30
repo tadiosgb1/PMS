@@ -267,10 +267,10 @@ export default {
       }
     },
     goToPayments(rental_id) {
-      this.$router.push({
-        path: "/coworking-payments",
-        query: { rental_id },
-      });
+       this.$router.push({
+          name: "coworking-payments-detail",
+          params: { id: rental_id },
+        });
     },
   },
 };

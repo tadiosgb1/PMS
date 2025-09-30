@@ -97,29 +97,22 @@
 
         <!-- Row 5: User + Space -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div>
+          <!-- User (from localStorage) -->
+          <!-- <div>
             <label class="block text-sm font-medium mb-1">User</label>
-            <select
-              v-model.number="form.user"
-              
-              class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
-            >
-              <option disabled value="">Select User</option>
-              <option
-                v-for="user in users"
-                :key="user.id"
-                :value="user.id"
-              >
-                {{ user.name }}
-              </option>
-            </select>
-          </div>
+            <input
+              type="text"
+              :value="getUserName()"
+              disabled
+              class="w-full border rounded-lg px-3 py-2 bg-gray-100 cursor-not-allowed"
+            />
+          </div> -->
 
+          <!-- Space -->
           <div>
             <label class="block text-sm font-medium mb-1">Space</label>
             <select
               v-model.number="form.space"
-             
               class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
             >
               <option disabled value="">Select Space</option>
@@ -148,8 +141,6 @@
   </div>
 </template>
 
-
-
 <script>
 export default {
   name: "AddRental",
@@ -165,7 +156,7 @@ export default {
         cycle: "",
         start_date: "",
         is_active: true,
-        user: 52,
+        user: localStorage.getItem("userId") || 0,
         space: 1,
       },
       users: [],
@@ -173,18 +164,22 @@ export default {
     };
   },
   async mounted() {
-    // Fetch users and spaces for dropdowns
     try {
       const usersRes = await this.$apiGet("/get_users");
       this.users = usersRes.data || [];
 
       const spacesRes = await this.$apiGet("/get_coworking_spaces");
-      this.spaces = spacesRes.data.data || [];
+      this.spaces = spacesRes.data
     } catch (err) {
       console.error("Failed to fetch users or spaces:", err);
     }
   },
   methods: {
+    // getUserName() {
+    //   const userId = Number(localStorage.getItem("userId"));
+    //   const user = this.users.find(u => u.id === userId);
+    //   return user ? user.name : "Unknown User";
+    // },
     async submitForm() {
       try {
         const payload = { ...this.form };
@@ -206,7 +201,7 @@ export default {
         cycle: "",
         start_date: "",
         is_active: true,
-        user: 0,
+        user: localStorage.getItem("userId") || 0,
         space: 0,
       };
     },

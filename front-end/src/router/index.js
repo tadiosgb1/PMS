@@ -150,6 +150,7 @@ const routes = [
       { path: '/coworking-spaces', name: 'coworking-spaces', component: CowrkingSpaces },
       { path: '/coworking-space-rentals', name: 'coworking-space-rentals', component:CowrkingSpaceRental },
       { path: '/coworking-payments', name: 'coworking-payments', component:CoworkspacePayments },
+      { path: '/coworking-payments/:id', name: 'coworking-payments-detail', component:CoworkspacePayments, props:true },
       { path: '/user_add', name: 'user_add', component: User_add },
 
       {

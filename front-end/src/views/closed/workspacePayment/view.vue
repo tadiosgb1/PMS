@@ -8,6 +8,7 @@
         <div class="bg-primary text-white px-6 py-4 text-xl font-bold flex justify-between items-center">
           Workspace Payments
           <button
+            v-if="!rentalId"
             @click="showModal = true"
             class="bg-white text-blue-700 font-semibold px-2 lg:px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300 flex items-center"
           >
@@ -15,8 +16,8 @@
           </button>
         </div>
 
-        <!-- Search & Page Size -->
-        <div class="p-6 flex justify-between items-center mb-6">
+        <!-- Search & Page Size (hide in detail) -->
+        <div v-if="!rentalId" class="p-6 flex justify-between items-center mb-6">
           <input
             v-model="searchTerm"
             @input="fetchPayments(1)"
@@ -33,7 +34,7 @@
             <span class="ml-1 text-gray-700">per page</span>
           </div>
         </div>
-
+{{ this.$route.params.id }}
         <!-- Table -->
         <div class="overflow-x-auto p-6">
           <table class="min-w-full table-auto border-collapse border border-gray-300 text-sm">
@@ -85,8 +86,8 @@
           </table>
         </div>
 
-        <!-- Pagination -->
-        <div class="flex justify-between items-center p-6">
+        <!-- Pagination (hide in detail) -->
+        <div v-if="!rentalId" class="flex justify-between items-center p-6">
           <button
             :disabled="!previous"
             @click="fetchPayments(previous)"
@@ -107,6 +108,7 @@
 
       <!-- Add Payment Modal -->
       <AddRentalPayment
+        v-if="!rentalId"
         :visible="showModal"
         @close="showModal = false"
         @success="fetchPayments"
@@ -155,6 +157,9 @@ export default {
     };
   },
   computed: {
+    rentalId() {
+      return this.$route.params.id || null; // detail mode if exists
+    },
     filteredAndSortedPayments() {
       const term = this.searchTerm.toLowerCase();
       return this.payments
@@ -178,31 +183,51 @@ export default {
   mounted() {
     this.fetchPayments();
   },
+  watch: {
+    "$route.params.id"() {
+      this.fetchPayments();
+    },
+  },
   methods: {
-    async fetchPayments(url = null) {
+    async fetchPayments(urlOrPage = null) {
       try {
-        const params = typeof url === "string" ? {} : { page_size: this.perPage };
-        const res = await this.$getWorkspacePayments(url, params);
+        let params = {};
+        let url = null;
+
+        if (this.rentalId) {
+          // detail mode: only fetch by rental_id
+          params = { rental_id: this.rentalId };
+        } else {
+          // list mode
+          if (typeof urlOrPage === "string") url = urlOrPage;
+          else params = { page: urlOrPage || 1, page_size: this.perPage };
+        }
+
+       const res = await this.$getWorkspacePayments(null, params);
         this.payments = res.payments || [];
         this.currentPage = res.currentPage || 1;
         this.totalPages = res.totalPages || 1;
-        this.next = res.next;
-        this.previous = res.previous;
+        this.next = res.next || null;
+        this.previous = res.previous || null;
       } catch (err) {
         console.error("Failed to fetch payments:", err);
         this.payments = [];
       }
     },
+
     sortBy(key) {
       if (this.sortKey === key) this.sortAsc = !this.sortAsc;
       else this.sortKey = key;
     },
+
     approve(payment) {
       this.updatePaymentStatus(payment, "paid", "Payment Approved Successfully");
     },
+
     disApprove(payment) {
       this.updatePaymentStatus(payment, "pending", "Payment Disapproved Successfully");
     },
+
     async updatePaymentStatus(payment, status, message) {
       try {
         await this.$apiPatch("/update_rental_payments", payment.id, { status });
@@ -213,6 +238,7 @@ export default {
         this.$refs.toast.showToast("Failed to update payment", "error");
       }
     },
+
     formatDate(dateString) {
       if (!dateString) return "-";
       return new Date(dateString).toLocaleDateString();
