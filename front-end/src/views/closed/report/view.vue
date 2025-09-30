@@ -114,8 +114,10 @@
           </div>
 
           <div v-if="activePaymentTab === 'rental'">
-            <h3 class="text-gray-600 font-semibold mb-2">Rental Payments</h3>
+            <h3 class="text-gray-600 font-semibold mb-2">Cowrk space Payments</h3>
             <div class="flex space-x-4 mb-2">
+
+             
               <div class="flex flex-col">
                 <label class="text-sm font-medium">From</label>
                 <input type="date" v-model="rentalPaymentFilter.from" class="border rounded p-1 text-sm" />
@@ -124,6 +126,13 @@
                 <label class="text-sm font-medium">To</label>
                 <input type="date" v-model="rentalPaymentFilter.to" class="border rounded p-1 text-sm" />
               </div>
+               <select v-model="cowrk_type" class="border rounded-lg p-2">
+        <option value="rental__start_date">Agreement Start</option>
+        <option value="paid_at">Paid at</option>
+        <option value="cycle_start">Cycle Start</option>
+        <option value="cycle_end">Cycle End</option>
+        <option value="rental__next_due_date">Next Due Date</option>
+      </select>
               <button @click="applyRentalFilter" class="self-end px-3 py-1 bg-purple-600 text-white rounded hover:bg-purple-700 text-sm">Apply</button>
             </div>
             <p class="text-xl font-bold mb-2">{{ filteredRentalPayments.length }}</p>
@@ -148,6 +157,7 @@ export default {
   components: { apexchart: VueApexCharts },
   data() {
     return {
+      cowrk_type:"rental__start_date",
       activeUserTab: "owners",
       activePaymentTab: "subscription",
       userTabs: [
@@ -160,7 +170,7 @@ export default {
         { key: "subscription", label: "Subscription" },
         { key: "sales", label: "Sales" },
         { key: "rent", label: "Rent" },
-        { key: "rental", label: "Rental" },
+        { key: "rental", label: "Co-work-space" },
       ],
 
       users: [],
@@ -185,7 +195,7 @@ export default {
       userSeries: [1, 1, 1, 1], // Owners, Tenants, Staffs, Managers
       userChartOptions: { labels: ["Owners", "Tenants", "Staffs", "Managers"], legend: { position: "bottom" } },
       paymentSeries: [10, 20, 15, 5], // Subscription, Sales, Rent, Rental
-      paymentChartOptions: { labels: ["Subscription", "Sales", "Rent", "Rental"], legend: { position: "bottom" } },
+      paymentChartOptions: { labels: ["Subscription", "Sales", "Rent", "Workspace"], legend: { position: "bottom" } },
     };
   },
   mounted() {
@@ -203,12 +213,92 @@ export default {
         console.error(err);
       }
     },
-    applyUserFilter() {
-      if (!this.userFilter.from || !this.userFilter.to) { this.filteredUsers = [...this.users]; return; }
-      const from = new Date(this.userFilter.from);
-      const to = new Date(this.userFilter.to);
-      this.filteredUsers = this.users.filter(u => new Date(u.created_at) >= from && new Date(u.created_at) <= to);
-    },
+
+async applySalesFilter() {
+  //alert("hi")
+  try {
+   // alert("hii")
+    // If no dates are selected, fetch all sales payments
+    if (!this.salesPaymentFilter.from || !this.salesPaymentFilter.to) {
+      const res = await this.$apiGet("/get_sales_payments");
+      console.log("res filter for sales payment",res);
+      this.salesPayments = res?.data || [];
+      this.filteredSalesPayments = [...this.salesPayments];
+      return;
+    }
+
+    const params= {
+        due_date__gte: this.salesPaymentFilter.from,
+        due_date__lte: this.salesPaymentFilter.to,
+      };
+    // Use backend filters for due_date
+    const res = await this.$apiGet("/get_sales_payments", params);
+
+    console.log("sales filter by date",res);
+
+    this.salesPayments = res?.data || [];
+    this.filteredSalesPayments = [...this.salesPayments];
+  } catch (error) {
+    console.error("Error fetching filtered sales payments:", error);
+  }
+},
+
+
+  async applyRentFilter() {
+    //alert("hu")
+  try {
+    // If no dates are selected, fetch all rental payments
+    if (!this.rentPaymentFilter.from || !this.rentPaymentFilter.to) {
+      const res = await this.$apiGet("/get_payments");
+      this.rentPayments = res?.data || [];
+      this.filteredRentPayments = [...this.rentPayments];
+      return;
+    }
+
+   const  params= {
+        due_date__gte: this.rentPaymentFilter.from,
+        due_date__lte: this.rentPaymentFilter.to,
+      };
+    // Use backend filters for rental__start_date
+    const res = await this.$apiGet("/get_payments",params);
+
+    console.log("res for rental apply filter",res)
+    this.rentPayments = res?.data || [];
+    this.filteredRentPayments = [...this.rentPayments];
+  } catch (error) {
+    console.error("Error fetching filtered rent payments:", error);
+  }
+},
+
+ async applyRentalFilter() {
+  try {
+    // If no dates are selected, fetch all rental payments
+    if (!this.rentalPaymentFilter.from || !this.rentalPaymentFilter.to) {
+      const res = await this.$apiGet("/get_rental_payments");
+      this.rentalPayments = res?.data || [];
+      this.filteredRentalPayments = [...this.rentalPayments];
+      return;
+    }
+
+    // Build dynamic params based on cowrk_type
+    const params = {
+      [`${this.cowrk_type}__gte`]: this.rentalPaymentFilter.from,
+      [`${this.cowrk_type}__lte`]: this.rentalPaymentFilter.to,
+    };
+
+    const res = await this.$apiGet("/get_rental_payments",  params );
+
+    console.log("Filter applied for:", this.cowrk_type, res);
+
+    this.rentalPayments = res?.data || [];
+    this.filteredRentalPayments = [...this.rentalPayments];
+  } catch (error) {
+    console.error("Error fetching filtered rental payments:", error);
+  }
+},
+
+
+
 
     /** PAYMENTS */
     async fetchAllPayments() {
@@ -218,15 +308,40 @@ export default {
       await this.fetchRentalPayments();
     },
     async fetchSubscriptionPayments() { const res = await this.$apiGet("/get_subscription_payment"); this.subscriptionPayments = res?.data || []; this.filteredSubscriptionPayments = [...this.subscriptionPayments]; },
-    async fetchSalesPayments() { const res = await this.$apiGet("/get_sales_payments"); this.salesPayments = res?.data || []; this.filteredSalesPayments = [...this.salesPayments]; },
+    async fetchSalesPayments() {
+       const res = await this.$apiGet("/get_sales_payments"); this.salesPayments = res?.data || []; this.filteredSalesPayments = [...this.salesPayments]; },
     async fetchRentPayments() { const res = await this.$apiGet("/get_payments"); this.rentPayments = res?.data || []; this.filteredRentPayments = [...this.rentPayments]; },
     async fetchRentalPayments() { const res = await this.$apiGet("/get_rental_payments"); this.rentalPayments = res?.data || []; this.filteredRentalPayments = [...this.rentalPayments]; },
 
-    applySubscriptionFilter() { this.filteredSubscriptionPayments = this.applyDateFilter(this.subscriptionPayments, this.subscriptionPaymentFilter, "payment_date"); },
-    applySalesFilter() { this.filteredSalesPayments = this.applyDateFilter(this.salesPayments, this.salesPaymentFilter, "payment_date"); },
-    applyRentFilter() { this.filteredRentPayments = this.applyDateFilter(this.rentPayments, this.rentPaymentFilter, "due_date"); },
-    applyRentalFilter() { this.filteredRentalPayments = this.applyDateFilter(this.rentalPayments, this.rentalPaymentFilter, "due_date"); },
-    applyDateFilter(data, filter, field) {
+    async applySubscriptionFilter() {
+        try {
+          // If no dates are selected, fetch all subscription payments
+          if (!this.subscriptionPaymentFilter.from || !this.subscriptionPaymentFilter.to) {
+            const res = await this.$apiGet("/get_subscription_payment");
+            this.subscriptionPayments = res?.data || [];
+            this.filteredSubscriptionPayments = [...this.subscriptionPayments];
+            return;
+          }
+
+          // Build filter params for created_at
+          const params = {
+            created_at__gte: this.subscriptionPaymentFilter.from,
+            created_at__lte: this.subscriptionPaymentFilter.to,
+          };
+
+          const res = await this.$apiGet("/get_subscription_payment",  params );
+
+          console.log("Subscription filter applied:", res);
+
+          this.subscriptionPayments = res?.data || [];
+          this.filteredSubscriptionPayments = [...this.subscriptionPayments];
+        } catch (error) {
+          console.error("Error fetching filtered subscription payments:", error);
+        }
+      },
+
+  
+  applyDateFilter(data, filter, field) {
       if (!filter.from || !filter.to) return [...data];
       const from = new Date(filter.from), to = new Date(filter.to);
       return data.filter(item => new Date(item[field]) >= from && new Date(item[field]) <= to);
