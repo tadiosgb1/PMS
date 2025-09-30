@@ -330,7 +330,9 @@ export default {
     ) {
       try {
         const res = await this.$apiGet(url);
-        console.log("sale", res);
+      
+        console.log("saless", res);
+        
         console.log("property sale", res.data.property_id);
         this.sales = res.data || [];
         this.currentPage = res.current_page || 1;
