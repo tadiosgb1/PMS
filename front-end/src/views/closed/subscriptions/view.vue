@@ -289,15 +289,17 @@ export default {
     async fetchSubscriptions(url = null) {
       try {
         let params = {
-          user_id: localStorage.getItem("userId"),
+          user_id__id: localStorage.getItem("userId"),
           ordering: "-id",
         };
 
-        if (localStorage.getItem("is_superuser") === "true") {
+        if (localStorage.getItem("is_superuser") == "true") {
           params = {
             ordering: "-id",
           };
         }
+
+        console.log("params for subscription",params)
 
         const pageUrl =
           url || `/get_subscription?page=1&page_size=${this.pageSize}`;

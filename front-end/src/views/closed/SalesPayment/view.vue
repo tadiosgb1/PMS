@@ -197,17 +197,27 @@ export default {
       if(status=='all'){
         params={}
       }
+      
       const res = await this.$apiGet("/get_sales_payments", params);
        this.payments = res.data || [];
     },
     async fetchPayments(page = 1) {
       try {
-        const params = { page, page_size: this.perPage ,search:this.searchTerm};
+        const params = { 
+          page, page_size: this.perPage ,
+          search:this.searchTerm
+        };
+
+
         const id = this.$route.query.id;
-        if (id) params.property_sale_id__id = id;
+        if (id) params.property_zone_sale_id__id = id;
+        console.log("params for sale payments params",params);
 
         const res = await this.$apiGet("/get_sales_payments", params);
         this.payments = res.data || [];
+        
+        console.log("payments sale",this.payments);
+
         this.currentPage = res.current_page || 1;
         this.totalPages = res.total_pages || 1;
         this.next = res.next;
