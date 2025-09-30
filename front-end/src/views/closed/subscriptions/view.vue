@@ -74,18 +74,18 @@
                     {{ formatDate(subscription.end_date) }}
                   </td>
                  <td
-                  class="px-4 py-2 border text-white font-medium rounded"
+                  class="bg-white px-4 py-2 border text-white font-medium rounded"
                   :class="{
                     'bg-yellow-500': subscription.status === 'pending',
                     'bg-red-500': subscription.status === 'expired',
                     'bg-green-500': subscription.status === 'active'
                   }"
                 >
-                  {{ subscription.status }}
+             {{ subscription.status }}
                 </td>
 
 
-                  <td class="px-4 py-2 border">{{ subscription.ownerName }}</td>
+                  <td class="px-4 py-2 border">{{ subscription.ownerName }} <i class="fas fa-detail"></i></td>
 
                   <td class="px-4 py-2 border text-center">
                     <div class="flex flex-wrap justify-center gap-2">
