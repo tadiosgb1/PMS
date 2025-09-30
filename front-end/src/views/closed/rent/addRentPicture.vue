@@ -38,6 +38,7 @@
                 </svg>
                 <p class="text-sm text-gray-500">Click to upload</p>
               </div>
+              {{ this.rentId }}
               <input
                 required
                 id="file-upload"
