@@ -45,8 +45,16 @@
               <tr class="bg-gray-200 text-gray-700">
                 <th class="border border-gray-300 px-4 py-2">Message</th>
                 <th class="border border-gray-300 px-4 py-2">Type</th>
+                    <th class="border border-gray-300 px-4 py-2">User </th>
+                    <th class="border border-gray-300 px-4 py-2">Maintenance detail</th>
+                 <th class="border border-gray-300 px-4 py-2">Payment detail</th>
+                    <th class="border border-gray-300 px-4 py-2">Rent detail</th>
                 <th class="border border-gray-300 px-4 py-2">Created At</th>
+
+
                 <th class="border border-gray-300 px-4 py-2">Status</th>
+                
+                <th class="border border-gray-300 px-4 py-2">Read At</th>
                 <th class="border border-gray-300 px-4 py-2 text-center">
                   Actions
                 </th>
@@ -65,11 +73,36 @@
                   {{ notif.notification_type }}
                 </td>
                 <td class="border border-gray-300 px-4 py-2">
+                  {{ notif.user_id.first_name
+                      }}  {{ notif.user_id.middle_name
+                      }}  {{ notif.user_id.last_name
+                      }}
+                </td>
+
+                 <td class="border border-gray-300 px-4 py-2">
+                  {{ notif.maintenance_request_id
+                      }}
+                </td>
+                 <td class="border border-gray-300 px-4 py-2">
+                  {{ notif.payment_id
+                      }}
+                </td>
+                    <td class="border border-gray-300 px-4 py-2">
+                  {{ notif.rent_id
+                      }}
+                </td>
+
+                <td class="border border-gray-300 px-4 py-2">
                   {{ formatDate(notif.created_at) }}
                 </td>
                 <td class="border border-gray-300 px-4 py-2">
                   {{ notif.is_read ? "Read" : "Unread" }}
                 </td>
+ <td class="border border-gray-300 px-4 py-2">
+                  {{ notif.rent_at
+                      }}
+                </td>
+
                 <td class="border border-gray-300 px-4 py-2 text-center space-x-2">
                   <button
                     v-if="!notif.is_read"
@@ -171,7 +204,7 @@ export default {
       totalPages: 1,
       next: null,
       previous: null,
-      pageSize: 10,
+      pageSize: 1000,
       pageSizes: [5, 10, 20, 50, 100],
     };
   },
@@ -195,10 +228,19 @@ export default {
    },
     async fetchNotifications(customUrl = null) {
       try {
-        const params = { page_size: this.pageSize, page: this.currentPage };
+        let params = {
+          user_id__email:localStorage.getItem('email'),
+          page_size: this.pageSize,
+          page: this.currentPage };
+          if(localStorage.getItem('is_superuser'=='true')){
+         params = {
+          page_size: this.pageSize,
+          page: this.currentPage };
+          }
         const url = customUrl || "get_notifications";
+        console.log("params for notif",params);
 
-        const res = await this.$apiGet(`/get_unread_notifications`, params);
+        const res = await this.$apiGet(`/get_notifications`, params);
 
         this.notifications = res.data || [];
         this.currentPage = res.current_page || 1;

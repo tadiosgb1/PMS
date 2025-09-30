@@ -25,7 +25,7 @@
             <li v-for="item in filteredMenuItems" :key="item.route">
               <router-link
                 :to="{ name: item.route }"
-                class="flex items-center px-3 py-2 rounded-md hover:bg-orange-100 text-sm font-medium transition-all duration-200"
+                class="flex items-center px-3 py-1 rounded-md hover:bg-orange-100 text-sm font-medium transition-all duration-200"
                 :class="{
                   'bg-orange-50 text-orange-600 font-semibold':
                     $route.name === item.route,
@@ -172,13 +172,7 @@ export default {
           icon: "fas fa-money-bill-wave",
           color: "#22c55e",
         },
-         {
-          name: "Tenants",
-          route: "tenants",
-          icon: "fas fa-user",
-          color: "#22c55e",
-        },
-
+        
       ],
     };
   },

@@ -18,6 +18,20 @@
         class="px-3 py-2 border rounded w-full max-w-md focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
 
+             <div class="flex items-center">
+              <label class="mr-2 text-sm text-gray-600">Status</label>
+              <select
+                @change="filterByStatus(statusFilter)"
+                v-model="statusFilter"
+                class="px-2 py-1 border rounded-md text-sm"
+              >
+                <option value="all">All</option>
+                <option value="complete">Completed</option>
+                <option value="pending">Pending</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+            </div>
+
       <!-- Show -->
       <div class="ml-4">
         <label class="mr-2 text-sm text-gray-600">Show</label>
@@ -68,21 +82,26 @@
             <td class="px-3 py-2">{{ payment.rent_id }}</td>
             <td class="px-3 py-2">{{ payment.user_id }}</td>
             <td class="px-3 py-2 text-center">
-              <button
-                v-if="payment.status !== 'paid'"
-                @click="approve(payment)"
-                class="text-blue-600 hover:text-blue-800 focus:outline-none mr-2"
-              >
-                Approve
-              </button>
-              <button
-                v-else
-                @click="disApprove(payment)"
-                class="text-red-600 hover:text-red-800 focus:outline-none"
-              >
-                Disapprove
-              </button>
+            
+
+                 <button
+                       v-if="payment.status=='pending'  || payment.status=='cancelled'"
+                      @click="approve(payment)"
+                      class="text-blue-600 hover:text-blue-800 focus:outline-none"
+                    >
+                      Approve
+                    </button>
+
+                    <button
+                      v-if="payment.status=='pending'  || payment.status=='complete'"
+                      @click="reject(payment)"
+                      class="ml-2 text-red-600 hover:text-red-800 focus:outline-none"
+                    >
+                      Cancel
+                    </button>
             </td>
+
+            
           </tr>
           <tr v-if="filteredPayments.length === 0">
             <td colspan="11" class="px-3 py-4 text-center text-gray-500">No payments found</td>
@@ -124,6 +143,7 @@ export default {
       totalPages: 1,
       next: null,
       previous: null,
+      statusFilter:'all'
     };
   },
   computed: {
@@ -140,11 +160,24 @@ export default {
     this.fetchPayments(1);
   },
   methods: {
+
+    async filterByStatus(status){
+      let params={
+       status:status,
+      }
+      if(status=='all'){
+        params={}
+      }
+
+      const res = await this.$apiGet("/get_payments", params);
+      this.payments = Array.isArray(res.data) ? res.data : [];
+    },
     async fetchPayments(page = 1) {
       try {
         const params = { page, page_size: this.perPage };
         const res = await this.$apiGet("/get_payments", params);
         this.payments = Array.isArray(res.data) ? res.data : [];
+
         this.currentPage = res.current_page;
         this.totalPages = res.total_pages;
         this.next = res.next;
@@ -175,7 +208,7 @@ export default {
         this.fetchPayments(this.currentPage);
       }
     },
-    async disApprove(payment) {
+    async reject(payment) {
       const payload = { id: payment.id, status: "pending" };
       const res = await this.$apiPatch(`/update_payments`, payment.id, payload);
       if (res) {

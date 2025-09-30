@@ -213,7 +213,7 @@ export default {
     this.name = localStorage.getItem("name");
 
     const params = { page_size: 1000000 };
-    const res = await this.$apiGet(`/get_unread_notifications`, params);
+    const res = await this.$apiGet(`/get_unread_notifications`,localStorage.getItem('userId'),params);
     this.notifications = res.data;
     console.log("notifications", this.notifications);
   },

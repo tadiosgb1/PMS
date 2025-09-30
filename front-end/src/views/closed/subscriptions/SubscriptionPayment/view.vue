@@ -86,17 +86,7 @@
                       :sort-asc="sortAsc"
                     />
                   </th>
-                  <th
-                    class="border border-gray-300 px-4 py-2 cursor-pointer"
-                    @click="sortBy('status')"
-                  >
-                    Status
-                    <SortIcon
-                      :field="'status'"
-                      :sort-key="sortKey"
-                      :sort-asc="sortAsc"
-                    />
-                  </th>
+                 
                   <th
                     class="border border-gray-300 px-4 py-2 cursor-pointer"
                     @click="sortBy('transaction_id')"
@@ -109,9 +99,20 @@
                     />
                   </th>
                   <th class="border border-gray-300 px-4 py-2">Created At</th>
-                  <th class="border border-gray-300 px-4 py-2">End Date</th>
+                  <th v-if="showEndDate" class="border border-gray-300 px-4 py-2">End Date</th>
                   <th class="border border-gray-300 px-4 py-2">Owner</th>
                   <th class="border border-gray-300 px-4 py-2">Plan</th>
+                   <th
+                    class="border border-gray-300 px-4 py-2 cursor-pointer"
+                    @click="sortBy('status')"
+                  >
+                    Status
+                    <SortIcon
+                      :field="'status'"
+                      :sort-key="sortKey"
+                      :sort-asc="sortAsc"
+                    />
+                  </th>
                   <th class="border border-gray-300 px-4 py-2 text-center">
                     Actions
                   </th>
@@ -126,19 +127,25 @@
                   <td class="border border-gray-300 px-4 py-2">
                     {{ p.payment_method }}
                   </td>
+
+
                   <td class="border border-gray-300 px-4 py-2">
                     {{ p.amount }}
                   </td>
-                  <td class="border border-gray-300 px-4 py-2">
-                    {{ p.status }}
-                  </td>
+
+
+                  
+
+
+                
+
                   <td class="border border-gray-300 px-4 py-2">
                     {{ p.transaction_id }}
                   </td>
                   <td class="border border-gray-300 px-4 py-2">
                     {{ p.created_at || "-" }}
                   </td>
-                  <td class="border border-gray-300 px-4 py-2">
+                  <td v-if="showEndDate" class="border border-gray-300 px-4 py-2">
                     {{ p.end_date || "-" }}
                   </td>
                   <td class="border border-gray-300 px-4 py-2">
@@ -147,9 +154,19 @@
                   <td class="border border-gray-300 px-4 py-2">
                     {{ p.planName }}
                   </td>
+                   <td
+                  class="px-4 py-2 border text-black font-medium rounded"
+                  :class="{
+                    'bg-yellow-500': p.status === 'pending',
+                    'bg-red-500': p.status === 'canceled',
+                    'bg-green-500': p.status === 'paid'
+                  }"
+                >
+                  {{ p.status }}
+                </td>
                   <td class="border border-gray-300 px-4 py-2 text-center">
                     <button
-                      v-if="p.status != 'paid'"
+                      v-if="p.status == 'canceled'  || p.status=='pending' "
                       @click="approve(p)"
                       class="text-blue-600 hover:text-blue-800 focus:outline-none"
                     >
@@ -157,12 +174,14 @@
                     </button>
 
                     <button
-                      v-else
-                      @click="disApprove(p)"
-                      class="text-red-600 hover:text-red-800 focus:outline-none"
+                      v-if="p.status == 'paid'  || p.status=='pending' "
+                      @click="reject(p)"
+                      class="ml-3 text-red-600 hover:text-red-800 focus:outline-none"
                     >
-                      Disapprove
+                     Reject
                     </button>
+
+                    
                   </td>
                 </tr>
                 <tr v-if="filteredAndSortedPayments.length === 0">
@@ -351,8 +370,8 @@ export default {
         }
       }
     },
-    async disApprove(payment) {
-      const payload = { id: payment.id, status: "pending" };
+    async reject(payment) {
+      const payload = { id: payment.id, status: "canceled" };
       const res = await this.$apiPatch(`/update_subscription_payment`, payment.id, payload);
       if (res) {
         this.$root.$refs.toast.showToast(`Payment DisApproved Successfully`, 'success');
