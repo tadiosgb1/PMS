@@ -5,9 +5,7 @@
     <div class="min-h-screen bg-gray-100 mt-3 mx-3">
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
         <!-- Header -->
-        <div
-          class="bg-primary text-white px-6 py-4 text-xl font-bold flex justify-between items-center"
-        >
+        <div class="bg-primary text-white px-6 py-4 text-xl font-bold flex justify-between items-center">
           Co-Working Spaces
           <button
             @click="showAddSpace = true"
@@ -44,21 +42,12 @@
 
         <!-- Table -->
         <div class="overflow-x-auto p-6">
-          <table
-            class="min-w-full table-auto border-collapse border border-gray-300 text-sm"
-          >
+          <table class="min-w-full table-auto border-collapse border border-gray-300 text-sm">
             <thead>
               <tr class="bg-gray-200 text-gray-700">
-                <th
-                  class="border border-gray-300 px-4 py-2 cursor-pointer"
-                  @click="sortBy('name')"
-                >
+                <th class="border border-gray-300 px-4 py-2 cursor-pointer" @click="sortBy('name')">
                   Name
-                  <SortIcon
-                    :field="'name'"
-                    :sort-key="sortKey"
-                    :sort-asc="sortAsc"
-                  />
+                  <SortIcon :field="'name'" :sort-key="sortKey" :sort-asc="sortAsc" />
                 </th>
                 <th class="border border-gray-300 px-4 py-2">Location</th>
                 <th class="border border-gray-300 px-4 py-2">Description</th>
@@ -68,17 +57,11 @@
                 <th class="border border-gray-300 px-4 py-2">Quarterly Price</th>
                 <th class="border border-gray-300 px-4 py-2">Yearly Price</th>
                 <th class="border border-gray-300 px-4 py-2">Zone</th>
-                <th class="border border-gray-300 px-4 py-2 text-center">
-                  Actions
-                </th>
+                <th class="border border-gray-300 px-4 py-2 text-center">Actions</th>
               </tr>
             </thead>
             <tbody>
-              <tr
-                v-for="space in filteredAndSortedSpaces"
-                :key="space.id"
-                class="hover:bg-gray-100"
-              >
+              <tr v-for="space in filteredAndSortedSpaces" :key="space.id" class="hover:bg-gray-100">
                 <td class="border border-gray-300 px-4 py-2">{{ space.name }}</td>
                 <td class="border border-gray-300 px-4 py-2">{{ space.location }}</td>
                 <td class="border border-gray-300 px-4 py-2">{{ space.description }}</td>
@@ -89,32 +72,19 @@
                 <td class="border border-gray-300 px-4 py-2">{{ space.price_yearly }}</td>
                 <td class="border border-gray-300 px-4 py-2">{{ space.zone }}</td>
                 <td class="border border-gray-300 px-4 py-2 text-center space-x-2">
-                  <button
-                    @click="editSpace(space)"
-                    class="text-green-600 hover:text-green-800"
-                  >
+                  <button @click="editSpace(space)" class="text-green-600 hover:text-green-800">
                     <i class="fas fa-edit"></i>
                   </button>
-                  <button
-                    @click="askDeleteConfirmation(space);"
-                    class="text-red-600 hover:text-red-800"
-                  >
+                  <button @click="askDeleteConfirmation(space)" class="text-red-600 hover:text-red-800">
                     <i class="fas fa-trash"></i>
                   </button>
-
-             
-                  <button
-                    @click="goToRentals(space.id);"
-                    class="text-blue-600 hover:text-blue-800"
-                      >
+                  <button @click="goToRentals(space.id)" class="text-blue-600 hover:text-blue-800">
                     Payments
                   </button>
                 </td>
               </tr>
               <tr v-if="filteredAndSortedSpaces.length === 0">
-                <td colspan="10" class="text-center py-6 text-gray-500">
-                  No co-working spaces found.
-                </td>
+                <td colspan="10" class="text-center py-6 text-gray-500">No co-working spaces found.</td>
               </tr>
             </tbody>
           </table>
@@ -129,9 +99,7 @@
           >
             Previous
           </button>
-          <span class="text-gray-600">
-            Page {{ currentPage }} of {{ totalPages }}
-          </span>
+          <span class="text-gray-600">Page {{ currentPage }} of {{ totalPages }}</span>
           <button
             :disabled="!next"
             @click="fetchSpaces(next)"
@@ -142,20 +110,10 @@
         </div>
       </div>
 
-      <!-- Add & Update Modals -->
-      <AddSpace
-        :visible="showAddSpace"
-        @close="showAddSpace = false"
-        @success="fetchSpaces()"
-      />
-      <UpdateCoworkspace
-        :visible="updateVisible"
-        :space="spaceToEdit"
-        @close="updateVisible = false"
-        @refresh="fetchSpaces"
-      />
+      <!-- Modals -->
+      <AddSpace :visible="showAddSpace" @close="showAddSpace = false" @success="fetchSpaces" />
+      <UpdateCoworkspace :visible="updateVisible" :space="spaceToEdit" @close="updateVisible = false" @refresh="fetchSpaces" />
 
-      <!-- Delete Confirmation Modal -->
       <ConfirmModal
         v-if="confirmVisible"
         :visible="confirmVisible"
@@ -248,24 +206,16 @@ export default {
     this.fetchSpaces();
   },
   methods: {
-      goToRentals(workspace_id) {
-        this.$router.push({
-          path: "/coworking-space-rentals",
-          query: { workspace_id }
-        });
-      },
-    async fetchSpaces(customUrl = null) {
+    async fetchSpaces(url = null) {
       try {
-        let url = customUrl || "get_coworking_spaces";
-        const res = await this.$apiGet(url, { page_size: this.pageSize });
-        const data = res.data || {};
-        this.spaces = res.data;
-        this.currentPage = data.current_page || 1;
-        this.totalPages = data.total_pages || 1;
-        this.next = data.next;
-        this.previous = data.previous;
+        const response = await this.$getCoworkingSpaces(url, this.pageSize);
+        this.spaces = response.spaces || [];
+        this.currentPage = response.currentPage || 1;
+        this.totalPages = response.totalPages || 1;
+        this.next = response.next;
+        this.previous = response.previous;
       } catch (err) {
-        console.error("Failed to fetch spaces:", err);
+        console.error("Failed to fetch coworking spaces:", err);
         this.spaces = [];
       }
     },
@@ -278,10 +228,8 @@ export default {
       this.updateVisible = true;
     },
     askDeleteConfirmation(space) {
-       
       this.spaceToDelete = space;
-       this.confirmVisible = true;
-    
+      this.confirmVisible = true;
     },
     async confirmDelete() {
       this.confirmVisible = false;
@@ -295,6 +243,12 @@ export default {
       } finally {
         this.spaceToDelete = null;
       }
+    },
+    goToRentals(workspace_id) {
+      this.$router.push({
+        path: "/coworking-space-rentals",
+        query: { workspace_id },
+      });
     },
   },
 };

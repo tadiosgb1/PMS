@@ -5,7 +5,7 @@ import {
   apiPatch, apiDelete, isStrongPassword, validateField,
   gregorianToEthiopian, getPdfBlobUrl, base64ToFile,
   processFilesToAdd, triggerFileInput, handleFileInput, toggleDragState, removeAttachment,
-  handleAnyFileInput, convertImageToBase64, getFullNameById, getZones, getProperties, getManagers, hasPermission,getTenants
+  handleAnyFileInput, convertImageToBase64, getFullNameById, getZones, getProperties, getManagers, hasPermission,getTenants,getCoworkingSpaces,getWorkspaceRentals,getWorkspacePayments
 } from "../utils/utils"; // Adjust the path to match your project structure
 export default {
 
@@ -90,7 +90,10 @@ export default {
       $getProperties: getProperties,
       $getManagers: getManagers,
       $hasPermission: hasPermission,
-      $getTenants:getTenants
+      $getTenants:getTenants,
+      $getCoworkingSpaces:getCoworkingSpaces,
+      $getWorkspaceRentals:getWorkspaceRentals,
+      $getWorkspacePayments:getWorkspacePayments
     };
     // Assign to the global properties in the Vue app
     app.config.globalProperties = {

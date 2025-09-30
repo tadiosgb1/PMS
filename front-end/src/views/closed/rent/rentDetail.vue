@@ -260,7 +260,10 @@ export default {
 
     // Other actions
     viewPayments(rentId) {
-      this.$router.push({ path: "/payments", query: { rent_id: rentId } });
+      this.$router.push({
+          name: "rents_payment_detail",
+          params: { id: rentId },
+        });
     },
     editRent(rent) {
       console.log("Edit rent:", rent);

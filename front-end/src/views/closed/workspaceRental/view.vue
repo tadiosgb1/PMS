@@ -16,6 +16,7 @@
             <span class="text-primary mr-1">+</span> Add
           </button>
         </div>
+
         <!-- Search & Page Size -->
         <div class="p-6 flex justify-between items-center mb-6">
           <input
@@ -40,12 +41,16 @@
             <span class="ml-1 text-gray-700">per page</span>
           </div>
         </div>
+
         <!-- Table -->
         <div class="overflow-x-auto p-6">
           <table class="min-w-full table-auto border-collapse border border-gray-300 text-sm">
             <thead>
               <tr class="bg-gray-200 text-gray-700">
-                <th class="border border-gray-300 px-4 py-2 cursor-pointer" @click="sortBy('guest_name')">
+                <th
+                  class="border border-gray-300 px-4 py-2 cursor-pointer"
+                  @click="sortBy('guest_name')"
+                >
                   Guest Name
                   <SortIcon :field="'guest_name'" :sort-key="sortKey" :sort-asc="sortAsc" />
                 </th>
@@ -69,7 +74,7 @@
                 <td class="border border-gray-300 px-4 py-2">{{ rental.guest_phone }}</td>
                 <td class="border border-gray-300 px-4 py-2">{{ rental.cycle }}</td>
                 <td class="border border-gray-300 px-4 py-2">{{ rental.start_date }}</td>
-                <td class="border border-gray-300 px-4 py-2">{{ rental.is_active ? 'Yes' : 'No' }}</td>
+                <td class="border border-gray-300 px-4 py-2">{{ rental.is_active ? "Yes" : "No" }}</td>
                 <td class="border border-gray-300 px-4 py-2">{{ rental.space.name || rental.space }}</td>
                 <td class="border border-gray-300 px-4 py-2 text-center space-x-2">
                   <button
@@ -88,12 +93,10 @@
 
                   <button
                     @click="goToPayments(rental.id)"
-                    class="text-green-600 hover:text-green-800"
+                    class="text-blue-600 hover:text-blue-800"
                   >
                     Payments
                   </button>
-
-
                 </td>
               </tr>
               <tr v-if="filteredAndSortedRentals.length === 0">
@@ -114,9 +117,7 @@
           >
             Previous
           </button>
-          <span class="text-gray-600">
-            Page {{ currentPage }} of {{ totalPages }}
-          </span>
+          <span class="text-gray-600">Page {{ currentPage }} of {{ totalPages }}</span>
           <button
             :disabled="!next"
             @click="fetchRentals(next)"
@@ -201,14 +202,15 @@ export default {
     filteredAndSortedRentals() {
       const term = this.searchTerm.toLowerCase();
       return this.rentals
-        .filter(r =>
-          r.guest_name.toLowerCase().includes(term) ||
-          r.guest_email.toLowerCase().includes(term) ||
-          r.guest_phone.toLowerCase().includes(term) ||
-          r.cycle.toLowerCase().includes(term) ||
-          r.start_date.toLowerCase().includes(term) ||
-          String(r.is_active).toLowerCase().includes(term) ||
-          String(r.space_name || r.space).toLowerCase().includes(term)
+        .filter(
+          (r) =>
+            r.guest_name.toLowerCase().includes(term) ||
+            r.guest_email.toLowerCase().includes(term) ||
+            r.guest_phone.toLowerCase().includes(term) ||
+            r.cycle.toLowerCase().includes(term) ||
+            r.start_date.toLowerCase().includes(term) ||
+            String(r.is_active).toLowerCase().includes(term) ||
+            String(r.space?.name || r.space).toLowerCase().includes(term)
         )
         .sort((a, b) => {
           let aVal = a[this.sortKey];
@@ -225,25 +227,15 @@ export default {
     this.fetchRentals();
   },
   methods: {
-   goToPayments(rental_id) {
-  this.$router.push({
-    path: "/coworking-payments",
-    query: { rental_id }
-  });
-},
-    async fetchRentals(customUrl = null) {
+    async fetchRentals(url = null) {
       try {
-        const url = customUrl || "get_workspace_rentals";
-        const res = await this.$apiGet(url, { page_size: this.pageSize });
-        
-        console.log("res",res);
-
-        const data = res.data || [];
-        this.rentals = data.results || data;
-        this.currentPage = data.current_page || 1;
-        this.totalPages = data.total_pages || 1;
-        this.next = data.next;
-        this.previous = data.previous;
+        // ✅ same pattern as coworkspaces
+        const response = await this.$getWorkspaceRentals(url, this.pageSize);
+        this.rentals = response.rentals || [];
+        this.currentPage = response.currentPage || 1;
+        this.totalPages = response.totalPages || 1;
+        this.next = response.next;
+        this.previous = response.previous;
       } catch (err) {
         console.error("Failed to fetch rentals:", err);
         this.rentals = [];
@@ -251,10 +243,7 @@ export default {
     },
     sortBy(key) {
       if (this.sortKey === key) this.sortAsc = !this.sortAsc;
-      else {
-        this.sortKey = key;
-        this.sortAsc = true;
-      }
+      else this.sortKey = key;
     },
     editRental(rental) {
       this.rentalToEdit = rental;
@@ -276,6 +265,12 @@ export default {
       } finally {
         this.rentalToDelete = null;
       }
+    },
+    goToPayments(rental_id) {
+      this.$router.push({
+        path: "/coworking-payments",
+        query: { rental_id },
+      });
     },
   },
 };

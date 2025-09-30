@@ -143,6 +143,8 @@ const routes = [
       { path: '/property_sales', name: 'property_sales', component: Property_sales },
       { path: '/sales_payments', name: 'sales_payments', component: Sales_Payments },
       { path: '/rents_payments', name: 'rents_payments', component: Rent_Payments },
+      { path: '/rents_payments/:id',name: 'rents_payment_detail',component: Rent_Payments,props: true, // optional, so you can use props instead of $route.params.id
+  },
       { path: '/maintenance-requests', name: 'maintenance-requests', component: MaintenanceRequests },
       { path: '/user_view', name: 'user_view', component: User_view },
       { path: '/coworking-spaces', name: 'coworking-spaces', component: CowrkingSpaces },
