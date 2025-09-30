@@ -56,6 +56,7 @@
                 </th>
                 <th class="border border-gray-300 px-4 py-2">Email</th>
                 <th class="border border-gray-300 px-4 py-2">Phone</th>
+                 <th class="border border-gray-300 px-4 py-2">Created By</th>
                 <th class="border border-gray-300 px-4 py-2">Cycle</th>
                 <th class="border border-gray-300 px-4 py-2">Start Date</th>
                 <th class="border border-gray-300 px-4 py-2">Active</th>
@@ -71,7 +72,9 @@
               >
                 <td class="border border-gray-300 px-4 py-2">{{ rental.guest_name }}</td>
                 <td class="border border-gray-300 px-4 py-2">{{ rental.guest_email }}</td>
+
                 <td class="border border-gray-300 px-4 py-2">{{ rental.guest_phone }}</td>
+                 <td class="border border-gray-300 px-4 py-2">{{ rental.user.first_name }}</td>
                 <td class="border border-gray-300 px-4 py-2">{{ rental.cycle }}</td>
                 <td class="border border-gray-300 px-4 py-2">{{ rental.start_date }}</td>
                 <td class="border border-gray-300 px-4 py-2">{{ rental.is_active ? "Yes" : "No" }}</td>
