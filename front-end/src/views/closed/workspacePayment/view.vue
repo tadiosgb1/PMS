@@ -24,6 +24,20 @@
         class="px-3 py-2 border rounded w-full max-w-md focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
 
+        <div class="flex items-center">
+              <label class="mr-2 text-sm text-gray-600">Status</label>
+              <select
+                @change="filterByStatus(statusFilter)"
+                v-model="statusFilter"
+                class="px-2 py-1 border rounded-md text-sm"
+              >
+                <option value="all">All</option>
+                <option value="complete">Completed</option>
+                <option value="pending">Pending</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+            </div>
+
       <!-- Show page size -->
       <div class="ml-4">
         <label class="mr-2 text-sm text-gray-600">Show</label>
@@ -136,6 +150,7 @@ export default {
       totalPages: 1,
       next: null,
       previous: null,
+      statusFilter:"all"
     };
   },
   computed: {
@@ -152,6 +167,19 @@ export default {
     this.fetchPayments(1);
   },
   methods: {
+   async  filterByStatus(status){
+   // alert("hii")
+      let params={
+        status:status,
+      }
+
+      if(status=='all'){
+        params={}
+      }
+
+      const res = await this.$apiGet("/get_rental_payments", params);
+      this.payments = Array.isArray(res.data) ? res.data : [];
+    },
     async fetchPayments(page = 1) {
       try {
         const params = { page, page_size: this.perPage };
