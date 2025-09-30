@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-white shadow rounded-lg">
+  <div class="bg-white shadow rounded-lg m-3">
     <Toast ref="toast" />
 
     <!-- Header -->
@@ -164,7 +164,7 @@ export default {
   },
   computed: {
     rentId() {
-      return this.$route.params.id || null;
+      return this.$route.params.rent_id || null;
     },
     filteredPayments() {
       const term = this.searchTerm.toLowerCase();
@@ -190,7 +190,7 @@ export default {
 
         if (this.rentId) {
           // Detail mode: only rent_id
-          params = { rent_id: this.rentId };
+          params = { rent_id__id: this.rentId };
         } else {
           // List mode
           params = { page, page_size: this.perPage };
