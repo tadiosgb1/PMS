@@ -8,40 +8,56 @@
         class="bg-orange-500 text-white px-6 py-4 text-xl font-bold flex justify-between items-center"
       >
         Maintenance Requests
-        <button
-          @click="visible = true"
-          class="bg-white text-blue-700 font-semibold px-1 lg:px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300"
-        >
-          <span class="text-primary">+</span> Add
-        </button>
+        <div class="flex items-center gap-4">
+          <!-- Add button -->
+          <button
+            @click="visible = true"
+            class="bg-white text-blue-700 font-semibold px-1 lg:px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300"
+          >
+            <span class="text-primary">+</span> Add
+          </button>
+        </div>
       </div>
 
       <div class="p-6">
-        <!-- Filters -->
-        <div class="mb-6 flex flex-col md:flex-row gap-4 md:items-end">
-          <div>
-            <label class="block text-sm font-medium text-gray-700">Start Date</label>
-            <input v-model="startDate" type="date" class="border rounded p-2 w-full" />
+        <!-- Filters + Rows per page -->
+        <div class="mb-6 flex flex-col md:flex-row gap-4 md:items-end justify-between">
+          <!-- Left side: Filters -->
+          <div class="flex flex-col md:flex-row gap-4 md:items-end">
+            <div>
+              <label class="block text-sm font-medium text-gray-700">Start Date</label>
+              <input v-model="startDate" type="date" class="border rounded p-2 w-full" />
+            </div>
+            <div>
+              <label class="block text-sm font-medium text-gray-700">End Date</label>
+              <input v-model="endDate" type="date" class="border rounded p-2 w-full" />
+            </div>
+            <div>
+              <label class="block text-gray-700 mb-1">Filter By</label>
+              <select v-model="filter_by" class="custom-input">
+                <option value="" disabled>Select</option>
+                <option value="requested_at">Requested At</option>
+                <option value="resolved_at">Resolved At</option>
+              </select>
+            </div>
+            <button
+              @click="applyDateFilter()"
+              class="px-4 py-2 bg-primary text-white rounded hover:bg-orange-600"
+              :disabled="!filter_by"
+            >
+              Apply
+            </button>
           </div>
-          <div>
-            <label class="block text-sm font-medium text-gray-700">End Date</label>
-            <input v-model="endDate" type="date" class="border rounded p-2 w-full" />
-          </div>
-          <div>
-            <label class="block text-gray-700 mb-1">Filter By</label>
-            <select v-model="filter_by" class="custom-input">
-              <option value="" disabled>Select</option>
-              <option value="requested_at">Requested At</option>
-              <option value="resolved_at">Resolved At</option>
+
+          <!-- Right side: Rows per page -->
+          <div class="flex items-center gap-2">
+            <label class="text-sm text-gray-700">Rows per page:</label>
+            <select v-model.number="pageSize" class="border rounded p-1 text-black">
+              <option v-for="size in [5, 10, 50, 100]" :key="size" :value="size">
+                {{ size }}
+              </option>
             </select>
           </div>
-          <button
-            @click="applyDateFilter()"
-            class="px-4 py-2 bg-primary text-white rounded hover:bg-orange-600"
-            :disabled="!filter_by"
-          >
-            Apply
-          </button>
         </div>
 
         <!-- Table -->
@@ -122,14 +138,7 @@
           v-if="filteredData.length > 0"
           class="mt-4 flex justify-between items-center"
         >
-          <div class="flex items-center gap-2">
-            <label class="text-sm">Rows per page:</label>
-            <select v-model.number="pageSize" class="border rounded p-1">
-              <option v-for="size in [5, 10, 50, 100]" :key="size" :value="size">
-                {{ size }}
-              </option>
-            </select>
-          </div>
+          <div></div>
           <div class="flex items-center gap-4">
             <button
               @click="prevPage"
@@ -259,7 +268,7 @@ export default {
       } catch (err) {
         console.error("Failed to fetch maintenance", err);
         this.maintenance = [];
-        this.$root.$refs.toast.showToast("Failed to load requests", "error");
+        this.$refs.toast.showToast("Failed to load requests", "error");
       }
     },
 
@@ -286,7 +295,7 @@ export default {
       } catch (error) {
         console.error("Failed to fetch maintenance", error);
         this.maintenance = [];
-        this.$root.$refs.toast.showToast("Failed to load requests", "error");
+        this.$refs.toast.showToast("Failed to load requests", "error");
       }
     },
 
@@ -298,7 +307,7 @@ export default {
         this.fetchMaintenance(); // refetch after resolve
       } catch (error) {
         console.error("Failed to resolve request", error);
-        this.$root.$refs.toast.showToast("Failed to resolve request", "error");
+        this.$refs.toast.showToast("Failed to resolve request", "error");
       }
     },
 
