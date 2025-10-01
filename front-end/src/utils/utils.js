@@ -858,7 +858,7 @@ export async function getCoworkingSpaces(url = null, pageSize = 10) {
   }
 }
 
-export async function getWorkspaceRentals(url = null, pageSize = 10) {
+export async function getWorkspaceRentals(url = null, pageSize = 100) {
   try {
     const isSuperUser =
       localStorage.getItem("is_superuser") === "1" ||
@@ -866,14 +866,15 @@ export async function getWorkspaceRentals(url = null, pageSize = 10) {
 
     const groups = JSON.parse(localStorage.getItem("groups") || "[]");
     const email = localStorage.getItem("email");
+    const id= localStorage.getItem("userId");
 
     let params = {};
 
     if (!isSuperUser) {
       if (groups.includes("manager")) {
-        params = { "space__zone__manager_id__email": email };
+        params = { "space__zone__manager_id__id": id };
       } else if (groups.includes("owner")) {
-        params = { "space__zone__owner_id__email": email };
+        params = { "space__zone__owner_id__id": id };
       } else if (groups.includes("staff")) {
         params = { "staff_id__email": email };
       } else if (groups.includes("super_staff")) {
@@ -883,7 +884,10 @@ export async function getWorkspaceRentals(url = null, pageSize = 10) {
 
     let apiUrl = url || `/get_workspace_rentals?page=1&page_size=${pageSize}`;
 
+  console.log("params rentals",params);
+
     const response = await this.$apiGet(apiUrl, params);
+    console.log("response rentals",response);
 
     let rentals = response.data?.results || response.data || [];
 
@@ -907,6 +911,9 @@ export async function getWorkspaceRentals(url = null, pageSize = 10) {
 }
 
 export async function getWorkspacePayments(url = null, params = {}) {
+
+  console.log("params rentals",params);
+
   try {
     const isSuperUser =
       localStorage.getItem("is_superuser") === "1" ||
@@ -917,6 +924,7 @@ export async function getWorkspacePayments(url = null, params = {}) {
 
     // Always include rental_id if provided (detail mode), even for superuser
     const rentalId = params.rental_id || null;
+    console.log("rental_id",rentalId);
 
     // Add access control only if not in detail mode
     if (!rentalId && !isSuperUser) {

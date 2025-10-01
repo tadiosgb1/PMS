@@ -1,22 +1,19 @@
 <template>
   <div
-    class="relative min-h-screen bg-blue-300"
-    :style="{
-      backgroundImage:
-        'url(https://www.transparenttextures.com/patterns/connected.png)',
-    }"
+    class="relative min-h-screen bg-gray-200"
+    
   >
     <!-- Top Header -->
     <div
       class="absolute top-0 left-0 w-full flex justify-between items-center px-6 py-4"
     >
       <!-- Logo -->
-      <div class="flex items-center space-x-2 text-white text-2xl font-bold">
+      <!-- <div class="flex items-center space-x-2 text-white text-2xl font-bold">
         <img src="" alt="Logo" class="h-16 w-auto rounded-full" />
-      </div>
+      </div> -->
 
       <!-- Language Dropdown -->
-      <div>
+      <!-- <div>
         <select
           v-model="selectedLanguage"
           @change="changeLanguage"
@@ -27,7 +24,7 @@
           <option value="am">Amharic</option>
           <option value="ti">Tigrigna</option>
         </select>
-      </div>
+      </div> -->
     </div>
 
     <!-- Centered Form -->
@@ -56,7 +53,7 @@
           <div class="flex items-center justify-between mb-4">
             <button
               type="submit"
-              class="w-full bg-indigo-600 text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-600"
+              class="w-full bg-primary text-white py-2 px-4 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-primary"
             >
               <i class="fas fa-envelope mr-2"></i> Send Reset Link
             </button>
@@ -73,9 +70,9 @@
           <p class="text-sm text-gray-600">
             Remember your password?
             <router-link
-              to="/login"
+              to="/"
               class="text-indigo-600 hover:text-indigo-800"
-              >Login here</router-link
+              >Back to Home</router-link
             >
           </p>
         </div>
@@ -88,10 +85,10 @@
       class="flex justify-center items-center min-h-screen px-4"
     >
       <div
-        class="max-w-xl w-full p-6 bg-white border-l-4 border-blue-500 shadow-md rounded-md"
+        class="max-w-xl w-full p-6 bg-white border-l-4 border-primary shadow-md rounded-md"
       >
         <div class="flex items-start space-x-4">
-          <div class="text-blue-500 text-2xl mt-1">
+          <div class="text-primary text-2xl mt-1">
             <i class="fas fa-envelope-open-text"></i>
           </div>
           <div>
