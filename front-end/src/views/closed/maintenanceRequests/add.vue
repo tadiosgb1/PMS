@@ -1,4 +1,4 @@
-<template>
+<template> 
   <div>
     <!-- ✅ Toast Component -->
     <Toast ref="toast" />
@@ -62,70 +62,70 @@
             <input v-model="form.resolved_at" type="date" class="custom-input" />
           </div>
 
-          <!-- Property ID -->
-       
-
-
-
-
-
-             <div>
-            <label class="block text-gray-700 mb-1">Property ID</label>
+          <!-- Property Dropdown -->
+          <div class="relative">
+            <label class="block text-gray-700 mb-1">Property</label>
             <input 
-              v-model="form.property_id" 
+              v-model="propertySearch"
               type="text"
-              class="custom-input" 
-              @input="searchProperty"
-              required />
-          </div>
-
-                <div class="mt-2 border rounded bg-white shadow w-full" v-if="pr_length > 0">
-                <div
-                  v-for="property in properties"
-                  :key="property.id"
-                  class="p-2 hover:bg-gray-100 cursor-pointer flex items-center justify-between"
-                  @click="selectProperty(property.id)"
-                >
-                  <span>{{ property.name }}</span>
-
-                  <!-- Show check icon only for the selected one -->
-                  <i v-if="form.property_id === property.id" class="fas fa-check text-green-500"></i>
-                </div>
-              </div>
-
-          <!-- User ID -->
-          <!-- <div>
-            <label class="block text-gray-700 mb-1">User ID</label>
-            <input
-              v-model="form.user_id"
-              type="number"
               class="custom-input"
-              placeholder="Enter user ID"
+              placeholder="Search property"
+              @input="searchProperty"
+              @focus="propertyDropdownOpen = true"
+              @blur="closePropertyDropdown"
+              autocomplete="off"
+              required
             />
-          </div> -->
 
-
-
-          
-           <div>
-            <label class="block text-gray-700 mb-1">Requester </label>
-            <input v-model="form.user_id" type="text" class="custom-input" 
-              @input="searchUser()"/>
+            <!-- Dropdown -->
+            <ul 
+              v-if="propertyDropdownOpen && filteredProperties.length > 0"
+              class="absolute z-50 bg-white border rounded shadow w-full max-h-40 overflow-y-auto mt-1"
+            >
+              <li 
+                v-for="property in filteredProperties" 
+                :key="property.id"
+                class="p-2 hover:bg-gray-100 cursor-pointer flex justify-between items-center"
+                @mousedown.prevent="selectProperty(property)"
+              >
+                <span>{{ property.name }}</span>
+                <i v-if="form.property_id === property.id" class="fas fa-check text-green-500"></i>
+              </li>
+            </ul>
           </div>
 
-           <div class="mt-2 border rounded bg-white shadow w-full" v-if="users.length > 0">
-  <div
-    v-for="user in users"
-    :key="user.id"
-    class="p-2 hover:bg-gray-100 cursor-pointer flex items-center justify-between"
-    @click="selectUser(user.id)"
-  >
-    <span>{{ user.first_name }} {{ user.middle_name }} {{ user.last_name }}</span>
+          <!-- Requester Dropdown -->
+          <div class="relative">
+            <label class="block text-gray-700 mb-1">Requester</label>
+            <input
+              v-model="userSearch"
+              type="text"
+              class="custom-input"
+              placeholder="Search user"
+              @input="searchUser"
+              @focus="userDropdownOpen = true"
+              @blur="closeUserDropdown"
+              autocomplete="off"
+              required
+            />
 
-    <!-- Check icon if selected -->
-    <i v-if="form.user_id === user.id" class="fas fa-check text-green-500"></i>
-  </div>
-</div>
+            <!-- Dropdown -->
+            <ul
+              v-if="userDropdownOpen && filteredUsers.length > 0"
+              class="absolute z-50 bg-white border rounded shadow w-full max-h-40 overflow-y-auto mt-1"
+            >
+              <li
+                v-for="user in filteredUsers"
+                :key="user.id"
+                class="p-2 hover:bg-gray-100 cursor-pointer flex justify-between items-center"
+                @mousedown.prevent="selectUser(user)"
+              >
+                <span>{{ user.first_name }} {{ user.middle_name }} {{ user.last_name }}</span>
+                <i v-if="form.user_id === user.id" class="fas fa-check text-green-500"></i>
+              </li>
+            </ul>
+          </div>
+
           <!-- Submit -->
           <div class="md:col-span-2 text-right pt-2">
             <button
@@ -160,45 +160,58 @@ export default {
         user_id: "",
         property_id: "",
       },
-      properties:[],
-      pr_length:0,
-      user_length:0,
-      users:[],
+      propertySearch: "",
+      userSearch: "",
+      properties: [],
+      users: [],
+      filteredProperties: [],
+      filteredUsers: [],
+      propertyDropdownOpen: false,
+      userDropdownOpen: false,
     };
   },
   methods: {
-    selectUser(user_id){
-this.form.user_id=user_id
-console.log("form",this.form);
-},
-selectProperty(property_id){
-this.form.property_id=property_id
-console.log("form",this.form);
-},
     async searchProperty() {
-      const params={
-        search:this.form.property_id,
-        page_size:100000000,
+      if (!this.propertySearch) {
+        this.filteredProperties = [];
+        return;
       }
-      console.log("Searching for:", this.form.property_id);
-       const res=await this.$apiGet(`get_properties`,params);
-       this.properties=res.data
-       this.pr_length=res.data.length;
-       console.log("res",res);
-      
-    },
 
-   async searchUser() {
-      const params={
-        search:this.form.user_id,
-        page_size:100000000,
+      const res = await this.$apiGet("get_properties", {
+        search: this.propertySearch,
+        page_size: 50,
+      });
+      this.properties = res.data;
+      this.filteredProperties = res.data;
+    },
+    async searchUser() {
+      if (!this.userSearch) {
+        this.filteredUsers = [];
+        return;
       }
-      console.log("Searching for:", this.form.user_id);
-       const res=await this.$apiGet(`get_users`,params);
-       this.users=res.data
-       this.user_length=res.data.length;
-       console.log("res",res);
-      
+
+      const res = await this.$apiGet("get_users", {
+        search: this.userSearch,
+        page_size: 50,
+      });
+      this.users = res.data;
+      this.filteredUsers = res.data;
+    },
+    selectProperty(property) {
+      this.form.property_id = property.id;  // store id for backend
+      this.propertySearch = property.name;  // show name in input
+      this.propertyDropdownOpen = false;
+    },
+    selectUser(user) {
+      this.form.user_id = user.id;           // store id for backend
+      this.userSearch = `${user.first_name} ${user.middle_name} ${user.last_name}`;
+      this.userDropdownOpen = false;
+    },
+    closePropertyDropdown() {
+      setTimeout(() => (this.propertyDropdownOpen = false), 150);
+    },
+    closeUserDropdown() {
+      setTimeout(() => (this.userDropdownOpen = false), 150);
     },
     async submitForm() {
       try {
@@ -214,6 +227,8 @@ console.log("form",this.form);
           user_id: "",
           property_id: "",
         };
+        this.propertySearch = "";
+        this.userSearch = "";
 
         // Auto-close modal after 2s
         setTimeout(() => {

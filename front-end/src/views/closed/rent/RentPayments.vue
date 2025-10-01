@@ -184,16 +184,45 @@ export default {
     },
   },
   methods: {
+    // --- role-based filtering helper ---
+    buildRoleParams(params = {}) {
+      const isSuperUser =
+        localStorage.getItem("is_superuser") === "1" ||
+        localStorage.getItem("is_superuser") === "true";
+
+      const groups = JSON.parse(localStorage.getItem("groups") || "[]");
+      const email = localStorage.getItem("email");
+
+      if (!isSuperUser) {
+        if (groups.includes("manager")) {
+          params = {
+            ...params,
+            "rent_id__property_id__property_zone_id__manager_id__email": email,
+          };
+        } else if (groups.includes("owner")) {
+          params = {
+            ...params,
+            "rent_id__property_id__property_zone_id__owner_id__email": email,
+          };
+        } else if (groups.includes("staff")) {
+          params = { ...params, "staff_id__email": email };
+        } else if (groups.includes("super_staff")) {
+          params = { ...params }; // sees all payments
+        }
+      }
+      return params;
+    },
+
     async fetchPayments(page = 1) {
       try {
-        let params = {};
+        let params = this.buildRoleParams();
 
         if (this.rentId) {
           // Detail mode: only rent_id
-          params = { rent_id__id: this.rentId };
+          params = { ...params, rent_id__id: this.rentId };
         } else {
           // List mode
-          params = { page, page_size: this.perPage };
+          params = { ...params, page, page_size: this.perPage };
           if (this.statusFilter !== "all") {
             params.status = this.statusFilter;
           }

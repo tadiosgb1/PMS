@@ -42,8 +42,6 @@
           >
             Apply
           </button>
-
-         
         </div>
 
         <!-- Table -->
@@ -65,8 +63,7 @@
                 </th>
                 <th class="border border-gray-300 px-3 py-2">Property</th>
                 <th class="border border-gray-300 px-3 py-2">User</th>
-                 <th class="border border-gray-300 px-3 py-2">Actions
-                 </th>
+                <th class="border border-gray-300 px-3 py-2">Actions</th>
               </tr>
             </thead>
             <tbody>
@@ -107,12 +104,12 @@
                   </router-link>
                   <span v-else>N/A</span>
                 </td>
-                  <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
-                   <button @click="confirm=true; selectedId=maint.id ">Resolve</button>
+                <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
+                  <button @click="confirm = true; selectedId = maint.id">Resolve</button>
                 </td>
               </tr>
               <tr v-if="filteredData.length === 0">
-                <td colspan="6" class="text-center py-6 text-gray-500">
+                <td colspan="7" class="text-center py-6 text-gray-500">
                   No maintenance requests found.
                 </td>
               </tr>
@@ -154,15 +151,29 @@
       </div>
     </div>
 
-    <div v-if="confirm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-10">
-    <div class="bg-white rounded-lg shadow-md max-w-sm w-full p-6 text-center">
-      <p class="text-orange-400  mb-6">Do you want to make it resolved</p>
-      <div class="flex justify-center space-x-4">
-        <button @click="confirm=false" class="px-4 py-2 rounded bg-orange-400 text-white hover:bg-orange-500">Cancel</button>
-        <button @click="resolve()" class="px-4 py-2 rounded bg-orange-500 text-white hover:bg-orange-600">OK</button>
+    <!-- Confirm Resolve Modal -->
+    <div
+      v-if="confirm"
+      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-10"
+    >
+      <div class="bg-white rounded-lg shadow-md max-w-sm w-full p-6 text-center">
+        <p class="text-orange-400 mb-6">Do you want to make it resolved</p>
+        <div class="flex justify-center space-x-4">
+          <button
+            @click="confirm = false"
+            class="px-4 py-2 rounded bg-orange-400 text-white hover:bg-orange-500"
+          >
+            Cancel
+          </button>
+          <button
+            @click="resolve()"
+            class="px-4 py-2 rounded bg-orange-500 text-white hover:bg-orange-600"
+          >
+            OK
+          </button>
+        </div>
       </div>
     </div>
-  </div>
 
     <!-- Add Maintenance Request Modal -->
     <MaintenanceRequestAdd
@@ -183,7 +194,7 @@ export default {
   data() {
     return {
       maintenance: [],
-      filter_by:"",
+      filter_by: "",
       searchTerm: "",
       startDate: "",
       endDate: "",
@@ -192,25 +203,18 @@ export default {
       sortKey: "requested_at",
       sortAsc: true,
       visible: false,
-      confirm:false,
-      selectedId:''
+      confirm: false,
+      selectedId: "",
     };
   },
   computed: {
     filteredData() {
-      return this.maintenance
-        // .filter((m) => {
-        //   const reqDate = new Date(m.requested_at);
-        //   const start = this.startDate ? new Date(this.startDate) : null;
-        //   const end = this.endDate ? new Date(this.endDate) : null;
-        //   return (!start || reqDate >= start) && (!end || reqDate <= end);
-        // })
-        .sort((a, b) => {
-          let res = 0;
-          if (a[this.sortKey] < b[this.sortKey]) res = -1;
-          if (a[this.sortKey] > b[this.sortKey]) res = 1;
-          return this.sortAsc ? res : -res;
-        });
+      return this.maintenance.sort((a, b) => {
+        let res = 0;
+        if (a[this.sortKey] < b[this.sortKey]) res = -1;
+        if (a[this.sortKey] > b[this.sortKey]) res = 1;
+        return this.sortAsc ? res : -res;
+      });
     },
     totalPages() {
       return Math.ceil(this.filteredData.length / this.pageSize) || 1;
@@ -224,9 +228,33 @@ export default {
     this.fetchMaintenance();
   },
   methods: {
+    // helper to build params based on role
+    buildRoleParams(params = {}) {
+      const isSuperUser =
+        localStorage.getItem("is_superuser") === "1" ||
+        localStorage.getItem("is_superuser") === "true";
+
+      const groups = JSON.parse(localStorage.getItem("groups") || "[]");
+      const email = localStorage.getItem("email");
+
+      if (!isSuperUser) {
+        if (groups.includes("manager")) {
+          params = { ...params, "property_id__property_zone_id__manager_id__email": email };
+        } else if (groups.includes("owner")) {
+          params = { ...params, "property_id__property_zone_id__owner_id__email": email };
+        } else if (groups.includes("staff")) {
+          params = { ...params, "staff_id__email": email };
+        } else if (groups.includes("super_staff")) {
+          params = { ...params };
+        }
+      }
+      return params;
+    },
+
     async fetchMaintenance() {
       try {
-        const response = await this.$apiGet("get_maintenance_requests");
+        let params = this.buildRoleParams();
+        const response = await this.$apiGet("get_maintenance_requests", params);
         this.maintenance = response.data || [];
       } catch (err) {
         console.error("Failed to fetch maintenance", err);
@@ -234,6 +262,46 @@ export default {
         this.$root.$refs.toast.showToast("Failed to load requests", "error");
       }
     },
+
+    async applyDateFilter() {
+      try {
+        let params = this.buildRoleParams();
+
+        if (this.filter_by === "requested_at") {
+          params = {
+            ...params,
+            requested_at__gte: this.startDate,
+            requested_at__lte: this.endDate,
+          };
+        } else if (this.filter_by === "resolved_at") {
+          params = {
+            ...params,
+            resolved_at__gte: this.startDate,
+            resolved_at__lte: this.endDate,
+          };
+        }
+
+        const res = await this.$apiGet("get_maintenance_requests", params);
+        this.maintenance = res.data;
+      } catch (error) {
+        console.error("Failed to fetch maintenance", error);
+        this.maintenance = [];
+        this.$root.$refs.toast.showToast("Failed to load requests", "error");
+      }
+    },
+
+    async resolve() {
+      try {
+        const payload = { id: this.selectedId };
+        await this.$apiPost("/resolve_maintenance_request", payload);
+        this.confirm = false;
+        this.fetchMaintenance(); // refetch after resolve
+      } catch (error) {
+        console.error("Failed to resolve request", error);
+        this.$root.$refs.toast.showToast("Failed to resolve request", "error");
+      }
+    },
+
     sortBy(field) {
       if (this.sortKey === field) {
         this.sortAsc = !this.sortAsc;
@@ -243,40 +311,6 @@ export default {
       }
     },
 
-    async applyDateFilter() {
-      try {
-       let params=[];
-      if(this.filter_by=='requested_at'){
-        params={
-        requested_at__gte:this.startDate,
-        requested_at__lte: this.endDate
-        }
-      }else{
-        params={
-          resolved_at__gte:this.startDate,
-          resolved_at__lte:this.endDate
-        }
-      }
-     const res=await this.$apiGet('get_maintenance_requests',params)
-     this.maintenance=res.data;
-     console.log("maintennace by start and end date",this.maintenance);
-    } catch (error) {
-       console.error("Failed to fetch maintenance", error);
-       this.maintenance = [];
-        this.$root.$refs.toast.showToast("Failed to load requests", "error");
-    }
-    },
-    async resolve(){
-      const payload={
-        id:this.selectedId
-      }
-      console.log("selcted",payload)
-     const res=await this.$apiPost('/resolve_maintenance_request',payload )
-     console.log("resresolve",res)
-
-     this.confirm=false
-
-    },
     prevPage() {
       if (this.currentPage > 1) this.currentPage--;
     },
@@ -284,9 +318,7 @@ export default {
       if (this.currentPage < this.totalPages) this.currentPage++;
     },
     fullName(user) {
-      return [user.first_name, user.middle_name, user.last_name]
-        .filter(Boolean)
-        .join(" ");
+      return [user.first_name, user.middle_name, user.last_name].filter(Boolean).join(" ");
     },
     formatDate(dateStr) {
       if (!dateStr) return "";
