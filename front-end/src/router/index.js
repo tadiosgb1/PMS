@@ -89,14 +89,12 @@ const routes = [
     component: ForgotPasssword,
     props: true
   },
-
-  {
-    path: '/reset-password',
-    name: 'ResetPassword',
-    component: ResetPassword,
-    props: true
-  },
-
+    {
+      path: "/:lang/reset-password",
+      name: "ResetPassword",
+      component: ResetPassword,
+      props: true, // passes route params as props
+    },
 
   ,
   {

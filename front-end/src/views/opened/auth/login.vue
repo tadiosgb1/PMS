@@ -135,7 +135,6 @@ export default {
 
       try {
         const response = await this.$apiPost("/token", payload);
-
         const {
           refresh,
           access,
