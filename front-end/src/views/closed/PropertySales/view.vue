@@ -325,14 +325,42 @@ export default {
       });
     },
 
+     buildRoleParams(params = {}) {
+      const isSuperUser =
+        localStorage.getItem("is_superuser") === "1" ||
+        localStorage.getItem("is_superuser") === "true";
+
+      const groups = JSON.parse(localStorage.getItem("groups") || "[]");
+      const email = localStorage.getItem("email");
+      const id=localStorage.getItem("userId");
+
+      if (!isSuperUser) {
+        if (groups.includes("manager")) {
+          params = {
+            ...params,
+            "property_id__manager_id__id": id,
+          };
+        } else if (groups.includes("owner")) {
+          params = {
+            ...params,  
+            "property_id__owner_id__id": id,
+          };
+        } else if (groups.includes("staff")) {
+          params = { ...params, "property_id__manager_id__id": id };
+        } else if (groups.includes("super_staff")) {
+          params = { ...params }; // sees all payments
+        }
+      }
+      return params;
+    },
+
     async fetchSales(
       url = `/get_property_zone_sales?page=1&page_size=${this.pageSize}`
     ) {
       try {
         
-        const params={
-            property_id__owner_id__id:localStorage.getItem("userId")
-          }
+        let params = this.buildRoleParams();
+    
 
           console.log("params for p sales",params);
       
