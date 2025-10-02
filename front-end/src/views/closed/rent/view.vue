@@ -312,20 +312,55 @@ export default {
   },
   methods: {
    goToPayments(rental_id) {
-  this.$router.push({
-    path: "/rents_payments",
-    query: { rent_id: rental_id },
-  });
-}
-,
+      this.$router.push({
+        path: "/rents_payments",
+        query: { rent_id: rental_id },
+      });
+    },
+
     rentDetail(rent_id) {
       this.$router.push({ name: "rent-detail", params: { id: rent_id } });
     },
-    async fetchRents() {
-      const params={
-        page_size:1000,
-        ordering:"-id"
+
+
+    buildRoleParams(params = {}) {
+      const isSuperUser =
+        localStorage.getItem("is_superuser") === "1" ||
+        localStorage.getItem("is_superuser") === "true";
+
+      const groups = JSON.parse(localStorage.getItem("groups") || "[]");
+      const email = localStorage.getItem("email");
+      const id=localStorage.getItem("userId");
+
+      if (!isSuperUser) {
+        if (groups.includes("manager")) {
+          params = {
+            ...params,
+            "property_id__property_zone_id__manager_id__email": email,
+          };
+        } else if (groups.includes("owner")) {
+          params = {
+            ...params,  
+            "property_id__property_zone_id__owner_id__email": email,
+          };
+        } else if (groups.includes("staff")) {
+          params = { ...params, "property_id__property_zone_id__staff_id__email": email };
+        } else if (groups.includes("super_staff")) {
+          params = { ...params }; // sees all payments
+        }
       }
+      return params;
+    },
+    async fetchRents() {
+
+      // const params={
+      //   property_id__property_zone_id__manager_id__email:localStorage.getItem("email"),
+      //   page_size:1000,
+      //   ordering:"-id"
+      // }
+     let params = this.buildRoleParams();
+    
+       
       try {
         const response = await this.$apiGet("/get_rents",params);
         if (Array.isArray(response.data)) {

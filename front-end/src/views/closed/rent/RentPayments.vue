@@ -198,15 +198,15 @@ export default {
         if (groups.includes("manager")) {
           params = {
             ...params,
-            "rent_id__property_id__property_zone_id__manager_id__id": id,
+            "rent_id__property_id__property_zone_id__manager_id__email": email,
           };
         } else if (groups.includes("owner")) {
           params = {
-            ...params,
-            "rent_id__property_id__property_zone_id__owner_id__id": id,
+            ...params,  
+            "rent_id__property_id__property_zone_id__owner_id__email": email,
           };
         } else if (groups.includes("staff")) {
-          params = { ...params, "staff_id__email": email };
+          params = { ...params, "rent_id__property_id__property_zone_id__staff_id__id": id };
         } else if (groups.includes("super_staff")) {
           params = { ...params }; // sees all payments
         }

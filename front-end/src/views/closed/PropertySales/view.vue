@@ -329,7 +329,14 @@ export default {
       url = `/get_property_zone_sales?page=1&page_size=${this.pageSize}`
     ) {
       try {
-        const res = await this.$apiGet(url);
+        
+        const params={
+            property_id__property_zone_id__manager_id__email:localStorage.getItem("email")
+          }
+
+          console.log("params for p sales",params);
+      
+        const res = await this.$apiGet(url,params);
       
         console.log("saless", res);
         
