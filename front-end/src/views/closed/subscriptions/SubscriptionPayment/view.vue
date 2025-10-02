@@ -300,19 +300,25 @@ export default {
     async fetchPayments(page = 1) {
       try {
         let params = {
-          user_id:localStorage.getItem("userId"),
-          page: page,
-          page_size: this.perPage,
+          // user_id:localStorage.getItem("userId"),
+          // page: page,
+          // page_size: this.perPage,
         };
-        if(localStorage.getItem("is_superuser"=='true')){
-         params = {
-          page: page,
-          page_size: this.perPage,
-        };
-        }
 
+       if(localStorage.getItem("is_superuser") =="true") {
+  params = {
+    page: page,
+    page_size: this.perPage,
+  };
+} else {
+  params = {
+    user_id: localStorage.getItem("userId"),
+    page: page,
+    page_size: this.perPage,
+  };
+}
+        
         const response = await this.$apiGet("/get_subscription_payment", params);
-
         this.payments = response.data || [];
         this.currentPage = response.current_page;
         this.totalPages = response.total_pages;
