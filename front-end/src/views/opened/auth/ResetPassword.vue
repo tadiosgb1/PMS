@@ -29,25 +29,30 @@
           />
         </div>
 
-        <!-- Error message -->
-        <p v-if="errorMessage" class="text-red-500 text-sm">{{ errorMessage }}</p>
-
-        <!-- Success message -->
-        <p v-if="successMessage" class="text-green-600 text-sm">{{ successMessage }}</p>
-
         <!-- Submit Button -->
         <button
           type="submit"
-          class="w-full bg-primary text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition font-medium"
+          :disabled="loading"
+          class="w-full bg-primary text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition font-medium disabled:opacity-60"
         >
-          Change Password
+          <span v-if="loading">Changing...</span>
+          <span v-else>Change Password</span>
         </button>
       </form>
+
+      <!-- Back to Home link after success -->
+      <div v-if="success" class="text-center mt-6">
+        <router-link to="/" class="text-blue-600 hover:underline">
+          Go to Home
+        </router-link>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   props: ["lang"],
   data() {
@@ -55,15 +60,15 @@ export default {
       token: "",
       password: "",
       confirmPassword: "",
-      errorMessage: "",
-      successMessage: "",
+      loading: false,
+      success: false,
     };
   },
   mounted() {
-    // Attempt to get token from query parameter 'token'
+    // Get token from ?token=... query param
     this.token = this.$route.query.token || "";
 
-    // If not present, fallback: take entire query string as token
+    // If not found, fallback to entire query string
     if (!this.token) {
       const query = this.$route.fullPath.split("?")[1];
       this.token = query || "";
@@ -74,38 +79,48 @@ export default {
   },
   methods: {
     async submitForm() {
-      this.errorMessage = "";
-      this.successMessage = "";
-
       if (this.password !== this.confirmPassword) {
-        this.errorMessage = "Passwords do not match.";
+        this.$root.$refs.toast.showToast("Passwords do not match", "error");
         return;
       }
 
       if (!this.token) {
-        this.errorMessage = "Invalid or missing token.";
+        this.$root.$refs.toast.showToast("Invalid or missing token", "error");
         return;
       }
 
-      try {
-        const payload= {
-          password: this.password,
-        }
-        // Replace with your API client
-        const res = await this.$apiPost(`/reset_password/${this.token}`,payload);
+      this.loading = true;
 
-        console.log("res reset",res);
-        if (res) {
-          alert("reseted successfully")
-          this.successMessage = "Password changed successfully!";
+      try {
+        const payload = { password: this.password };
+
+        const res = await axios.post(
+          `https://alphapms.sunriseworld.org/api/reset_password/${this.token}`,
+          payload
+        );
+
+        if (res.data && res.data.message) {
+          this.$root.$refs.toast.showToast(
+            res.data.message || "Password changed successfully!",
+            "success"
+          );
+          this.success = true;
           this.password = "";
           this.confirmPassword = "";
         } else {
-          this.errorMessage = res.data.message || "Something went wrong.";
+          this.$root.$refs.toast.showToast(
+            res.data?.error || "Failed to reset password",
+            "error"
+          );
         }
       } catch (err) {
-        this.errorMessage = "Server error. Please try again.";
-        console.error(err);
+        this.$root.$refs.toast.showToast(
+          err.response?.data?.message || "Server error. Please try again.",
+          "error"
+        );
+        console.error("Reset password error:", err);
+      } finally {
+        this.loading = false;
       }
     },
   },

@@ -192,17 +192,18 @@ export default {
 
       const groups = JSON.parse(localStorage.getItem("groups") || "[]");
       const email = localStorage.getItem("email");
+      const id=localStorage.getItem("userId");
 
       if (!isSuperUser) {
         if (groups.includes("manager")) {
           params = {
             ...params,
-            "rent_id__property_id__property_zone_id__manager_id__email": email,
+            "rent_id__property_id__property_zone_id__manager_id__id": id,
           };
         } else if (groups.includes("owner")) {
           params = {
             ...params,
-            "rent_id__property_id__property_zone_id__owner_id__email": email,
+            "rent_id__property_id__property_zone_id__owner_id__id": id,
           };
         } else if (groups.includes("staff")) {
           params = { ...params, "staff_id__email": email };
@@ -228,7 +229,13 @@ export default {
           }
         }
 
+
+        console.log("params payments",params);
+
         const res = await this.$apiGet("/get_payments", params);
+
+        console.log("res for payments",res)
+
         this.payments = Array.isArray(res.data) ? res.data : [];
         this.currentPage = res.current_page || 1;
         this.totalPages = res.total_pages || 1;
