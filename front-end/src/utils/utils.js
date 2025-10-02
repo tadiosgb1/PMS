@@ -927,7 +927,7 @@ export async function getWorkspacePayments(url = null, params = {}) {
     console.log("rental_id",rentalId);
 
     // Add access control only if not in detail mode
-    if (!rentalId && !isSuperUser) {
+    if (!isSuperUser) {
       if (groups.includes("manager")) {
         params = { ...params, "rental__space__zone__manager_id__email": email };
       } else if (groups.includes("owner")) {
