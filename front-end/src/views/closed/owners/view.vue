@@ -175,7 +175,11 @@ async   mounted() {
     async fetchOwners() {
       try {
         const response = await this.$apiGet('/get_owners');
+
         this.owners = response.owners || [];
+
+        console.log("owners",response);
+
       } catch (error) {
         console.error('Failed to fetch owners:', error);
         this.owners = [];

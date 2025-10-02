@@ -1,7 +1,7 @@
 <template>
   <div class="p-6 bg-gray-100 min-h-screen">
     <!-- Header -->
-    <h1 class="text-3xl font-bold mb-6">🏠 Property Manager Dashboard</h1>
+    <h1 class="text-lg font-bold mb-6">Dashboard</h1>
 
     <!-- Top Stats -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">

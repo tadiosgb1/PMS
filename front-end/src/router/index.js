@@ -54,11 +54,13 @@ import CowrkingSpaces from '../views/closed/coworkingSpace/view.vue'
 import CowrkingSpaceRental from '../views/closed/workspaceRental/view.vue'
 import saleCommissions from '../views/closed/saleCommissions/view.vue'
 import rentCommissions from '../views/closed/rentCommissions/view.vue'
+import Transactions from '../views/closed/transactions/transactions_view.vue'
 
 import Configurations from '../views/closed/Configurations/view.vue'
 import CoworkspacePayments from '../views/closed/workspacePayment/view.vue'
 import brokers from '../views/closed/brokers/view.vue'
 import brokerDetail from '../views/closed/brokers/brokerDetail.vue'
+
 
 const routes = [
   {
@@ -135,7 +137,8 @@ const routes = [
       { path: '/sale-commissions', name: 'sale-commissions', component:saleCommissions },
       { path: '/rent-commissions', name: 'rent-commissions', component:rentCommissions },
       
-   
+    { path: '/transactions', name: 'transactions', component:Transactions },
+      
       { path: '/configurations', name: 'configurations', component:Configurations },
       { path: '/rents', name: 'rents', component: Rents },
       { path: '/property_sales', name: 'property_sales', component: Property_sales },
