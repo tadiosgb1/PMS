@@ -26,33 +26,18 @@
     <!-- Pricing Plan Stats -->
     <div class="bg-white p-6 rounded-lg shadow-md mb-8">
       <h2 class="text-lg font-semibold mb-4">Pricing Plan Analytics</h2>
-      <apexchart
-        type="bar"
-        height="350"
-        :options="pricingChartOptions"
-        :series="pricingSeries"
-      />
+      <apexchart type="line" height="350" :options="pricingChartOptions" :series="pricingSeries" />
     </div>
 
     <!-- Charts -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
       <div class="bg-white p-6 rounded-lg shadow-md">
-        <h2 class="text-lg font-semibold mb-4">Sales vs Rent Income</h2>
-        <apexchart
-          type="bar"
-          height="300"
-          :options="incomeChartOptions"
-          :series="incomeSeries"
-        />
+        <h2 class="text-lg font-semibold mb-4">Sales / Rent / Subscription / Workspace Income</h2>
+        <apexchart type="bar" height="320" :options="incomeChartOptions" :series="incomeSeries" />
       </div>
       <div class="bg-white p-6 rounded-lg shadow-md">
-        <h2 class="text-lg font-semibold mb-4">User Types</h2>
-        <apexchart
-          type="donut"
-          height="300"
-          :options="userChartOptions"
-          :series="userSeries"
-        />
+        <h2 class="text-lg font-semibold mb-4">User Types (by Group)</h2>
+        <apexchart type="donut" height="300" :options="userChartOptions" :series="userSeries" />
       </div>
     </div>
   </div>
@@ -62,43 +47,30 @@
 export default {
   data() {
     return {
-      stats: {
-        totalProperties: 0,
-        totalZones: 0,
-        totalSubscriptions: 0,
-        totalTenants: 0,
-      },
+      stats: { totalProperties: 0, totalZones: 0, totalSubscriptions: 0, totalTenants: 0 },
+      hugePageSize: 10000000000,
+
+      // charts
       incomeSeries: [
-        {
-          name: "Rent",
-          data: [11000, 15000, 12500, 14000, 16000],
-        },
-        {
-          name: "Sale",
-          data: [8000, 9000, 7000, 8500, 9500],
-        },
+        { name: "Rent", data: [] },
+        { name: "Sale", data: [] },
+        { name: "Subscription", data: [] },
+        { name: "Workspace", data: [] },
       ],
       incomeChartOptions: {
-        chart: { id: "income-chart", toolbar: { show: false } },
-        xaxis: { categories: ["Apr", "May", "Jun", "Jul", "Aug"] },
+        chart: { id: "income-chart", stacked: false, toolbar: { show: false } },
+        xaxis: { categories: [] },
         plotOptions: { bar: { horizontal: false, columnWidth: "55%" } },
         dataLabels: { enabled: false },
         legend: { position: "top" },
       },
-      userSeries: [60, 30, 10],
+
+      userSeries: [],
       userChartOptions: {
-        labels: ["Tenants", "Owners", "Agents"],
+        labels: [],
         legend: { position: "bottom" },
-        responsive: [
-          {
-            breakpoint: 480,
-            options: {
-              chart: { width: 200 },
-              legend: { position: "bottom" },
-            },
-          },
-        ],
       },
+
       pricingSeries: [
         { name: "Users", type: "column", data: [] },
         { name: "Revenue ($)", type: "line", data: [] },
@@ -107,112 +79,198 @@ export default {
         chart: { height: 350, type: "line", toolbar: { show: false } },
         stroke: { width: [0, 4] },
         title: { text: "Plan Adoption and Revenue", align: "left" },
-        xaxis: { categories: [] }, // will be updated dynamically
-        yaxis: [
-          { title: { text: "Users" } },
-          { opposite: true, title: { text: "Revenue ($)" } },
-        ],
+        xaxis: { categories: [] },
+        yaxis: [{ title: { text: "Users" } }, { opposite: true, title: { text: "Revenue ($)" } }],
         dataLabels: { enabled: true, enabledOnSeries: [1] },
         colors: ["#60a5fa", "#34d399"],
         legend: { position: "top" },
       },
     };
   },
+
   mounted() {
-    this.fetchTotalProperties();
-    this.fetchTotalZones();
-    this.fetchTotalSubscriptions();
-    this.fetchTotalTenants();
-    this.fetchPricingAnalytics();
+    this.fetchAllData();
   },
+
   methods: {
+    async fetchAllData() {
+      await Promise.all([
+        this.fetchTotalProperties(),
+        this.fetchTotalZones(),
+        this.fetchTotalSubscriptions(),
+        this.fetchTotalTenants(),
+        this.fetchPricingAndSubscriptionData(),
+        this.fetchIncomeData(),
+        this.fetchAndGroupUsers(),
+      ]);
+    },
+
+    //--------------------------------
+    // 🔹 Pricing Analytics with plan_name
+    //--------------------------------
+    async fetchPricingAndSubscriptionData() {
+      try {
+        const params = { page_size: this.hugePageSize };
+        const res = await this.$apiGet("/get_subscription_payment", params);
+        const payments = res.data?.results ?? res.data ?? [];
+
+        // collect subscription ids
+        const subscriptionIds = [...new Set(payments.map(p => p.subscription_id))];
+
+        // fetch subscription details (plan_name) for each
+        const subscriptionMap = {};
+        for (const id of subscriptionIds) {
+          try {
+            const subRes = await this.$apiGet(`/get_subscription/${id}`);
+            if (subRes && subRes.plan_name) {
+              subscriptionMap[id] = subRes.plan_name;
+            }
+          } catch (e) {
+            subscriptionMap[id] = "Unknown Plan";
+          }
+        }
+
+        // aggregate users & revenue
+        const usersPerPlan = {}, revenuePerPlan = {};
+        payments.forEach(p => {
+          const plan = subscriptionMap[p.subscription_id] ?? "Unknown Plan";
+          if (!usersPerPlan[plan]) { usersPerPlan[plan] = 0; revenuePerPlan[plan] = 0; }
+          usersPerPlan[plan]++;
+          revenuePerPlan[plan] += parseFloat(p.amount ?? p.price ?? 0) || 0;
+        });
+
+        const plans = Object.keys(usersPerPlan);
+        this.pricingChartOptions = { ...this.pricingChartOptions, xaxis: { categories: plans } };
+        this.pricingSeries = [
+          { name: "Users", type: "column", data: plans.map(p => usersPerPlan[p]) },
+          { name: "Revenue ($)", type: "line", data: plans.map(p => revenuePerPlan[p]) },
+        ];
+
+        //this.$root.$refs.toast.showToast("Pricing analytics loaded successfully", "success");
+      } catch (err) {
+        this.$root.$refs.toast.showToast("Failed to load pricing analytics", "error");
+      }
+    },
+
+    //--------------------------------
+    // 🔹 Group Users (only active)
+    //--------------------------------
+async fetchAndGroupUsers() {
+  try {
+    const params = { page_size: this.hugePageSize };
+    const res = await this.$apiGet("/get_users", params);
+
+    // Backend returns { data: [...] }
+    const users = res.data;
+
+    const groupCounts = {};
+
+    users.forEach(u => {
+      if (!u.is_active) return; // ✅ only active users
+
+      if (Array.isArray(u.groups) && u.groups.length > 0) {
+        u.groups.forEach(g => {
+          const groupName = typeof g === "string" ? g : g?.name || "Unknown";
+          if (!groupCounts[groupName]) groupCounts[groupName] = 0;
+          groupCounts[groupName]++;
+        });
+      } else {
+        const groupName = "No Group"; // optional bucket
+        if (!groupCounts[groupName]) groupCounts[groupName] = 0;
+        groupCounts[groupName]++;
+      }
+    });
+
+    // Update chart
+    this.userChartOptions = {
+      ...this.userChartOptions,
+      labels: Object.keys(groupCounts),
+    };
+    this.userSeries = Object.values(groupCounts);
+console.log("this.userSeries ",this.userSeries )
+    //this.$root.$refs.toast.showToast("Users grouped successfully", "success");
+  } catch (err) {
+    console.error("Error fetching users:", err);
+    this.$root.$refs.toast.showToast("Failed to load users", "error");
+  }
+}
+
+,
+
+    //--------------------------------
+    // 🔹 Fetch totals
+    //--------------------------------
     async fetchTotalProperties() {
       try {
-        const response = await this.$apiGet("/get_properties");
-        if (response && response.count !== undefined) {
-          this.stats.totalProperties = response.count;
-        }
-      } catch (error) {
-        console.error("Failed to fetch total properties:", error);
-      }
+        const res = await this.$apiGet("/get_properties", { page_size: this.hugePageSize });
+        this.stats.totalProperties = res.count ?? res.data?.results?.length ?? 0;
+      } catch {}
     },
     async fetchTotalZones() {
       try {
-        const response = await this.$apiGet("/get_property_zones");
-        if (response && response.count !== undefined) {
-          this.stats.totalZones = response.count;
-        }
-      } catch (error) {
-        console.error("Failed to fetch total zones:", error);
-      }
+        const res = await this.$apiGet("/get_property_zones", { page_size: this.hugePageSize });
+        this.stats.totalZones = res.count ?? res.data?.results?.length ?? 0;
+      } catch {}
     },
     async fetchTotalSubscriptions() {
       try {
-        const response = await this.$apiGet("/get_subscription");
-        if (response && response.count !== undefined) {
-          this.stats.totalSubscriptions = response.count;
-        }
-      } catch (error) {
-        console.error("Failed to fetch total subscriptions:", error);
-      }
+        const res = await this.$apiGet("/get_subscription", { page_size: this.hugePageSize });
+        this.stats.totalSubscriptions = res.count ?? res.data?.results?.length ?? 0;
+      } catch {}
     },
     async fetchTotalTenants() {
       try {
-        const response = await this.$apiGet("/get_tenants");
-        if (response && response.count !== undefined) {
-          this.stats.totalTenants = response.count;
-        }
-      } catch (error) {
-        console.error("Failed to fetch total tenants:", error);
-      }
+        const res = await this.$apiGet("/get_tenants", { page_size: this.hugePageSize });
+        this.stats.totalTenants = res.count ?? res.data?.results?.length ?? 0;
+      } catch {}
     },
 
-    async fetchPricingAnalytics() {
+    //--------------------------------
+    // 🔹 Income Data
+    //--------------------------------
+    async fetchIncomeData() {
+      const params = { page_size: this.hugePageSize };
       try {
-        const response = await this.$apiGet("/get_subscription");
+        const [rentRes, salesRes, subsRes] = await Promise.all([
+          this.$apiGet("/get_payments", params),
+          this.$apiGet("/get_sales_payments", params),
+          this.$apiGet("/get_subscription_payment", params),
+        ]);
 
-        if (response && response.data) {
-          // Plans to include
-          const plans = ["Basic Plan", "Profectional", "Enterprise"];
+        const rents = rentRes.data?.results ?? rentRes.data ?? [];
+        const sales = salesRes.data?.results ?? salesRes.data ?? [];
+        const subs = subsRes.data?.results ?? subsRes.data ?? [];
 
-          // Initialize counters
-          const usersPerPlan = { "Basic Plan": 0, Profectional: 0, Enterprise: 0 };
-          const revenuePerPlan = { "Basic Plan": 0, Profectional: 0, Enterprise: 0 };
-
-          // Aggregate data
-          response.data.forEach((sub) => {
-            if (plans.includes(sub.plan_name)) {
-              usersPerPlan[sub.plan_name] += 1;
-              revenuePerPlan[sub.plan_name] += sub.price || 0;
-            }
+        const sumByMonth = (arr) => {
+          const map = {};
+          arr.forEach(item => {
+            const d = new Date(item.payment_date ?? item.date);
+            const month = !isNaN(d) ? `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}` : "Unknown";
+            const amount = parseFloat(item.amount ?? item.price ?? 0) || 0;
+            map[month] = (map[month] || 0) + amount;
           });
+          return map;
+        };
 
-          // ✅ Replace options object to trigger reactivity
-          this.pricingChartOptions = {
-            ...this.pricingChartOptions,
-            xaxis: {
-              categories: plans, // "Basic Plan", "Profectional", "Enterprise"
-            },
-          };
+        const rentByMonth = sumByMonth(rents);
+        const salesByMonth = sumByMonth(sales);
+        const subsByMonth = sumByMonth(subs);
+        const workspaceByMonth = sumByMonth(subs.filter(s => (s.plan_name ?? "").toLowerCase().includes("workspace")));
 
-          // Update chart series
-          this.pricingSeries = [
-            {
-              name: "Users",
-              type: "column",
-              data: plans.map((p) => usersPerPlan[p]),
-            },
-            {
-              name: "Revenue ($)",
-              type: "line",
-              data: plans.map((p) => revenuePerPlan[p]),
-            },
-          ];
-        }
-      } catch (error) {
-        console.error("Failed to fetch pricing analytics:", error);
+        const months = [...new Set([...Object.keys(rentByMonth), ...Object.keys(salesByMonth), ...Object.keys(subsByMonth), ...Object.keys(workspaceByMonth)])].sort();
+        this.incomeChartOptions = { ...this.incomeChartOptions, xaxis: { categories: months } };
+        this.incomeSeries = [
+          { name: "Rent", data: months.map(m => rentByMonth[m] || 0) },
+          { name: "Sale", data: months.map(m => salesByMonth[m] || 0) },
+          { name: "Subscription", data: months.map(m => subsByMonth[m] || 0) },
+          { name: "Workspace", data: months.map(m => workspaceByMonth[m] || 0) },
+        ];
+      } catch (err) {
+        this.$root.$refs.toast.showToast("Failed to load income data", "error");
       }
     },
   },
 };
 </script>
+
+
