@@ -17,7 +17,7 @@
         </div>
 
         <!-- Search & Page Size (hide in detail) -->
-        <div v-if="!rentalId" class="p-6 flex justify-between items-center mb-6">
+        <div  class="p-6 flex justify-between items-center mb-6">
           <input
             v-model="searchTerm"
             @input="fetchPayments(1)"
@@ -34,7 +34,7 @@
             <span class="ml-1 text-gray-700">per page</span>
           </div>
         </div>
-{{ this.$route.params.id }}
+
         <!-- Table -->
         <div class="overflow-x-auto p-6">
           <table class="min-w-full table-auto border-collapse border border-gray-300 text-sm">
