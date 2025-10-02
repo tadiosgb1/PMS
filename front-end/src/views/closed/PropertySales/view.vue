@@ -331,7 +331,7 @@ export default {
       try {
         
         const params={
-            property_id__property_zone_id__manager_id__email:localStorage.getItem("email")
+            property_id__owner_id__id:localStorage.getItem("userId")
           }
 
           console.log("params for p sales",params);
