@@ -245,7 +245,7 @@ console.log("this.userSeries ",this.userSeries )
           const map = {};
           arr.forEach(item => {
             const d = new Date(item.payment_date ?? item.date);
-            const month = !isNaN(d) ? `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}` : "Unknown";
+            const month = !isNaN(d) ? `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}` : "";
             const amount = parseFloat(item.amount ?? item.price ?? 0) || 0;
             map[month] = (map[month] || 0) + amount;
           });

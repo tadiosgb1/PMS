@@ -305,7 +305,7 @@ export default {
           // page_size: this.perPage,
         };
 
-       if(localStorage.getItem("is_superuser") =="true") {
+ if(localStorage.getItem("is_superuser") =="true") {
   params = {
     page: page,
     page_size: this.perPage,

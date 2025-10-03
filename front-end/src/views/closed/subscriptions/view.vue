@@ -27,6 +27,22 @@
               class="w-full max-w-md px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
 
+
+             <div class="flex items-center">
+              <label class="mr-2 text-sm text-gray-600">Status</label>
+              <select
+                @change="fetchSubscriptions()"
+                v-model="status"
+                class="px-2 py-1 border rounded-md text-sm"
+              >
+                <option value="">All</option>
+                <option value="pending">Pending</option>
+                <option value="active">Active</option>
+                <option value="expired">Expired</option>
+              </select>
+            </div>
+
+
             <div class="ml-4">
               <label for="pageSize" class="mr-2 text-gray-700">Show</label>
               <select
@@ -74,11 +90,11 @@
                     {{ formatDate(subscription.end_date) }}
                   </td>
                  <td
-                  class="bg-white px-4 py-2 border text-white font-medium rounded"
+                  class=" px-4 py-2 border  font-medium rounded text-white"
                   :class="{
-                    'bg-yellow-500': subscription.status === 'pending',
-                    'bg-red-500': subscription.status === 'expired',
-                    'bg-green-500': subscription.status === 'active'
+                    'bg-yellow-500': subscription.status =='pending',
+                    'bg-red-500': subscription.status =='expired',
+                    'bg-green-500': subscription.status =='active'
                   }"
                 >
              {{ subscription.status }}
@@ -261,6 +277,7 @@ export default {
       previous: null,
       pageSize: 10,
       pageSizes: [5, 10, 20, 50, 100],
+      status:"",
     };
   },
   computed: {
@@ -291,11 +308,13 @@ export default {
         let params = {
           user_id__id: localStorage.getItem("userId"),
           ordering: "-id",
+          status:this.status
         };
 
         if (localStorage.getItem("is_superuser") == "true") {
           params = {
             ordering: "-id",
+            status:this.status
           };
         }
 
