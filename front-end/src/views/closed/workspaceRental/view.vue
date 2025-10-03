@@ -68,7 +68,13 @@
                 <td class="border border-gray-300 px-4 py-2">{{ rental.cycle }}</td>
                 <td class="border border-gray-300 px-4 py-2">{{ rental.start_date }}</td>
                 <td class="border border-gray-300 px-4 py-2">{{ rental.is_active ? "Yes" : "No" }}</td>
-                <td class="border border-gray-300 px-4 py-2">{{ rental.space.name || rental.space }}</td>
+                <td class="border border-gray-300 px-4 py-2">{{ rental.space.name || rental.space }}  <button
+                      @click="goToSpaceDetail(rental.space.id)"
+                      class="text-blue-600 hover:text-blue-800 focus:outline-none"
+                      title="View Payment"
+                    >
+                      View 
+                    </button></td>
                 <td class="border border-gray-300 px-4 py-2 text-center space-x-2">
                   <button @click="openPaymentModal(rental.id)" class="relative px-3 py-1 text-green-600 border border-green-600 rounded-lg hover:text-white hover:bg-green-600 transition duration-300 ease-in-out">
                     <i class="fas fa-credit-card mr-1"></i> Pay
@@ -202,6 +208,9 @@ export default {
     this.fetchRentals();
   },
   methods: {
+    goToSpaceDetail(id) {
+      this.$router.push(`/co-work-detail/${id}`);
+    },
     async fetchRentals(url = null) {
       try {
         const response = await this.$getWorkspaceRentals(url, this.pageSize);

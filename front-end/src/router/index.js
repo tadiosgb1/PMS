@@ -62,6 +62,7 @@ import CoworkspacePayments from '../views/closed/workspacePayment/view.vue'
 import brokers from '../views/closed/brokers/view.vue'
 import brokerDetail from '../views/closed/brokers/brokerDetail.vue'
 import subDetail from '../views/closed/subscriptions/subDetail.vue'
+import workSpaceDetail from '../views/closed/coworkingSpace/detail.vue'
 
 
 const routes = [
@@ -122,6 +123,12 @@ const routes = [
         path: '/sub-detail/:id',   // Route param :id
         name: 'sub-detail',
         component: subDetail,
+                     // optional: allows you to receive `id` as a prop
+      },
+       {
+        path: '/co-work-detail/:id',   // Route param :id
+        name: 'co-work-detail',
+        component: workSpaceDetail,
                      // optional: allows you to receive `id` as a prop
       },
       { path: '/properties', name: 'properties', component: Properties },

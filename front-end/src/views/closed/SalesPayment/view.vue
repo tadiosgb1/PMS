@@ -27,9 +27,6 @@
               class="w-full max-w-md px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               @input="fetchPayments(1)"
             />
-
-
-
             <div class="flex items-center">
               <label class="mr-2 text-sm text-gray-600">Status</label>
               <select
@@ -113,10 +110,10 @@
                   </td>
                   <td class="border border-gray-300 px-4 py-2">{{ payment.created_at }}</td>
                   <td class="border border-gray-300 px-4 py-2">{{ payment.updated_at }}</td>
-                  <td class="border border-gray-300 px-4 py-2">{{ payment.property_zone_sale_id }}  <button @click="goToSaleDetail(payment.property_zone_sale_id)" class="px-3 py-2 rounded bg-blue-500 text-white hover:bg-blue-600">
+                  <td class="border border-gray-300 px-4 py-2"> <button @click="goToSaleDetail(payment.property_zone_sale_id)" class="px-3 py-2 rounded bg-blue-500 text-white hover:bg-blue-600">
                     <i class="fa fa-info-circle mr-2"></i> Detail
                   </button></td>
-                                    <td class="border border-gray-300 px-4 py-2">{{ payment.buyer_id }} <button @click="goToUserDetail(payment.buyer_id)" class="px-3 py-2 rounded bg-blue-500 text-white hover:bg-blue-600">
+                                    <td class="border border-gray-300 px-4 py-2"><button @click="goToUserDetail(payment.buyer_id)" class="px-3 py-2 rounded bg-blue-500 text-white hover:bg-blue-600">
                     <i class="fa fa-info-circle mr-2"></i> Detail
                   </button>
                 </td>
