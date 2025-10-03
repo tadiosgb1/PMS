@@ -37,14 +37,26 @@
                 v-model="statusFilter"
                 class="px-2 py-1 border rounded-md text-sm"
               >
-                <option value="all">All</option>
+                <option value="">All</option>
                 <option value="complete">Completed</option>
                 <option value="pending">Pending</option>
                 <option value="cancelled">Cancelled</option>
               </select>
             </div>
 
-
+             <div class="flex items-center">
+              <label class="mr-2 text-sm text-gray-600">Payment Method</label>
+              <select
+                @change="fetchPayments()"
+                v-model="payment_method"
+                class="px-2 py-1 border rounded-md text-sm"
+              >
+                <option value="">All</option>
+                <option value="Telle">Tellebirr</option>
+                <option value="cbe">CBE</option>
+                <option value="Manual">Manual</option>
+              </select>
+            </div>
 
             <!-- Show Dropdown -->
             <div class="ml-4">
@@ -66,16 +78,15 @@
             <table class="min-w-full table-auto border-collapse border border-gray-300 text-sm">
               <thead>
                 <tr class="bg-gray-200 text-gray-700">
-                  <th class="border border-gray-300 px-4 py-2">ID</th>
                   <th class="border border-gray-300 px-4 py-2">Amount</th>
                   <th class="border border-gray-300 px-4 py-2">Method</th>
-                  <th class="border border-gray-300 px-4 py-2">Transaction ID</th>
+                  <th class="border border-gray-300 px-4 py-2">Transaction Id</th>
                   <!-- <th class="border border-gray-300 px-4 py-2">Due Date</th> -->
                   <th class="border border-gray-300 px-4 py-2">Status</th>
                   <th class="border border-gray-300 px-4 py-2">Created At</th>
                   <th class="border border-gray-300 px-4 py-2">Updated At</th>
-                  <th class="border border-gray-300 px-4 py-2">Property Sale ID</th>
-                  <th class="border border-gray-300 px-4 py-2">Buyer ID</th>
+                  <th class="border border-gray-300 px-4 py-2">Property Sale </th>
+                  <th class="border border-gray-300 px-4 py-2">Buyer </th>
                   <th class="border border-gray-300 px-4 py-2 text-center">Actions</th>
                 </tr>
               </thead>
@@ -85,7 +96,6 @@
                   :key="payment.id"
                   class="hover:bg-gray-100"
                 >
-                  <td class="border border-gray-300 px-4 py-2">{{ payment.id }}</td>
                   <td class="border border-gray-300 px-4 py-2">{{ payment.amount | currency }}</td>
                   <td class="border border-gray-300 px-4 py-2">{{ payment.payment_method }}</td>
                   <td class="border border-gray-300 px-4 py-2">{{ payment.transaction_id }}</td>
@@ -103,8 +113,13 @@
                   </td>
                   <td class="border border-gray-300 px-4 py-2">{{ payment.created_at }}</td>
                   <td class="border border-gray-300 px-4 py-2">{{ payment.updated_at }}</td>
-                  <td class="border border-gray-300 px-4 py-2">{{ payment.property_zone_sale_id }}</td>
-                  <td class="border border-gray-300 px-4 py-2">{{ payment.buyer_id }}</td>
+                  <td class="border border-gray-300 px-4 py-2">{{ payment.property_zone_sale_id }}  <button @click="goToSaleDetail(payment.property_zone_sale_id)" class="px-3 py-2 rounded bg-blue-500 text-white hover:bg-blue-600">
+                    <i class="fa fa-info-circle mr-2"></i> Detail
+                  </button></td>
+                                    <td class="border border-gray-300 px-4 py-2">{{ payment.buyer_id }} <button @click="goToUserDetail(payment.buyer_id)" class="px-3 py-2 rounded bg-blue-500 text-white hover:bg-blue-600">
+                    <i class="fa fa-info-circle mr-2"></i> Detail
+                  </button>
+                </td>
                   <td class="border border-gray-300 px-4 py-2 text-center">
                     <button
                        v-if="payment.status=='pending'  || payment.status=='cancelled'"
@@ -173,6 +188,7 @@ export default {
       next: null,
       previous: null,
       statusFilter:"all",
+      payment_method:""
     };
   },
   computed: {
@@ -189,6 +205,13 @@ export default {
     this.fetchPayments(1);
   },
   methods: {
+    goToUserDetail(id) {
+      this.$router.push(`/user_detail/${id}`);
+    },
+    goToSaleDetail(id) {
+      this.$router.push(`/property-sale/${id}`);
+    },
+
     async filterByStatus(status){
 
       let params={
@@ -205,7 +228,8 @@ export default {
       try {
         const params = { 
           page, page_size: this.perPage ,
-          search:this.searchTerm
+          search:this.searchTerm,
+          payment_method:this.payment_method
         };
 
 

@@ -64,6 +64,9 @@
             >
               <thead>
                 <tr class="bg-gray-200 text-gray-700">
+                 <th class="border border-gray-300 px-4 py-2">Transaction Id</th>
+                 <th class="border border-gray-300 px-4 py-2">Subscription</th>
+                 <th class="border border-gray-300 px-4 py-2">Owner</th>
                   <th
                     class="border border-gray-300 px-4 py-2 cursor-pointer"
                     @click="sortBy('payment_method')"
@@ -75,6 +78,7 @@
                       :sort-asc="sortAsc"
                     />
                   </th>
+
                   <th
                     class="border border-gray-300 px-4 py-2 cursor-pointer"
                     @click="sortBy('amount')"
@@ -124,6 +128,20 @@
                   :key="p.id"
                   class="hover:bg-gray-100"
                 >
+
+                <td class="border border-gray-300 px-4 py-2">
+                    {{ p.transaction_id }}
+                  </td>
+                  <td class="border border-gray-300 px-4 py-2">
+                    <button @click="goToSubDetail(p.subscription_id)" class="px-1 rounded bg-blue-500 text-white hover:bg-blue-600">
+                    <i class="fa fa-info-circle mr-2"></i> Detail
+                    </button>
+                  </td>
+                    <td class="border border-gray-300 px-4 py-2">
+                    <button @click="goToUserDetail(p.user_id)" class="px-1 rounded bg-blue-500 text-white hover:bg-blue-600">
+                    <i class="fa fa-info-circle mr-2"></i> Detail
+                    </button>
+                  </td>
                   <td class="border border-gray-300 px-4 py-2">
                     {{ p.payment_method }}
                   </td>
@@ -133,11 +151,6 @@
                     {{ p.amount }}
                   </td>
 
-
-                  
-
-
-                
 
                   <td class="border border-gray-300 px-4 py-2">
                     {{ p.transaction_id }}
@@ -297,6 +310,12 @@ export default {
     this.fetchPayments(1);
   },
   methods: {
+      goToUserDetail(id) {
+      this.$router.push(`/user_detail/${id}`);
+    },
+    goToSubDetail(id) {
+      this.$router.push(`/sub-detail/${id}`);
+    },
     async fetchPayments(page = 1) {
       try {
         let params = {
@@ -319,6 +338,8 @@ export default {
 }
         
         const response = await this.$apiGet("/get_subscription_payment", params);
+
+        console.log("subscription payments are",response);
         this.payments = response.data || [];
         this.currentPage = response.current_page;
         this.totalPages = response.total_pages;

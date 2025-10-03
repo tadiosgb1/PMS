@@ -44,6 +44,7 @@ import view_groups from '../views/closed/groups/view.vue'
 import view_managers from '../views/closed/managers/view.vue'
 import view_owners from '../views/closed/owners/view.vue'
 import Property_sales from '../views/closed/PropertySales/view.vue'
+import PropertySaleDetail from '../views/closed/PropertySales/saleDetail.vue'
 import Sales_Payments from '../views/closed/SalesPayment/view.vue'
 import Rent_Payments from '../views/closed/rent/RentPayments.vue'
 import staffs from '../views/closed/stafs/view.vue'
@@ -60,6 +61,7 @@ import Configurations from '../views/closed/Configurations/view.vue'
 import CoworkspacePayments from '../views/closed/workspacePayment/view.vue'
 import brokers from '../views/closed/brokers/view.vue'
 import brokerDetail from '../views/closed/brokers/brokerDetail.vue'
+import subDetail from '../views/closed/subscriptions/subDetail.vue'
 
 
 const routes = [
@@ -116,6 +118,12 @@ const routes = [
         component: RentDetail,
         props: true,              // optional: allows you to receive `id` as a prop
       },
+       {
+        path: '/sub-detail/:id',   // Route param :id
+        name: 'sub-detail',
+        component: subDetail,
+                     // optional: allows you to receive `id` as a prop
+      },
       { path: '/properties', name: 'properties', component: Properties },
 
       { path: 'properties/:id', name: 'PropertyDetail', component: PropertyDetail, props: true },
@@ -153,7 +161,12 @@ const routes = [
       { path: '/coworking-payments', name: 'coworking-payments', component:CoworkspacePayments },
       { path: '/coworking-payments/:id', name: 'coworking-payments-detail', component:CoworkspacePayments, props:true },
       { path: '/user_add', name: 'user_add', component: User_add },
-
+{
+      path: "/property-sale/:id",
+      name: "PropertySaleDetail",
+      component: PropertySaleDetail,
+      props: true
+    },
       {
         path: "/user_edit/:id",
         name: "UserEdit",

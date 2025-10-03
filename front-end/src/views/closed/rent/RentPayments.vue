@@ -94,8 +94,22 @@
             <td class="px-3 py-2">
               {{ payment.updated_at ? formatDate(payment.updated_at) : "-" }}
             </td>
-            <td class="px-3 py-2">{{ payment.rent_id }}</td>
-            <td class="px-3 py-2">{{ payment.user_id }}</td>
+                 <td class="px-3 py-2"><button
+                      @click="goToRentDetail(payment.rent_id)"
+                      class="text-blue-600 hover:text-blue-800 focus:outline-none"
+                      title="View Payment"
+                    >
+                      View Detail
+                    </button></td>
+                   <td class="px-3 py-2"><button
+                      @click="goToUserDetail(payment.user_id)"
+                      class="text-blue-600 hover:text-blue-800 focus:outline-none"
+                      title="View Payment"
+                    >
+                      View Detail
+                    </button> </td>
+
+
             <td class="px-3 py-2 text-center">
               <button
                 v-if="payment.status == 'pending' || payment.status == 'cancelled'"
@@ -163,6 +177,7 @@ export default {
     };
   },
   computed: {
+    
     rentId() {
       return this.$route.params.rent_id || null;
     },
@@ -184,6 +199,12 @@ export default {
     },
   },
   methods: {
+     goToUserDetail(id) {
+      this.$router.push(`/user_detail/${id}`);
+    },
+    goToRentDetail(id) {
+      this.$router.push(`/rent-detail/${id}`);
+    },
     // --- role-based filtering helper ---
     buildRoleParams(params = {}) {
       const isSuperUser =
