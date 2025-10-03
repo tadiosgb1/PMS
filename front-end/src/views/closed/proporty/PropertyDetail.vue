@@ -163,7 +163,7 @@ import AddPictureModal from "@/views/closed/proporty/AddPropertyPicture.vue";
 import UpdatePictureModal from "@/views/closed/proporty/UpdatePropertyPicture.vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
 import Toast from "../../../components/Toast.vue";
-import Maintenance from "@/views/closed/maintenanceRequests/view.vue";
+import Maintenance from "@/views/closed/maintenanceRequests/view1.vue";
 
 export default {
   name: "PropertyDetail",

@@ -11,6 +11,7 @@
         <div class="flex items-center gap-4">
           <!-- Add button -->
           <button
+          v-if="!this.propertyId"
             @click="visible = true"
             class="bg-white text-blue-700 font-semibold px-1 lg:px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300"
           >
@@ -200,6 +201,9 @@ import MaintenanceRequestAdd from "@/views/closed/maintenanceRequests/add.vue";
 export default {
   name: "MaintenanceRequestView",
   components: { Toast, MaintenanceRequestAdd },
+   props: {
+    propertyId: Number,
+  },
   data() {
     return {
       maintenance: [],
@@ -257,6 +261,10 @@ export default {
           params = { ...params };
         }
       }
+       // ✅ Always filter by propertyId if available
+  if (this.propertyId) {
+    params = { ...params, "property_id__id": this.propertyId };
+  }
       return params;
     },
 
