@@ -117,7 +117,7 @@
                     <button
                       v-if="payment.status=='pending'  || payment.status=='complete'"
                       @click="reject(payment)"
-                      class="text-red-600 hover:text-red-800 focus:outline-none"
+                      class="ml-2 text-red-600 hover:text-red-800 focus:outline-none"
                     >
                       Cancel
                     </button>

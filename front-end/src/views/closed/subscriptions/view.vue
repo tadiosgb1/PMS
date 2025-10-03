@@ -28,7 +28,7 @@
             />
 
 
-             <div class="flex items-center">
+             <div class="flex items-center" v-if="is_super_user=='true'">
               <label class="mr-2 text-sm text-gray-600">Status</label>
               <select
                 @change="fetchSubscriptions()"
@@ -278,6 +278,7 @@ export default {
       pageSize: 10,
       pageSizes: [5, 10, 20, 50, 100],
       status:"",
+     
     };
   },
   computed: {

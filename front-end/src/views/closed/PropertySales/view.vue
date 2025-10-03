@@ -27,6 +27,19 @@
               class="w-full max-w-md px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
 
+
+             <div class="flex items-center" >
+              <label class="mr-2 text-sm text-gray-600">Status</label>
+              <select
+                @change="fetchSales()"
+                v-model="status"
+                class="px-2 py-1 border rounded-md text-sm"
+              >
+                <option value="">All</option>
+                <option value="pending">Pending</option>
+                <option value="active">Active</option>
+              </select>
+            </div>
             <!-- Page Size Dropdown -->
             <div class="ml-4">
               <label for="pageSize" class="mr-2 text-gray-700">Show</label>
@@ -127,17 +140,19 @@
                   <td class="border border-gray-300 px-4 py-2">
                     {{ sale.selling_price | currency }}
                   </td>
-                  <td class="border border-gray-300 px-4 py-2">
-                    <span
-                      :class="{
-                        'text-green-600': sale.status === 'active',
-                        'text-yellow-600': sale.status === 'pending',
-                        'text-red-600': sale.status === 'inactive',
-                      }"
-                    >
-                      {{ sale.status }}
-                    </span>
-                  </td>
+                 
+                                  <td class="border border-gray-300 px-3 py-2 whitespace-nowrap text-center">
+                                  <span 
+                                    class="px-3 py-1 rounded-full text-white text-xs font-semibold"
+                                    :class="{
+                                      'bg-green-600': sale.status === 'active',
+                                      'bg-yellow-600': sale.status === 'pending',
+                                    
+                                    }"
+                                  >
+                                    {{ sale.status }}
+                                  </span>
+                                </td>
                   <td class="border border-gray-300 px-4 py-2">
                     {{ formatDate(sale.created_at) }}
                   </td>
@@ -289,6 +304,7 @@ export default {
       showAddSale: false,
       showUpdateSale: false,
       selectedSale: null,
+      status:"",
     };
   },
   computed: {
@@ -339,16 +355,24 @@ export default {
           params = {
             ...params,
             "property_id__manager_id__id": id,
+            status:this.status
           };
         } else if (groups.includes("owner")) {
           params = {
             ...params,  
             "property_id__owner_id__id": id,
+            status:this.status
           };
         } else if (groups.includes("staff")) {
-          params = { ...params, "property_id__manager_id__id": id };
+          params = { ...params, "property_id__manager_id__id": id ,
+            status:this.status
+          };
         } else if (groups.includes("super_staff")) {
-          params = { ...params }; // sees all payments
+          params = { ...params ,status:this.status}; // sees all payments
+        }
+      }else{
+        params={
+        status:this.status
         }
       }
       return params;

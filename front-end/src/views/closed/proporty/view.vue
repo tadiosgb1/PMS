@@ -43,6 +43,23 @@
               </select>
             </div>
 
+
+            <div class="flex items-center" >
+              <label class="mr-2 text-sm text-gray-600">Status</label>
+              <select
+                @change="fetchProperties()"
+                v-model="status"
+                class="px-2 py-1 border rounded-md text-sm"
+              >
+                <option value="">All</option>
+                <option value="rent">Rent</option>
+                <option value="sale">Sale</option>
+                <option value="available">available</option>
+                <option value="under_maintenance">Under Maintenance</option>
+              </select>
+            </div>
+
+
             <div class="ml-4">
               <label for="pageSize" class="mr-2 text-gray-700">Show</label>
               <select
@@ -128,9 +145,21 @@
                   <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
                     {{ property.city }}
                   </td>
-                  <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
-                    {{ property.status }}
-                  </td>
+                <td class="border border-gray-300 px-3 py-2 whitespace-nowrap text-center">
+  <span 
+    class="px-3 py-1 rounded-full text-white text-xs font-semibold"
+    :class="{
+      'bg-green-600': property.status === 'available',
+      'bg-blue-600': property.status === 'rent',
+      'bg-yellow-600': property.status === 'sale',
+      'bg-pink-400': property.status === 'under_maintenance'
+    }"
+  >
+    {{ property.status }}
+  </span>
+</td>
+
+
                   <td
                     class="border border-gray-300 px-3 py-2 text-center space-x-2"
                   >
@@ -255,9 +284,12 @@ export default {
       pageSize: 10,
       pageSizes: [5, 10, 20, 50, 100],
       ordering: "-id", // default ordering
+      status:"",
+      is_super_user:false,
     };
   },
   async mounted() {
+      this.is_super_user=localStorage.getItem('is_superuser');
     if (this.$route.query.zone_id) {
       this.zone_id_query_set = true;
     }
@@ -269,18 +301,24 @@ export default {
   methods: {
     async fetchProperties(url = null) {
       try {
+        let params={};
         const pageUrl =
           url ||
           `/get_properties?page=${this.currentPage}&page_size=${this.pageSize}&search=${this.searchTerm}&ordering=${this.ordering}`;
 
         let result = [];
         if (this.$route.query.zone_id || this.zone_id) {
-          const params = {
+           params = {
             property_zone_id: this.$route.query.zone_id || this.zone_id,
+            status:this.status
           };
+          console.log("params properties",params)
           result = await this.$getProperties(pageUrl, params);
         } else {
-          result = await this.$getProperties(pageUrl);
+           params={
+             status:this.status
+          }
+          result = await this.$getProperties(pageUrl,params);
         }
 
         this.properties = result.properties;
