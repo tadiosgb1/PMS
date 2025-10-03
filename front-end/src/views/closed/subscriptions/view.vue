@@ -90,14 +90,14 @@
                     {{ formatDate(subscription.end_date) }}
                   </td>
                  <td
-                  class=" px-4 py-2 border  font-medium rounded text-white"
+                  class=" px-4 py-2 border   rounded text-white font-bold"
                   :class="{
                     'bg-yellow-500': subscription.status =='pending',
                     'bg-red-500': subscription.status =='expired',
                     'bg-green-500': subscription.status =='active'
                   }"
                 >
-             {{ subscription.status }}
+            {{ subscription.status.charAt(0).toUpperCase() + subscription.status.slice(1) }}
                 </td>
 
 
