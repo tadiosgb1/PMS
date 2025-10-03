@@ -35,6 +35,18 @@
         </select>
       </div>
 
+      <div class="flex items-center">
+        <label class="mr-2 text-sm text-gray-600">Payment Method</label>
+        <select
+          @change="fetchPayments(1)"
+          v-model="payment_method"
+          class="px-2 py-1 border rounded-md text-sm"
+        >
+          <option value="">All</option>
+          <option value="tellebirr">Tellebirr</option>
+          <option value="cash">Cash</option>
+        </select>
+      </div>
       <!-- Show -->
       <div class="ml-4">
         <label class="mr-2 text-sm text-gray-600">Show</label>
@@ -63,8 +75,8 @@
             <th class="px-3 py-2 text-left">Status</th>
             <th class="px-3 py-2 text-left">Created At</th>
             <th class="px-3 py-2 text-left">Updated At</th>
-            <th class="px-3 py-2 text-left">Rent ID</th>
-            <th class="px-3 py-2 text-left">User ID</th>
+            <th class="px-3 py-2 text-left">Rent Info </th>
+            <th class="px-3 py-2 text-left">User </th>
             <th class="px-3 py-2 text-center">Actions</th>
           </tr>
         </thead>
@@ -174,6 +186,7 @@ export default {
       next: null,
       previous: null,
       statusFilter: "all",
+      payment_method:""
     };
   },
   computed: {
@@ -220,16 +233,24 @@ export default {
           params = {
             ...params,
             "rent_id__property_id__property_zone_id__manager_id__email": email,
+            payment_method:this.payment_method
           };
         } else if (groups.includes("owner")) {
           params = {
             ...params,  
             "rent_id__property_id__property_zone_id__owner_id__email": email,
+              payment_method:this.payment_method
           };
         } else if (groups.includes("staff")) {
-          params = { ...params, "rent_id__property_id__property_zone_id__staff_id__id": id };
+          params = { ...params, "rent_id__property_id__property_zone_id__staff_id__id": id ,
+              payment_method:this.payment_method
+          };
         } else if (groups.includes("super_staff")) {
           params = { ...params }; // sees all payments
+        }
+      }else{
+        params={
+            payment_method:this.payment_method
         }
       }
       return params;

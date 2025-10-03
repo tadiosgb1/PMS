@@ -36,6 +36,19 @@
               </select>
             </div>
 
+      <div class="flex items-center">
+        <label class="mr-2 text-sm text-gray-600">Payment Method</label>
+        <select
+          @change="fetchPayments(1)"
+          v-model="payment_method"
+          class="px-2 py-1 border rounded-md text-sm"
+        >
+          <option value="">All</option>
+          <option value="tellebirr">Tellebirr</option>
+          <option value="cash">Cash</option>
+        </select>
+      </div>
+
             <!-- Show Dropdown -->
             <div>
               <label class="mr-2 text-sm text-gray-600">Show</label>
@@ -269,6 +282,7 @@ export default {
       totalPages: 1,
       next: null,
       previous: null,
+      payment_method:""
     };
   },
   computed: {
@@ -328,12 +342,14 @@ export default {
   params = {
     page: page,
     page_size: this.perPage,
+    payment_method:this.payment_method,
   };
 } else {
   params = {
     user_id: localStorage.getItem("userId"),
     page: page,
     page_size: this.perPage,
+     payment_method:this.payment_method,
   };
 }
         

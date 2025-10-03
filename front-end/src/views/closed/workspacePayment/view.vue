@@ -26,6 +26,33 @@
             class="w-full max-w-md px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 
+
+           <div class="flex items-center">
+              <label class="mr-2 text-sm text-gray-600">Status</label>
+              <select
+              @change="fetchPayments()"
+                v-model="status"
+                class="px-2 py-1 border rounded-md text-sm"
+              >
+                <option value="">All</option>
+                <option value="paid">Paid</option>
+                <option value="pending">Pending</option>
+                <option value="cancelled">Cancelled</option>
+              </select>
+            </div>
+
+      <div class="flex items-center">
+        <label class="mr-2 text-sm text-gray-600">Payment Method</label>
+        <select
+          @change="fetchPayments(1)"
+          v-model="payment_method"
+          class="px-2 py-1 border rounded-md text-sm"
+        >
+          <option value="">All</option>
+          <option value="tellebirr">Tellebirr</option>
+          <option value="cash">Cash</option>
+        </select>
+      </div>
           <div class="ml-4 flex items-center">
             <label class="mr-2 text-gray-700">Show</label>
             <select v-model="perPage" @change="fetchPayments(1)" class="border px-2 py-1 rounded">
@@ -45,6 +72,8 @@
                   <SortIcon :field="'rental_info'" :sort-key="sortKey" :sort-asc="sortAsc" />
                 </th>
                 <th class="border border-gray-300 px-4 py-2">Amount</th>
+                 <th class="border border-gray-300 px-4 py-2">Transaction ID</th>
+                 <th class="border border-gray-300 px-4 py-2">Payment Method</th>
                 <th class="border border-gray-300 px-4 py-2">Cycle Start</th>
                 <th class="border border-gray-300 px-4 py-2">Cycle End</th>
                 <th class="border border-gray-300 px-4 py-2">Paid At</th>
@@ -54,8 +83,18 @@
             </thead>
             <tbody>
               <tr v-for="payment in filteredAndSortedPayments" :key="payment.id" class="hover:bg-gray-100">
-                <td class="border border-gray-300 px-4 py-2">{{ payment.rental_info }}</td>
+
+
+                <td class="border border-gray-300 px-4 py-2"> {{ payment.rental_id }}<button @click="goToRentalDetail(payment.rental)" class="text-blue-600 hover:text-blue-800">
+                    View detail
+                  </button></td>
+
+
                 <td class="border border-gray-300 px-4 py-2">{{ payment.amount }} ETB</td>
+
+                <td class="border border-gray-300 px-4 py-2">{{ payment.transaction_id }} ETB</td>
+                <td class="border border-gray-300 px-4 py-2">{{ payment.payment_method }} ETB</td>
+
                 <td class="border border-gray-300 px-4 py-2">{{ formatDate(payment.cycle_start) }}</td>
                 <td class="border border-gray-300 px-4 py-2">{{ formatDate(payment.cycle_end) }}</td>
                 <td class="border border-gray-300 px-4 py-2">{{ formatDate(payment.paid_at) }}</td>
@@ -154,6 +193,8 @@ export default {
       showModal: false,
       sortKey: "rental_info",
       sortAsc: true,
+      payment_method:"",
+      status:"",
     };
   },
   computed: {
@@ -189,6 +230,10 @@ export default {
     },
   },
   methods: {
+    goToRentalDetail(id) {
+      //console.log("id",id);
+      this.$router.push(`/co-work-rental-detail/${id}`);
+    },
     async fetchPayments(urlOrPage = null) {
       try {
         let params = {};
@@ -196,14 +241,22 @@ export default {
 
         if (this.rentalId) {
           // detail mode: only fetch by rental_id
-          params = { rental_id: this.rentalId };
+          params = { rental_id: this.rentalId ,
+            payment_method:this.payment_method,
+            status:this.status
+          };
+          
         } else {
+          params.pament_method=this.payment_method;
+          params.status=this.status;
           // list mode
           if (typeof urlOrPage === "string") url = urlOrPage;
-          else params = { page: urlOrPage || 1, page_size: this.perPage };
+          else params = { page: urlOrPage || 1, payment_method:this.payment_method, page_size: this.perPage };
         }
 
        const res = await this.$getWorkspacePayments(null, params);
+
+       console.log("cow-payments",res);
         this.payments = res.payments || [];
         this.currentPage = res.currentPage || 1;
         this.totalPages = res.totalPages || 1;
