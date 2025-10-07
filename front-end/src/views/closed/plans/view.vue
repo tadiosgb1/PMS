@@ -43,14 +43,14 @@
                   Max Users
                   <SortIcon :field="'max_users'" :sort-key="sortKey" :sort-asc="sortAsc" />
                 </th>
-                <th class="border border-gray-300 px-4 py-2 cursor-pointer" @click="sortBy('max_kds')">
+                <!-- <th class="border border-gray-300 px-4 py-2 cursor-pointer" @click="sortBy('max_kds')">
                   Max KDS
                   <SortIcon :field="'max_kds'" :sort-key="sortKey" :sort-asc="sortAsc" />
                 </th>
                 <th class="border border-gray-300 px-4 py-2 cursor-pointer" @click="sortBy('kds_enabled')">
                   KDS Enabled
                   <SortIcon :field="'kds_enabled'" :sort-key="sortKey" :sort-asc="sortAsc" />
-                </th>
+                </th> -->
                 <th class="border border-gray-300 px-4 py-2 cursor-pointer" @click="sortBy('price')">
                   Price
                   <SortIcon :field="'price'" :sort-key="sortKey" :sort-asc="sortAsc" />
@@ -72,8 +72,8 @@
                 <td class="border border-gray-300 px-4 py-2">{{ plan.max_locations }}</td>
                 <td class="border border-gray-300 px-4 py-2">{{ plan.max_staff }}</td>
                 <td class="border border-gray-300 px-4 py-2">{{ plan.max_users }}</td>
-                <td class="border border-gray-300 px-4 py-2">{{ plan.max_kds }}</td>
-                <td class="border border-gray-300 px-4 py-2">{{ plan.kds_enabled ? 'Yes' : 'No'}}</td>
+                <!-- <td class="border border-gray-300 px-4 py-2">{{ plan.max_kds }}</td>
+                <td class="border border-gray-300 px-4 py-2">{{ plan.kds_enabled ? 'Yes' : 'No'}}</td> -->
                 <td class="border border-gray-300 px-4 py-2">{{ plan.price }}</td>
                 <td class="border border-gray-300 px-4 py-2">{{ plan.billing_cycle }}</td>
                 <td class="border border-gray-300 px-4 py-2 text-center space-x-2">

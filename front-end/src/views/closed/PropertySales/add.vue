@@ -201,16 +201,27 @@ export default {
   methods: {
     async fetchZones() {
       try {
-        const res = await this.$apiGet("/get_property_zones");
-        this.zones = res.data || [];
+        const url = `/get_property_zones?search=${this.zoneSearch}`;
+      
+        const result = await this.$getZones(url);
+        console.log("result for zones",result)
+        this.zones = result.zones;
+        
       } catch (err) {
         console.error("Failed to fetch zones:", err);
       }
     },
-    async fetchProperties() {
+    async fetchProperties(url = null) {
       try {
-        const res = await this.$apiGet("get_properties");
-        this.properties = res.data || [];
+         const pageUrl =
+          url ||
+          `/get_properties?search=${this.propertySearch}`;
+
+        let result = [];
+      
+          result = await this.$getProperties(pageUrl);
+       
+        this.properties = result.properties;
       } catch (err) {
         console.error("Error fetching properties:", err);
       }
@@ -224,22 +235,10 @@ export default {
       }
     },
     searchZones() {
-      if (this.zoneSearch === "") {
-        this.fetchZones();
-      } else {
-        this.zones = this.zones.filter((z) =>
-          z.name.toLowerCase().includes(this.zoneSearch.toLowerCase())
-        );
-      }
+     this.fetchZones();
     },
     searchProperties() {
-      if (this.propertySearch === "") {
-        this.fetchProperties();
-      } else {
-        this.properties = this.properties.filter((p) =>
-          p.name.toLowerCase().includes(this.propertySearch.toLowerCase())
-        );
-      }
+      this.fetchProperties()
     },
     searchBrokers() {
       if (this.brokerSearch === "") {

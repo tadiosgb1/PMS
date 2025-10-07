@@ -21,8 +21,35 @@
           class="p-4 sm:p-6 grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[80vh] overflow-y-auto"
         >
        
+ <!-- Property -->
+          <div class="relative">
+            <label class="block text-gray-700 mb-1">Property</label>
+            <input
+              v-model="propertySearch"
+              type="text"
+              class="custom-input"
+              placeholder="Search Property..."
+              @input="searchProperties"
+              @focus="propertyDropdown = true"
+              @blur="hideDropdown('property')"
+              required
+            />
+            <ul
+              v-if="properties.length > 0 && propertyDropdown"
+              class="absolute z-50 w-full max-h-48 overflow-y-auto bg-white border border-gray-300 rounded shadow mt-1"
+            >
+              <li
+                v-for="property in properties"
+                :key="property.id"
+                class="p-2 hover:bg-gray-100 cursor-pointer"
+                @mousedown.prevent="selectProperty(property)"
+              >
+                {{ property.name }}
+              </li>
+            </ul>
+          </div>
 
-           <div>
+           <!-- <div>
             <label class="block text-gray-700 mb-1">Property</label>
             <input 
               v-model="form.property_id" 
@@ -41,10 +68,10 @@
           >
             <span>{{ property.name }}</span>
 
-            <!-- Show check icon only for the selected one -->
+           
             <i v-if="form.property_id === property.id" class="fas fa-check text-green-500"></i>
           </div>
-        </div>
+        </div> -->
 
 
     
@@ -196,7 +223,9 @@ export default {
         broker: "",
       },
       properties:[],
+      propertySearch:"",
       pr_length:0,
+      propertyDropdown:false,
       user_length:0,
       users:[],
 
@@ -207,8 +236,39 @@ export default {
   },
   mounted(){
   this.fetchBrokers();
+  this.fetchProperties()
   },
   methods: {
+    async fetchProperties(url = null) {
+      try {
+         const pageUrl =
+          url ||
+          `/get_properties?search=${this.propertySearch}`;
+
+        let result = [];
+      
+          result = await this.$getProperties(pageUrl);
+       
+        this.properties = result.properties;
+      } catch (err) {
+        console.error("Error fetching properties:", err);
+      }
+    },
+     searchProperties() {
+      this.fetchProperties()
+    },
+     hideDropdown(type) {
+      setTimeout(() => {
+        if (type === "zone") this.zoneDropdown = false;
+        if (type === "property") this.propertyDropdown = false;
+        if (type === "broker") this.brokerDropdown = false;
+      }, 200);
+    },
+    selectProperty(property) {
+      this.form.property_id = property.id;
+      this.propertySearch = property.name;
+      this.propertyDropdown = false;
+    },
         async fetchBrokers() {
       try {
         const res = await this.$apiGet("/get_broker_profiles");
@@ -238,10 +298,10 @@ selectUser(user_id){
 this.form.user_id=user_id
 console.log("form",this.form);
 },
-selectProperty(property_id){
-this.form.property_id=property_id
-console.log("form",this.form);
-},
+// selectProperty(property_id){
+// this.form.property_id=property_id
+// console.log("form",this.form);
+// },
     async searchProperty() {
       const params={
         search:this.form.property_id,

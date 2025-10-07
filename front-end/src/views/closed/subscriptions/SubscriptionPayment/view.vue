@@ -65,7 +65,7 @@
           </div>
 
           <!-- Amount Summary -->
-          <div v-if="statusFilter" class="mb-4 text-sm font-semibold text-gray-700">
+          <div v-if="statusFilter && statusFilter !== 'pending'" class="mb-4 text-sm font-semibold text-gray-700">
             Total {{ statusFilter }} Amount:
             <span class="text-orange-600">{{ totalAmountByStatus }}</span>
           </div>

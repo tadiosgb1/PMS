@@ -40,7 +40,7 @@
           <input v-model="form.max_users" type="number" class="custom-input" />
         </div>
 
-        <div>
+        <!-- <div>
           <label class="block text-gray-700 mb-1">Max KDS</label>
           <input v-model="form.max_kds" type="number" class="custom-input" />
         </div>
@@ -53,7 +53,7 @@
     class="h-5 w-5 rounded border border-orange-100 text-orange-300 focus:ring-orange-300"
   />
   <label for="kdsEnabled" class="block text-gray-700">KDS Enabled</label>
-</div>
+</div>  -->
 
 
         <div>
@@ -117,8 +117,7 @@ export default {
         max_locations: '',
         max_staff: '',
         max_users: '',
-        max_kds: '',
-        kds_enabled: false,
+        max_kds: '27',
         price: null,
         billing_cycle: null,
         created_at: new Date().toISOString(),
@@ -134,11 +133,6 @@ export default {
 
         console.log("response.namejh,jkljkllllllllllllllllllllllllllllllllllllllllllllllllllllllllll",response.name);
     
-          if (response.name) {
-      // Show validation error from backend
-      this.$root.$refs.toast.showToast(response.name[0], "error");
-      return; // stop further execution
-    }
 
      this.$root.$refs.toast.showToast('Plan saved successfully ', 'success');
 

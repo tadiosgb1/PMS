@@ -56,7 +56,7 @@
             />
           </div>
 
-          <div>
+          <!-- <div>
             <label class="block text-gray-700">Max KDS</label>
             <input
               v-model="form.max_kds"
@@ -75,7 +75,7 @@
             <label for="kdsEnabled" class="block text-gray-700"
               >KDS Enabled</label
             >
-          </div>
+          </div> -->
 
           <div>
             <label class="block text-gray-700">Price</label>
@@ -134,7 +134,7 @@ export default {
         max_locations: '',
         max_staff: '',
         max_users: '',
-        max_kds: '',
+        max_kds: '27',
         kds_enabled: false,
         price: null,
         billing_cycle: '',
