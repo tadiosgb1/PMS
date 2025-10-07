@@ -51,15 +51,14 @@
           <div class="relative">
             <label class="block text-sm font-medium mb-1">Rent</label>
             <input
-              v-model="searchTerm"
-              @input="searchPropertyRents"
+              v-model="form.rent"
               type="text"
               placeholder="Search property..."
               class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
             />
 
             <!-- Suggestions -->
-            <ul
+            <!-- <ul
               v-if="propertyRents.length && showSuggestions"
               class="absolute z-10 bg-white border rounded-lg shadow-md mt-1 w-full max-h-48 overflow-auto"
             >
@@ -71,7 +70,7 @@
               >
                 {{ rent.id }}
               </li>
-            </ul>
+            </ul> -->
           </div>
         </div>
 

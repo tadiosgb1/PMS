@@ -24,7 +24,8 @@
     </div>
 
     <!-- Pricing Plan Stats -->
-    <div class="bg-white p-6 rounded-lg shadow-md mb-8">
+    <div class="bg-white p-6 rounded-lg shadow-md mb-8" v-if="is_superuser==='true'">
+
       <h2 class="text-lg font-semibold mb-4">Pricing Plan Analytics</h2>
       <apexchart type="line" height="350" :options="pricingChartOptions" :series="pricingSeries" />
     </div>
@@ -47,6 +48,7 @@
 export default {
   data() {
     return {
+      is_superuser:false,
       stats: { totalProperties: 0, totalZones: 0, totalSubscriptions: 0, totalTenants: 0 },
       hugePageSize: 10000000000,
 
@@ -89,7 +91,9 @@ export default {
   },
 
   mounted() {
+    this.is_superuser=localStorage.getItem("is_superuser");
     this.fetchAllData();
+    
   },
 
   methods: {

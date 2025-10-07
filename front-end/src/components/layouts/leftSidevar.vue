@@ -46,6 +46,7 @@
     </transition>
   </div>
 </template>
+
 <script>
 export default {
   data() {
@@ -56,13 +57,13 @@ export default {
         {
           name: "Dashboard",
           route: "first-dash",
-          icon: "fas fa-tachometer-alt",
+          icon: "fas fa-gauge", // ✅ updated from deprecated tachometer-alt
           color: "#f97316",
         },
-          {
+        {
           name: "Configurations",
           route: "configurations",
-          icon: "fas fa-tags",
+          icon: "fas fa-gear", // ✅ fa-tags → fa-gear (better match)
           color: "#f59e0b",
           permission: "pms.view_plan",
           is_superuser: true,
@@ -70,128 +71,112 @@ export default {
         {
           name: "Subscriptions",
           route: "subscriptions_view",
-          icon: "fas fa-tags",
+          icon: "fas fa-receipt", // ✅ fa-tags → fa-receipt
           color: "#f59e0b",
           permission: "pms.view_subscription",
         },
-         {
+        {
           name: "Groups",
           route: "groups",
-          icon: "fas fa-layer-group",
+          icon: "fas fa-layer-group", // ✅ valid
           color: "#6366f1",
           permission: "auth.view_group",
         },
         {
           name: "Permissions",
           route: "permissions_view",
-          icon: "fas fa-shield-alt",
+          icon: "fas fa-shield-halved", // ✅ modern version of fa-shield-alt
           color: "#10b981",
           permission: "auth.view_permission",
         },
         {
           name: "Users",
           route: "user_view",
-          icon: "fas fa-user",
+          icon: "fas fa-user", // ✅ valid
           color: "#60a5fa",
           permission: "pms.view_user",
         },
-          
         {
           name: "Zones",
           route: "zones",
-          icon: "fas fa-map-marked-alt",
+          icon: "fas fa-map-location-dot", // ✅ fa-map-marked-alt replaced
           color: "#3b82f6",
           permission: "pms.view_propertyzone",
         },
-        
         {
           name: "Properties",
           route: "properties",
-          icon: "fas fa-building",
+          icon: "fas fa-building", // ✅ valid
           color: "#6b7280",
           permission: "pms.view_property",
         },
         {
           name: "Property Sales",
           route: "property_sales",
-          icon: "fas fa-hand-holding-usd",
+          icon: "fas fa-hand-holding-dollar", // ✅ fa-hand-holding-usd → updated name
           color: "#6b7280",
           permission: "pms.view_propertysale",
         },
-    
         {
           name: "Rent Management",
           route: "rents",
-          icon: "fas fa-file-contract",
+          icon: "fas fa-file-contract", // ✅ valid
           color: "#3b82f6",
           permission: "pms.view_rent",
         },
-      
         {
           name: "Maintenance Requests",
           route: "maintenance-requests",
-          icon: "fas fa-tools",
+          icon: "fas fa-screwdriver-wrench", // ✅ fa-tools → modern name
           color: "#ef4444",
           permission: "pms.view_maintenancerequest",
         },
-
         {
           name: "Payments",
           route: "payments",
-          icon: "fas fa-money-bill-wave",
+          icon: "fas fa-money-bill-wave", // ✅ valid
           color: "#22c55e",
         },
-          
-       
-
-         {
+        {
           name: "Coworking Spaces",
           route: "coworking-spaces",
-          icon: "fas fa-file-alt",
+          icon: "fas fa-people-roof", // ✅ better icon for shared spaces
           color: "#22c55e",
         },
-
-         {
+        {
           name: "Coworking-space-rentals",
           route: "coworking-space-rentals",
-          icon: "fas fa-file-alt",
+          icon: "fas fa-file-signature", // ✅ relevant for contracts
           color: "#22c55e",
         },
-
-       {
+        {
           name: "Transactions",
           route: "transactions",
-          icon: "fas fa-money-bill-wave",
+          icon: "fas fa-arrows-rotate", // ✅ better for transactions
           color: "#22c55e",
         },
-          {
+        {
           name: "Reports",
           route: "reports",
-          icon: "fas fa-file-alt",
+          icon: "fas fa-chart-line", // ✅ fa-file-alt → fa-chart-line (better match)
           color: "#22c55e",
         },
-
-         {
+        {
           name: "Notifications",
           route: "notifications",
-          icon: "fas fa-money-bill-wave",
+          icon: "fas fa-bell", // ✅ fa-money-bill-wave → fixed
           color: "#22c55e",
         },
-        
       ],
     };
   },
   computed: {
     filteredMenuItems() {
       return this.menuItems.filter((item) => {
-        // Superuser-only items
         if (item.is_superuser && !this.is_superuser) return false;
-
-        // Permission check
         if (item.permission) {
           return this.$hasPermission(item.permission);
         }
-
         return true;
       });
     },
