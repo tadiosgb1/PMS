@@ -8,7 +8,7 @@
     >
       <!-- Header -->
       <div class="bg-primary text-white px-6 py-4 text-2xl font-semibold flex justify-between items-center">
-        Add Commission
+        Add Sale Commission
         <button @click="$emit('close')" class="text-white hover:text-gray-200 text-lg font-bold">
           ✕
         </button>
@@ -18,7 +18,7 @@
       <form @submit.prevent="submitForm" class="space-y-4 px-4 py-4">
         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
-            <label class="block text-sm font-medium mb-1">SaaS Commission</label>
+            <label class="block text-sm font-medium mb-1">SaaS Commission %</label>
             <input
               v-model="form.saas_commission"
               type="text"
@@ -28,7 +28,7 @@
           </div>
 
           <div>
-            <label class="block text-sm font-medium mb-1">Broker Commission</label>
+            <label class="block text-sm font-medium mb-1">Broker Commission %</label>
             <input
               v-model="form.broker_commission"
               type="text"
@@ -144,7 +144,8 @@ export default {
         this.$emit("close");
       } catch (err) {
         console.error("Failed to add commission:", err);
-        alert("Failed to add commission.");
+            this.$root.$refs.toast.showToast(err.message, 'error');
+        //alert("Failed to add commission.");
       }
     },
 
