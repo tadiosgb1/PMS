@@ -37,41 +37,32 @@
             />
           </div>
 
-          <div>
-            <label class="block text-sm font-medium mb-1">Total Commission</label>
-            <input
-              v-model="form.total_commission"
-              type="text"
-              required
-              class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
-            />
-          </div>
+        
 
           <!-- Property Sale Autocomplete -->
           <div class="relative">
-            <label class="block text-sm font-medium mb-1">Property Sale</label>
+            <label class="block text-sm font-medium mb-1">Property Sale Code</label>
             <input
-              v-model="searchTerm"
-              @input="searchPropertySales"
+              v-model="form.property_sale"
               type="text"
               placeholder="Search property..."
               class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
             />
 
             <!-- Suggestions -->
-            <ul
+            <!-- <ul
               v-if="propertySales.length && showSuggestions"
-              class="absolute z-10 bg-white border rounded-lg shadow-md mt-1 w-full max-h-48 overflow-auto"
+              class="pb-10 absolute z-10 bg-white border rounded-lg shadow-md mt-1 w-full max-h-48 overflow-auto"
             >
               <li
                 v-for="sale in propertySales"
                 :key="sale.id"
-                @click="selectPropertySale(sale)"
-                class="px-3 py-2 hover:bg-gray-100 cursor-pointer"
+                @click="selectPropertySale(sale);searchTerm=sale.id"
+                class="px-3 pt-2  hover:bg-gray-100 cursor-pointer"
               >
-                {{ sale.name || sale.code }}
+                {{ sale.id }}
               </li>
-            </ul>
+            </ul> -->
           </div>
         </div>
 
@@ -100,8 +91,8 @@ export default {
       form: {
         saas_commission: "",
         broker_commission: "",
-        total_commission: "",
-        property_sale: 0, // ID of selected property
+        total_commission:0,
+        property_sale: null, // ID of selected property
       },
       searchTerm: "",
       propertySales: [],
@@ -142,6 +133,8 @@ export default {
     },
 
     async submitForm() {
+
+ 
       try {
         const payload = { ...this.form };
         const res = await this.$apiPost("/post_commission", payload);

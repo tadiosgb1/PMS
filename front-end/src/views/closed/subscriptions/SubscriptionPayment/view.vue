@@ -343,6 +343,7 @@ export default {
     page: page,
     page_size: this.perPage,
     payment_method:this.payment_method,
+    subscription_id:this.$route.params.id
   };
 } else {
   params = {
@@ -350,6 +351,7 @@ export default {
     page: page,
     page_size: this.perPage,
      payment_method:this.payment_method,
+     subscription_id:this.$route.params.id
   };
 }
         

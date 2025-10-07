@@ -278,6 +278,7 @@ export default {
       pageSize: 10,
       pageSizes: [5, 10, 20, 50, 100],
       status:"",
+      ordering: "-id"
      
     };
   },
@@ -322,13 +323,13 @@ export default {
         console.log("params for subscription",params)
 
         const pageUrl =
-          url || `/get_subscription?page=1&page_size=${this.pageSize}`;
+          url || `/get_subscription?page=1&page_size=${this.pageSize}&search=${this.searchTerm}&ordering=${this.ordering}`;
         const res = await this.$apiGet(pageUrl, params);
         console.log("res", res);
 
         this.subscriptions = res.data || [];
-        this.currentPage = res.currentPage || 1;
-        this.totalPages = res.totalPages || 1;
+        this.currentPage = res.current_page || 1;
+        this.totalPages = res.total_pages || 1;
         this.next = res.next || null;
         this.previous = res.previous || null;
 
