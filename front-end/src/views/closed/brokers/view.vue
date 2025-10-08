@@ -183,7 +183,7 @@ export default {
       totalPages: 1,
       next: null,
       previous: null,
-      pageSize: 10,
+      pageSize: 100,
       pageSizes: [5, 10, 20, 50, 100],
       showAddBroker: false,
       showUpdateModal: false,
@@ -217,14 +217,13 @@ export default {
       try {
         let url = customUrl || "get_broker_profiles";
         const params = {
+          user__first_name:this.searchTerm,
           page_size: this.pageSize,
-          search: this.searchTerm || "",
+          
         };
         const res = await this.$apiGet(url, params);
-
         const data = res.data || [];
         this.brokers = data.results || data;
-
         // fetch user details for each broker
         await Promise.all(
           this.brokers.map(async (broker) => {

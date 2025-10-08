@@ -59,13 +59,6 @@
                 <li>🏢 Max Locations: <strong>{{ plan.max_locations }}</strong></li>
                 <li>👥 Max Staff: <strong>{{ plan.max_staff }}</strong></li>
                 <li>🔐 Max Users: <strong>{{ plan.max_users }}</strong></li>
-                <li>📱 Max KDS: <strong>{{ plan.max_kds }}</strong></li>
-                <li>
-                  💡 KDS Enabled:
-                  <span :class="plan.kds_enabled ? 'text-green-600' : 'text-red-600'" class="font-medium">
-                    {{ plan.kds_enabled ? 'Yes' : 'No' }}
-                  </span>
-                </li>
               </ul>
             </div>
 

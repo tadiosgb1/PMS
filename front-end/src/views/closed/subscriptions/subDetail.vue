@@ -14,7 +14,7 @@
 
       <div class="grid grid-cols-2 gap-4">
         <p><strong>Plan Name:</strong> {{ subscription.plan_name }}</p>
-        <p><strong>Price:</strong> ${{ subscription.price }}</p>
+        <p><strong>Price:</strong> {{ subscription.price }}</p>
         <p><strong>Billing Cycle:</strong> {{ subscription.billing_cycle || 'N/A' }}</p>
         <p><strong>Status:</strong>
           <span

@@ -7,12 +7,20 @@
       v-if="visible"
       class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4 overflow-auto"
     >
-      <div class="bg-white w-full sm:w-auto sm:max-w-[700px] md:max-w-[850px] lg:max-w-[950px] xl:max-w-[1050px] rounded-lg shadow-lg overflow-hidden relative mx-auto">
-        
+      <div
+        class="bg-white w-full sm:w-auto sm:max-w-[700px] md:max-w-[850px] lg:max-w-[950px] xl:max-w-[1050px] rounded-lg shadow-lg overflow-hidden relative mx-auto"
+      >
         <!-- Header -->
-        <div class="bg-primary hover:bg-primary text-white px-6 py-4 text-xl font-semibold flex justify-between items-center">
+        <div
+          class="bg-primary hover:bg-primary text-white px-6 py-4 text-xl font-semibold flex justify-between items-center"
+        >
           Add New Rent
-          <button @click="$emit('close')" class="text-white hover:text-gray-200 text-lg font-bold">✕</button>
+          <button
+            @click="$emit('close')"
+            class="text-white hover:text-gray-200 text-lg font-bold"
+          >
+            ✕
+          </button>
         </div>
 
         <!-- Form -->
@@ -20,8 +28,7 @@
           @submit.prevent="submitForm"
           class="p-4 sm:p-6 grid grid-cols-1 md:grid-cols-2 gap-4 max-h-[80vh] overflow-y-auto"
         >
-       
- <!-- Property -->
+          <!-- Property -->
           <div class="relative">
             <label class="block text-gray-700 mb-1">Property</label>
             <input
@@ -29,7 +36,7 @@
               type="text"
               class="custom-input"
               placeholder="Search Property..."
-              @input="searchProperties"
+              @input="fetchProperties"
               @focus="propertyDropdown = true"
               @blur="hideDropdown('property')"
               required
@@ -49,61 +56,44 @@
             </ul>
           </div>
 
-           <!-- <div>
-            <label class="block text-gray-700 mb-1">Property</label>
-            <input 
-              v-model="form.property_id" 
+          <!-- Tenant -->
+          <div>
+            <label class="block text-gray-700 mb-1">Tenant</label>
+            <input
+              v-model="form.user_id"
               type="text"
-              class="custom-input" 
-              @input="searchProperty"
-              required />
+              class="custom-input"
+              placeholder="Search Tenant..."
+              @input="searchUser"
+            />
+            <div
+              class="mt-2 border rounded bg-white shadow w-full"
+              v-if="users.length > 0"
+            >
+              <div
+                v-for="user in users"
+                :key="user.id"
+                class="p-2 hover:bg-gray-100 cursor-pointer flex items-center justify-between"
+                @click="selectUser(user)"
+              >
+                <span>{{ user.first_name }} {{ user.middle_name }} {{ user.last_name }}</span>
+                <i
+                  v-if="form.user_id === user.id"
+                  class="fas fa-check text-green-500"
+                ></i>
+              </div>
+            </div>
           </div>
 
-         <div class="mt-2 border rounded bg-white shadow w-full" v-if="pr_length > 0">
-          <div
-            v-for="property in properties"
-            :key="property.id"
-            class="p-2 hover:bg-gray-100 cursor-pointer flex items-center justify-between"
-            @click="selectProperty(property.id)"
-          >
-            <span>{{ property.name }}</span>
-
-           
-            <i v-if="form.property_id === property.id" class="fas fa-check text-green-500"></i>
-          </div>
-        </div> -->
-
-
-    
-
-           <div>
-            <label class="block text-gray-700 mb-1">Tenant </label>
-            <input v-model="form.user_id" type="text" class="custom-input" 
-              @input="searchUser()"/>
-          </div>
-
-           <div class="mt-2 border rounded bg-white shadow w-full" v-if="users.length > 0">
-  <div
-    v-for="user in users"
-    :key="user.id"
-    class="p-2 hover:bg-gray-100 cursor-pointer flex items-center justify-between"
-    @click="selectUser(user.id)"
-  >
-    <span>{{ user.first_name }} {{ user.middle_name }} {{ user.last_name }}</span>
-
-    <!-- Check icon if selected -->
-    <i v-if="form.user_id === user.id" class="fas fa-check text-green-500"></i>
-  </div>
-</div>
-
-     <div class="relative">
+          <!-- Broker -->
+          <div class="relative">
             <label class="block text-gray-700 mb-1">Broker</label>
             <input
               v-model="brokerSearch"
               type="text"
               class="custom-input"
               placeholder="Search Broker..."
-              @input="searchBrokers"
+              @input="fetchBrokers"
               @focus="brokerDropdown = true"
               @blur="hideDropdown('broker')"
               required
@@ -118,71 +108,76 @@
                 class="p-2 hover:bg-gray-100 cursor-pointer"
                 @mousedown.prevent="selectBroker(broker)"
               >
-                {{ broker.license_number }}
+                {{ broker.user?.first_name }} {{ broker.user?.last_name }}
+                <span class="text-sm text-gray-500">({{ broker.license_number }})</span>
               </li>
             </ul>
           </div>
 
+          <!-- Rent Type -->
           <div>
-        <label class="block text-sm font-medium text-gray-700">Rent Type</label>
-        <select
-          v-model="form.rent_type"
-          class="custom-select mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
-        >
-          <option value="lease">Lease</option>
-          <option value="house_rent">House Rent</option>
-          <option value="vehicle_rent">Vehicle Rent</option>
-          <option value="other">Other</option>
-        </select>
-      </div>
+            <label class="block text-sm font-medium text-gray-700">Rent Type</label>
+            <select
+              v-model="form.rent_type"
+              class="custom-select mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
+            >
+              <option value="lease">Lease</option>
+              <option value="house_rent">House Rent</option>
+              <option value="vehicle_rent">Vehicle Rent</option>
+              <option value="other">Other</option>
+            </select>
+          </div>
 
+          <!-- Start Date -->
           <div>
             <label class="block text-gray-700 mb-1">Start Date</label>
             <input v-model="form.start_date" type="date" class="custom-input" required />
           </div>
 
+          <!-- End Date -->
           <div>
             <label class="block text-gray-700 mb-1">End Date</label>
             <input v-model="form.end_date" type="date" class="custom-input" required />
           </div>
 
-      
-
+          <!-- Payment Cycle -->
           <div>
-        <label class="block text-sm font-medium text-gray-700">Payment Cycle</label>
-        <select
-          v-model="form.payment_cycle"
-          class="custom-select mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
-        >
-          <option value="weekly">Weekly</option>
-          <option value="monthly">Monthly</option>
-          <option value="yearly">Yearly</option>
-          <option value="quarterly">Quarterly</option>
-        </select>
-      </div>
+            <label class="block text-sm font-medium text-gray-700">Payment Cycle</label>
+            <select
+              v-model="form.payment_cycle"
+              class="custom-select mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
+            >
+              <option value="weekly">Weekly</option>
+              <option value="monthly">Monthly</option>
+              <option value="yearly">Yearly</option>
+              <option value="quarterly">Quarterly</option>
+            </select>
+          </div>
 
+          <!-- Rent Amount -->
           <div>
             <label class="block text-gray-700 mb-1">Rent Amount</label>
             <input v-model="form.rent_amount" type="number" class="custom-input" required />
           </div>
 
+          <!-- Deposit Amount -->
           <div>
             <label class="block text-gray-700 mb-1">Deposit Amount</label>
             <input v-model="form.deposit_amount" type="number" class="custom-input" required />
           </div>
 
-        
+          <!-- Status -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700">Status</label>
+            <select
+              v-model="form.status"
+              class="custom-select mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
+            >
+              <option value="active">Active</option>
+              <option value="inactive">Inactive</option>
+            </select>
+          </div>
 
-       <div>
-        <label class="block text-sm font-medium text-gray-700">Status</label>
-        <select
-          v-model="form.status"
-          class="custom-select mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
-        >
-          <option value="active">Active</option>
-          <option value="inactive">Inactive</option>
-        </select>
-      </div>
           <!-- Actions -->
           <div class="md:col-span-2 text-right pt-2">
             <button
@@ -206,7 +201,7 @@ export default {
   components: { Toast },
   props: {
     visible: Boolean,
-    propertyId: [String, Number] // passed from parent if adding for specific property
+    propertyId: [String, Number],
   },
   data() {
     return {
@@ -222,145 +217,109 @@ export default {
         status: "",
         broker: "",
       },
-      properties:[],
-      propertySearch:"",
-      pr_length:0,
-      propertyDropdown:false,
-      user_length:0,
-      users:[],
-
+      properties: [],
+      propertySearch: "",
+      propertyDropdown: false,
+      users: [],
       brokers: [],
       brokerSearch: "",
       brokerDropdown: false,
     };
   },
-  mounted(){
-  this.fetchBrokers();
-  this.fetchProperties()
+  mounted() {
+    this.fetchProperties();
+    this.fetchBrokers();
   },
   methods: {
-    async fetchProperties(url = null) {
+    // --- Properties ---
+    async fetchProperties() {
       try {
-         const pageUrl =
-          url ||
-          `/get_properties?search=${this.propertySearch}`;
-
-        let result = [];
-      
-          result = await this.$getProperties(pageUrl);
-       
-        this.properties = result.properties;
+        const params = { search: this.propertySearch || "" };
+        const res = await this.$apiGet("/get_properties", { params });
+        this.properties = res.data || [];
+        this.propertyDropdown = true;
       } catch (err) {
         console.error("Error fetching properties:", err);
       }
-    },
-     searchProperties() {
-      this.fetchProperties()
-    },
-     hideDropdown(type) {
-      setTimeout(() => {
-        if (type === "zone") this.zoneDropdown = false;
-        if (type === "property") this.propertyDropdown = false;
-        if (type === "broker") this.brokerDropdown = false;
-      }, 200);
     },
     selectProperty(property) {
       this.form.property_id = property.id;
       this.propertySearch = property.name;
       this.propertyDropdown = false;
     },
-        async fetchBrokers() {
+
+    // --- Users ---
+    async searchUser() {
+      if (!this.form.user_id) {
+        this.users = [];
+        return;
+      }
       try {
-        const res = await this.$apiGet("/get_broker_profiles");
+        const params = { search: this.form.user_id, page_size: 1000 };
+        const res = await this.$apiGet("/get_tenants", { params });
+        this.users = res.data || [];
+      } catch (err) {
+        console.error("Error searching users:", err);
+      }
+    },
+    selectUser(user) {
+      this.form.user_id = user.id;
+      this.users = [];
+    },
+
+    // --- Brokers ---
+    async fetchBrokers() {
+      if (!this.brokerSearch) {
+        this.brokers = [];
+        return;
+      }
+      try {
+        const params = { user__first_name: this.brokerSearch };
+        const res = await this.$apiGet("/get_broker_profiles", { params });
         this.brokers = res.data || [];
+        this.brokerDropdown = true;
       } catch (err) {
         console.error("Failed to fetch brokers:", err);
       }
     },
-    searchBrokers() {
-      if (this.brokerSearch === "") {
-        this.fetchBrokers();
-      } else {
-        this.brokers = this.brokers.filter((b) =>
-          b.license_number
-            .toString()
-            .toLowerCase()
-            .includes(this.brokerSearch.toLowerCase())
-        );
-      }
-    },
-      selectBroker(broker) {
+    selectBroker(broker) {
       this.form.broker = broker.id;
-      this.brokerSearch = broker.license_number;
+      this.brokerSearch = broker.user
       this.brokerDropdown = false;
     },
-selectUser(user_id){
-this.form.user_id=user_id
-console.log("form",this.form);
-},
-// selectProperty(property_id){
-// this.form.property_id=property_id
-// console.log("form",this.form);
-// },
-    async searchProperty() {
-      const params={
-        search:this.form.property_id,
-        page_size:100000000,
-        user__first_name:this.brokerSearch
-      }
-      console.log("Searching for:", this.form.property_id);
-       const res=await this.$apiGet(`get_properties`,params);
-       this.properties=res.data
-       this.pr_length=res.data.length;
-       console.log("res",res);
-      
+
+    // --- Dropdown ---
+    hideDropdown(type) {
+      setTimeout(() => {
+        if (type === "property") this.propertyDropdown = false;
+        if (type === "broker") this.brokerDropdown = false;
+      }, 200);
     },
 
-   async searchUser() {
-      const params={
-        search:this.form.user_id,
-        page_size:100000000,
-      }
-      console.log("Searching for:", this.form.user_id);
-       const res=await this.$apiGet(`get_tenants`,params);
-       this.users=res.data
-       this.user_length=res.data.length;
-       console.log("res",res);
-      
-    },
+    // --- Submit ---
     async submitForm() {
       try {
-        const response = await this.$apiPost("/post_rent", this.form);
-        if(response.error){
-          this.$root.$refs.toast.showToast(response.error);
+        const res = await this.$apiPost("/post_rent", this.form);
+        this.$refs.toast.showToast(res.message || "Rent added successfully", "success");
 
-        }
+        // Reset form (keep property_id if passed from parent)
+        this.form = { ...this.form, user_id: "", rent_type: "", start_date: "", end_date: "", payment_cycle: "", rent_amount: "", deposit_amount: "", status: "", broker: "" };
 
-        this.$root.$refs.toast.showToast(response.message || "Rent added successfully", "success");
-
-        // Reset form (keep property_id if provided from route)
-        this.form = {
-          property_id: this.propertyId || "",
-          user_id: "",
-          rent_type: "",
-          start_date: "",
-          end_date: "",
-          payment_cycle: "",
-          rent_amount: "",
-          deposit_amount: "",
-          status: ""
-        };
-
-        // Close modal after short delay
         setTimeout(() => {
           this.$emit("close");
           this.$emit("refresh");
-        }, 2000);
-      } catch (error) {
-        console.error(error);
-        alert("Failed to add rent.");
+        }, 1500);
+      } catch (err) {
+        console.error(err);
+        this.$refs.toast.showToast("Failed to add rent.", "error");
       }
-    }
-  }
+    },
+  },
 };
 </script>
+
+<style scoped>
+.custom-input {
+  @apply w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary;
+}
+</style>
