@@ -923,8 +923,8 @@ export async function getWorkspacePayments(url = null, params = {}) {
     const email = localStorage.getItem("email");
 
     // Always include rental_id if provided (detail mode), even for superuser
-    const rentalId = params.rental_id || null;
-    console.log("rental_id",rentalId);
+    const rentalId = params.rental__space__id || null;
+    console.log("rental_id   hkjhkhjlkjkhljhl",rentalId);
 
     // Add access control only if not in detail mode
     if (!isSuperUser) {
@@ -940,7 +940,7 @@ export async function getWorkspacePayments(url = null, params = {}) {
     }
 
     let apiUrl = url || `/get_rental_payments?page=1&page_size=${params.page_size || 10}`;
-
+console.log("params workspace rental payment",params)
     const response = await this.$apiGet(apiUrl, params);
 
     let payments = response.data?.results || response.data || [];

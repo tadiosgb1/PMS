@@ -1,5 +1,8 @@
 <template>
   <section id="contact" class="py-16 bg-gray-200">
+    <!-- ✅ Toast Component -->
+    <Toast ref="toast" />
+
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <!-- Section Header -->
       <div class="text-center mb-12">
@@ -49,14 +52,14 @@
           <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
             <input
               type="text"
-              placeholder="Your Name"
-              v-model="form.name"
+              placeholder="Full Name"
+              v-model="form.full_name"
               required
               class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
             />
             <input
               type="email"
-              placeholder="Your Email"
+              placeholder="Email Address"
               v-model="form.email"
               required
               class="w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-orange-500"
@@ -87,11 +90,16 @@
 </template>
 
 <script>
+import Toast from "../../../components/Toast.vue"; // adjust path if needed
+import axios from "axios";
+
 export default {
+  name: "ContactUs",
+  components: { Toast },
   data() {
     return {
       form: {
-        name: "",
+        full_name: "",
         email: "",
         subject: "",
         message: "",
@@ -99,11 +107,29 @@ export default {
     };
   },
   methods: {
-    submitForm() {
-      // You can integrate with an API or send an email here.
-      console.log("Form submitted:", this.form);
-      alert("Thank you for contacting us!");
-      this.form = { name: "", email: "", subject: "", message: "" };
+    async submitForm() {
+      try {
+        const payload = {
+          full_name: this.form.full_name,
+          email: this.form.email,
+          subject: this.form.subject,
+          message: this.form.message,
+        };
+
+         const response = await axios.post(
+      'https://alphapms.sunriseworld.org/api/contact_us',
+      payload,
+    );
+        console.log("Response:", response);
+
+        this.$root.$refs.toast.showToast(response.success || "Message sent successfully!", "success");
+
+        // Reset form
+        this.form = { full_name: "", email: "", subject: "", message: "" };
+      } catch (error) {
+        console.error("Error submitting form:", error);
+        this.$root.$refs.toast.showToast("Failed to send message. Please try again.", "error");
+      }
     },
   },
 };

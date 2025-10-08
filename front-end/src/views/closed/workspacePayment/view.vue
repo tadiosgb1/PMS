@@ -241,7 +241,7 @@ export default {
 
         if (this.rentalId) {
           // detail mode: only fetch by rental_id
-          params = { rental_id: this.rentalId ,
+          params = { rental__space__id: this.rentalId ,
             payment_method:this.payment_method,
             status:this.status
           };
