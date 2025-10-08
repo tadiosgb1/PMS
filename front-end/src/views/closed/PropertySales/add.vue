@@ -188,7 +188,7 @@ export default {
       zoneSearch: "",
       propertySearch: "",
       brokerSearch: "",
-      zoneDropdown: false,
+      zoneSearch: "",zoneSearch: "",
       propertyDropdown: false,
       brokerDropdown: false,
     };
