@@ -92,7 +92,7 @@
               type="text"
               class="custom-input"
               placeholder="Search Broker..."
-              @input="searchBrokers"
+              @input="fetchBrokers"
               @focus="brokerDropdown = true"
               @blur="hideDropdown('broker')"
               required
@@ -107,7 +107,9 @@
                 class="p-2 hover:bg-gray-100 cursor-pointer"
                 @mousedown.prevent="selectBroker(broker)"
               >
-                {{ broker.license_number }}
+                <!-- Display broker name (update based on your API response) -->
+                {{ broker.user?.first_name }} {{ broker.user?.last_name }}
+                <span class="text-sm text-gray-500">({{ broker.license_number }})</span>
               </li>
             </ul>
           </div>
@@ -199,74 +201,85 @@ export default {
     this.fetchBrokers();
   },
   methods: {
+    // ✅ Fetch Zones
     async fetchZones() {
       try {
-        const url = `/get_property_zones?search=${this.zoneSearch}`;
-      
-        const result = await this.$getZones(url);
-        console.log("result for zones",result)
-        this.zones = result.zones;
-        
+        const res = await this.$apiGet("/get_property_zones");
+        this.zones = res.data || [];
       } catch (err) {
         console.error("Failed to fetch zones:", err);
       }
     },
-    async fetchProperties(url = null) {
-      try {
-         const pageUrl =
-          url ||
-          `/get_properties?search=${this.propertySearch}`;
 
-        let result = [];
-      
-          result = await this.$getProperties(pageUrl);
-       
-        this.properties = result.properties;
+    // ✅ Fetch Properties
+    async fetchProperties() {
+      try {
+        const res = await this.$apiGet("/get_properties");
+        this.properties = res.data || [];
       } catch (err) {
         console.error("Error fetching properties:", err);
       }
     },
+
+    // ✅ Search Zones
+    searchZones() {
+      if (this.zoneSearch === "") {
+        this.fetchZones();
+      } else {
+        this.zones = this.zones.filter((z) =>
+          z.name.toLowerCase().includes(this.zoneSearch.toLowerCase())
+        );
+      }
+    },
+
+    // ✅ Search Properties
+    searchProperties() {
+      if (this.propertySearch === "") {
+        this.fetchProperties();
+      } else {
+        this.properties = this.properties.filter((p) =>
+          p.name.toLowerCase().includes(this.propertySearch.toLowerCase())
+        );
+      }
+    },
+
+    // ✅ Fetch Brokers (fixed version)
     async fetchBrokers() {
       try {
-        const res = await this.$apiGet("/get_broker_profiles");
+        const search = this.brokerSearch || "";
+        const params = { user__first_name: search };
+        const res = await this.$apiGet("/get_broker_profiles",params );
         this.brokers = res.data || [];
+        this.brokerDropdown = true;
+        console.log("brokers", this.brokers);
       } catch (err) {
         console.error("Failed to fetch brokers:", err);
       }
     },
-    searchZones() {
-     this.fetchZones();
+
+    // ✅ Select Broker
+    selectBroker(broker) {
+      console.log("broker",broker)
+      this.form.broker = broker.id;
+      this.brokerSearch =broker.user;
+      this.brokerDropdown = false;
     },
-    searchProperties() {
-      this.fetchProperties()
-    },
-    searchBrokers() {
-      if (this.brokerSearch === "") {
-        this.fetchBrokers();
-      } else {
-        this.brokers = this.brokers.filter((b) =>
-          b.license_number
-            .toString()
-            .toLowerCase()
-            .includes(this.brokerSearch.toLowerCase())
-        );
-      }
-    },
+
+    // ✅ Select Zone
     selectZone(zone) {
       this.form.property_zone_id = zone.id;
       this.zoneSearch = zone.name;
       this.zoneDropdown = false;
     },
+
+    // ✅ Select Property
     selectProperty(property) {
       this.form.property_id = property.id;
       this.propertySearch = property.name;
       this.propertyDropdown = false;
     },
-    selectBroker(broker) {
-      this.form.broker = broker.id;
-      this.brokerSearch = broker.license_number;
-      this.brokerDropdown = false;
-    },
+
+    // ✅ Hide dropdowns gracefully
     hideDropdown(type) {
       setTimeout(() => {
         if (type === "zone") this.zoneDropdown = false;
@@ -274,13 +287,15 @@ export default {
         if (type === "broker") this.brokerDropdown = false;
       }, 200);
     },
+
+    // ✅ Submit form
     async submitForm() {
       try {
         const response = await this.$apiPost(
           "/post_property_zone_sale",
           this.form
         );
-        this.$root.$refs.toast.showToast(
+        this.$refs.toast.showToast(
           response.message || "Sale added successfully",
           "success"
         );
@@ -291,7 +306,7 @@ export default {
         }, 1500);
       } catch (error) {
         console.error(error);
-        this.$root.$refs.toast.showToast("Failed to add sale.", "error");
+        this.$refs.toast.showToast("Failed to add sale.", "error");
       }
     },
   },
