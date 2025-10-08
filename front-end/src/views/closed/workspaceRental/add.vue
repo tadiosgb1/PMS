@@ -6,7 +6,7 @@
     <div
       class="bg-white w-full max-w-full sm:max-w-[90%] md:max-w-[900px] lg:max-w-[1050px] rounded-lg shadow-lg overflow-hidden relative mx-auto"
     >
-      <!-- Close Button -->
+      <!-- Header -->
       <div
         class="bg-primary text-white px-6 py-4 text-2xl font-semibold flex justify-between items-center"
       >
@@ -72,7 +72,7 @@
           </div>
         </div>
 
-        <!-- Row 3: Start Date (full width) -->
+        <!-- Row 3: Start Date -->
         <div>
           <label class="block text-sm font-medium mb-1">Start Date</label>
           <input
@@ -83,7 +83,7 @@
           />
         </div>
 
-        <!-- Row 4: Active checkbox (full width) -->
+        <!-- Row 4: Active Checkbox -->
         <div>
           <label class="inline-flex items-center mt-2">
             <input
@@ -95,36 +95,32 @@
           </label>
         </div>
 
-        <!-- Row 5: User + Space -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <!-- User (from localStorage) -->
-          <!-- <div>
-            <label class="block text-sm font-medium mb-1">User</label>
-            <input
-              type="text"
-              :value="getUserName()"
-              disabled
-              class="w-full border rounded-lg px-3 py-2 bg-gray-100 cursor-not-allowed"
-            />
-          </div> -->
-
-          <!-- Space -->
-          <div>
-            <label class="block text-sm font-medium mb-1">Space</label>
-            <select
-              v-model.number="form.space"
-              class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+        <!-- Row 5: Coworking Space Search (like Property) -->
+        <div class="relative">
+          <label class="block text-sm font-medium mb-1">Workspace</label>
+          <input
+            v-model="spaceSearch"
+            type="text"
+            placeholder="Search workspace..."
+            class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500"
+            @input="searchSpaces"
+            @focus="spaceDropdown = true"
+            @blur="hideDropdown"
+            required
+          />
+          <ul
+            v-if="spaces.length > 0 && spaceDropdown"
+            class="absolute z-50 w-full max-h-48 overflow-y-auto bg-white border border-gray-300 rounded shadow mt-1"
+          >
+            <li
+              v-for="space in spaces"
+              :key="space.id"
+              class="p-2 hover:bg-gray-100 cursor-pointer"
+              @mousedown.prevent="selectSpace(space)"
             >
-              <option disabled value="">Select Space</option>
-              <option
-                v-for="space in spaces"
-                :key="space.id"
-                :value="space.id"
-              >
-                {{ space.name }}
-              </option>
-            </select>
-          </div>
+              {{ space.name }}
+            </li>
+          </ul>
         </div>
 
         <!-- Actions -->
@@ -157,29 +153,60 @@ export default {
         start_date: "",
         is_active: true,
         user: localStorage.getItem("userId") || 0,
-        space: 1,
+        space: "",
       },
-      users: [],
       spaces: [],
+      spaceSearch: "",
+      spaceDropdown: false,
     };
   },
   async mounted() {
-    try {
-      const usersRes = await this.$apiGet("/get_users");
-      this.users = usersRes.data || [];
-
-      const spacesRes = await this.$apiGet("/get_coworking_spaces");
-      this.spaces = spacesRes.data
-    } catch (err) {
-      console.error("Failed to fetch users or spaces:", err);
-    }
+    this.fetchSpaces();
   },
   methods: {
-    // getUserName() {
-    //   const userId = Number(localStorage.getItem("userId"));
-    //   const user = this.users.find(u => u.id === userId);
-    //   return user ? user.name : "Unknown User";
-    // },
+    // ✅ Fetch coworking spaces
+    async fetchSpaces() {
+      try {
+        const response = await this.$getCoworkingSpaces();
+        this.spaces = response.spaces || [];
+      } catch (err) {
+        console.error("Failed to fetch spaces:", err);
+        this.spaces = [];
+      }
+    },
+
+    // ✅ Search coworking spaces (like property)
+    async searchSpaces() {
+      try {
+        const response = await this.$getCoworkingSpaces();
+        if (this.spaceSearch) {
+          this.spaces = response.spaces.filter((s) =>
+            s.name.toLowerCase().includes(this.spaceSearch.toLowerCase())
+          );
+        } else {
+          this.spaces = response.spaces;
+        }
+      } catch (error) {
+        console.error("Failed to search spaces:", error);
+        this.spaces = [];
+      }
+    },
+
+    // ✅ Select space
+    selectSpace(space) {
+      this.form.space = space.id;
+      this.spaceSearch = space.name;
+      this.spaceDropdown = false;
+    },
+
+    // ✅ Hide dropdown on blur
+    hideDropdown() {
+      setTimeout(() => {
+        this.spaceDropdown = false;
+      }, 200);
+    },
+
+    // ✅ Submit form
     async submitForm() {
       try {
         const payload = { ...this.form };
@@ -193,6 +220,7 @@ export default {
         alert("Failed to add workspace rental.");
       }
     },
+
     resetForm() {
       this.form = {
         guest_name: "",
@@ -202,8 +230,9 @@ export default {
         start_date: "",
         is_active: true,
         user: localStorage.getItem("userId") || 0,
-        space: 0,
+        space: "",
       };
+      this.spaceSearch = "";
     },
   },
 };
