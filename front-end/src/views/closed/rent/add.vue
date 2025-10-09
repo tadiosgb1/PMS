@@ -57,32 +57,33 @@
           </div>
 
           <!-- Tenant -->
-          <div>
+          <div class="relative">
             <label class="block text-gray-700 mb-1">Tenant</label>
             <input
-              v-model="form.user_id"
+              v-model="userSearch"
               type="text"
               class="custom-input"
-              placeholder="Search Tenant..."
-              @input="searchUser"
+              placeholder="Search user"
+              @input="searchUsers"
+              @focus="userDropdown = true"
+              @blur="hideDropdown('user')"
+              autocomplete="off"
+              required
             />
-            <div
-              class="mt-2 border rounded bg-white shadow w-full"
-              v-if="users.length > 0"
+
+            <ul
+              v-if="users.length > 0 && userDropdown"
+              class="absolute z-50 w-full max-h-48 overflow-y-auto bg-white border border-gray-300 rounded shadow mt-1"
             >
-              <div
+              <li
                 v-for="user in users"
                 :key="user.id"
-                class="p-2 hover:bg-gray-100 cursor-pointer flex items-center justify-between"
-                @click="selectUser(user)"
+                class="p-2 hover:bg-gray-100 cursor-pointer"
+                @mousedown.prevent="selectUser(user)"
               >
-                <span>{{ user.first_name }} {{ user.middle_name }} {{ user.last_name }}</span>
-                <i
-                  v-if="form.user_id === user.id"
-                  class="fas fa-check text-green-500"
-                ></i>
-              </div>
-            </div>
+                {{ user.first_name }} {{ user.middle_name }} {{ user.last_name }}
+              </li>
+            </ul>
           </div>
 
           <!-- Broker -->
@@ -220,53 +221,70 @@ export default {
       properties: [],
       propertySearch: "",
       propertyDropdown: false,
+       userSearch: "",
       users: [],
       brokers: [],
       brokerSearch: "",
       brokerDropdown: false,
+      ordering:"-id",
+      userDropdown:false
     };
   },
   mounted() {
     this.fetchProperties();
     this.fetchBrokers();
+     this.fetchUsers();
   },
   methods: {
     // --- Properties ---
-    async fetchProperties() {
+    async fetchProperties(url=null) {
       try {
-        const params = { search: this.propertySearch || "" };
-        const res = await this.$apiGet("/get_properties", { params });
-        this.properties = res.data || [];
-        this.propertyDropdown = true;
+         const pageUrl =
+          url ||
+          `/get_properties?search=${this.propertySearch}&ordering=${this.ordering}`;
+
+        let result = [];
+      
+          result = await this.$getProperties(pageUrl);
+       
+
+        this.properties = result.properties;
+      
       } catch (err) {
         console.error("Error fetching properties:", err);
       }
     },
+     async fetchUsers(url = null) {
+  try {
+    const pageUrl = url || `/get_rents?search=${this.userSearch}`;
+
+    // 👇 FIX: Bind `this` so $apiGet works properly inside getTenants
+    const response = await this.$getTenants.call(this, pageUrl);
+
+    this.users = response.tenants || response.data || [];
+  } catch (err) {
+    console.error("Error fetching users:", err);
+  }
+},
+// ✅ Search users
+    searchUsers() {
+     
+        this.fetchUsers();
+     
+    },
+ selectUser(user) {
+      this.form.user_id = user.id;
+      this.userSearch = `${user.first_name} ${user.middle_name} ${user.last_name}`;
+      this.userDropdown = false;
+    },
+
     selectProperty(property) {
       this.form.property_id = property.id;
       this.propertySearch = property.name;
       this.propertyDropdown = false;
     },
 
-    // --- Users ---
-    async searchUser() {
-      if (!this.form.user_id) {
-        this.users = [];
-        return;
-      }
-      try {
-        const params = { search: this.form.user_id, page_size: 1000 };
-        const res = await this.$apiGet("/get_tenants", { params });
-        this.users = res.data || [];
-      } catch (err) {
-        console.error("Error searching users:", err);
-      }
-    },
-    selectUser(user) {
-      this.form.user_id = user.id;
-      this.users = [];
-    },
-
+   
     // --- Brokers ---
     async fetchBrokers() {
       if (!this.brokerSearch) {
@@ -293,6 +311,7 @@ export default {
       setTimeout(() => {
         if (type === "property") this.propertyDropdown = false;
         if (type === "broker") this.brokerDropdown = false;
+         if (type === "user") this.userDropdown = false;
       }, 200);
     },
 

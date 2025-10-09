@@ -41,79 +41,7 @@
         <apexchart type="donut" height="300" :options="userChartOptions" :series="userSeries" />
       </div>
     </div>
-    <!-- Contact Us (visible only for superusers) -->
-<div v-if="is_superuser === 'true'" class="bg-white p-6 rounded-lg shadow-md mt-8">
-  <h2 class="text-lg font-semibold mb-4">Contact Messages</h2>
-
-  <!-- Search & Show per page -->
-  <div class="flex justify-between items-center mb-4">
-    <input
-      v-model="contactSearch"
-      @input="fetchContactUs"
-      type="search"
-      placeholder="Search messages..."
-      class="w-full max-w-md px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-    />
-    <div class="ml-4">
-      <label for="contactPageSize" class="mr-2 text-gray-700">Show</label>
-      <select
-        id="contactPageSize"
-        v-model="contactPageSize"
-        @change="fetchContactUs"
-        class="border px-2 py-1 rounded"
-      >
-        <option v-for="size in contactPageSizes" :key="size" :value="size">{{ size }}</option>
-      </select>
-      <span class="ml-1 text-gray-700">per page</span>
-    </div>
-  </div>
-
-  <!-- Table -->
-  <div class="overflow-x-auto">
-    <table class="min-w-full table-auto border-collapse border border-gray-300">
-      <thead>
-        <tr class="bg-gray-200 text-gray-700">
-          <th class="border border-gray-300 px-4 py-2">Full Name</th>
-          <th class="border border-gray-300 px-4 py-2">Email</th>
-          <th class="border border-gray-300 px-4 py-2">Subject</th>
-          <th class="border border-gray-300 px-4 py-2">Message</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr v-for="msg in contactMessages" :key="msg.id" class="hover:bg-gray-100">
-          <td class="border border-gray-300 px-4 py-2">{{ msg.full_name }}</td>
-          <td class="border border-gray-300 px-4 py-2">{{ msg.email }}</td>
-          <td class="border border-gray-300 px-4 py-2">{{ msg.subject }}</td>
-          <td class="border border-gray-300 px-4 py-2">{{ msg.message }}</td>
-        </tr>
-        <tr v-if="contactMessages.length === 0">
-          <td colspan="4" class="text-center py-4 text-gray-500">No messages found.</td>
-        </tr>
-      </tbody>
-    </table>
-  </div>
-
-  <!-- Pagination -->
-  <div class="flex justify-between items-center mt-4">
-    <button
-      :disabled="!contactPrev"
-      @click="fetchContactUs(contactPrev)"
-      class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
-    >
-      Previous
-    </button>
-    <span class="text-gray-600">
-      Page {{ contactCurrentPage }} of {{ contactTotalPages }}
-    </span>
-    <button
-      :disabled="!contactNext"
-      @click="fetchContactUs(contactNext)"
-      class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
-    >
-      Next
-    </button>
-  </div>
-</div>
+   
 
   </div>
 </template>
@@ -161,14 +89,7 @@ export default {
         colors: ["#60a5fa", "#34d399"],
         legend: { position: "top" },
       },
-      contactMessages: [],
-contactSearch: "",
-contactPageSize: 10,
-contactPageSizes: [5, 10, 20, 50, 100],
-contactCurrentPage: 1,
-contactTotalPages: 1,
-contactNext: null,
-contactPrev: null,
+      
 
     };
   },
@@ -176,41 +97,12 @@ contactPrev: null,
   mounted() {
     this.is_superuser=localStorage.getItem("is_superuser");
     this.fetchAllData();
-    if (this.is_superuser === "true") {
-    this.fetchContactUs();
-  }
+    
     
   },
 
   methods: {
-    async fetchContactUs(url = null) {
-  try {
-    const params = {
-      page_size: this.contactPageSize,
-      search: this.contactSearch || "",
-      ordering: "-id",
-    };
-    const res = url
-      ? await this.$apiGet(url)
-      : await this.$apiGet("/contact_us", params);
-
-    const data = res.data?.results || res.data || [];
-    this.contactMessages = Array.isArray(data) ? data : [];
-
-    // Handle pagination if provided
-    this.contactNext = res.next || null;
-    this.contactPrev = res.previous || null;
-    this.contactCurrentPage =
-      res.current_page ||
-      (this.contactNext || this.contactPrev
-        ? this.contactCurrentPage
-        : 1);
-    this.contactTotalPages = res.total_pages || 1;
-  } catch (error) {
-    console.error("Failed to fetch contact messages:", error);
-    this.contactMessages = [];
-  }
-},
+   
 
     async fetchAllData() {
       await Promise.all([

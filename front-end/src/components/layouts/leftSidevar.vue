@@ -167,6 +167,12 @@ export default {
           icon: "fas fa-bell", // ✅ fa-money-bill-wave → fixed
           color: "#22c55e",
         },
+         {
+          name: "Contacts",
+          route: "contacts",
+          icon: "fas fa-user", // ✅ fa-money-bill-wave → fixed
+          color: "#22c55e",
+        },
       ],
     };
   },

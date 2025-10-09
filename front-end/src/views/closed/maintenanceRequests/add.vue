@@ -1,4 +1,4 @@
-<template> 
+<template>
   <div>
     <!-- ✅ Toast Component -->
     <Toast ref="toast" />
@@ -12,7 +12,7 @@
       >
         <!-- Header -->
         <div
-          class="bg-primary hover:bg-primary text-white px-6 py-4 text-xl font-semibold flex justify-between items-center"
+          class="bg-primary text-white px-6 py-4 text-xl font-semibold flex justify-between items-center"
         >
           Add Maintenance Request
           <button
@@ -43,85 +43,66 @@
           <div>
             <label class="block text-gray-700 mb-1">Status</label>
             <select v-model="form.status" class="custom-input">
-              <option value="" disabled>Select status</option>
-              <option value="active">Active</option>
               <option value="pending">Pending</option>
+              <option value="active">Active</option>
               <option value="resolved">Resolved</option>
             </select>
           </div>
 
-          <!-- Requested At -->
-          <div>
-            <label class="block text-gray-700 mb-1">Requested At</label>
-            <input v-model="form.requested_at" type="date" class="custom-input" />
-          </div>
-
-          <!-- Resolved At -->
-          <div>
-            <label class="block text-gray-700 mb-1">Resolved At</label>
-            <input v-model="form.resolved_at" type="date" class="custom-input" />
-          </div>
-
-          <!-- Property Dropdown -->
+          <!-- Property Dropdown (Refactored like AddSale) -->
           <div class="relative">
             <label class="block text-gray-700 mb-1">Property</label>
-            <input 
+            <input
               v-model="propertySearch"
               type="text"
               class="custom-input"
-              placeholder="Search property"
-              @input="searchProperty"
-              @focus="propertyDropdownOpen = true"
-              @blur="closePropertyDropdown"
-              autocomplete="off"
+              placeholder="Search Property..."
+              @input="searchProperties"
+              @focus="propertyDropdown = true"
+              @blur="hideDropdown('property')"
               required
             />
-
-            <!-- Dropdown -->
-            <ul 
-              v-if="propertyDropdownOpen && filteredProperties.length > 0"
-              class="absolute z-50 bg-white border rounded shadow w-full max-h-40 overflow-y-auto mt-1"
+            <ul
+              v-if="properties.length > 0 && propertyDropdown"
+              class="absolute z-50 w-full max-h-48 overflow-y-auto bg-white border border-gray-300 rounded shadow mt-1"
             >
-              <li 
-                v-for="property in filteredProperties" 
+              <li
+                v-for="property in properties"
                 :key="property.id"
-                class="p-2 hover:bg-gray-100 cursor-pointer flex justify-between items-center"
+                class="p-2 hover:bg-gray-100 cursor-pointer"
                 @mousedown.prevent="selectProperty(property)"
               >
-                <span>{{ property.name }}</span>
-                <i v-if="form.property_id === property.id" class="fas fa-check text-green-500"></i>
+                {{ property.name }}
               </li>
             </ul>
           </div>
 
           <!-- Requester Dropdown -->
           <div class="relative">
-            <label class="block text-gray-700 mb-1">Requester</label>
+            <label class="block text-gray-700 mb-1">Tenant</label>
             <input
               v-model="userSearch"
               type="text"
               class="custom-input"
               placeholder="Search user"
-              @input="searchUser"
-              @focus="userDropdownOpen = true"
-              @blur="closeUserDropdown"
+              @input="searchUsers"
+              @focus="userDropdown = true"
+              @blur="hideDropdown('user')"
               autocomplete="off"
               required
             />
 
-            <!-- Dropdown -->
             <ul
-              v-if="userDropdownOpen && filteredUsers.length > 0"
-              class="absolute z-50 bg-white border rounded shadow w-full max-h-40 overflow-y-auto mt-1"
+              v-if="users.length > 0 && userDropdown"
+              class="absolute z-50 w-full max-h-48 overflow-y-auto bg-white border border-gray-300 rounded shadow mt-1"
             >
               <li
-                v-for="user in filteredUsers"
+                v-for="user in users"
                 :key="user.id"
-                class="p-2 hover:bg-gray-100 cursor-pointer flex justify-between items-center"
+                class="p-2 hover:bg-gray-100 cursor-pointer"
                 @mousedown.prevent="selectUser(user)"
               >
-                <span>{{ user.first_name }} {{ user.middle_name }} {{ user.last_name }}</span>
-                <i v-if="form.user_id === user.id" class="fas fa-check text-green-500"></i>
+                {{ user.first_name }} {{ user.middle_name }} {{ user.last_name }}
               </li>
             </ul>
           </div>
@@ -142,7 +123,7 @@
 </template>
 
 <script>
-import Toast from "../../../components/Toast.vue";
+import Toast from "@/components/Toast.vue";
 
 export default {
   name: "MaintenanceRequestAdd",
@@ -153,92 +134,128 @@ export default {
   data() {
     return {
       form: {
-        status: "",
+        status: "pending",
         description: "",
-        requested_at: "",
-        resolved_at: "",
+        requested_at: new Date().toISOString().split("T")[0],
         user_id: "",
         property_id: "",
       },
-      propertySearch: "",
-      userSearch: "",
       properties: [],
       users: [],
-      filteredProperties: [],
-      filteredUsers: [],
-      propertyDropdownOpen: false,
-      userDropdownOpen: false,
+      propertySearch: "",
+      userSearch: "",
+      propertyDropdown: false,
+      userDropdown: false,
+      ordering:"-id"
     };
   },
+  mounted() {
+    this.fetchProperties();
+    this.fetchUsers();
+  },
   methods: {
-    async searchProperty() {
-      if (!this.propertySearch) {
-        this.filteredProperties = [];
-        return;
-      }
+    // ✅ Fetch all properties initially
+    async fetchProperties(url=null) {
+      try {
+         const pageUrl =
+          url ||
+          `/get_properties?search=${this.propertySearch}&ordering=${this.ordering}`;
 
-      const res = await this.$apiGet("get_properties", {
-        search: this.propertySearch,
-        page_size: 50,
-      });
-      this.properties = res.data;
-      this.filteredProperties = res.data;
-    },
-    async searchUser() {
-      if (!this.userSearch) {
-        this.filteredUsers = [];
-        return;
-      }
+        let result = [];
+      
+          result = await this.$getProperties(pageUrl);
+       
 
-      const res = await this.$apiGet("get_users", {
-        search: this.userSearch,
-        page_size: 50,
-      });
-      this.users = res.data;
-      this.filteredUsers = res.data;
+        this.properties = result.properties;
+      
+      } catch (err) {
+        console.error("Error fetching properties:", err);
+      }
     },
+
+    // ✅ Fetch all users initially
+   async fetchUsers(url = null) {
+  try {
+    const pageUrl = url || `/get_rents?search=${this.userSearch}`;
+
+    // 👇 FIX: Bind `this` so $apiGet works properly inside getTenants
+    const response = await this.$getTenants.call(this, pageUrl);
+
+    this.users = response.tenants || response.data || [];
+  } catch (err) {
+    console.error("Error fetching users:", err);
+  }
+},
+
+    // ✅ Search properties like AddSale
+    searchProperties() {
+    
+        this.fetchProperties();
+     
+    },
+
+    // ✅ Search users
+    searchUsers() {
+     
+        this.fetchUsers();
+     
+    },
+
+    // ✅ Selectors
     selectProperty(property) {
-      this.form.property_id = property.id;  // store id for backend
-      this.propertySearch = property.name;  // show name in input
-      this.propertyDropdownOpen = false;
+      this.form.property_id = property.id;
+      this.propertySearch = property.name;
+      this.propertyDropdown = false;
     },
     selectUser(user) {
-      this.form.user_id = user.id;           // store id for backend
+      this.form.user_id = user.id;
       this.userSearch = `${user.first_name} ${user.middle_name} ${user.last_name}`;
-      this.userDropdownOpen = false;
+      this.userDropdown = false;
     },
-    closePropertyDropdown() {
-      setTimeout(() => (this.propertyDropdownOpen = false), 150);
+
+    // ✅ Hide dropdowns gracefully
+    hideDropdown(type) {
+      setTimeout(() => {
+        if (type === "property") this.propertyDropdown = false;
+        if (type === "user") this.userDropdown = false;
+      }, 200);
     },
-    closeUserDropdown() {
-      setTimeout(() => (this.userDropdownOpen = false), 150);
-    },
+
+    // ✅ Submit
     async submitForm() {
       try {
-        const response = await this.$apiPost("/post_maintenance_request", this.form);
-        this.$root.$refs.toast.showToast("Maintenance request saved successfully", "success");
+        this.form.requested_at = new Date().toISOString().split("T")[0];
+
+        const res = await this.$apiPost("/post_maintenance_request", this.form);
+        if (res?.data?.error) {
+          this.$refs.toast.showToast(res.data.error || "Failed to save request", "error");
+        } else {
+          this.$refs.toast.showToast("Maintenance request saved successfully", "success");
+        }
 
         // Reset form
         this.form = {
-          status: "",
+          status: "pending",
           description: "",
-          requested_at: "",
-          resolved_at: "",
+          requested_at: new Date().toISOString().split("T")[0],
           user_id: "",
           property_id: "",
         };
         this.propertySearch = "";
         this.userSearch = "";
 
-        // Auto-close modal after 2s
-        setTimeout(() => {
-          this.$emit("close");
-        }, 2000);
+        setTimeout(() => this.$emit("close"), 2000);
       } catch (error) {
         console.error("Error saving request:", error);
-        this.$root.$refs.toast.showToast("Failed to save request", "error");
+        this.$refs.toast.showToast("Failed to save request", "error");
       }
     },
   },
 };
 </script>
+
+<style scoped>
+.custom-input {
+  @apply w-full px-4 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-primary;
+}
+</style>
