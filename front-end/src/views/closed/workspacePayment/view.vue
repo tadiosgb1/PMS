@@ -281,16 +281,35 @@ export default {
       this.updatePaymentStatus(payment, "pending", "Payment Disapproved Successfully");
     },
 
-    async updatePaymentStatus(payment, status, message) {
-      try {
-        await this.$apiPatch("/update_rental_payment", payment.id, { status });
+   async updatePaymentStatus(payment, status, message) {
+  try {
+    console.log("payment", payment);
+
+    // 1️⃣ Update rental payment first
+    const res1 = await this.$apiPatch("/update_rental_payment", payment.id, { status });
+
+    if (res1 ) {
+      // 2️⃣ Only if the first update succeeds, update workspace rental
+      const payloadWorkspaceRental = { is_active: true };
+      const res2 = await this.$apiPatch("/update_workspace_rental", payment.rental, payloadWorkspaceRental);
+
+      if (res2) {
         this.$root.$refs.toast.showToast(message, "success");
         this.fetchPayments(this.currentPage);
-      } catch (err) {
-        console.error(err);
-        this.$refs.toast.showToast("Failed to update payment", "error");
+      } else {
+        this.$refs.toast.showToast("Failed to update workspace rental", "error");
       }
-    },
+      this.$reloadPage();
+    } else {
+      this.$refs.toast.showToast("Failed to update rental payment", "error");
+    }
+
+  } catch (err) {
+    console.error(err);
+    this.$refs.toast.showToast("Something went wrong while updating payment", "error");
+  }
+}
+,
 
     formatDate(dateString) {
       if (!dateString) return "-";

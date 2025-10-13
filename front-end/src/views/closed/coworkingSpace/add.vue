@@ -146,9 +146,10 @@
           <div class="flex justify-end space-x-3 pt-4 border-t mt-4">
             <button
               type="submit"
-              class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600"
+              :disabled="loading"
+              class="px-4 py-2 bg-orange-500 text-white rounded-lg hover:bg-orange-600 disabled:opacity-60 disabled:cursor-not-allowed"
             >
-              Save Space
+              {{ loading ? "Saving..." : "Save Space" }}
             </button>
           </div>
         </form>
@@ -182,6 +183,7 @@ export default {
       zoneSearch: "",
       zones: [],
       zoneDropdown: false,
+      loading: false, // Added loading state
     };
   },
   mounted() {
@@ -211,22 +213,35 @@ export default {
       }, 200);
     },
     async submitForm() {
+      this.loading = true;
       try {
         const payload = { ...this.form };
         const res = await this.$apiPost("/post_coworking_space", payload);
         console.log("Space added:", res);
 
         if (res && res.error) {
-          this.$root.$refs.toast.showToast(res.error || "Failed to add space", "error");
+          this.$root.$refs.toast.showToast(
+            res.error || "Failed to add space",
+            "error"
+          );
         } else {
-          this.$root.$refs.toast.showToast("Co-working space added successfully!", "success");
+          this.$root.$refs.toast.showToast(
+            "Co-working space added successfully!",
+            "success"
+          );
           this.resetForm();
           this.$emit("success");
+          this.$reloadPage();
           setTimeout(() => this.$emit("close"), 1500);
         }
       } catch (err) {
         console.error("Failed to add space:", err);
-        this.$root.$refs.toast.showToast("Failed to add co-working space", "error");
+        this.$root.$refs.toast.showToast(
+          "Failed to add co-working space",
+          "error"
+        );
+      } finally {
+        this.loading = false;
       }
     },
     resetForm() {
