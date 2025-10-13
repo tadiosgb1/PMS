@@ -128,6 +128,8 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   props: {
     visible: Boolean,
@@ -161,44 +163,52 @@ export default {
       this.passwordMismatch = false;
       this.emailExistsError = "";
 
+      // Validate password confirmation
       if (this.form.password !== this.form.confirmPassword) {
         this.passwordMismatch = true;
         return;
       }
 
       try {
+        // Prepare payload
         const payload = { ...this.form };
         delete payload.confirmPassword; // don't send confirmPassword to backend
 
-        const response = await this.$apiPost("sign_up", payload);
+        // Axios POST request to registration API
+        const response = await axios.post(
+          "https://alphapms.sunriseworld.org/api/sign_up",
+          payload
+        );
         console.log("User registered successfully:", response.data);
-        const resetPayload = {
-          email: this.form.email,
-        };
 
-        if (response.data) {
-          const res = await this.$apiPost(
-            `/send_password_reset_email`,
+        // Optionally send password reset email
+        if (response.data?.email) {
+          const resetPayload = { email: this.form.email };
+          const resetResponse = await axios.post(
+            "https://alphapms.sunriseworld.org/api/send_password_reset_email",
             resetPayload
           );
-          console.log("res", res.data);
+          console.log("Password reset email sent:", resetResponse.data);
         }
 
+        // Close modal
         this.$emit("close");
       } catch (error) {
+        // Handle errors
         const errorMsg = error.response?.data?.error;
 
         if (errorMsg === "This email already exists in the system") {
           this.emailExistsError = errorMsg;
         } else {
-          this.emailExistsError = ""; // Clear any email-specific error
-          alert(errorMsg || "Registration failed."); // ✅ show general errors in alert
+          this.emailExistsError = "";
+          alert(errorMsg || "Registration failed.");
         }
       }
     },
   },
 };
 </script>
+
 
 <style scoped>
 .custom-input {

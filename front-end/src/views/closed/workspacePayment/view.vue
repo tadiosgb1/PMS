@@ -101,7 +101,7 @@
                 <td class="border border-gray-300 px-4 py-2">{{ payment.status }}</td>
                 <td class="border border-gray-300 px-4 py-2 text-center space-x-2">
                   <button
-                    v-if="payment.status !== 'paid'"
+                    v-if="payment.status !== 'complete'"
                     @click="approve(payment)"
                     class="text-blue-600 hover:text-blue-800"
                   >
@@ -274,7 +274,7 @@ export default {
     },
 
     approve(payment) {
-      this.updatePaymentStatus(payment, "paid", "Payment Approved Successfully");
+      this.updatePaymentStatus(payment, "complete", "Payment Approved Successfully");
     },
 
     disApprove(payment) {
@@ -283,7 +283,7 @@ export default {
 
     async updatePaymentStatus(payment, status, message) {
       try {
-        await this.$apiPatch("/update_rental_payments", payment.id, { status });
+        await this.$apiPatch("/update_rental_payment", payment.id, { status });
         this.$root.$refs.toast.showToast(message, "success");
         this.fetchPayments(this.currentPage);
       } catch (err) {

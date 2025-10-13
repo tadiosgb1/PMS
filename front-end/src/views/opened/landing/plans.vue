@@ -46,10 +46,7 @@
                   </span>
                 </div>
              <div class="text-xs text-gray-500">
-  <span class="line-through mr-1">ETB {{ plan.price }}</span>
-  <span class="text-orange-500 font-semibold">
-    ETB {{ (plan.price * 0.85).toFixed(2) }} <span class="ml-1">🔥 15% OFF</span>
-  </span>
+ 
 </div>
 
               </div>
