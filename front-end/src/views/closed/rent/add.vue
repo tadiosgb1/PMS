@@ -256,12 +256,15 @@ export default {
     },
      async fetchUsers(url = null) {
   try {
-    const pageUrl = url || `/get_rents?search=${this.userSearch}`;
+    const pageUrl = url || `/get_tenants?search=${this.userSearch}`;
+    //const pageUrl = url || `/get_rents?search=${this.userSearch}`;
 
     // 👇 FIX: Bind `this` so $apiGet works properly inside getTenants
-    const response = await this.$getTenants.call(this, pageUrl);
+    // const response = await this.$getTenants.call(this, pageUrl);
+    const response = await this.$apiGet(pageUrl);
 
-    this.users = response.tenants || response.data || [];
+   //this.users = response.tenants || response.data || [];
+    this.users = response.data || [];
   } catch (err) {
     console.error("Error fetching users:", err);
   }

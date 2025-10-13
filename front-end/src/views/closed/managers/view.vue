@@ -266,13 +266,13 @@ export default {
     },
     activateUser(id) {
       this.$apiPost(`/activate_user/${id}`, { id }).then((res) => {
-        this.$root.$refs.toast.showToast("Plan saved successfully ", "success");
+        this.$root.$refs.toast.showToast("Activate Manger User successfully ", "success");
         this.fetchManagers();
       });
     },
     deactivateUser(id) {
       this.$apiDelete(`/deactivate_user`, { id }).then((res) => {
-        this.$root.$refs.toast.showToast("Plan saved successfully ", "success");
+        this.$root.$refs.toast.showToast("Deactivate Manger User successfully ", "success");
         this.fetchManagers();
       });
     },

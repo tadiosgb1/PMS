@@ -155,6 +155,7 @@ export async function apiPost(url, data, customHeaders = {}) {
   try {
     const headers = getDefaultHeaders(customHeaders);
     const response = await apiClient.post(url, data, { headers });
+    console.log("error ibeeeeeeeeeeeeeeeeeeeeeerrrrrrrrrrrrrrrr",response.error)
     return response.data;
   } catch (error) {
     console.log("error in post", error);
@@ -923,7 +924,7 @@ export async function getWorkspacePayments(url = null, params = {}) {
     const email = localStorage.getItem("email");
 
     // Always include rental_id if provided (detail mode), even for superuser
-    const rentalId = params.rental__space__id || null;
+    const rentalId = params.rental__id || null;
     console.log("rental_id   hkjhkhjlkjkhljhl",rentalId);
 
     // Add access control only if not in detail mode

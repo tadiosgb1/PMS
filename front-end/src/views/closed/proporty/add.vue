@@ -25,7 +25,7 @@
           class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 max-h-[80vh] overflow-y-auto"
         >
           <div>
-            <label class="block text-gray-700">Zone manager</label>
+            <label class="block text-gray-700">Property manager</label>
             <select v-model="form.manager_id" class="custom-input">
               <option value="">Select Manager</option>
               <option
@@ -134,6 +134,7 @@
             <label class="block text-gray-700">Status</label>
             <select v-model="form.status" class="custom-input">
               <option value="">Select</option>
+              <option value="pending">Pending</option>
               <option value="available">Available</option>
             </select>
           </div>
@@ -178,7 +179,7 @@ export default {
         bed_rooms: "",
         bath_rooms: "",
         rent: "",
-        status: "",
+        status: "pending",
       },
     };
   },
