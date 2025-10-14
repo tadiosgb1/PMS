@@ -235,27 +235,18 @@ export default {
 
       try {
        const res = await this.$apiPost("/post_property", this.form);
-        if(res && res.error){
- this.$root.$refs.toast.showToast(
-          res.error || "Failed to save property ",
-          "error"
-        );
-
-        } else {
+       
+       console.log("res properties fetch",res)
         this.$root.$refs.toast.showToast(
           "Property saved successfully ",
           "success"
         );
         this.resetForm();
-        }
-        // this.$emit("refresh");
-        // setTimeout(() => {
-        //   this.$emit("close");
-        // }, 3000); // 3000 milliseconds = 3 seconds
+      
         
       } catch (err) {
         this.$root.$refs.toast.showToast(
-           "Failed to save property ",
+          err.message.error || err.message.non_field_errors[0],
           "error"
         );
       }
