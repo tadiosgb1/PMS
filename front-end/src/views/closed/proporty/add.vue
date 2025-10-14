@@ -130,14 +130,14 @@
               class="custom-input"
             />
           </div>
-          <div>
+          <!-- <div>
             <label class="block text-gray-700">Status</label>
             <select v-model="form.status" class="custom-input">
               <option value="">Select</option>
               <option value="pending">Pending</option>
               <option value="available">Available</option>
             </select>
-          </div>
+          </div> -->
           <div class="md:col-span-2 text-right">
             <button
               type="submit"
@@ -179,7 +179,7 @@ export default {
         bed_rooms: "",
         bath_rooms: "",
         rent: "",
-        status: "pending",
+        status: "available",
       },
     };
   },
