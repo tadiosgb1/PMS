@@ -92,9 +92,14 @@
                 <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
                   {{ maint.description }}
                 </td>
-                <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
-                  {{ maint.status }}
-                </td>
+                <td class="border border-gray-300 px-3 py-2 whitespace-nowrap font-semibold"
+    :class="{
+      'text-orange-500': maint.status === 'pending',
+      'text-green-600': maint.status === 'resolved'
+    }"
+>
+  {{ maint.status }}
+</td>
                 <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
                   {{ formatDate(maint.requested_at) }}
                 </td>
@@ -121,9 +126,22 @@
                   </router-link>
                   <span v-else>N/A</span>
                 </td>
-                <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
-                  <button @click="confirm = true; selectedId = maint.id">Resolve</button>
-                </td>
+                <td class="border border-gray-300 px-3 py-2 whitespace-nowrap text-center">
+  <button
+    v-if="maint.status === 'pending'"
+    @click="confirm = true; selectedId = maint.id"
+    class="px-3 py-1 bg-orange-500 text-white rounded hover:bg-orange-600 transition"
+  >
+    Resolve
+  </button>
+  <button
+    v-else
+    disabled
+    class="px-3 py-1 bg-gray-300 text-gray-600 rounded cursor-not-allowed"
+  >
+    Resolved
+  </button>
+</td>
               </tr>
               <tr v-if="filteredData.length === 0">
                 <td colspan="7" class="text-center py-6 text-gray-500">

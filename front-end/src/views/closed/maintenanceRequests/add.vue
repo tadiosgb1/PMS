@@ -228,9 +228,9 @@ export default {
 
         const res = await this.$apiPost("/post_maintenance_request", this.form);
         if (res?.data?.error) {
-          this.$refs.toast.showToast(res.data.error || "Failed to save request", "error");
+          this.$root.$refs.toast.showToast(res.data.error || "Failed to save request", "error");
         } else {
-          this.$refs.toast.showToast("Maintenance request saved successfully", "success");
+          this.$root.$refs.toast.showToast("Maintenance request saved successfully", "success");
         }
 
         // Reset form

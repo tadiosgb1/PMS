@@ -13,25 +13,59 @@
 
       <form @submit.prevent="submitForm" class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 max-h-[80vh] overflow-y-auto">
        
-       <div>
+       <!-- <div>
           <label class="block text-gray-700">Owner ID</label>
           <input v-model="form.owner_id" type="text" class="custom-input" />
-        </div>
+        </div> -->
 
         <div>
+            <label class="block text-gray-700">Property Zone</label>
+            <select v-model="form.property_zone_id" class="custom-input">
+              <option value="">Select Zone</option>
+              <option v-for="zone in zones" :key="zone.id" :value="zone.id">
+                {{ zone.name }}
+              </option>
+            </select>
+          </div>
+        
+        <!-- <div>
           <label class="block text-gray-700">Manager ID</label>
           <input v-model="form.manager_id" type="text" class="custom-input" />
-        </div>
+        </div> -->
+        <div>
+            <label class="block text-gray-700">Property manager</label>
+            <select v-model="form.manager_id" class="custom-input">
+              <option value="">Select Manager</option>
+              <option
+                class="text-black"
+                v-for="manager in managers"
+                :key="manager.manager.id"
+                :value="manager.manager.id"
+              >
+                {{ manager.manager.first_name }}
+                {{ manager.manager.middle_name }}
+              </option>
+            </select>
+          </div>
        
         <div>
           <label class="block text-gray-700">Name</label>
           <input v-model="form.name" type="text" class="custom-input" required />
         </div>
 
-        <div>
-          <label class="block text-gray-700">Property Type</label>
-          <input v-model="form.property_type" type="text" class="custom-input" />
-        </div>
+        
+ <div>
+        <label class="block text-gray-700">Property type</label>
+        <select
+          v-model="form.property_type"
+          class="custom-input"
+        >
+          <option value="land">Land</option>
+          <option value="house">House</option>
+          <option value="apartment">Apartment</option>
+          <option value="room">Room</option>
+        </select>
+      </div>
 
         <div>
           <label class="block text-gray-700">Address</label>
@@ -54,7 +88,7 @@
         </div>
 
         <div>
-          <label class="block text-gray-700">Price</label>
+          <label class="block text-gray-700">Selling Price</label>
           <input v-model.number="form.price" type="number" class="custom-input" />
         </div>
 
@@ -69,11 +103,11 @@
         </div>
 
         <div>
-          <label class="block text-gray-700">Rent</label>
+          <label class="block text-gray-700">Rent Price</label>
           <input v-model.number="form.rent" type="number" class="custom-input" />
         </div>
 
-        <div>
+        <!-- <div>
           <label class="block text-gray-700">Status</label>
           <select v-model="form.status" class="custom-input">
             <option value="">Select</option>
@@ -81,7 +115,7 @@
             <option value="rented">Rented</option>
             <option value="maintenance">Maintenance</option>
           </select>
-        </div>
+        </div> -->
 
         <div class="md:col-span-2 text-right">
           <button
@@ -108,11 +142,14 @@ export default {
   },
   data() {
     return {
+
+      zones: [],
+      managers: [],
       form: {
         id: null,
         name: '',
         property_type: '',
-        owner_id: '',
+        property_zone_id:'',
         manager_id: '',
         address: '',
         city: '',
@@ -122,7 +159,7 @@ export default {
         bed_rooms: '',
         bath_rooms: '',
         rent: '',
-        status: ''
+        
       }
     };
   },
@@ -135,6 +172,28 @@ export default {
         }
       }
     }
+  },
+  async mounted() {
+
+    if (localStorage.getItem("is_superuser") == true) {
+      const res = await this.$apiGet(`/get_managers`);
+      console.log("res managers", res);
+      this.managers = res.data || [];
+    } else {
+      console.log("managers for the owner");
+      const params = {
+        owner__id: localStorage.getItem("userId"),
+      };
+      console.log("params", params);
+
+      const res = await this.$apiGet(`/get_owner_managers`, params);
+      console.log("res managers", res);
+      this.managers = res.data || [];
+    }
+ const result = await this.$getZones();
+    this.zones = result.zones;
+
+    console.log("zones", this.zones);
   },
   methods: {
     async submitForm() {

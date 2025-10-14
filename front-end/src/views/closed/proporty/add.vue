@@ -63,15 +63,15 @@
 
 
       <div>
-        <label class="block text-sm font-medium text-gray-700">Property type</label>
+        <label class="block text-gray-700">Property type</label>
         <select
           v-model="form.property_type"
-          class="custom-select mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-green-500 focus:border-green-500 sm:text-sm"
+          class="custom-input"
         >
-          <option value="weekly">Land</option>
-          <option value="monthly">House</option>
-          <option value="yearly">Apartment</option>
-          <option value="quarterly">Room</option>
+          <option value="land">Land</option>
+          <option value="house">House</option>
+          <option value="apartment">Apartment</option>
+          <option value="room">Room</option>
         </select>
       </div>
 
@@ -96,7 +96,7 @@
           </div>
 
           <div>
-            <label class="block text-gray-700">Price</label>
+            <label class="block text-gray-700">Selling Price</label>
             <input
               v-model.number="form.price"
               type="number"
@@ -123,7 +123,7 @@
           </div>
 
           <div>
-            <label class="block text-gray-700">Rent</label>
+            <label class="block text-gray-700">Rent Price</label>
             <input
               v-model.number="form.rent"
               type="number"
