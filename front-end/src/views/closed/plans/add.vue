@@ -127,41 +127,47 @@ export default {
     };
   },
   methods: {
-    async submitForm() {
-      console.log("Submitted Plan:", this.form);
-      await this.$apiPost("/post_plan", this.form).then(response=>{
+  async submitForm() {
+  this.loading = true; // start loading
+  console.log("Submitted Plan:", this.form);
 
-        console.log("response.namejh,jkljkllllllllllllllllllllllllllllllllllllllllllllllllllllllllll",response.name);
-    
+  try {
+    const response = await this.$apiPost("/post_plan", this.form);
+    console.log("Response:", response);
 
-     this.$root.$refs.toast.showToast('Plan saved successfully ', 'success');
+    this.$root.$refs.toast.showToast("Plan saved successfully", "success");
 
-      })
+    // Reset form
+    this.form = {
+      Plan_zone_id: '',
+      owner_id: '',
+      manager_id: '',
+      Plan_type: '',
+      name: '',
+      max_locations: '',
+      max_staff: '',
+      max_users: '',
+      max_kds: '',
+      kds_enabled: null,
+      price: null,
+      billing_cycle: null,
+      created_at: '',
+      updated_at: '',
+    };
 
-      
-      // Reset and close modal
-      this.form = {
-        Plan_zone_id: '',
-        owner_id: '',
-        manager_id: '',
-        Plan_type: '',
-        name: '',
-        max_locations: '',
-        max_staff: '',
-        max_users: '',
-        max_kds: '',
-        kds_enabled: null,
-        price: null,
-        billing_cycle: null,
-        created_at: '',
-        updated_at: '',
-      };
-      //alert("Plan saved!");
-     setTimeout(() => {
-  this.$emit("close");
-}, 3000); // 3000 milliseconds = 3 seconds
+    // Close modal after a short delay
+    setTimeout(() => {
+      this.$emit("close");
+    }, 3000);
 
-    },
+  } catch (err) {
+    console.error("Error saving plan:", err);
+    this.$root.$refs.toast.showToast(err.message || "Failed to save plan", "error");
+  } finally {
+    this.loading = false; // stop loading
+  }
+}
+,
   },
 };
 </script>

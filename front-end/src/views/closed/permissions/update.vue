@@ -81,7 +81,8 @@ export default {
         this.$emit("refresh");
       } catch (error) {
         console.error("Error updating permission:", error);
-        alert("Failed to update permission.");
+         this.$root.$refs.toast.showToast(error.message,"error")
+       // alert("Failed to update permission.");
       }
     }
   }

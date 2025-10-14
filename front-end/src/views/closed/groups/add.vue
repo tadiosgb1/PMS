@@ -111,7 +111,8 @@ export default {
         this.$emit("close");
       } catch (err) {
         console.error("Failed to create group:", err);
-        alert("Failed to save group.");
+        //alert("Failed to save group.");
+         this.$root.$refs.toast.showToast(err.message,"error")
       } finally {
         this.form.name = '';
         this.form.permissions = [];

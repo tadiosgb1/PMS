@@ -125,7 +125,8 @@ export default {
         this.$emit("close");   // close modal after success
       } catch (error) {
         console.error("Failed to create user:", error);
-        alert("Failed to create user.");
+         this.$root.$refs.toast.showToast(error.message,"error")
+        //alert("Failed to create user.");
       }
     },
   },

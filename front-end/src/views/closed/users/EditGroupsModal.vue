@@ -82,7 +82,8 @@ export default {
         this.$emit("close");
       } catch (err) {
         console.error("Failed to save groups:", err);
-        alert("Failed to save groups");
+        //alert("Failed to save groups");
+         this.$root.$refs.toast.showToast(error.message,"error")
       }
     },
   },

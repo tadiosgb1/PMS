@@ -158,38 +158,47 @@ export default {
   },
   methods: {
     async submitForm() {
-      try {
-        // 1. Create the user
-        const payload = { ...this.form };
-        const res = await this.$apiPost("/post_user", payload);
-         console.log("res sign up",res);
-        // if (!res || !res.id) {
-        //   throw new Error("User creation failed: No ID returned.");
-        // }
+  try {
+    // Step 1: Create the user
+    const payload = { ...this.form };
+    let res = null;
+    try {
+      res = await this.$apiPost("/post_user", payload);
+      console.log("User created:", res);
+    } catch (err) {
+      console.error("Error creating user:", err);
+      this.$root.$refs.toast.showToast(err.message || "Failed to create user", "error");
+      return; // stop further execution if user creation fails
+    }
 
-        console.log("User created:", res);
+    // Step 2: Assign user to group
+    try {
+      const groupPayload = {
+        user_id: res.id,
+        groups: ["super_staff"],
+      };
+      console.log("Assigning groups:", groupPayload);
 
-        // 2. Assign to super_staff group
-        const groupPayload = {
-          user_id: res.id,
-          groups: ["super_staff"],
-        };
+      const resAssign = await this.$apiPost("/set_user_groups", groupPayload);
 
-        console.log("Assigning groups:", groupPayload);
-
-        const resAsign=await this.$apiPost("/set_user_groups", groupPayload);
-       
-        if(resAsign){
-          this.$root.$refs.toast.showToast("Successfully  Created", "success");
-        }
-        // 3. Emit events to parent
-        this.$emit("success"); // refresh parent users
-        this.$emit("close");   // close modal
-      } catch (error) {
-        console.error("Failed to create user or assign group:", error);
-        alert("Failed to create user or assign to super_staff group.");
+      if (resAssign) {
+        this.$root.$refs.toast.showToast("Successfully created and assigned group", "success");
       }
-    },
+    } catch (err) {
+      console.error("Error assigning group:", err);
+      this.$root.$refs.toast.showToast(err.message || "Failed to assign user group", "error");
+    }
+
+    // Step 3: Emit events regardless of success/failure in group assignment
+    this.$emit("success"); // refresh parent
+    this.$emit("close");   // close modal
+
+  } catch (error) {
+    console.error("Unexpected error in submitForm:", error);
+    this.$root.$refs.toast.showToast(error.message || "Something went wrong", "error");
+  }
+}
+,
   },
 };
 </script>

@@ -169,7 +169,8 @@ export default {
         this.$emit('refresh');
       } catch (err) {
         console.error('Update failed:', err);
-        alert('Failed to update plan.');
+         this.$root.$refs.toast.showToast(err.message,"error")
+        //alert('Failed to update plan.');
       }
     },
   },

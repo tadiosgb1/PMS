@@ -16,11 +16,11 @@
       <div class="p-6">
         <!-- Search -->
        <input
-  v-model="searchTerm"
-  type="search"
-  placeholder="Search Plan..."
-  class="w-full max-w-md px-4 py-2 mb-6 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-/>
+        v-model="searchTerm"
+        type="search"
+        placeholder="Search Plan..."
+        class="w-full max-w-md px-4 py-2 mb-6 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+      />
 
         <!-- Table -->
         <div class="overflow-x-auto">

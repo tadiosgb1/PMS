@@ -56,15 +56,20 @@
     </div>
 
     <!-- Fields -->
-    <div class="mt-4">
-      <label class="block font-semibold mb-1">Payment Method:</label>
-      <input
-        v-model="form.payment_method"
-        type="text"
-        class="w-full border rounded p-2"
-        placeholder="e.g. CBE, Wegagen, TeleBirr"
-      />
-    </div>
+   <div>
+  <label class="block font-semibold mb-1">Payment Method:</label>
+  <select
+    v-model="form.payment_method"
+    class="w-full border rounded p-2 bg-white"
+  >
+    <option disabled value="">Select payment method</option>
+    <option value="cash">Cash</option>
+    <option value="telebirr">Telebirr</option>
+    <option value="cbe">CBE</option>
+    <option value="e-birr">E-Birr</option>
+  </select>
+</div>
+
 
     <div>
       <label class="block font-semibold mb-1">Transaction ID:</label>
@@ -192,25 +197,18 @@ export default {
         }, 3000);
       } catch (err) {
         console.error('Payment failed:', err);
-        this.$root.$refs.toast.showToast('Payment failed. Please try again.', 'error');
+        this.$root.$refs.toast.showToast(err.message, 'error');
       } finally {
         this.loading = false;
       }
     },
-
     async payOnline(provider) {
       this.loading = true;
       try {
-        // Placeholder for ArifPay / TeleBirr API
         this.$root.$refs.toast.showToast(`Redirecting to ${provider}...`, 'info');
-
-        // Later: call backend API to generate payment link
-        // e.g., const res = await this.$apiPost(`/pay/${provider}`, this.form);
-        // window.location.href = res.data.payment_url;
-
       } catch (err) {
         console.error(`${provider} payment failed:`, err);
-        this.$root.$refs.toast.showToast(`${provider} payment failed`, 'error');
+        this.$root.$refs.toast.showToast(err.message, 'error');
       } finally {
         this.loading = false;
       }
