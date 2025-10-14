@@ -23,7 +23,7 @@
           <div class="flex justify-between items-center mb-6">
             <input
               v-model="searchTerm"
-              @input="currentPage='';fetchProperties()"
+              @input="fetchProperties()"
               type="search"
               placeholder="Search properties..."
               class="w-full max-w-md px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -314,7 +314,16 @@ export default {
           };
           console.log("params properties",params)
           result = await this.$getProperties(pageUrl, params);
-        } else {
+        }else if(this.searchTerm){
+           params={
+             status:this.status,
+             search:this.searchTerm
+          }
+          result = await this.$getProperties(pageUrl,params);
+        }
+        
+        
+        else {
            params={
              status:this.status
           }
