@@ -241,6 +241,11 @@ export default {
           "Property saved successfully ",
           "success"
         );
+         this.$emit('refresh');
+          this.$emit("close");
+
+       //  this.$reloadPage();
+
         this.resetForm();
       
         

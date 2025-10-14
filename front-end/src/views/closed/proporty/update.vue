@@ -204,6 +204,8 @@ export default {
        }else{
         this.$root.$refs.toast.showToast('Property Updated successfully ', 'success');
         this.$emit('refresh');
+         this.$emit("close");
+         
        }
 //           setTimeout(() => {
 //   this.$emit("close");
