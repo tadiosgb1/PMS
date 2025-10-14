@@ -115,7 +115,8 @@ export default {
           route: "property_sales",
           icon: "fas fa-hand-holding-dollar", // ✅ fa-hand-holding-usd → updated name
           color: "#6b7280",
-          permission: "pms.view_propertysale",
+          permission: "",
+            //permission: "pms.view_propertysale",
         },
         {
           name: "Rent Management",

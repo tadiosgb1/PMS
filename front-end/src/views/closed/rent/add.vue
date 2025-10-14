@@ -121,16 +121,6 @@
             <input v-model="form.deposit_amount" type="number" class="custom-input" required />
           </div>
 
-          <!-- Status -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700">Status</label>
-            <select v-model="form.status" class="custom-select mt-1 block w-full">
-              <option value="active">Active</option>
-              <option value="inactive">Inactive</option>
-            </select>
-          </div>
-
-          <!-- Actions -->
           <div class="md:col-span-2 text-right pt-4">
             <button
               type="submit"
@@ -191,7 +181,7 @@ export default {
         payment_cycle: "",
         rent_amount: "",
         deposit_amount: "",
-        status: "active",
+        status: "pending",
       },
       tenant: {
         password: "",
