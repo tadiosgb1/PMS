@@ -66,7 +66,8 @@
             <option value="">Select method</option>
             <option value="cash">Cash</option>
             <option value="bank">Bank Transfer</option>
-            <option value="mobile">Mobile Payment</option>
+            <option value="cbe">CBE</option>
+            <option value="tellbirr">Tele Birr</option>
           </select>
         </div>
 

@@ -299,6 +299,7 @@ export default {
     await this.fetchProperties();
   },
   methods: {
+    //if per(view_property)
     async fetchProperties(url = null) {
       try {
         let params={};
