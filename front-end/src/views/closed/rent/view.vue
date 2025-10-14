@@ -123,15 +123,7 @@
                   <td
                     class="border border-gray-300 px-4 py-2 text-center space-x-2"
                   >
-                    <button
-                      @click="selectedRentId = rent.id; showModal = true"
-                      class="relative px-4 py-2 text-green-600 border border-green-600 rounded-lg
-                        hover:text-white hover:bg-green-600
-                        transition duration-300 ease-in-out"
-                      title="Pay Rent"
-                    >
-                      <i class="fas fa-credit-card mr-2"></i> Pay
-                    </button>
+                 
                     <button
                       @click="rentDetail(rent.id)"
                       class="text-green-600 hover:text-green-800 focus:outline-none"
@@ -139,12 +131,23 @@
                     >
                       <i class="fas fa-info-circle"></i>
                     </button>
+                
                     <button
                       @click="goToPayments(rent.id)"
                       class="text-green-600 hover:text-green-800 focus:outline-none"
                       title="Payments"
                     >
                       Payments
+                    </button>
+                     
+                      <button
+                      @click="selectedRentId = rent.id; showModal = true"
+                      class="relative px-4 py-2 text-green-600 border border-green-600 rounded-lg
+                        hover:text-white hover:bg-green-600
+                        transition duration-300 ease-in-out"
+                      title="Pay Rent"
+                    >
+                      <i class="fas fa-credit-card mr-2"></i> Pay
                     </button>
                   </td>
                 </tr>

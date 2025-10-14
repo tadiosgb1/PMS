@@ -60,6 +60,8 @@ function handleApiError(error) {
         error.response.data ||  error.response.data.message ||
         errorMessages[status] ||
         `Client Error: ${status}. Please check your request.`;
+
+        console.log("message",error.response.data);
     } else if (status >= 500 && status < 600) {
       const errorMessages = {
         500: "Internal server error.",
@@ -81,6 +83,7 @@ function handleApiError(error) {
   } else if (error.message) {
     message = `Error: ${error.message}`;
   }
+
   console.error("API Error:", { status, message, error });
 
   throw { status, message };
@@ -694,9 +697,12 @@ export async function getProperties(
       params = { ...params, ...extraParams };
     }
 
-    console.log("Params in properties:", params);
+    console.log("Params and url in properties:", params,url);
 
     const response = await this.$apiGet(url, params);
+
+    console.log("response properties",response);
+
     const properties = response.data || [];
 
     // Fetch owner, manager, and zone name for each property
