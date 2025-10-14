@@ -57,7 +57,7 @@ function handleApiError(error) {
         429: "Too many requests. Slow down!",
       };
       message =
-        error.response.data.message ||
+        error.response.data ||  error.response.data.message ||
         errorMessages[status] ||
         `Client Error: ${status}. Please check your request.`;
     } else if (status >= 500 && status < 600) {
@@ -70,7 +70,7 @@ function handleApiError(error) {
         505: "HTTP version not supported.",
       };
       message =
-        error.response.data.message ||
+        error.response.data || error.response.data.message ||
         errorMessages[status] ||
         `Server Error: ${status}. Please try again later.`;
     } else {
@@ -159,6 +159,7 @@ export async function apiPost(url, data, customHeaders = {}) {
     return response.data;
   } catch (error) {
     console.log("error in post", error);
+    console.log("error in post response", error.response.data);
     const handledError = handleApiError(error); // Handle error
     throw handledError; // Re-throw the error so the caller can catch it
   }

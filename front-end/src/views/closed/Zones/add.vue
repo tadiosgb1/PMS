@@ -121,7 +121,7 @@ export default {
         }
       } catch (err) {
         console.error("Failed to add zone:", err);
-        this.$root.$refs.toast.showToast("Failed to add property zone", "error");
+        this.$root.$refs.toast.showToast(err.message.error, "error");
       } finally {
         this.loading = false;
       }
