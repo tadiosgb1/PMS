@@ -305,7 +305,7 @@ export default {
 
     async approve(payment) {
       const payload = { id: payment.id, status: "paid" };
-      const res = await this.$apiPatch(`/update_payments`, payment.id, payload);
+      const res = await this.$apiPatch(`/update_payment`, payment.id, payload);
       if (res) {
         this.$root.$refs.toast.showToast(
           "Payment Approved Successfully",
@@ -317,7 +317,7 @@ export default {
 
     async reject(payment) {
       const payload = { id: payment.id, status: "pending" };
-      const res = await this.$apiPatch(`/update_payments`, payment.id, payload);
+      const res = await this.$apiPatch(`/update_payment`, payment.id, payload);
       if (res) {
         this.$root.$refs.toast.showToast(
           "Payment Disapproved Successfully",

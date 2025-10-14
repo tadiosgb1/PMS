@@ -1,8 +1,8 @@
 <template>
   <div>
- <Toast ref="toast" />
-
+    <Toast ref="toast" />
   </div>
+
   <div
     v-if="visible"
     class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4 overflow-auto"
@@ -30,34 +30,30 @@
       >
         <input type="hidden" v-model="form.rent_id" />
 
-        <!-- Cycle IDs -->
-     <!-- Cycle IDs -->
-<div>
-  <label class="block text-gray-700 mb-2 font-medium">Select Cycles</label>
-  
-  <div class="space-y-2 max-h-48 overflow-y-auto border rounded p-3">
-    <div
-      v-for="cycle in cycles"
-      :key="cycle.id"
-      class="flex items-center space-x-3 bg-gray-50 p-2 rounded hover:bg-gray-100 cursor-pointer"
-    >
-      <input
-        type="checkbox"
-        :value="cycle.id"
-        v-model="form.cycle_ids"
-        class="h-5 w-5 text-orange-500 border-gray-300 rounded focus:ring-orange-400"
-      />
-      <span class="text-gray-700">
-        {{ cycle.cycle_start }} → {{ cycle.cycle_end }}
-      </span>
-    </div>
-  </div>
-
-  <p class="text-xs text-gray-500 mt-1">
-    You can select multiple cycles.
-  </p>
-</div>
-
+        <!-- Cycles -->
+        <div>
+          <label class="block text-gray-700 mb-2 font-medium">Select Cycles</label>
+          <div class="space-y-2 max-h-48 overflow-y-auto border rounded p-3">
+            <div
+              v-for="cycle in cycles"
+              :key="cycle.id"
+              class="flex items-center space-x-3 bg-gray-50 p-2 rounded hover:bg-gray-100 cursor-pointer"
+            >
+              <input
+                type="checkbox"
+                :value="cycle.id"
+                v-model="form.cycle_ids"
+                class="h-5 w-5 text-orange-500 border-gray-300 rounded focus:ring-orange-400"
+              />
+              <span class="text-gray-700">
+                {{ cycle.cycle_start }} → {{ cycle.cycle_end }}
+              </span>
+            </div>
+          </div>
+          <p class="text-xs text-gray-500 mt-1">
+            You can select multiple cycles.
+          </p>
+        </div>
 
         <!-- Payment Method -->
         <div>
@@ -95,11 +91,38 @@
           >
             Cancel
           </button>
+
+          <!-- Loading / Submit Button -->
           <button
             type="submit"
-            class="px-4 py-2 bg-orange-500 text-white rounded hover:bg-orange-600"
+            :disabled="loading"
+            class="px-4 py-2 rounded text-white transition-all duration-200"
+            :class="loading ? 'bg-gray-400 cursor-not-allowed' : 'bg-orange-500 hover:bg-orange-600'"
           >
-            Submit
+            <span v-if="!loading">Submit</span>
+            <span v-else class="flex items-center space-x-2">
+              <svg
+                class="animate-spin h-5 w-5 text-white"
+                xmlns="http://www.w3.org/2000/svg"
+                fill="none"
+                viewBox="0 0 24 24"
+              >
+                <circle
+                  class="opacity-25"
+                  cx="12"
+                  cy="12"
+                  r="10"
+                  stroke="currentColor"
+                  stroke-width="4"
+                ></circle>
+                <path
+                  class="opacity-75"
+                  fill="currentColor"
+                  d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                ></path>
+              </svg>
+              <span>Saving...</span>
+            </span>
           </button>
         </div>
       </form>
@@ -109,9 +132,10 @@
 
 <script>
 import Toast from "../../../components/Toast.vue";
+
 export default {
   name: "MakePaymentModal",
-    components: { Toast },
+  components: { Toast },
   props: {
     rentId: {
       type: Number,
@@ -131,6 +155,7 @@ export default {
         transaction_id: "",
       },
       cycles: [],
+      loading: false,
     };
   },
   watch: {
@@ -143,36 +168,49 @@ export default {
       },
     },
   },
-  mounted(){
-   this.fetchCycles(12)
-  },
   methods: {
     async fetchCycles(rentId) {
       try {
-        const response = await this.$apiGetById(`get_rent_cycles`,rentId);
-        console.log("rent cycless",response)
+        const response = await this.$apiGetById("get_rent_cycles", rentId);
         this.cycles = response.data || [];
-        
       } catch (error) {
         console.error("Failed to fetch cycles:", error);
         this.cycles = [];
       }
     },
+
     async submitPayment() {
+      if (!this.form.cycle_ids.length) {
+        this.$refs.toast.showToast("Please select at least one cycle", "error");
+        return;
+      }
+
+      this.loading = true;
       try {
-        console.log("cycles",this.form)
         const response = await this.$apiPost("make_payment", this.form);
- this.$root.$refs.toast.showToast(
-          "Rent Payed successfully ",
-          "success"
-        );
+
+         this.$root.$refs.toast.showToast("Rent paid successfully", "success");
         this.$emit("success", response);
         this.$emit("close");
       } catch (error) {
         console.error("Failed to make payment:", error);
-        alert("Failed to submit payment.");
+         this.$root.$refs.toast.showToast("Failed to submit payment", "error");
+      } finally {
+        this.loading = false;
       }
     },
   },
 };
 </script>
+
+<style scoped>
+/* Optional smoother spinner animation */
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+.animate-spin {
+  animation: spin 1s linear infinite;
+}
+</style>
