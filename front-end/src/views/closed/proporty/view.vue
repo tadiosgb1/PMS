@@ -19,62 +19,79 @@
 
         <!-- Content -->
         <div class="p-6">
-          <!-- Search & Page Size -->
-          <div class="flex justify-between items-center mb-6">
-            <input
-              v-model="searchTerm"
-              @input="fetchProperties()"
-              type="search"
-              placeholder="Search properties..."
-              class="w-full max-w-md px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+          <!-- Search & Page Size (Responsive) -->
+<div
+  class="flex flex-col sm:flex-col md:flex-row md:flex-wrap lg:flex-nowrap justify-between items-start md:items-center gap-4 mb-6"
+>
+  <!-- Search -->
+  <div class="w-full md:w-1/2 lg:w-1/3">
+    <input
+      v-model="searchTerm"
+      @input="fetchProperties()"
+      type="search"
+      placeholder="Search properties..."
+      class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+    />
+  </div>
 
-            <div v-if="!zone_id_query_set">
-              <label class="block text-gray-700">Property Zone</label>
-              <select
-                v-model="zone_id"
-                class="custom-input"
-                @change="fetchProperties()"
-              >
-                <option value="">Select Zone</option>
-                <option v-for="zone in zones" :key="zone.id" :value="zone.id">
-                  {{ zone.name }}
-                </option>
-              </select>
-            </div>
+  <!-- Property Zone -->
+  <div
+    v-if="!zone_id_query_set"
+    class="w-full sm:w-1/2 md:w-1/3 lg:w-1/4 xl:w-auto"
+  >
+    <label class="block text-gray-700 text-sm mb-1">Property Zone</label>
+    <select
+      v-model="zone_id"
+      class="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+      @change="fetchProperties()"
+    >
+      <option value="">Select Zone</option>
+      <option v-for="zone in zones" :key="zone.id" :value="zone.id">
+        {{ zone.name }}
+      </option>
+    </select>
+  </div>
 
+  <!-- Status -->
+  <div
+    class="flex flex-col sm:flex-row items-start sm:items-center w-full sm:w-auto md:w-1/4 lg:w-auto"
+  >
+    <label class="mr-2 text-sm text-gray-600 mb-1 sm:mb-0">Status</label>
+    <select
+      @change="fetchProperties()"
+      v-model="status"
+      class="px-3 py-2 border rounded-md text-sm w-full sm:w-auto"
+    >
+      <option value="">All</option>
+      <option value="rent">Rent</option>
+      <option value="sale">Sale</option>
+      <option value="available">Available</option>
+      <option value="under_maintenance">Under Maintenance</option>
+    </select>
+  </div>
 
-            <div class="flex items-center" >
-              <label class="mr-2 text-sm text-gray-600">Status</label>
-              <select
-                @change="fetchProperties()"
-                v-model="status"
-                class="px-2 py-1 border rounded-md text-sm"
-              >
-                <option value="">All</option>
-                <option value="rent">Rent</option>
-                <option value="sale">Sale</option>
-                <option value="available">available</option>
-                <option value="under_maintenance">Under Maintenance</option>
-              </select>
-            </div>
-
-
-            <div class="ml-4">
-              <label for="pageSize" class="mr-2 text-gray-700">Show</label>
-              <select
-                id="pageSize"
-                v-model="pageSize"
-                @change="fetchProperties()"
-                class="border px-2 py-1 rounded"
-              >
-                <option v-for="size in pageSizes" :key="size" :value="size">
-                  {{ size }}
-                </option>
-              </select>
-              <span class="ml-1 text-gray-700">per page</span>
-            </div>
-          </div>
+  <!-- Page Size -->
+  <div
+    class="flex flex-col sm:flex-row items-start sm:items-center w-full sm:w-auto lg:w-auto"
+  >
+    <label for="pageSize" class="mr-2 text-gray-700 text-sm mb-1 sm:mb-0"
+      >Show</label
+    >
+    <div class="flex items-center">
+      <select
+        id="pageSize"
+        v-model="pageSize"
+        @change="fetchProperties()"
+        class="border px-3 py-2 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+      >
+        <option v-for="size in pageSizes" :key="size" :value="size">
+          {{ size }}
+        </option>
+      </select>
+      <span class="ml-1 text-gray-700 text-sm">per page</span>
+    </div>
+  </div>
+</div>
 
           <!-- Table -->
           <div class="overflow-x-auto">

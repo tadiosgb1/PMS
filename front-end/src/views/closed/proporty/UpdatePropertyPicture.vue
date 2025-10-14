@@ -116,7 +116,7 @@ export default {
         const msg = res?.message || 'Property picture updated';
         this.$root.$refs.toast.showToast(msg, 'success');
         this.$emit('refresh');
-        setTimeout(() => this.$emit('close'), 1000);
+          this.$emit("close");
       } catch (err) {
         console.error(err);
         alert('Failed to update property picture');

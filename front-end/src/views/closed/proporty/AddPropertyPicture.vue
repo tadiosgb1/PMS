@@ -116,6 +116,8 @@ export default {
         this.$root.$refs.toast.showToast(msg, 'success');
         this.$emit('refresh');
         this.$emit('close');
+         //this.$reloadPage();
+
 
         // Reset form
         this.form.description = '';

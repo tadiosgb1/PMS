@@ -17,9 +17,19 @@
         <!-- Content -->
         <div class="p-6">
           <!-- Property Title -->
-          <h1 v-if="property" class="text-2xl font-bold mb-4">
-            Property Name: {{ property.name }}
-          </h1>
+          <div v-if="property" class="flex items-center justify-between mb-4">
+  <h1 class="text-2xl font-bold">
+    Property Name: {{ property.name }}
+  </h1>
+  <button
+    v-if="$hasPermission('pms.change_property')"
+    @click="editProperty(property)"
+    class="text-blue-600 hover:text-blue-800"
+    title="Edit"
+  >
+    <i class="fas fa-edit"></i>Edit Property
+  </button>
+</div>
           <p v-else>Loading...</p>
 
           <!-- Property Details -->
@@ -136,6 +146,15 @@
       @cancel="confirmDeleteVisible = false"
     />
 
+     <!-- 🆕 Add Update Property Modal -->
+    <UpdateProperty
+      v-if="updateVisible"
+      :visible="updateVisible"
+      :property="propertyToEdit"
+      @close="updateVisible = false"
+      @refresh="fetchProperty"
+    />
+
     <!-- Image Preview Modal -->
     <div
       v-if="imagePreviewVisible"
@@ -162,6 +181,7 @@
 import AddPictureModal from "@/views/closed/proporty/AddPropertyPicture.vue";
 import UpdatePictureModal from "@/views/closed/proporty/UpdatePropertyPicture.vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
+import UpdateProperty from "@/views/closed/proporty/update.vue"; // 🆕 added
 import Toast from "../../../components/Toast.vue";
 import Maintenance from "@/views/closed/maintenanceRequests/view1.vue";
 
@@ -170,6 +190,7 @@ export default {
   components: {
     AddPictureModal,
     UpdatePictureModal,
+    UpdateProperty, // 🆕 added
     ConfirmModal,
     Toast,
     Maintenance,
@@ -186,6 +207,8 @@ export default {
       maintenanceView: false,
       imagePreviewVisible: false,
       imageToPreview: null,
+       updateVisible: false, // 🆕 added
+      propertyToEdit: null, // 🆕 added
     };
   },
   computed: {
@@ -203,6 +226,11 @@ export default {
     this.fetchProperty();
   },
   methods: {
+     // 🆕 Open update modal
+    editProperty(property) {
+      this.propertyToEdit = property;
+      this.updateVisible = true;
+    },
     async fetchProperty() {
       try {
         const res = await this.$apiGet(
@@ -229,11 +257,11 @@ export default {
         const res = await this.$apiDelete(
           `/delete_property_picture/${this.pictureToDelete.id}`
         );
-        this.$refs.toast.showToast(res.message || "Picture deleted successfully", "success");
+        this.$root.$refs.toast.showToast(res.message || "Picture deleted successfully", "success");
         this.fetchProperty();
       } catch (err) {
         console.error(err);
-        this.$refs.toast.showToast("Failed to delete picture.", "error");
+        this.$root.$refs.toast.showToast("Failed to delete picture.", "error");
       }
       this.pictureToDelete = null;
     },
