@@ -153,16 +153,31 @@ export default {
       this.resetForm();
       this.managerVisible = false;
     },
-    async submitForm() {
-      console.log("this.form",this.form)
-      const res = await this.$apiPost('/sign_up',this.form);
-      console.log("res staff add",res);
-      if(res){
-        alert("Successfully registered")
-      }
-      this.resetForm();
-      this.close();
-    },
+async submitForm() {
+  console.log("this.form", this.form);
+
+  try {
+    const res = await this.$apiPost('/sign_up', this.form);
+    console.log("res staff add", res);
+
+    if (res) {
+      this.$root.$refs.toast.showToast("Successfully registered", "success");
+      // or if you prefer alert:
+      // alert("Successfully registered");
+    }
+
+    this.resetForm();
+    this.close();
+
+  } catch (err) {
+    console.error("Error registering staff:", err);
+    this.$root.$refs.toast.showToast(err.message || "Failed to register", "error");
+
+  } finally {
+    // any cleanup logic or loading state reset can go here
+  }
+},
+
     resetForm() {
       this.form = {
         email: "",

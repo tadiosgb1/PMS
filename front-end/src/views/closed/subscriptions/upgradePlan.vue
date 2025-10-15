@@ -132,7 +132,7 @@ export default {
         setTimeout(() => this.$emit("close"), 3000);
       } catch (error) {
         console.error("Upgrade failed", error);
-        this.$refs.toast?.showErrorToastMessage("Failed to upgrade plan.");
+       this.$root.$refs.toast.showToast(error.message,'error');
       } finally {
         this.updating = false;
       }

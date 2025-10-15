@@ -106,7 +106,8 @@ export default {
         this.$emit('close');
       } catch (err) {
         console.error(err);
-        alert('Failed to update group. Please try again.');
+        //alert('Failed to update group. Please try again.');
+         this.$root.$refs.toast.showToast(err.message,"error")
       }
     }
   }

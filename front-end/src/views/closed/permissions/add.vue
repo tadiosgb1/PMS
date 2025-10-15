@@ -68,7 +68,8 @@ export default {
 }, 3000); // 3000 milliseconds = 3 seconds
       } catch (error) {
         console.error("Error saving permission:", error);
-        alert("Failed to save permission.");
+        this.$root.$refs.toast.showToast(error.message,"error")
+       // alert("Failed to save permission.");
       }
     },
   },

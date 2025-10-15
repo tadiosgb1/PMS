@@ -195,9 +195,7 @@ export default {
         };
         const userResponse = await this.$apiPost("/post_user", userPayload);
         console.log("userResponse", userResponse);
-
         const userId = userResponse.id; // make sure your API returns user ID
-
         // 2️⃣ Create Broker with User ID
         const brokerPayload = {
           license_number: this.form.license_number,
@@ -206,7 +204,6 @@ export default {
           user: userId,
         };
         await this.$apiPost("/post_broker_profile", brokerPayload);
-
         this.$root.$refs.toast.showToast(
           "Broker added successfully",
           "success"
@@ -218,7 +215,7 @@ export default {
       } catch (error) {
         console.error("Error creating user/broker", error);
         this.$root.$refs.toast.showToast(
-          "Failed to create user or broker",
+         error.message,
           "error"
         );
       }

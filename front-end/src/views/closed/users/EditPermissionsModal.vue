@@ -86,7 +86,8 @@ export default {
         this.$emit("close");
       } catch (err) {
         console.error("Failed to save permissions:", err);
-        alert("Failed to save permissions");
+       // alert("Failed to save permissions");
+        this.$root.$refs.toast.showToast(error.message,"error")
       }
     },
   },

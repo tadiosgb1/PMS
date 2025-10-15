@@ -156,7 +156,7 @@ export default {
         }, 3000);
       } catch (error) {
         console.error("Failed to add subscription:", error);
-        this.$root.$refs.toast.showToast("Failed to add subscription", "error");
+        this.$root.$refs.toast.showToast(error.message, "error");
       }
     },
   },
