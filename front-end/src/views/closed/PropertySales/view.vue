@@ -248,14 +248,14 @@
       <AddSale
         :visible="showAddSale"
         @close="showAddSale = false"
-        @success="fetchSales()"
+        @ref="fetchSales()"
       />
 
       <UpdateSale
         :visible="showUpdateSale"
         :sale="selectedSale"
         @close="showUpdateSale = false"
-        @success="fetchSales()"
+        @refresh="fetchSales()"
       />
     </div>
   </div>
