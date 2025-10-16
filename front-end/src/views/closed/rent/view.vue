@@ -311,10 +311,11 @@ export default {
     this.fetchRents();
   },
   methods: {
-   goToPayments(rental_id) {
-      this.$router.push({
+   goToPayments(rentId) {
+   
+     this.$router.push({
           name: "rents_payment_detail",
-          params: { id: rental_id },
+          params: { id: rentId },
         });
     },
 

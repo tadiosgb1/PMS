@@ -170,7 +170,6 @@
         Next
       </button>
     </div>
-    {{ this.$route.params.id }}ugyyyctyjyg
   </div>
 </template>
 
