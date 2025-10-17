@@ -1,24 +1,22 @@
 <template>
-  <div class="min-h-screen bg-gray-100">
+  <div class="min-h-screen bg-gray-100 p-4 sm:p-6">
     <div class="bg-white shadow-md rounded-lg overflow-hidden">
-      <!-- Header with Add button -->
+      <!-- Header -->
       <div
         class="bg-primary text-white px-6 py-4 text-xl font-bold flex justify-between items-center"
       >
         Super Staff Users
         <button
           @click="showAddModal = true"
-          class="bg-white text-blue-700 font-semibold px-2 lg:px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300 flex items-center"
+          class="bg-white text-blue-700 font-semibold px-3 sm:px-4 py-2 rounded-lg shadow hover:bg-gray-100 transition flex items-center border border-gray-300"
         >
-          <span class="text-primary mr-1">+</span> Add
+          <span class="text-primary mr-1 text-lg">+</span> Add
         </button>
       </div>
 
-      <!-- Table -->
-      <div class="p-6 overflow-x-auto">
-        <table
-          class="min-w-full table-auto border-collapse border border-gray-300 text-sm"
-        >
+      <!-- Desktop Table -->
+      <div class="hidden md:block p-6 overflow-x-auto">
+        <table class="min-w-full border-collapse border border-gray-300 text-sm">
           <thead>
             <tr class="bg-gray-200 text-gray-700">
               <th
@@ -52,37 +50,37 @@
                 {{ user.groups.join(", ") }}
               </td>
               <td class="border border-gray-300 px-4 py-2">
-                {{ user.is_active ? "Yes" : "No" }}
+                <span
+                  :class="user.is_active ? 'text-green-600 font-semibold' : 'text-red-600 font-semibold'"
+                >
+                  {{ user.is_active ? "Active" : "Inactive" }}
+                </span>
               </td>
-              <td class="flex flex row border border-gray-300 px-4 py-2 text-center space-x-2">
+              <td
+                class="border border-gray-300 px-4 py-2 text-center space-x-2 flex justify-center"
+              >
                 <button
-                    class="flex items-center px-3 py-1.5 bg-blue-50 text-blue-700 text-sm font-medium rounded-lg border border-blue-200 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-200 transition"
-                    @click="goToDetail(user.id)"
-                  >
-                    <i class="fas fa-info-circle"></i> Details
-                  </button>
+                  class="px-3 py-1.5 bg-blue-50 text-blue-700 text-sm font-medium rounded-lg border border-blue-200 hover:bg-blue-100 transition"
+                  @click="goToDetail(user.id)"
+                >
+                  Details
+                </button>
 
-                  <!-- Activate / Deactivate -->
-                  <button
-                    v-if="!user.is_active"
-                    @click="activateUser(user.id)"
-                    class="flex items-center px-3 py-1.5 bg-green-50 text-green-700 text-sm font-medium rounded-lg border border-green-200 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-blue-200 transition"
-                  >
-                    <i class="fas fa-check-circle"></i> Activate
-                  </button>
-                  <button
-                    v-else
-                    @click="deactivateUser(user.id)"
-                    class="flex items-center px-3 py-1.5 bg-orange-50 text-orange-700 text-sm font-medium rounded-lg border border-orange-200 hover:bg-orange-100 focus:outline-none focus:ring-2 focus:ring-orange-200 transition"
-                  >
-                    <i class="fas fa-ban mr-1"></i> Deactivate
-                  </button>
-
-
-                
+                <button
+                  v-if="!user.is_active"
+                  @click="activateUser(user.id)"
+                  class="px-3 py-1.5 bg-green-50 text-green-700 text-sm font-medium rounded-lg border border-green-200 hover:bg-green-100 transition"
+                >
+                  Activate
+                </button>
+                <button
+                  v-else
+                  @click="deactivateUser(user.id)"
+                  class="px-3 py-1.5 bg-orange-50 text-orange-700 text-sm font-medium rounded-lg border border-orange-200 hover:bg-orange-100 transition"
+                >
+                  Deactivate
+                </button>
               </td>
-
-
             </tr>
             <tr v-if="superStaffs.length === 0">
               <td colspan="4" class="text-center py-6 text-gray-500">
@@ -91,6 +89,60 @@
             </tr>
           </tbody>
         </table>
+      </div>
+
+      <!-- ✅ Mobile / Tablet List View -->
+      <div class="block md:hidden p-4 space-y-4">
+        <div
+          v-for="user in sortedSuperStaffs"
+          :key="user.id"
+          class="bg-gray-50 rounded-xl shadow-sm p-4 border border-gray-200 hover:shadow-md transition"
+        >
+          <div class="flex justify-between items-center mb-2">
+            <h3 class="text-base font-semibold text-gray-900">
+              {{ user.first_name }} {{ user.middle_name }} {{ user.last_name }}
+            </h3>
+            <span
+              :class="user.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'"
+              class="px-2 py-1 text-xs font-semibold rounded-full"
+            >
+              {{ user.is_active ? 'Active' : 'Inactive' }}
+            </span>
+          </div>
+
+          <p class="text-sm text-gray-600 mb-3">
+            <strong>Groups:</strong> {{ user.groups.join(", ") }}
+          </p>
+
+          <div class="flex flex-wrap gap-2">
+            <button
+              class="px-3 py-1.5 bg-blue-50 text-blue-700 text-sm font-medium rounded-lg border border-blue-200 hover:bg-blue-100 transition"
+              @click="goToDetail(user.id)"
+            >
+              Details
+            </button>
+
+            <button
+              v-if="!user.is_active"
+              @click="activateUser(user.id)"
+              class="px-3 py-1.5 bg-green-50 text-green-700 text-sm font-medium rounded-lg border border-green-200 hover:bg-green-100 transition"
+            >
+              Activate
+            </button>
+
+            <button
+              v-else
+              @click="deactivateUser(user.id)"
+              class="px-3 py-1.5 bg-orange-50 text-orange-700 text-sm font-medium rounded-lg border border-orange-200 hover:bg-orange-100 transition"
+            >
+              Deactivate
+            </button>
+          </div>
+        </div>
+
+        <div v-if="superStaffs.length === 0" class="text-center text-gray-500 py-6">
+          No super staff found.
+        </div>
       </div>
     </div>
 
@@ -103,6 +155,7 @@
     />
   </div>
 </template>
+
 
 <script>
 import Addsuperstaff from "./addSuperStaff.vue";

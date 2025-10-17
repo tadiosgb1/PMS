@@ -1,143 +1,255 @@
 <template>
   <div>
     <Toast ref="toast" />
-    <div class="min-h-screen bg-gray-100 p-6">
+
+    <div class="min-h-screen bg-gray-100 p-4 lg:p-6">
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
         <!-- Header -->
-        <div class="bg-primary text-white px-6 py-4 text-xl font-bold flex justify-between items-center">
+        <div
+          class="bg-primary text-white px-4 lg:px-6 py-4 text-lg lg:text-xl font-bold flex justify-between items-center"
+        >
           Property Zones
           <button
             v-if="$hasPermission('pms.add_propertyzone')"
             @click="visible = true"
-            class="bg-white text-blue-700 font-semibold px-1 lg:px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300"
+            class="bg-white text-blue-700 font-semibold px-3 py-2 rounded shadow hover:bg-gray-100 transition-all duration-200 border border-gray-300"
           >
             <span class="text-primary">+</span> Add Zone
           </button>
         </div>
 
-        <!-- Content -->
-        <div class="p-6">
-          <!-- Search & Page Size -->
-          <div class="flex justify-between items-center mb-6">
-            <input
-              v-model="searchTerm"
-              @input="onSearch"
-              type="search"
-              placeholder="Search Zone..."
-              class="w-full max-w-md px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+        <!-- Search & Page Size -->
+        <div class="p-4 flex flex-col lg:flex-row justify-between items-center gap-4">
+          <input
+            v-model="searchTerm"
+            @input="onSearch"
+            type="search"
+            placeholder="Search Zone..."
+            class="w-full lg:max-w-md px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
 
-            <div class="ml-4">
-              <label for="pageSize" class="mr-2 text-gray-700">Show</label>
-              <select
-                id="pageSize"
-                v-model="pageSize"
-                @change="fetchZones()"
-                class="border px-2 py-1 rounded"
+          <div class="flex items-center">
+            <label for="pageSize" class="mr-2 text-gray-700 text-sm">Show</label>
+            <select
+              id="pageSize"
+              v-model="pageSize"
+              @change="fetchZones()"
+              class="border px-2 py-1 rounded text-sm"
+            >
+              <option v-for="size in pageSizes" :key="size" :value="size">
+                {{ size }}
+              </option>
+            </select>
+            <span class="ml-1 text-gray-700 text-sm">per page</span>
+          </div>
+        </div>
+
+        <!-- Table (Desktop) -->
+        <div class="hidden lg:block overflow-x-auto p-4">
+          <table
+            class="min-w-full table-auto border-collapse border border-gray-300 text-sm"
+          >
+            <thead>
+              <tr class="bg-gray-200 text-gray-700">
+                <th class="border px-4 py-2 cursor-pointer" @click="sortBy('name')">
+                  Name
+                  <SortIcon :field="'name'" :sort-key="sortKey" :sort-asc="sortAsc" />
+                </th>
+                <th class="border px-4 py-2 cursor-pointer" @click="sortBy('address')">
+                  Address
+                  <SortIcon :field="'address'" :sort-key="sortKey" :sort-asc="sortAsc" />
+                </th>
+                <th class="border px-4 py-2 cursor-pointer" @click="sortBy('city')">
+                  City
+                  <SortIcon :field="'city'" :sort-key="sortKey" :sort-asc="sortAsc" />
+                </th>
+                <th class="border px-4 py-2 cursor-pointer" @click="sortBy('state')">
+                  State
+                  <SortIcon :field="'state'" :sort-key="sortKey" :sort-asc="sortAsc" />
+                </th>
+                <th class="border px-4 py-2">Owner</th>
+                <th class="border px-4 py-2">Manager</th>
+                <th class="border px-4 py-2 text-center">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr
+                v-for="zone in filteredAndSortedZones"
+                :key="zone.id"
+                class="hover:bg-gray-100"
               >
-                <option v-for="size in pageSizes" :key="size" :value="size">{{ size }}</option>
-              </select>
-              <span class="ml-1 text-gray-700">per page</span>
+                <td class="border px-4 py-2">{{ zone.name }}</td>
+                <td class="border px-4 py-2">{{ zone.address }}</td>
+                <td class="border px-4 py-2">{{ zone.city }}</td>
+                <td class="border px-4 py-2">{{ zone.state }}</td>
+                <td class="border px-4 py-2">
+                  {{ zone.ownerName }}
+                  <button
+                    class="ml-2 text-blue-600 hover:underline"
+                    @click="goToDetail(zone.owner_id)"
+                  >
+                    Details
+                  </button>
+                </td>
+                <td class="border px-4 py-2">
+                  {{ zone.managerName }}
+                  <button
+                    class="ml-2 text-blue-600 hover:underline"
+                    @click="goToDetail(zone.manager_id)"
+                  >
+                    Details
+                  </button>
+                </td>
+                <td class="border px-4 py-2 text-center space-x-2">
+                  <button
+                    @click="goToZoneDetail(zone.id)"
+                    class="text-green-600 hover:text-green-800"
+                    title="Detail"
+                    :disabled="!zone.id"
+                  >
+                    <i class="fas fa-info-circle"></i>
+                  </button>
+                  <button
+                    v-if="$hasPermission('pms.change_propertyzone')"
+                    @click="editZone(zone)"
+                    class="text-blue-600 hover:text-blue-800"
+                  >
+                    <i class="fas fa-edit"></i>
+                  </button>
+                  <button
+                    v-if="$hasPermission('pms.delete_propertyzone')"
+                    @click="askDeleteConfirmation(zone)"
+                    class="text-red-600 hover:text-red-800"
+                  >
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                  <button
+                    @click="properties(zone.id)"
+                    class="text-blue-600 hover:text-blue-800"
+                  >
+                    Properties
+                  </button>
+                </td>
+              </tr>
+
+              <tr v-if="filteredAndSortedZones.length === 0">
+                <td colspan="7" class="text-center py-6 text-gray-500">
+                  No zones found.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Mobile Cards -->
+        <div class="block lg:hidden p-4 space-y-4">
+          <div
+            v-for="zone in filteredAndSortedZones"
+            :key="zone.id"
+            class="bg-white border rounded-lg shadow-sm p-4"
+          >
+            <div class="flex justify-between items-center">
+              <h3 class="font-semibold text-gray-800">{{ zone.name }}</h3>
+              <span class="text-sm text-gray-500">{{ zone.state }}</span>
+            </div>
+            <p class="text-gray-600 text-sm mt-1">{{ zone.address }}</p>
+            <p class="text-gray-600 text-sm">{{ zone.city }}</p>
+
+            <div class="mt-3 text-sm">
+              <p>
+                <strong>Owner:</strong> {{ zone.ownerName }}
+                <button
+                  class="text-blue-600 ml-1"
+                  @click="goToDetail(zone.owner_id)"
+                >
+                  Details
+                </button>
+              </p>
+              <p>
+                <strong>Manager:</strong> {{ zone.managerName }}
+                <button
+                  class="text-blue-600 ml-1"
+                  @click="goToDetail(zone.manager_id)"
+                >
+                  Details
+                </button>
+              </p>
+            </div>
+
+            <div class="mt-3 flex flex-wrap gap-2">
+              <button
+                @click="goToZoneDetail(zone.id)"
+                class="px-3 py-1 text-green-700 border border-green-300 rounded-lg text-xs"
+              >
+                Detail
+              </button>
+              <button
+                v-if="$hasPermission('pms.change_propertyzone')"
+                @click="editZone(zone)"
+                class="px-3 py-1 text-blue-700 border border-blue-300 rounded-lg text-xs"
+              >
+                Edit
+              </button>
+              <button
+                v-if="$hasPermission('pms.delete_propertyzone')"
+                @click="askDeleteConfirmation(zone)"
+                class="px-3 py-1 text-red-700 border border-red-300 rounded-lg text-xs"
+              >
+                Delete
+              </button>
+              <button
+                @click="properties(zone.id)"
+                class="px-3 py-1 text-blue-700 border border-blue-300 rounded-lg text-xs"
+              >
+                Properties
+              </button>
             </div>
           </div>
 
-          <!-- Table -->
-          <div class="overflow-x-auto">
-            <table class="min-w-full table-auto border-collapse border border-gray-300">
-              <thead>
-                <tr class="bg-gray-200 text-gray-700">
-                  <th class="border px-4 py-2 cursor-pointer" @click="sortBy('name')">
-                    Name
-                    <SortIcon :field="'name'" :sort-key="sortKey" :sort-asc="sortAsc" />
-                  </th>
-                  <th class="border px-4 py-2 cursor-pointer" @click="sortBy('address')">
-                    Address
-                    <SortIcon :field="'address'" :sort-key="sortKey" :sort-asc="sortAsc" />
-                  </th>
-                  <th class="border px-4 py-2 cursor-pointer" @click="sortBy('city')">
-                    City
-                    <SortIcon :field="'city'" :sort-key="sortKey" :sort-asc="sortAsc" />
-                  </th>
-                  <th class="border px-4 py-2 cursor-pointer" @click="sortBy('state')">
-                    State
-                    <SortIcon :field="'state'" :sort-key="sortKey" :sort-asc="sortAsc" />
-                  </th>
-                  <th class="border px-4 py-2">Owner</th>
-                  <th class="border px-4 py-2">Manager</th>
-                  <th class="border px-4 py-2 text-center">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="zone in filteredAndSortedZones" :key="zone.id" class="hover:bg-gray-100">
-                  <td class="border px-4 py-2">{{ zone.name }}</td>
-                  <td class="border px-4 py-2">{{ zone.address }}</td>
-                  <td class="border px-4 py-2">{{ zone.city }}</td>
-                  <td class="border px-4 py-2">{{ zone.state }}</td>
-                  <td class="border px-4 py-2">{{ zone.ownerName }}   <button
-                    class="flex items-center px-3 py-1.5 bg-blue-50 text-blue-700 text-sm font-medium rounded-lg border border-blue-200 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-200 transition"
-                    @click="goToDetail(zone.owner_id)"
-                  >
-                    <i class="fas fa-info-circle"></i> Details
-                  </button></td>
-                  <td class="border px-4 py-2">{{ zone.managerName }}   <button
-                    class="flex items-center px-3 py-1.5 bg-blue-50 text-blue-700 text-sm font-medium rounded-lg border border-blue-200 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-200 transition"
-                    @click="goToDetail(zone.manager_id)"
-                  >
-                    <i class="fas fa-info-circle"></i> Details
-                  </button></td>
-                  <td class="border px-4 py-2 text-center space-x-2">
-                   
-                    <button
-                      @click="goToZoneDetail(zone.id)"
-                      class="text-green-600 hover:text-green-800"
-                      title="Detail"
-                      :disabled="!zone.id"
-                    >
-                       <i class="fas fa-info-circle"></i>
-                    </button>
-                  
-                    <button v-if="$hasPermission('pms.change_propertyzone')" @click="editZone(zone)" class="text-blue-600 hover:text-blue-800">
-                      <i class="fas fa-edit"></i>
-                    </button>
-                    <button v-if="$hasPermission('pms.delete_propertyzone')" @click="askDeleteConfirmation(zone)" class="text-red-600 hover:text-red-800">
-                      <i class="fas fa-trash-alt"></i>
-                    </button>
-                    <button @click="properties(zone.id)" class="text-blue-600 hover:text-blue-800">
-                      Properties
-                    </button>
-                  </td>
-                </tr>
-                <tr v-if="filteredAndSortedZones.length === 0">
-                  <td colspan="7" class="text-center py-6 text-gray-500">No zones found.</td>
-                </tr>
-              </tbody>
-            </table>
+          <div
+            v-if="filteredAndSortedZones.length === 0"
+            class="text-center text-gray-500 py-6"
+          >
+            No zones found.
           </div>
+        </div>
 
-          <!-- Pagination -->
-          <div class="flex justify-between items-center mt-4">
-            <button
-              :disabled="currentPage <= 1"
-              @click="changePage(currentPage - 1)"
-              class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
-            >
-              Previous
-            </button>
-            <span class="text-gray-600">Page {{ currentPage }} of {{ totalPages }}</span>
-            <button
-              :disabled="currentPage >= totalPages"
-              @click="changePage(currentPage + 1)"
-              class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
-            >
-              Next
-            </button>
-          </div>
+        <!-- Pagination -->
+        <div class="flex justify-between items-center p-4 border-t">
+          <button
+            :disabled="currentPage <= 1"
+            @click="changePage(currentPage - 1)"
+            class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+          >
+            Previous
+          </button>
+          <span class="text-gray-600 text-sm"
+            >Page {{ currentPage }} of {{ totalPages }}</span
+          >
+          <button
+            :disabled="currentPage >= totalPages"
+            @click="changePage(currentPage + 1)"
+            class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
+          >
+            Next
+          </button>
         </div>
       </div>
 
       <!-- Modals -->
-      <AddZone v-if="visible" :visible="visible" @close="visible = false" @refresh="fetchZones" />
-      <UpdateZone v-if="updateVisible" :visible="updateVisible" :zone="zoneToEdit" @close="updateVisible = false" @refresh="fetchZones" />
+      <AddZone
+        v-if="visible"
+        :visible="visible"
+        @close="visible = false"
+        @refresh="fetchZones"
+      />
+      <UpdateZone
+        v-if="updateVisible"
+        :visible="updateVisible"
+        :zone="zoneToEdit"
+        @close="updateVisible = false"
+        @refresh="fetchZones"
+      />
       <ConfirmModal
         v-if="confirmVisible"
         :visible="confirmVisible"
@@ -149,6 +261,7 @@
     </div>
   </div>
 </template>
+
 
 <script>
 import Toast from "../../../components/Toast.vue";

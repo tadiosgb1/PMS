@@ -1,7 +1,7 @@
 <template>
   <div>
     <Toast ref="toast" />
-    <div class="min-h-screen bg-gray-100 p-6">
+    <div class="min-h-screen bg-gray-100 p-4 sm:p-6">
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
         <!-- Header -->
         <div
@@ -13,7 +13,7 @@
         <!-- Tabs -->
         <div class="border-b border-gray-200">
           <nav
-            class="-mb-px flex overflow-x-auto no-scrollbar px-2 sm:px-6 space-x-4 sm:space-x-6"
+            class="flex flex-wrap justify-center sm:justify-start gap-2 sm:gap-4 px-2 sm:px-6 py-2"
             aria-label="Tabs"
           >
             <button
@@ -61,7 +61,6 @@
               Managers
             </button>
 
-            <!-- New Brokers Tab -->
             <button
               @click="activeTab = 'brokers'"
               class="tab-link"
@@ -71,7 +70,7 @@
             </button>
 
             <button
-             v-if="$hasPermission('pms.view_rentcycle') || is_superuser"
+              v-if="$hasPermission('pms.view_rentcycle') || is_superuser"
               @click="activeTab = 'tenants'"
               class="tab-link"
               :class="{ 'tab-active': activeTab === 'tenants' }"
@@ -82,7 +81,7 @@
         </div>
 
         <!-- Tab Content -->
-        <div class="p-6">
+        <div class="p-4 sm:p-6">
           <component :is="activeTabComponent" />
         </div>
       </div>
@@ -97,8 +96,6 @@ import managers from "../managers/view.vue";
 import owners from "../owners/view.vue";
 import tenants from "../tenant/view.vue";
 import superStaffs from "./superStaf.vue";
-
-// import your Brokers component
 import brokers from "../brokers/view.vue";
 
 export default {
@@ -109,20 +106,15 @@ export default {
     managers,
     owners,
     tenants,
-    brokers, // add Brokers here
+    brokers,
   },
   data() {
     const is_superuser = localStorage.getItem("is_superuser") === "true";
-    // set default tab based on role/permissions
-    let defaultTab = "tenants"; // fallback for normal users
 
-    if (is_superuser) {
-      defaultTab = "allUsers";
-    } else if (this.$hasPermission("pms.view_ownerstaff")) {
-      defaultTab = "staffs";
-    } else if (this.$hasPermission("pms.view_ownermanager")) {
-      defaultTab = "managers";
-    }
+    let defaultTab = "tenants";
+    if (is_superuser) defaultTab = "allUsers";
+    else if (this.$hasPermission("pms.view_ownerstaff")) defaultTab = "staffs";
+    else if (this.$hasPermission("pms.view_ownermanager")) defaultTab = "managers";
 
     return {
       is_superuser,
@@ -140,18 +132,14 @@ export default {
 
 <style scoped>
 .tab-link {
-  @apply whitespace-nowrap py-3 px-4 border-b-2 font-medium text-sm text-gray-500 hover:text-primary hover:border-primary transition;
+  @apply py-2 px-3 sm:px-4 border-b-2 border-transparent text-sm font-medium text-gray-600 bg-gray-50 rounded-md hover:text-primary hover:bg-blue-50 hover:border-primary transition-all;
 }
 .tab-active {
-  @apply border-primary text-primary;
+  @apply text-primary bg-blue-100 border-primary font-semibold;
 }
 
-/* Hide scrollbar on mobile */
-.no-scrollbar::-webkit-scrollbar {
-  display: none;
-}
-.no-scrollbar {
-  -ms-overflow-style: none; /* IE/Edge */
-  scrollbar-width: none; /* Firefox */
+/* Ensure wrapping looks clean */
+nav {
+  flex-wrap: wrap;
 }
 </style>

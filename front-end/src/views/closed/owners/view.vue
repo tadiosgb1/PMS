@@ -2,82 +2,159 @@
   <div>
     <Toast ref="toast" />
 
-    <div class="min-h-screen bg-gray-100">
+    <div class="min-h-screen bg-gray-100 p-4">
+      <!-- Card Container -->
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
-        <div class="bg-primary text-white px-6 py-4 text-xl font-bold flex justify-between items-center">
-          Owners
-          <button v-if="showAdd"
+        <!-- Header -->
+        <div
+          class="bg-primary text-white px-6 py-4 text-xl font-bold flex justify-between items-center flex-wrap gap-3"
+        >
+          <span>Owners</span>
+
+          <button
+            v-if="showAdd"
             @click="visible = true"
-            class="bg-white text-blue-700 font-semibold px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300"
+            class="bg-white text-blue-700 font-semibold px-4 py-2 rounded-lg shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300"
           >
-            <span class="text-primary">+</span> Add Owner
+            <span class="text-primary text-xl font-bold mr-1">+</span>
+            Add Owner
           </button>
         </div>
 
-        <div class="p-6">
-          <!-- Search -->
+        <!-- Search -->
+        <div class="p-4 border-b bg-gray-50">
           <input
             v-model="searchTerm"
             type="search"
             placeholder="Search owner..."
-            class="w-full max-w-md px-4 py-2 mb-6 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="w-full md:max-w-md px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
+        </div>
 
-          <!-- Table -->
-          <div class="overflow-x-auto">
-            <table class="min-w-full table-auto border-collapse border border-gray-300">
-              <thead>
-                <tr class="bg-gray-200 text-gray-700">
-                  <th class="border border-gray-300 px-4 py-2 cursor-pointer" @click="sortBy('full_name')">
-                    Full Name
-                    <SortIcon :field="'full_name'" :sort-key="sortKey" :sort-asc="sortAsc" />
-                  </th>
-                  <th class="border border-gray-300 px-4 py-2 text-center">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="owner in filteredAndSortedOwners"
-                  :key="owner.id"
-                  class="hover:bg-gray-100"
+        <!-- Desktop Table -->
+        <div class="hidden md:block p-4 overflow-x-auto">
+          <table class="min-w-full table-auto border-collapse border border-gray-300 rounded-lg overflow-hidden">
+            <thead>
+              <tr class="bg-gray-200 text-gray-700">
+                <th
+                  class="border border-gray-300 px-4 py-2 text-left cursor-pointer"
+                  @click="sortBy('full_name')"
                 >
-                  <td class="border border-gray-300 px-4 py-2">{{ owner.full_name }}</td>
-                  <td class="flex flex-row border border-gray-300 px-4 py-2 text-center space-x-2">
-                   <button
-                    class="flex items-center px-3 py-1.5 bg-blue-50 text-blue-700 text-sm font-medium rounded-lg border border-blue-200 hover:bg-blue-100 focus:outline-none focus:ring-2 focus:ring-blue-200 transition"
-                    @click="goToDetail(owner.id)"
-                  >
-                    <i class="fas fa-info-circle"></i> Details
-                  </button>
+                  Full Name
+                  <SortIcon
+                    :field="'full_name'"
+                    :sort-key="sortKey"
+                    :sort-asc="sortAsc"
+                  />
+                </th>
+                <th class="border border-gray-300 px-4 py-2 text-center">
+                  Actions
+                </th>
+              </tr>
+            </thead>
 
-                  <!-- Activate / Deactivate -->
-                  <button
-                    v-if="!owner.is_active"
-                    @click="activateUser(owner.id)"
-                    class="flex items-center px-3 py-1.5 bg-green-50 text-green-700 text-sm font-medium rounded-lg border border-green-200 hover:bg-green-100 focus:outline-none focus:ring-2 focus:ring-blue-200 transition"
-                  >
-                    <i class="fas fa-check-circle"></i> Activate
-                  </button>
-                  <button
-                    v-else
-                    @click="deactivateUser(owner.id)"
-                    class="flex items-center px-3 py-1.5 bg-orange-50 text-orange-700 text-sm font-medium rounded-lg border border-orange-200 hover:bg-orange-100 focus:outline-none focus:ring-2 focus:ring-orange-200 transition"
-                  >
-                    <i class="fas fa-ban mr-1"></i> Deactivate
-                  </button>
-                  </td>
-                </tr>
-                <tr v-if="filteredAndSortedOwners.length === 0">
-                  <td colspan="2" class="text-center py-6 text-gray-500">No owners found.</td>
-                </tr>
-              </tbody>
-            </table>
+            <tbody>
+              <tr
+                v-for="owner in filteredAndSortedOwners"
+                :key="owner.id"
+                class="hover:bg-gray-100"
+              >
+                <td class="border border-gray-300 px-4 py-2">
+                  {{ owner.full_name }}
+                </td>
+                <td class="border border-gray-300 px-4 py-2 text-center">
+                  <div class="flex justify-center gap-2 flex-wrap">
+                    <button
+                      class="flex items-center gap-1 px-3 py-1.5 bg-blue-50 text-blue-700 text-sm font-medium rounded-lg border border-blue-200 hover:bg-blue-100 transition"
+                      @click="goToDetail(owner.id)"
+                    >
+                      <i class="fas fa-info-circle"></i> Details
+                    </button>
+
+                    <button
+                      v-if="!owner.is_active"
+                      @click="activateUser(owner.id)"
+                      class="flex items-center gap-1 px-3 py-1.5 bg-green-50 text-green-700 text-sm font-medium rounded-lg border border-green-200 hover:bg-green-100 transition"
+                    >
+                      <i class="fas fa-check-circle"></i> Activate
+                    </button>
+                    <button
+                      v-else
+                      @click="deactivateUser(owner.id)"
+                      class="flex items-center gap-1 px-3 py-1.5 bg-orange-50 text-orange-700 text-sm font-medium rounded-lg border border-orange-200 hover:bg-orange-100 transition"
+                    >
+                      <i class="fas fa-ban"></i> Deactivate
+                    </button>
+                  </div>
+                </td>
+              </tr>
+
+              <tr v-if="filteredAndSortedOwners.length === 0">
+                <td colspan="2" class="text-center py-6 text-gray-500">
+                  No owners found.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Mobile / Tablet Cards -->
+        <div class="md:hidden p-4 space-y-4">
+          <div
+            v-for="owner in filteredAndSortedOwners"
+            :key="owner.id"
+            class="border border-gray-200 bg-white rounded-lg shadow-sm p-4"
+          >
+            <div class="flex justify-between items-center mb-2">
+              <h3 class="text-lg font-semibold text-gray-800">
+                {{ owner.full_name }}
+              </h3>
+              <span
+                class="text-xs px-2 py-1 rounded-full"
+                :class="owner.is_active ? 'bg-green-100 text-green-700' : 'bg-orange-100 text-orange-700'"
+              >
+                {{ owner.is_active ? 'Active' : 'Inactive' }}
+              </span>
+            </div>
+
+            <div class="flex flex-wrap gap-2">
+              <button
+                class="flex items-center gap-1 px-3 py-1.5 bg-blue-50 text-blue-700 text-sm font-medium rounded-lg border border-blue-200 hover:bg-blue-100 transition"
+                @click="goToDetail(owner.id)"
+              >
+                <i class="fas fa-info-circle"></i> Details
+              </button>
+
+              <button
+                v-if="!owner.is_active"
+                @click="activateUser(owner.id)"
+                class="flex items-center gap-1 px-3 py-1.5 bg-green-50 text-green-700 text-sm font-medium rounded-lg border border-green-200 hover:bg-green-100 transition"
+              >
+                <i class="fas fa-check-circle"></i> Activate
+              </button>
+              <button
+                v-else
+                @click="deactivateUser(owner.id)"
+                class="flex items-center gap-1 px-3 py-1.5 bg-orange-50 text-orange-700 text-sm font-medium rounded-lg border border-orange-200 hover:bg-orange-100 transition"
+              >
+                <i class="fas fa-ban"></i> Deactivate
+              </button>
+            </div>
+          </div>
+
+          <div v-if="filteredAndSortedOwners.length === 0" class="text-center py-6 text-gray-500">
+            No owners found.
           </div>
         </div>
       </div>
 
       <!-- Add Owner Modal -->
-      <AddOwner v-if="visible" :visible="visible" @close="visible = false" @saved="fetchOwners" />
+      <AddOwner
+        v-if="visible"
+        :visible="visible"
+        @close="visible = false"
+        @saved="fetchOwners"
+      />
 
       <!-- Update Owner Modal -->
       <UpdateOwner
