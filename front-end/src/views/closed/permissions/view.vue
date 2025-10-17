@@ -1,13 +1,13 @@
 <template>
   <div>
     <Toast ref="toast" />
-    <div class="min-h-screen bg-gray-100 p-6">
+    <div class="min-h-screen bg-gray-100 p-4 md:p-6">
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <!-- Header -->
         <div
           class="bg-primary text-white px-6 py-4 text-xl font-bold flex justify-between items-center"
         >
           Permissions
-
           <button
             @click="addVisible = true"
             class="bg-white text-blue-700 font-semibold px-1 lg:px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300"
@@ -22,14 +22,12 @@
             v-model="searchTerm"
             type="search"
             placeholder="Search permissions..."
-            class="w-full max-w-md px-4 py-2 mb-6 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="w-full md:w-1/3 px-4 py-2 mb-6 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 
-          <!-- Table -->
-          <div class="overflow-x-auto">
-            <table
-              class="min-w-full table-auto border-collapse border border-gray-300"
-            >
+          <!-- Table for Desktop -->
+          <div class="hidden md:block overflow-x-auto">
+            <table class="min-w-full table-auto border-collapse border border-gray-300">
               <thead>
                 <tr class="bg-gray-200 text-gray-700">
                   <th
@@ -37,26 +35,16 @@
                     @click="sortBy('name')"
                   >
                     Name
-                    <SortIcon
-                      :field="'name'"
-                      :sort-key="sortKey"
-                      :sort-asc="sortAsc"
-                    />
+                    <SortIcon :field="'name'" :sort-key="sortKey" :sort-asc="sortAsc" />
                   </th>
                   <th
                     class="border border-gray-300 px-4 py-2 cursor-pointer"
                     @click="sortBy('codename')"
                   >
                     Codename
-                    <SortIcon
-                      :field="'codename'"
-                      :sort-key="sortKey"
-                      :sort-asc="sortAsc"
-                    />
+                    <SortIcon :field="'codename'" :sort-key="sortKey" :sort-asc="sortAsc" />
                   </th>
-                  <th class="border border-gray-300 px-4 py-2 text-center">
-                    Actions
-                  </th>
+                  <th class="border border-gray-300 px-4 py-2 text-center">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -65,15 +53,9 @@
                   :key="permission.id"
                   class="hover:bg-gray-100"
                 >
-                  <td class="border border-gray-300 px-4 py-2">
-                    {{ permission.name }}
-                  </td>
-                  <td class="border border-gray-300 px-4 py-2">
-                    {{ permission.codename }}
-                  </td>
-                  <td
-                    class="border border-gray-300 px-4 py-2 text-center space-x-2"
-                  >
+                  <td class="border border-gray-300 px-4 py-2">{{ permission.name }}</td>
+                  <td class="border border-gray-300 px-4 py-2">{{ permission.codename }}</td>
+                  <td class="border border-gray-300 px-4 py-2 text-center space-x-2">
                     <button
                       @click="editPermission(permission)"
                       class="text-blue-600 hover:text-blue-800 focus:outline-none"
@@ -90,14 +72,42 @@
                     </button>
                   </td>
                 </tr>
-
                 <tr v-if="filteredAndSortedPermissions.length === 0">
-                  <td colspan="3" class="text-center py-6 text-gray-500">
-                    No permissions found.
-                  </td>
+                  <td colspan="3" class="text-center py-6 text-gray-500">No permissions found.</td>
                 </tr>
               </tbody>
             </table>
+          </div>
+
+          <!-- Card/List view for Mobile & Tablet -->
+          <div class="md:hidden flex flex-col gap-4">
+            <div
+              v-for="permission in filteredAndSortedPermissions"
+              :key="permission.id"
+              class="bg-gray-50 rounded-lg shadow p-4 flex flex-col gap-2"
+            >
+              <div class="flex justify-between items-center">
+                <h3 class="font-semibold text-lg">{{ permission.name }}</h3>
+                <span class="text-sm text-gray-500">{{ permission.codename }}</span>
+              </div>
+              <div class="flex gap-2 mt-2">
+                <button
+                  @click="editPermission(permission)"
+                  class="flex items-center px-3 py-1.5 bg-blue-50 text-blue-700 text-sm font-medium rounded-lg border border-blue-200 hover:bg-blue-100 transition"
+                >
+                  <i class="fas fa-edit mr-1"></i> Edit
+                </button>
+                <button
+                  @click="deletePermission(permission)"
+                  class="flex items-center px-3 py-1.5 bg-red-50 text-red-700 text-sm font-medium rounded-lg border border-red-200 hover:bg-red-100 transition"
+                >
+                  <i class="fas fa-trash-alt mr-1"></i> Delete
+                </button>
+              </div>
+            </div>
+            <div v-if="filteredAndSortedPermissions.length === 0" class="text-center py-6 text-gray-500">
+              No permissions found.
+            </div>
           </div>
         </div>
       </div>
@@ -106,10 +116,7 @@
       <AddPermission
         v-if="addVisible"
         :visible="addVisible"
-        @close="
-          addVisible = false;
-          fetchPermissions();
-        "
+        @close="addVisible = false; fetchPermissions();"
       />
       <UpdatePermission
         v-if="updateVisible"
@@ -128,6 +135,7 @@
     </div>
   </div>
 </template>
+
 
 <script>
 import Toast from "../../../components/Toast.vue";
