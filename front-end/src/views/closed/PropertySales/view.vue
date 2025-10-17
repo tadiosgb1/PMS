@@ -18,51 +18,50 @@
 
         <!-- Body -->
         <div class="p-6">
-          <!-- Search & Page Size -->
-          <div class="flex justify-between items-center mb-6">
-            <input
-              v-model="searchTerm"
-              type="search"
-              placeholder="Search Property Sale..."
-              class="w-full max-w-md px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-            />
+         <!-- Search & Filters -->
+<div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+  <!-- Search input -->
+  <input
+    v-model="searchTerm"
+    @input="fetchSales()"
+    type="search"
+    placeholder="Search Property Sale..."
+    class="w-full md:max-w-md px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+  />
+
+  <!-- Filters -->
+  <div class="flex flex-col md:flex-row md:items-center md:space-x-3 w-full md:w-auto">
+    <div class="flex items-center space-x-2 mb-2 md:mb-0">
+      <label class="text-sm text-gray-600">Status</label>
+      <select
+        @change="fetchSales()"
+        v-model="status"
+        class="px-2 py-1 border rounded-md text-sm"
+      >
+        <option value="">All</option>
+        <option value="pending">Pending</option>
+        <option value="active">Active</option>
+      </select>
+    </div>
+
+    <div class="flex items-center space-x-2">
+      <label for="pageSize" class="text-gray-700">Show</label>
+      <select
+        id="pageSize"
+        v-model="pageSize"
+        @change="fetchSales()"
+        class="border px-2 py-1 rounded"
+      >
+        <option v-for="size in pageSizes" :key="size" :value="size">{{ size }}</option>
+      </select>
+      <span class="text-gray-700">per page</span>
+    </div>
+  </div>
+</div>
 
 
-             <div class="flex items-center" >
-              <label class="mr-2 text-sm text-gray-600">Status</label>
-              <select
-                @change="fetchSales()"
-                v-model="status"
-                class="px-2 py-1 border rounded-md text-sm"
-              >
-                <option value="">All</option>
-                <option value="pending">Pending</option>
-                <option value="active">Active</option>
-              </select>
-            </div>
-            <!-- Page Size Dropdown -->
-            <div class="ml-4">
-              <label for="pageSize" class="mr-2 text-gray-700">Show</label>
-              <select
-                id="pageSize"
-                v-model="pageSize"
-                @change="
-                  fetchSales(
-                    `/get_property_zone_sales?page=1&page_size=${pageSize}`
-                  )
-                "
-                class="border px-2 py-1 rounded"
-              >
-                <option v-for="size in pageSizes" :key="size" :value="size">
-                  {{ size }}
-                </option>
-              </select>
-              <span class="ml-1 text-gray-700">per page</span>
-            </div>
-          </div>
-
-          <!-- Table -->
-          <div class="overflow-x-auto">
+          <!-- ✅ Desktop Table -->
+          <div class="hidden md:block overflow-x-auto">
             <table
               class="min-w-full table-auto border-collapse border border-gray-300 text-sm"
             >
@@ -81,12 +80,8 @@
                   </th>
                   <th class="border border-gray-300 px-4 py-2">Zone</th>
                   <th class="border border-gray-300 px-4 py-2">Broker</th>
-                  <th class="border border-gray-300 px-4 py-2">
-                    Listing Price
-                  </th>
-                  <th class="border border-gray-300 px-4 py-2">
-                    Selling Price
-                  </th>
+                  <th class="border border-gray-300 px-4 py-2">Listing Price</th>
+                  <th class="border border-gray-300 px-4 py-2">Selling Price</th>
                   <th class="border border-gray-300 px-4 py-2">Status</th>
                   <th class="border border-gray-300 px-4 py-2">Created</th>
                   <th class="border border-gray-300 px-4 py-2">Updated</th>
@@ -97,7 +92,7 @@
               </thead>
               <tbody>
                 <tr
-                  v-for="sale in filteredAndSortedSales"
+                  v-for="sale in sales"
                   :key="sale.id"
                   class="hover:bg-gray-100"
                 >
@@ -108,7 +103,7 @@
                       title="Detail"
                       :disabled="!sale.property_id?.id"
                     >
-                       {{ sale.property_id?.name || "-" }}
+                      {{ sale.property_id?.name || '-' }}
                     </button>
                   </td>
                   <td class="border border-gray-300 px-4 py-2">
@@ -118,7 +113,7 @@
                       title="Detail"
                       :disabled="!sale.property_zone_id?.id"
                     >
-                       {{ sale.property_zone_id?.name || "-" }}
+                      {{ sale.property_zone_id?.name || '-' }}
                     </button>
                   </td>
                   <td class="border border-gray-300 px-4 py-2">
@@ -128,31 +123,28 @@
                       title="Detail"
                       :disabled="!sale.broker"
                     >
-                       {{ sale.broker || "-" }}
+                      {{ sale.broker || '-' }}
                     </button>
                   </td>
-                  <!-- <td class="border border-gray-300 px-4 py-2">
-                    {{ sale.broker || "-" }}
-                  </td> -->
                   <td class="border border-gray-300 px-4 py-2">
                     {{ sale.listing_price | currency }}
                   </td>
                   <td class="border border-gray-300 px-4 py-2">
                     {{ sale.selling_price | currency }}
                   </td>
-                 
-                                  <td class="border border-gray-300 px-3 py-2 whitespace-nowrap text-center">
-                                  <span 
-                                    class="px-3 py-1 rounded-full text-white text-xs font-semibold"
-                                    :class="{
-                                      'bg-green-600': sale.status === 'active',
-                                      'bg-yellow-600': sale.status === 'pending',
-                                    
-                                    }"
-                                  >
-                                    {{ sale.status }}
-                                  </span>
-                                </td>
+                  <td
+                    class="border border-gray-300 px-3 py-2 whitespace-nowrap text-center"
+                  >
+                    <span
+                      class="px-3 py-1 rounded-full text-white text-xs font-semibold"
+                      :class="{
+                        'bg-green-600': sale.status === 'active',
+                        'bg-yellow-600': sale.status === 'pending'
+                      }"
+                    >
+                      {{ sale.status }}
+                    </span>
+                  </td>
                   <td class="border border-gray-300 px-4 py-2">
                     {{ formatDate(sale.created_at) }}
                   </td>
@@ -162,56 +154,37 @@
                   <td
                     class="border border-gray-300 px-4 py-2 text-center space-x-2"
                   >
-                    <!-- <button
-                    v-if="showApprove=true"
-                      @click="approve(sale.id)"
-                      class="text-green-600 hover:text-green-800 focus:outline-none"
-                      title="Approve"
-                    >
-                      Approve
-                    </button> -->
                     <button
                       @click="selectedSaleId = sale.id; showModal = true"
-                      class="relative px-4 py-2 text-green-600 border border-green-600 rounded-lg
-                        hover:text-white hover:bg-green-600
-                        transition duration-300 ease-in-out"
+                      class="relative px-4 py-2 text-green-600 border border-green-600 rounded-lg hover:text-white hover:bg-green-600 transition duration-300 ease-in-out"
                       title="Pay Rent"
                     >
                       <i class="fas fa-credit-card mr-2"></i> Pay
                     </button>
                     <button
                       @click="goToPayment(sale.id)"
-                      class="text-blue-600 hover:text-blue-800 focus:outline-none"
+                      class="text-blue-600 hover:text-blue-800"
                       title="View Payment"
                     >
                       View Payment
                     </button>
                     <button
                       @click="openUpdateModal(sale)"
-                      class="text-blue-600 hover:text-blue-800 focus:outline-none"
+                      class="text-blue-600 hover:text-blue-800"
                       title="Edit"
                     >
                       <i class="fas fa-edit"></i>
                     </button>
-
-                    <!-- <button
-                      @click=""
-                      class="text-blue-600 hover:text-blue-800 focus:outline-none"
-                      title="Edit"
-                    >
-                      Add broker
-                    </button> -->
-
                     <button
                       @click="confirmDeleteSale(sale.id)"
-                      class="text-red-600 hover:text-red-800 focus:outline-none"
+                      class="text-red-600 hover:text-red-800"
                       title="Delete"
                     >
                       <i class="fas fa-trash-alt"></i>
                     </button>
                   </td>
                 </tr>
-                <tr v-if="filteredAndSortedSales.length === 0">
+                <tr v-if="sales.length === 0">
                   <td colspan="9" class="text-center py-6 text-gray-500">
                     No property sales found.
                   </td>
@@ -220,8 +193,106 @@
             </table>
           </div>
 
+          <!-- ✅ Mobile Card View -->
+          <div class="md:hidden space-y-4">
+            <div
+              v-for="sale in sales"
+              :key="sale.id"
+              class="bg-white border rounded-lg shadow-sm p-4 flex flex-col space-y-2"
+            >
+              <div class="flex justify-between items-center">
+                <p class="text-gray-600">
+                 <strong>Property:</strong>
+                <button
+                  @click="goToDetail(sale.property_id?.id)"
+                  class="text-green-700 font-semibold"
+                  :disabled="!sale.property_id?.id"
+                >
+                  {{ sale.property_id?.name || '-' }}
+                </button>
+                </p >
+                <span
+                  class="text-sm font-medium px-2 py-1 rounded-full"
+                  :class="{
+                    'bg-green-100 text-green-700': sale.status === 'active',
+                    'bg-yellow-100 text-yellow-700': sale.status === 'pending'
+                  }"
+                >
+                  {{ sale.status }}
+                </span>
+              </div>
+
+              <p class="text-gray-600">
+                <strong>Zone:</strong>
+                <button
+                  @click="goToZoneDetail(sale.property_zone_id?.id)"
+                  class="text-blue-600 hover:underline"
+                >
+                  {{ sale.property_zone_id?.name || '-' }}
+                </button>
+              </p>
+              <p class="text-gray-600">
+                <strong>Broker:</strong>
+                <button
+                  @click="goToBrokerDetail(sale.broker)"
+                  class="text-blue-600 hover:underline"
+                >
+                  {{ sale.broker || '-' }}
+                </button>
+              </p>
+              <!-- <p class="text-gray-600">
+                <strong>Listing Price:</strong> {{ sale.listing_price | currency }}
+              </p>
+              <p class="text-gray-600">
+                <strong>Selling Price:</strong> {{ sale.selling_price | currency }}
+              </p>
+              <p class="text-gray-600">
+                <strong>Created:</strong> {{ formatDate(sale.created_at) }}
+              </p>
+              <p class="text-gray-600">
+                <strong>Updated:</strong> {{ formatDate(sale.updated_at) }}
+              </p> -->
+
+              <div class="flex justify-end gap-2 mt-3">
+                <button
+                  @click="selectedSaleId = sale.id; showModal = true"
+                  class="px-3 py-1 text-xs text-green-600 border border-green-600 rounded hover:bg-green-600 hover:text-white transition"
+                >
+                  Pay
+                </button>
+                <button
+                  @click="goToPayment(sale.id)"
+                  class="px-3 py-1 text-xs text-blue-600 border border-blue-600 rounded hover:bg-blue-600 hover:text-white transition"
+                >
+                  Payment
+                </button>
+                <button
+                  @click="openUpdateModal(sale)"
+                  class="px-3 py-1 text-xs text-orange-600 border border-orange-600 rounded hover:bg-orange-600 hover:text-white transition"
+                >
+                  Edit
+                </button>
+                <button
+                  @click="confirmDeleteSale(sale.id)"
+                  class="px-3 py-1 text-xs text-red-600 border border-red-600 rounded hover:bg-red-600 hover:text-white transition"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+
+            <p
+              v-if="sales.length === 0"
+              class="text-center text-gray-500"
+            >
+              No property sales found.
+            </p>
+          </div>
+
           <!-- Pagination -->
-          <div class="flex justify-between items-center mt-4">
+          <div
+            class="flex flex-col sm:flex-row justify-between items-center mt-6 gap-3"
+          >
             <button
               :disabled="!previous"
               @click="fetchSales(previous)"
@@ -243,7 +314,7 @@
         </div>
       </div>
 
-      <!-- Confirm Delete Modal -->
+      <!-- Modals -->
       <ConfirmModal
         v-if="confirmVisible"
         :visible="confirmVisible"
@@ -253,13 +324,11 @@
         @cancel="confirmVisible = false"
       />
 
-      <!-- Add & Update Modals -->
       <AddSale
         :visible="showAddSale"
         @close="showAddSale = false"
         @ref="fetchSales()"
       />
-
       <UpdateSale
         :visible="showUpdateSale"
         :sale="selectedSale"
@@ -276,6 +345,7 @@
     </div>
   </div>
 </template>
+
 
 <script>
 import ConfirmModal from "@/components/ConfirmModal.vue";
@@ -324,33 +394,32 @@ export default {
       status:"",
       showModal: false,
       selectedSaleId: "",
+      ordering:"-id"
     };
   },
   computed: {
-    filteredAndSortedSales() {
-      const term = this.searchTerm.toLowerCase();
-      let filtered = this.sales.filter(
-        (sale) =>
-          sale.property_id?.name?.toLowerCase().includes(term) ||
-          sale.property_zone_id?.name?.toLowerCase().includes(term) ||
-          sale.status?.toLowerCase().includes(term)
-      );
+    // filteredAndSortedSales() {
+    //   const term = this.searchTerm.toLowerCase();
+    //   let filtered = this.sales.filter(
+    //     (sale) =>
+    //       sale.property_id?.name?.toLowerCase().includes(term) ||
+    //       sale.property_zone_id?.name?.toLowerCase().includes(term) ||
+    //       sale.status?.toLowerCase().includes(term)
+    //   );
 
-      filtered.sort((a, b) => {
-        let aVal = a.property_id?.name?.toString().toLowerCase() || "";
-        let bVal = b.property_id?.name?.toString().toLowerCase() || "";
-        if (aVal < bVal) return this.sortAsc ? -1 : 1;
-        if (aVal > bVal) return this.sortAsc ? 1 : -1;
-        return 0;
-      });
+    //   filtered.sort((a, b) => {
+    //     let aVal = a.property_id?.name?.toString().toLowerCase() || "";
+    //     let bVal = b.property_id?.name?.toString().toLowerCase() || "";
+    //     if (aVal < bVal) return this.sortAsc ? -1 : 1;
+    //     if (aVal > bVal) return this.sortAsc ? 1 : -1;
+    //     return 0;
+    //   });
 
-      return filtered;
-    },
+    //   return filtered;
+    // },
   },
   mounted() {
-    this.fetchSales(
-      `/get_property_zone_sales?page=1&page_size=${this.pageSize}`
-    );
+    this.fetchSales();
   },
   methods: {
     goToPayment(saleId) {
@@ -398,16 +467,18 @@ export default {
     },
 
     async fetchSales(
-      url = `/get_property_zone_sales?page=1&page_size=${this.pageSize}`
+     url=null
     ) {
       try {
         
+        const pageurl = url || `/get_property_zone_sales?page=1&page_size=${this.pageSize}&search=${this.searchTerm}&ordering=${this.ordering}`
+
         let params = this.buildRoleParams();
     
 
           console.log("params for p sales",params);
       
-        const res = await this.$apiGet(url,params);
+        const res = await this.$apiGet(pageurl,params);
       
         console.log("saless", res);
         
