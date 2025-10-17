@@ -184,8 +184,8 @@ export default {
       totalPages: 1,
       next: null,
       previous: null,
-      statusFilter:"all",
-      payment_method:""
+      statusFilter: "",
+      payment_method: "",
     };
   },
   computed: {
@@ -209,45 +209,44 @@ export default {
       this.$router.push(`/property-sale/${id}`);
     },
 
-    async filterByStatus(status){
-
-      let params={
-        status:status,
-      }
-      if(status=='all'){
-        params={}
-      }
-      
-      const res = await this.$apiGet("/get_sales_payments", params);
-       this.payments = res.data || [];
-    },
+    // ✅ unified fetch function that respects all filters
     async fetchPayments(page = 1) {
       try {
-        const params = { 
-          page, page_size: this.perPage ,
-          search:this.searchTerm,
-          payment_method:this.payment_method
+        const params = {
+          page,
+          page_size: this.perPage,
+          search: this.searchTerm,
         };
 
+        // ✅ add optional filters dynamically
+        if (this.statusFilter && this.statusFilter !== "all") {
+          params.status = this.statusFilter;
+        }
 
+        if (this.payment_method) {
+          params.payment_method = this.payment_method;
+        }
+
+        // ✅ include sale ID filter if available
         const id = this.$route.query.id;
-        if (id) params.property_zone_sale_id__id = id;
-        console.log("params for sale payments params",params);
+        if (id) {
+          params.property_zone_sale_id__id = id;
+        }
+
+        console.log("Params for /get_sales_payments:", params);
 
         const res = await this.$apiGet("/get_sales_payments", params);
         this.payments = res.data || [];
-        
-        console.log("payments sale",this.payments);
-
         this.currentPage = res.current_page || 1;
         this.totalPages = res.total_pages || 1;
         this.next = res.next;
         this.previous = res.previous;
       } catch (err) {
-        console.error(err);
+        console.error("Error fetching payments:", err);
         this.payments = [];
       }
     },
+
     async fetchUrl(url) {
       if (!url) return;
       try {
@@ -261,23 +260,27 @@ export default {
         console.error(err);
       }
     },
+
+    // ✅ simplified — reuses fetchPayments() with filters
+    async filterByStatus() {
+      await this.fetchPayments(1);
+    },
+
     async approve(payment) {
-
-     // alert("hii");
-
       const payload = { id: payment.id, status: "complete" };
       const res = await this.$apiPatch("/update_sales_payments", payment.id, payload);
       if (res) {
-        this.$root.$refs.toast.showToast(`Payment Approved Successfully`, "success");
-        this.$reloadPage();
+        this.$root.$refs.toast.showToast("Payment Approved Successfully", "success");
+        this.fetchPayments(this.currentPage);
       }
     },
+
     async reject(payment) {
       const payload = { id: payment.id, status: "cancelled" };
       const res = await this.$apiPatch("/update_sales_payments", payment.id, payload);
       if (res) {
-        this.$root.$refs.toast.showToast(`Payment Disapproved Successfully`, "success");
-        this.$reloadPage();
+        this.$root.$refs.toast.showToast("Payment Disapproved Successfully", "success");
+        this.fetchPayments(this.currentPage);
       }
     },
   },
