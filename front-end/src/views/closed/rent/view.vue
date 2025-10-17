@@ -7,6 +7,7 @@
     >
       &larr; Back
     </button>
+
     <div class="min-h-screen bg-gray-100 p-6">
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
         <div
@@ -20,20 +21,20 @@
             <span class="text-primary">+</span> Add
           </button>
         </div>
+
         <div class="p-6">
           <!-- Search & Page Size -->
-          <div class="flex justify-between items-center mb-6">
+          <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
             <input
               v-model="searchTerm"
               @input="onSearch"
               type="search"
               placeholder="Search Rent..."
-              class="w-full max-w-md px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              class="w-full sm:max-w-md px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
 
-            <!-- Page Size Dropdown -->
-            <div class="ml-4">
-              <label for="pageSize" class="mr-2 text-gray-700">Show</label>
+            <div class="flex items-center space-x-2">
+              <label for="pageSize" class="text-gray-700">Show</label>
               <select
                 id="pageSize"
                 v-model="pageSize"
@@ -44,124 +45,119 @@
                   {{ size }}
                 </option>
               </select>
-              <span class="ml-1 text-gray-700">per page</span>
+              <span class="text-gray-700">per page</span>
             </div>
           </div>
 
-          <!-- Table -->
-          <div class="overflow-x-auto">
-            <table
-              class="min-w-full table-auto border-collapse border border-gray-300"
-            >
+          <!-- ✅ Table for Desktop -->
+          <div class="hidden md:block overflow-x-auto">
+            <table class="min-w-full table-auto border-collapse border border-gray-300">
               <thead>
                 <tr class="bg-gray-200 text-gray-700">
-                  <th
-                    class="border border-gray-300 px-4 py-2 cursor-pointer"
-                    @click="sortBy('property_id')"
-                  >
-                    Property
-                    <SortIcon
-                      :field="'property_id'"
-                      :sort-key="sortKey"
-                      :sort-asc="sortAsc"
-                    />
+                  <th class="border border-gray-300 px-4 py-2 cursor-pointer" @click="sortBy('property_id')">
+                    Property <SortIcon :field="'property_id'" :sort-key="sortKey" :sort-asc="sortAsc" />
                   </th>
-                  <th
-                    class="border border-gray-300 px-4 py-2 cursor-pointer"
-                    @click="sortBy('user_id')"
-                  >
-                    Tenant
-                    <SortIcon
-                      :field="'user_id'"
-                      :sort-key="sortKey"
-                      :sort-asc="sortAsc"
-                    />
+                  <th class="border border-gray-300 px-4 py-2 cursor-pointer" @click="sortBy('user_id')">
+                    Tenant <SortIcon :field="'user_id'" :sort-key="sortKey" :sort-asc="sortAsc" />
                   </th>
-                  <th
-                    class="border border-gray-300 px-4 py-2 cursor-pointer"
-                    @click="sortBy('rent_type')"
-                  >
-                    Rent Type
-                    <SortIcon
-                      :field="'rent_type'"
-                      :sort-key="sortKey"
-                      :sort-asc="sortAsc"
-                    />
+                  <th class="border border-gray-300 px-4 py-2 cursor-pointer" @click="sortBy('rent_type')">
+                    Rent Type <SortIcon :field="'rent_type'" :sort-key="sortKey" :sort-asc="sortAsc" />
                   </th>
-                  <th
-                    class="border border-gray-300 px-4 py-2 cursor-pointer"
-                    @click="sortBy('status')"
-                  >
-                    Status
-                    <SortIcon
-                      :field="'status'"
-                      :sort-key="sortKey"
-                      :sort-asc="sortAsc"
-                    />
+                  <th class="border border-gray-300 px-4 py-2 cursor-pointer" @click="sortBy('status')">
+                    Status <SortIcon :field="'status'" :sort-key="sortKey" :sort-asc="sortAsc" />
                   </th>
                   <th class="px-4 py-2 border text-center">Actions</th>
                 </tr>
               </thead>
+
               <tbody>
                 <tr
                   v-for="rent in filteredAndSortedRents"
                   :key="rent.id"
                   class="hover:bg-gray-100"
                 >
-                  <td class="border border-gray-300 px-4 py-2">
-                    {{ rent.property_id?.name }}
-                  </td>
-                  <td class="border border-gray-300 px-4 py-2">
-                    {{ rent.user_id?.first_name }}
-                  </td>
-                  <td class="border border-gray-300 px-4 py-2">
-                    {{ rent.rent_type }}
-                  </td>
-                  <td class="border border-gray-300 px-4 py-2">
-                    {{ rent.status }}
-                  </td>
-                  <td
-                    class="border border-gray-300 px-4 py-2 text-center space-x-2"
-                  >
+                  <td class="border border-gray-300 px-4 py-2">{{ rent.property_id?.name }}</td>
+                  <td class="border border-gray-300 px-4 py-2">{{ rent.user_id?.first_name }}</td>
+                  <td class="border border-gray-300 px-4 py-2">{{ rent.rent_type }}</td>
+                  <td class="border border-gray-300 px-4 py-2">{{ rent.status }}</td>
+                  <td class="border border-gray-300 px-4 py-2 text-center space-x-2">
                     <button
                       @click="selectedRentId = rent.id; showModal = true"
-                      class="relative px-4 py-2 text-green-600 border border-green-600 rounded-lg
-                        hover:text-white hover:bg-green-600
-                        transition duration-300 ease-in-out"
+                      class="relative px-4 py-2 text-green-600 border border-green-600 rounded-lg hover:text-white hover:bg-green-600 transition duration-300 ease-in-out"
                       title="Pay Rent"
                     >
                       <i class="fas fa-credit-card mr-2"></i> Pay
                     </button>
-                    <button
-                      @click="rentDetail(rent.id)"
-                      class="text-green-600 hover:text-green-800 focus:outline-none"
-                      title="Detail"
-                    >
+                    <button @click="rentDetail(rent.id)" class="text-blue-600 hover:text-blue-800">
                       <i class="fas fa-info-circle"></i>
                     </button>
-                    <button
-                      @click="goToPayments(rent.id)"
-                      class="text-green-600 hover:text-green-800 focus:outline-none"
-                      title="Payments"
-                    >
+                    <button @click="goToPayments(rent.id)" class="text-green-600 hover:text-green-800">
                       Payments
                     </button>
                   </td>
                 </tr>
+
                 <tr v-if="filteredAndSortedRents.length === 0">
-                  <td
-                    colspan="10"
-                    class="text-center py-6 text-gray-500"
-                  >
-                    No rents found.
-                  </td>
+                  <td colspan="10" class="text-center py-6 text-gray-500">No rents found.</td>
                 </tr>
               </tbody>
             </table>
           </div>
 
+          <!-- ✅ List view for Mobile -->
+          <div class="md:hidden space-y-4">
+            <div
+              v-for="rent in filteredAndSortedRents"
+              :key="rent.id"
+              class="bg-white border rounded-lg shadow-sm p-4 flex flex-col space-y-2"
+            >
+              <div class="flex justify-between items-center">
+                <h3 class="font-semibold text-gray-800">{{ rent.property_id?.name }}</h3>
+                <span
+                  class="text-sm font-medium px-2 py-1 rounded-full"
+                  :class="{
+                    'bg-green-100 text-green-700': rent.status === 'active',
+                    'bg-red-100 text-red-700': rent.status === 'inactive'
+                  }"
+                >
+                  {{ rent.status }}
+                </span>
+              </div>
+              <p class="text-gray-600"><strong>Tenant:</strong> {{ rent.user_id?.first_name }}</p>
+              <p class="text-gray-600"><strong>Type:</strong> {{ rent.rent_type }}</p>
+
+              <div class="flex justify-end gap-2 mt-3">
+                <button
+                  @click="selectedRentId = rent.id; showModal = true"
+                  class="px-3 py-1 text-xs text-green-600 border border-green-600 rounded hover:bg-green-600 hover:text-white transition"
+                >
+                  Pay
+                </button>
+                <button
+                  @click="rentDetail(rent.id)"
+                  class="px-3 py-1 text-xs text-blue-600 border border-blue-600 rounded hover:bg-blue-600 hover:text-white transition"
+                >
+                  Detail
+                </button>
+                <button
+                  @click="goToPayments(rent.id)"
+                  class="px-3 py-1 text-xs text-orange-600 border border-orange-600 rounded hover:bg-orange-600 hover:text-white transition"
+                >
+                  Payments
+                </button>
+              </div>
+            </div>
+
+            <p
+              v-if="filteredAndSortedRents.length === 0"
+              class="text-center text-gray-500"
+            >
+              No rents found.
+            </p>
+          </div>
+
           <!-- Pagination -->
-          <div class="flex justify-between items-center mt-4">
+          <div class="flex flex-col sm:flex-row justify-between items-center mt-6 gap-3">
             <button
               :disabled="!previous"
               @click="fetchRents(previous)"
@@ -272,7 +268,6 @@ export default {
       sortAsc: true,
       rents: [],
       showModal: false,
-      // Pagination
       pageSize: 10,
       pageSizes: [5, 10, 20, 50, 100],
       currentPage: 1,
@@ -284,12 +279,9 @@ export default {
   computed: {
     filteredAndSortedRents() {
       let sorted = [...this.rents];
-
-      // Sorting by property or tenant names
       sorted.sort((a, b) => {
         let valA = a[this.sortKey];
         let valB = b[this.sortKey];
-
         if (this.sortKey === "property_id") {
           valA = a.property_id?.name || "";
           valB = b.property_id?.name || "";
@@ -298,12 +290,10 @@ export default {
           valA = a.user_id?.first_name || "";
           valB = b.user_id?.first_name || "";
         }
-
         if (valA < valB) return this.sortAsc ? -1 : 1;
         if (valA > valB) return this.sortAsc ? 1 : -1;
         return 0;
       });
-
       return sorted;
     },
   },
@@ -311,72 +301,38 @@ export default {
     this.fetchRents();
   },
   methods: {
-   goToPayments(rentId) {
-   
-     this.$router.push({
-          name: "rents_payment_detail",
-          params: { id: rentId },
-        });
+    goToPayments(rentId) {
+      this.$router.push({ name: "rents_payment_detail", params: { id: rentId } });
     },
-
     rentDetail(rent_id) {
       this.$router.push({ name: "rent-detail", params: { id: rent_id } });
     },
-
-
     buildRoleParams(params = {}) {
       const isSuperUser =
         localStorage.getItem("is_superuser") === "1" ||
         localStorage.getItem("is_superuser") === "true";
-
       const groups = JSON.parse(localStorage.getItem("groups") || "[]");
       const email = localStorage.getItem("email");
-      const id=localStorage.getItem("userId");
 
       if (!isSuperUser) {
         if (groups.includes("manager")) {
-          params = {
-            ...params,
-            "property_id__property_zone_id__manager_id__email": email,
-          };
+          params["property_id__property_zone_id__manager_id__email"] = email;
         } else if (groups.includes("owner")) {
-          params = {
-            ...params,  
-            "property_id__property_zone_id__owner_id__email": email,
-          };
+          params["property_id__property_zone_id__owner_id__email"] = email;
         } else if (groups.includes("staff")) {
-          params = { ...params, "property_id__property_zone_id__staff_id__email": email };
-        } else if (groups.includes("super_staff")) {
-          params = { ...params }; // sees all payments
+          params["property_id__property_zone_id__staff_id__email"] = email;
         }
       }
       return params;
     },
     async fetchRents() {
-
-      // const params={
-      //   property_id__property_zone_id__manager_id__email:localStorage.getItem("email"),
-      //   page_size:1000,
-      //   ordering:"-id"
-      // }
-     let params = this.buildRoleParams();
-    
-       
+      let params = this.buildRoleParams();
       try {
-        const response = await this.$apiGet("/get_rents",params);
-        if (Array.isArray(response.data)) {
-          this.rents = response.data;
-          console.log("rents are ",this.rents);
-        } else {
-          this.rents = [];
-        }
+        const response = await this.$apiGet("/get_rents", params);
+        this.rents = Array.isArray(response.data) ? response.data : [];
       } catch (error) {
         console.error("Failed to fetch rents:", error);
         this.rents = [];
-        this.currentPage = 1;
-        this.totalPages = 1;
-        this.next = null;
-        this.previous = null;
       }
     },
     onSearch() {
@@ -390,28 +346,18 @@ export default {
         this.sortAsc = true;
       }
     },
-    editRent(rent) {
-      this.rentToEdit = rent;
-      this.updateVisible = true;
-    },
-    askDeleteConfirmation(rent) {
-      this.rentToDelete = rent;
-      this.confirmVisible = true;
-    },
-    async confirmDelete() {
-      this.confirmVisible = false;
-      try {
-        const response = await this.$apiDelete(
-          `/delete_rent/${this.rentToDelete.id}`
-        );
-        this.$refs.toast.showToast(response.message, "success");
-        this.fetchRents();
-      } catch (error) {
-        console.error(error);
-        alert("Failed to delete rent.");
-      }
-      this.rentToDelete = null;
-    },
   },
 };
 </script>
+
+<style scoped>
+/* Optional: smooth hover and card shadow tweaks */
+@media (max-width: 768px) {
+  .card {
+    transition: box-shadow 0.2s ease-in-out;
+  }
+  .card:hover {
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+}
+</style>

@@ -18,7 +18,7 @@
               v-model="searchTerm"
               type="search"
               placeholder="Search Payment..."
-              class="w-full max-w-md px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              class="w-full md:w-auto max-w-md px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
               @input="fetchPayments(1)"
             />
 
@@ -36,18 +36,19 @@
               </select>
             </div>
 
-      <div class="flex items-center">
-        <label class="mr-2 text-sm text-gray-600">Payment Method</label>
-        <select
-          @change="fetchPayments(1)"
-          v-model="payment_method"
-          class="px-2 py-1 border rounded-md text-sm"
-        >
-          <option value="">All</option>
-          <option value="tellebirr">Tellebirr</option>
-          <option value="cash">Cash</option>
-        </select>
-      </div>
+            <!-- Payment Method -->
+            <div class="flex items-center">
+              <label class="mr-2 text-sm text-gray-600">Payment Method</label>
+              <select
+                @change="fetchPayments(1)"
+                v-model="payment_method"
+                class="px-2 py-1 border rounded-md text-sm"
+              >
+                <option value="">All</option>
+                <option value="tellebirr">Tellebirr</option>
+                <option value="cash">Cash</option>
+              </select>
+            </div>
 
             <!-- Show Dropdown -->
             <div>
@@ -65,158 +66,173 @@
           </div>
 
           <!-- Amount Summary -->
-          <div v-if="statusFilter && statusFilter !== 'pending'" class="mb-4 text-sm font-semibold text-gray-700">
+          <div
+            v-if="statusFilter && statusFilter !== 'pending'"
+            class="mb-4 text-sm font-semibold text-gray-700"
+          >
             Total {{ statusFilter }} Amount:
             <span class="text-orange-600">{{ totalAmountByStatus }}</span>
           </div>
 
-          <!-- Table -->
-          <div class="overflow-x-auto">
-            <table
-              class="min-w-full table-auto border-collapse border border-gray-300"
-            >
-              <thead>
-                <tr class="bg-gray-200 text-gray-700">
-                 <th class="border border-gray-300 px-4 py-2">Transaction Id</th>
-                 <th class="border border-gray-300 px-4 py-2">Subscription</th>
-                 <th class="border border-gray-300 px-4 py-2">Owner</th>
-                  <th
-                    class="border border-gray-300 px-4 py-2 cursor-pointer"
-                    @click="sortBy('payment_method')"
-                  >
-                    Payment Method
-                    <SortIcon
-                      :field="'payment_method'"
-                      :sort-key="sortKey"
-                      :sort-asc="sortAsc"
-                    />
-                  </th>
-
-                  <th
-                    class="border border-gray-300 px-4 py-2 cursor-pointer"
-                    @click="sortBy('amount')"
-                  >
-                    Amount
-                    <SortIcon
-                      :field="'amount'"
-                      :sort-key="sortKey"
-                      :sort-asc="sortAsc"
-                    />
-                  </th>
-                 
-                  <th
-                    class="border border-gray-300 px-4 py-2 cursor-pointer"
-                    @click="sortBy('transaction_id')"
-                  >
-                    Transaction ID
-                    <SortIcon
-                      :field="'transaction_id'"
-                      :sort-key="sortKey"
-                      :sort-asc="sortAsc"
-                    />
-                  </th>
-                  <th class="border border-gray-300 px-4 py-2">Created At</th>
-                  <th v-if="showEndDate" class="border border-gray-300 px-4 py-2">End Date</th>
-                  <th class="border border-gray-300 px-4 py-2">Owner</th>
-                  <th class="border border-gray-300 px-4 py-2">Plan</th>
-                   <th
-                    class="border border-gray-300 px-4 py-2 cursor-pointer"
-                    @click="sortBy('status')"
-                  >
-                    Status
-                    <SortIcon
-                      :field="'status'"
-                      :sort-key="sortKey"
-                      :sort-asc="sortAsc"
-                    />
-                  </th>
-                  <th class="border border-gray-300 px-4 py-2 text-center">
-                    Actions
-                  </th>
+          <!-- Table View (Desktop) -->
+          <div class="hidden md:block overflow-x-auto">
+            <table class="min-w-full border border-gray-200">
+              <thead class="bg-gray-50">
+                <tr>
+                  <th class="px-3 py-2 text-left">Transaction ID</th>
+                  <th class="px-3 py-2 text-left">Subscription</th>
+                  <th class="px-3 py-2 text-left">Owner</th>
+                  <th class="px-3 py-2 text-left">Payment Method</th>
+                  <th class="px-3 py-2 text-left">Amount</th>
+                  <th class="px-3 py-2 text-left">Created At</th>
+                  <th class="px-3 py-2 text-left">End Date</th>
+                  <th class="px-3 py-2 text-left">Plan</th>
+                  <th class="px-3 py-2 text-left">Status</th>
+                  <th class="px-3 py-2 text-center">Actions</th>
                 </tr>
               </thead>
               <tbody>
                 <tr
                   v-for="p in filteredAndSortedPayments"
                   :key="p.id"
-                  class="hover:bg-gray-100"
+                  class="border-t hover:bg-gray-50"
                 >
-
-                <td class="border border-gray-300 px-4 py-2">
-                    {{ p.transaction_id }}
-                  </td>
-                  <td class="border border-gray-300 px-4 py-2">
-                    <button @click="goToSubDetail(p.subscription_id)" class="px-1 rounded bg-blue-500 text-white hover:bg-blue-600">
-                    <i class="fa fa-info-circle mr-2"></i> Detail
-                    </button>
-                  </td>
-                    <td class="border border-gray-300 px-4 py-2">
-                    <button @click="goToUserDetail(p.user_id)" class="px-1 rounded bg-blue-500 text-white hover:bg-blue-600">
-                    <i class="fa fa-info-circle mr-2"></i> Detail
-                    </button>
-                  </td>
-                  <td class="border border-gray-300 px-4 py-2">
-                    {{ p.payment_method }}
-                  </td>
-
-
-                  <td class="border border-gray-300 px-4 py-2">
-                    {{ p.amount }}
-                  </td>
-
-
-                  <td class="border border-gray-300 px-4 py-2">
-                    {{ p.transaction_id }}
-                  </td>
-                  <td class="border border-gray-300 px-4 py-2">
-                    {{ p.created_at || "-" }}
-                  </td>
-                  <td v-if="showEndDate" class="border border-gray-300 px-4 py-2">
-                    {{ p.end_date || "-" }}
-                  </td>
-                  <td class="border border-gray-300 px-4 py-2">
-                    {{ p.ownerName }}
-                  </td>
-                  <td class="border border-gray-300 px-4 py-2">
-                    {{ p.planName }}
-                  </td>
-                   <td
-                  class="px-4 py-2 border text-black font-medium rounded"
-                  :class="{
-                    'bg-yellow-500': p.status === 'pending',
-                    'bg-red-500': p.status === 'canceled',
-                    'bg-green-500': p.status === 'paid'
-                  }"
-                >
-                  {{ p.status }}
-                </td>
-                  <td class="border border-gray-300 px-4 py-2 text-center">
+                  <td class="px-3 py-2">{{ p.transaction_id }}</td>
+                  <td class="px-3 py-2">
                     <button
-                      v-if="p.status == 'canceled'  || p.status=='pending' "
+                      @click="goToSubDetail(p.subscription_id)"
+                      class="text-blue-600 hover:text-blue-800"
+                    >
+                      View
+                    </button>
+                  </td>
+                  <td class="px-3 py-2">
+                    <button
+                      @click="goToUserDetail(p.user_id)"
+                      class="text-blue-600 hover:text-blue-800"
+                    >
+                      View
+                    </button>
+                  </td>
+                  <td class="px-3 py-2">{{ p.payment_method }}</td>
+                  <td class="px-3 py-2">{{ p.amount }}</td>
+                  <td class="px-3 py-2">{{ p.created_at || "-" }}</td>
+                  <td class="px-3 py-2">{{ p.end_date || "-" }}</td>
+                  <td class="px-3 py-2">{{ p.planName }}</td>
+                  <td class="px-3 py-2">
+                    <span
+                      class="px-2 py-1 rounded text-xs font-semibold"
+                      :class="{
+                        'bg-green-100 text-green-700': p.status === 'paid',
+                        'bg-yellow-100 text-yellow-700': p.status === 'pending',
+                        'bg-red-100 text-red-700': p.status === 'canceled',
+                      }"
+                    >
+                      {{ p.status }}
+                    </span>
+                  </td>
+                  <td class="px-3 py-2 text-center">
+                    <button
+                      v-if="p.status === 'pending' || p.status === 'canceled'"
                       @click="approve(p)"
-                      class="text-blue-600 hover:text-blue-800 focus:outline-none"
+                      class="text-blue-600 hover:text-blue-800"
                     >
                       Approve
                     </button>
-
                     <button
-                      v-if="p.status == 'paid'  || p.status=='pending' "
+                      v-if="p.status === 'pending' || p.status === 'paid'"
                       @click="reject(p)"
-                      class="ml-3 text-red-600 hover:text-red-800 focus:outline-none"
+                      class="ml-2 text-red-600 hover:text-red-800"
                     >
-                     Reject
+                      Reject
                     </button>
-
-                    
                   </td>
                 </tr>
                 <tr v-if="filteredAndSortedPayments.length === 0">
-                  <td colspan="9" class="text-center py-6 text-gray-500">
+                  <td colspan="10" class="text-center py-4 text-gray-500">
                     No subscription payments found.
                   </td>
                 </tr>
               </tbody>
             </table>
+          </div>
+
+          <!-- Card List View (Mobile & Tablet) -->
+          <div class="md:hidden grid gap-4">
+            <div
+              v-for="p in filteredAndSortedPayments"
+              :key="p.id"
+              class="border border-gray-200 rounded-lg shadow-sm p-4 bg-white"
+            >
+              <div class="flex justify-between mb-2">
+                <span class="font-semibold text-gray-800"
+                  >Transaction ID:</span
+                >
+                <span>{{ p.transaction_id }}</span>
+              </div>
+              <div class="text-sm text-gray-600 mb-1">
+                <span class="font-medium">Amount:</span> {{ p.amount }} ETB
+              </div>
+              <div class="text-sm text-gray-600 mb-1">
+                <span class="font-medium">Payment:</span> {{ p.payment_method }}
+              </div>
+              <div class="text-sm text-gray-600 mb-1">
+                <span class="font-medium">Created:</span>
+                {{ p.created_at || "-" }}
+              </div>
+              <div class="text-sm text-gray-600 mb-1">
+                <span class="font-medium">Plan:</span> {{ p.planName }}
+              </div>
+              <div class="text-sm text-gray-600 mb-2">
+                <span class="font-medium">Status:</span>
+                <span
+                  class="px-2 py-1 rounded text-xs font-semibold"
+                  :class="{
+                    'bg-green-100 text-green-700': p.status === 'paid',
+                    'bg-yellow-100 text-yellow-700': p.status === 'pending',
+                    'bg-red-100 text-red-700': p.status === 'canceled',
+                  }"
+                >
+                  {{ p.status }}
+                </span>
+              </div>
+
+              <div class="flex justify-between mt-3 text-sm">
+                <button
+                  @click="goToSubDetail(p.subscription_id)"
+                  class="text-blue-600 hover:text-blue-800 font-medium"
+                >
+                  Subscription Detail
+                </button>
+                <button
+                  @click="goToUserDetail(p.user_id)"
+                  class="text-blue-600 hover:text-blue-800 font-medium"
+                >
+                  Owner Detail
+                </button>
+              </div>
+
+              <div class="flex justify-end mt-3 space-x-3">
+                <button
+                  v-if="p.status === 'pending' || p.status === 'canceled'"
+                  @click="approve(p)"
+                  class="text-blue-600 hover:text-blue-800"
+                >
+                  Approve
+                </button>
+                <button
+                  v-if="p.status === 'pending' || p.status === 'paid'"
+                  @click="reject(p)"
+                  class="text-red-600 hover:text-red-800"
+                >
+                  Reject
+                </button>
+              </div>
+            </div>
+
+            <div v-if="filteredAndSortedPayments.length === 0" class="text-center py-6 text-gray-500">
+              No subscription payments found.
+            </div>
           </div>
 
           <!-- Pagination -->
@@ -230,9 +246,7 @@
             >
               Previous
             </button>
-            <span>
-              Page {{ currentPage }} of {{ totalPages }}
-            </span>
+            <span>Page {{ currentPage }} of {{ totalPages }}</span>
             <button
               @click="fetchUrl(next)"
               :disabled="!next"
@@ -250,31 +264,14 @@
 <script>
 import Toast from "@/components/Toast.vue";
 
-const SortIcon = {
-  props: ["field", "sortKey", "sortAsc"],
-  template: `
-    <span class="inline-block ml-1 text-gray-500">
-      <svg v-if="sortKey !== field" xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"/>
-      </svg>
-      <svg v-else-if="sortAsc" xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 13l4 4 4-4m0-6l-4-4-4 4"/>
-      </svg>
-      <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"/>
-      </svg>
-    </span>
-  `,
-};
-
 export default {
   name: "subscriptionPaymentView",
-  components: { Toast, SortIcon },
+  components: { Toast },
   data() {
     return {
       payments: [],
       searchTerm: "",
-      statusFilter: "", // added filter
+      statusFilter: "",
       sortKey: "payment_method",
       sortAsc: true,
       perPage: 10,
@@ -282,37 +279,28 @@ export default {
       totalPages: 1,
       next: null,
       previous: null,
-      payment_method:""
+      payment_method: "",
     };
   },
   computed: {
     filteredAndSortedPayments() {
       const term = this.searchTerm.toLowerCase();
-
-      // search
       let filtered = this.payments.filter((p) =>
         Object.values(p).some((val) =>
           String(val || "").toLowerCase().includes(term)
         )
       );
-
-      // status filter
       if (this.statusFilter) {
         filtered = filtered.filter((p) => p.status === this.statusFilter);
       }
-
-      // sort
       filtered.sort((a, b) => {
         let res = 0;
         if (a[this.sortKey] < b[this.sortKey]) res = -1;
         if (a[this.sortKey] > b[this.sortKey]) res = 1;
         return this.sortAsc ? res : -res;
       });
-
       return filtered;
     },
-
-    // total amount based on status filter
     totalAmountByStatus() {
       return this.filteredAndSortedPayments.reduce(
         (sum, p) => sum + (parseFloat(p.amount) || 0),
@@ -324,7 +312,7 @@ export default {
     this.fetchPayments(1);
   },
   methods: {
-      goToUserDetail(id) {
+    goToUserDetail(id) {
       this.$router.push(`/user_detail/${id}`);
     },
     goToSubDetail(id) {
@@ -332,46 +320,35 @@ export default {
     },
     async fetchPayments(page = 1) {
       try {
-        let params = {
-          // user_id:localStorage.getItem("userId"),
-          // page: page,
-          // page_size: this.perPage,
-        };
+        let params;
+        if (localStorage.getItem("is_superuser") === "true") {
+          params = {
+            page,
+            page_size: this.perPage,
+            payment_method: this.payment_method,
+            subscription_id: this.$route.params.id,
+          };
+        } else {
+          params = {
+            user_id: localStorage.getItem("userId"),
+            page,
+            page_size: this.perPage,
+            payment_method: this.payment_method,
+            subscription_id: this.$route.params.id,
+          };
+        }
 
- if(localStorage.getItem("is_superuser") =="true") {
-  params = {
-    page: page,
-    page_size: this.perPage,
-    payment_method:this.payment_method,
-    subscription_id:this.$route.params.id
-  };
-} else {
-  params = {
-    user_id: localStorage.getItem("userId"),
-    page: page,
-    page_size: this.perPage,
-     payment_method:this.payment_method,
-     subscription_id:this.$route.params.id
-  };
-}
-        
         const response = await this.$apiGet("/get_subscription_payment", params);
-
-        console.log("subscription payments are",response);
         this.payments = response.data || [];
         this.currentPage = response.current_page;
         this.totalPages = response.total_pages;
         this.next = response.next;
         this.previous = response.previous;
 
-        // fetch owner + plan names
         await Promise.all(
           this.payments.map(async (payment) => {
             if (payment.user_id) {
-              const ownerRes = await this.$apiGetById(
-                "get_user",
-                payment.user_id
-              );
+              const ownerRes = await this.$apiGetById("get_user", payment.user_id);
               payment.ownerName = ownerRes.first_name || "Unknown";
             }
             if (payment.subscription_id) {
@@ -391,7 +368,7 @@ export default {
     async fetchUrl(url) {
       if (!url) return;
       try {
-        const response = await this.$apiGet(url); // direct URL
+        const response = await this.$apiGet(url);
         this.payments = response.data || [];
         this.currentPage = response.current_page;
         this.totalPages = response.total_pages;
@@ -401,40 +378,28 @@ export default {
         console.error("Failed to fetch page:", error);
       }
     },
-    sortBy(key) {
-      if (this.sortKey === key) {
-        this.sortAsc = !this.sortAsc;
-      } else {
-        this.sortKey = key;
-        this.sortAsc = true;
-      }
-    },
-
-
     async approve(payment) {
       const payload = { id: payment.id, status: "paid" };
       const res = await this.$apiPatch(`/update_subscription_payment`, payment.id, payload);
       if (res) {
-        this.$root.$refs.toast.showToast(`Payment Approved Successfully`, 'success');
+        this.$root.$refs.toast.showToast("Payment Approved Successfully", "success");
         const subPayload = { id: res.subscription_id, status: "active" };
         const resSub = await this.$apiPatch(`/update_subscription`, res.subscription_id, subPayload);
         if (resSub) {
-          this.$root.$refs.toast.showToast(`Subscription activated successfully!`, 'success');
+          this.$root.$refs.toast.showToast("Subscription activated successfully!", "success");
           this.$reloadPage();
         }
       }
     },
-    
-
     async reject(payment) {
       const payload = { id: payment.id, status: "canceled" };
       const res = await this.$apiPatch(`/update_subscription_payment`, payment.id, payload);
       if (res) {
-        this.$root.$refs.toast.showToast(`Payment DisApproved Successfully`, 'success');
+        this.$root.$refs.toast.showToast("Payment Disapproved Successfully", "success");
         const subPayload = { id: res.subscription_id, status: "pending" };
         const resSub = await this.$apiPatch(`/update_subscription`, res.subscription_id, subPayload);
         if (resSub) {
-          this.$root.$refs.toast.showToast(`Subscription status updated successfully!`, 'success');
+          this.$root.$refs.toast.showToast("Subscription status updated successfully!", "success");
           this.$reloadPage();
         }
       }

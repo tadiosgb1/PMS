@@ -5,7 +5,9 @@
     <div class="min-h-screen bg-gray-100 m-3">
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
         <!-- Header -->
-        <div class="bg-primary text-white px-6 py-4 text-xl font-bold flex justify-between items-center">
+        <div
+          class="bg-primary text-white px-6 py-4 text-xl font-bold flex justify-between items-center"
+        >
           Workspace Payments
           <button
             v-if="!rentalId"
@@ -16,21 +18,23 @@
           </button>
         </div>
 
-        <!-- Search & Page Size (hide in detail) -->
-        <div  class="p-6 flex justify-between items-center mb-6">
+        <!-- Filters & Search -->
+        <div
+          class="p-4 flex flex-col lg:flex-row gap-4 justify-between items-center"
+        >
           <input
             v-model="searchTerm"
             @input="fetchPayments(1)"
             type="search"
             placeholder="Search payments..."
-            class="w-full max-w-md px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="w-full lg:w-1/3 px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 
-
-           <div class="flex items-center">
+          <div class="flex flex-wrap gap-3 items-center justify-between w-full lg:w-auto">
+            <div class="flex items-center">
               <label class="mr-2 text-sm text-gray-600">Status</label>
               <select
-              @change="fetchPayments()"
+                @change="fetchPayments()"
                 v-model="status"
                 class="px-2 py-1 border rounded-md text-sm"
               >
@@ -41,65 +45,103 @@
               </select>
             </div>
 
-      <div class="flex items-center">
-        <label class="mr-2 text-sm text-gray-600">Payment Method</label>
-        <select
-          @change="fetchPayments(1)"
-          v-model="payment_method"
-          class="px-2 py-1 border rounded-md text-sm"
-        >
-          <option value="">All</option>
-          <option value="tellebirr">Tellebirr</option>
-          <option value="cash">Cash</option>
-        </select>
-      </div>
-          <div class="ml-4 flex items-center">
-            <label class="mr-2 text-gray-700">Show</label>
-            <select v-model="perPage" @change="fetchPayments(1)" class="border px-2 py-1 rounded">
-              <option v-for="size in pageSizes" :key="size" :value="size">{{ size }}</option>
-            </select>
-            <span class="ml-1 text-gray-700">per page</span>
+            <div class="flex items-center">
+              <label class="mr-2 text-sm text-gray-600">Payment Method</label>
+              <select
+                @change="fetchPayments(1)"
+                v-model="payment_method"
+                class="px-2 py-1 border rounded-md text-sm"
+              >
+                <option value="">All</option>
+                <option value="tellebirr">Tellebirr</option>
+                <option value="cash">Cash</option>
+              </select>
+            </div>
+
+            <div class="flex items-center">
+              <label class="mr-2 text-sm text-gray-600">Show</label>
+              <select
+                v-model="perPage"
+                @change="fetchPayments(1)"
+                class="px-2 py-1 border rounded-md text-sm"
+              >
+                <option
+                  v-for="size in pageSizes"
+                  :key="size"
+                  :value="size"
+                >
+                  {{ size }}
+                </option>
+              </select>
+            </div>
           </div>
         </div>
 
-        <!-- Table -->
-        <div class="overflow-x-auto p-6">
-          <table class="min-w-full table-auto border-collapse border border-gray-300 text-sm">
+        <!-- Table (Desktop) -->
+        <div class="hidden md:block overflow-x-auto p-6">
+          <table
+            class="min-w-full table-auto border-collapse border border-gray-300 text-sm"
+          >
             <thead>
               <tr class="bg-gray-200 text-gray-700">
-                <th class="border border-gray-300 px-4 py-2 cursor-pointer" @click="sortBy('rental_info')">
-                  Rental Info
-                  <SortIcon :field="'rental_info'" :sort-key="sortKey" :sort-asc="sortAsc" />
-                </th>
+                <th class="border border-gray-300 px-4 py-2">Rental Info</th>
                 <th class="border border-gray-300 px-4 py-2">Amount</th>
-                 <th class="border border-gray-300 px-4 py-2">Transaction ID</th>
-                 <th class="border border-gray-300 px-4 py-2">Payment Method</th>
+                <th class="border border-gray-300 px-4 py-2">Transaction ID</th>
+                <th class="border border-gray-300 px-4 py-2">Payment Method</th>
                 <th class="border border-gray-300 px-4 py-2">Cycle Start</th>
                 <th class="border border-gray-300 px-4 py-2">Cycle End</th>
                 <th class="border border-gray-300 px-4 py-2">Paid At</th>
                 <th class="border border-gray-300 px-4 py-2">Status</th>
-                <th class="border border-gray-300 px-4 py-2 text-center">Actions</th>
+                <th class="border border-gray-300 px-4 py-2 text-center">
+                  Actions
+                </th>
               </tr>
             </thead>
             <tbody>
-              <tr v-for="payment in filteredAndSortedPayments" :key="payment.id" class="hover:bg-gray-100">
-
-
-                <td class="border border-gray-300 px-4 py-2"> {{ payment.rental_id }}<button @click="goToRentalDetail(payment.rental)" class="text-blue-600 hover:text-blue-800">
-                    View detail
-                  </button></td>
-
-
-                <td class="border border-gray-300 px-4 py-2">{{ payment.amount }} ETB</td>
-
-                <td class="border border-gray-300 px-4 py-2">{{ payment.transaction_id }} ETB</td>
-                <td class="border border-gray-300 px-4 py-2">{{ payment.payment_method }} ETB</td>
-
-                <td class="border border-gray-300 px-4 py-2">{{ formatDate(payment.cycle_start) }}</td>
-                <td class="border border-gray-300 px-4 py-2">{{ formatDate(payment.cycle_end) }}</td>
-                <td class="border border-gray-300 px-4 py-2">{{ formatDate(payment.paid_at) }}</td>
-                <td class="border border-gray-300 px-4 py-2">{{ payment.status }}</td>
-                <td class="border border-gray-300 px-4 py-2 text-center space-x-2">
+              <tr
+                v-for="payment in filteredAndSortedPayments"
+                :key="payment.id"
+                class="hover:bg-gray-100"
+              >
+                <td class="border border-gray-300 px-4 py-2">
+                  {{ payment.rental_id }}
+                  <button
+                    @click="goToRentalDetail(payment.rental)"
+                    class="text-blue-600 hover:text-blue-800"
+                  >
+                    View Detail
+                  </button>
+                </td>
+                <td class="border border-gray-300 px-4 py-2">
+                  {{ payment.amount }} ETB
+                </td>
+                <td class="border border-gray-300 px-4 py-2">
+                  {{ payment.transaction_id }}
+                </td>
+                <td class="border border-gray-300 px-4 py-2">
+                  {{ payment.payment_method }}
+                </td>
+                <td class="border border-gray-300 px-4 py-2">
+                  {{ formatDate(payment.cycle_start) }}
+                </td>
+                <td class="border border-gray-300 px-4 py-2">
+                  {{ formatDate(payment.cycle_end) }}
+                </td>
+                <td class="border border-gray-300 px-4 py-2">
+                  {{ formatDate(payment.paid_at) }}
+                </td>
+                <td class="border border-gray-300 px-4 py-2">
+                  <span
+                    :class="{
+                      'bg-green-600 text-white px-2 py-1 rounded': payment.status === 'paid',
+                      'bg-yellow-500 text-white px-2 py-1 rounded': payment.status === 'pending',
+                      'bg-red-600 text-white px-2 py-1 rounded': payment.status === 'cancelled'
+                    }"
+                  >
+                    {{ payment.status }}
+                  </span>
+                </td>
+                <td class="border border-gray-300 px-4 py-2 text-center">
                   <button
                     v-if="payment.status !== 'complete'"
                     @click="approve(payment)"
@@ -117,7 +159,7 @@
                 </td>
               </tr>
               <tr v-if="filteredAndSortedPayments.length === 0">
-                <td colspan="7" class="text-center py-6 text-gray-500">
+                <td colspan="9" class="text-center py-6 text-gray-500">
                   No payments found.
                 </td>
               </tr>
@@ -125,8 +167,79 @@
           </table>
         </div>
 
-        <!-- Pagination (hide in detail) -->
-        <div v-if="!rentalId" class="flex justify-between items-center p-6">
+        <!-- Responsive List (Mobile + Tablet) -->
+        <div
+          class="md:hidden p-4 grid gap-4 sm:grid-cols-2"
+        >
+          <div
+            v-for="payment in filteredAndSortedPayments"
+            :key="payment.id"
+            class="bg-gray-50 border rounded-lg p-4 shadow-sm"
+          >
+            <div class="flex justify-between items-center mb-2">
+              <h3 class="font-semibold text-gray-800">
+                Rental #{{ payment.rental_id }}
+              </h3>
+              <span
+                :class="{
+                  'bg-green-600 text-white px-2 py-1 rounded': payment.status === 'paid',
+                  'bg-yellow-500 text-white px-2 py-1 rounded': payment.status === 'pending',
+                  'bg-red-600 text-white px-2 py-1 rounded': payment.status === 'cancelled'
+                }"
+              >
+                {{ payment.status }}
+              </span>
+            </div>
+            <p class="text-sm text-gray-600">
+              <strong>Amount:</strong> {{ payment.amount }} ETB
+            </p>
+            <p class="text-sm text-gray-600">
+              <strong>Method:</strong> {{ payment.payment_method }}
+            </p>
+            <p class="text-sm text-gray-600">
+              <strong>Transaction ID:</strong> {{ payment.transaction_id }}
+            </p>
+            <p class="text-sm text-gray-600">
+              <strong>Cycle:</strong> {{ formatDate(payment.cycle_start) }} →
+              {{ formatDate(payment.cycle_end) }}
+            </p>
+            <p class="text-sm text-gray-600 mb-3">
+              <strong>Paid At:</strong> {{ formatDate(payment.paid_at) }}
+            </p>
+            <div class="flex justify-between items-center">
+              <button
+                @click="goToRentalDetail(payment.rental)"
+                class="text-blue-600 font-medium hover:underline"
+              >
+                View Detail
+              </button>
+              <button
+                v-if="payment.status !== 'complete'"
+                @click="approve(payment)"
+                class="text-blue-600 hover:text-blue-800"
+              >
+                Approve
+              </button>
+              <button
+                v-else
+                @click="disApprove(payment)"
+                class="text-red-600 hover:text-red-800"
+              >
+                Disapprove
+              </button>
+            </div>
+          </div>
+
+          <div v-if="filteredAndSortedPayments.length === 0" class="text-center text-gray-500">
+            No payments found.
+          </div>
+        </div>
+
+        <!-- Pagination -->
+        <div
+          v-if="!rentalId"
+          class="flex justify-between items-center p-6 text-sm text-gray-600"
+        >
           <button
             :disabled="!previous"
             @click="fetchPayments(previous)"
@@ -134,7 +247,7 @@
           >
             Previous
           </button>
-          <span class="text-gray-600">Page {{ currentPage }} of {{ totalPages }}</span>
+          <span>Page {{ currentPage }} of {{ totalPages }}</span>
           <button
             :disabled="!next"
             @click="fetchPayments(next)"
@@ -155,6 +268,7 @@
     </div>
   </div>
 </template>
+
 
 <script>
 import Toast from "@/components/Toast.vue";
