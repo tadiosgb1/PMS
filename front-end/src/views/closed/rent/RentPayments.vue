@@ -34,7 +34,7 @@
           <option value="cancelled">Cancelled</option>
         </select>
       </div>
-
+       
       <div class="flex items-center">
         <label class="mr-2 text-sm text-gray-600">Payment Method</label>
         <select
@@ -192,7 +192,7 @@ export default {
   computed: {
     
     rentId() {
-      return this.$route.params.rent_id || null;
+      return this.$route.params.id || null;
     },
     filteredPayments() {
       const term = this.searchTerm.toLowerCase();
@@ -262,7 +262,7 @@ export default {
 
         if (this.rentId) {
           // Detail mode: only rent_id
-          params = { ...params, rent_id__id: this.rentId };
+          params = { ...params, rent_id: this.rentId };
         } else {
           // List mode
           params = { ...params, page, page_size: this.perPage };
@@ -272,7 +272,7 @@ export default {
         }
 
 
-        console.log("params payments",params);
+        console.log("params msmsmsmssmsmmsmsmmssmmsm payments",params);
 
         const res = await this.$apiGet("/get_payments", params);
 

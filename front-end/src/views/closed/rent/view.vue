@@ -123,24 +123,7 @@
                   <td
                     class="border border-gray-300 px-4 py-2 text-center space-x-2"
                   >
-                 
                     <button
-                      @click="rentDetail(rent.id)"
-                      class="text-green-600 hover:text-green-800 focus:outline-none"
-                      title="Detail"
-                    >
-                      <i class="fas fa-info-circle"></i>
-                    </button>
-                
-                    <button
-                      @click="goToPayments(rent.id)"
-                      class="text-green-600 hover:text-green-800 focus:outline-none"
-                      title="Payments"
-                    >
-                      Payments
-                    </button>
-                     
-                      <button
                       @click="selectedRentId = rent.id; showModal = true"
                       class="relative px-4 py-2 text-green-600 border border-green-600 rounded-lg
                         hover:text-white hover:bg-green-600
@@ -148,6 +131,20 @@
                       title="Pay Rent"
                     >
                       <i class="fas fa-credit-card mr-2"></i> Pay
+                    </button>
+                    <button
+                      @click="rentDetail(rent.id)"
+                      class="text-green-600 hover:text-green-800 focus:outline-none"
+                      title="Detail"
+                    >
+                      <i class="fas fa-info-circle"></i>
+                    </button>
+                    <button
+                      @click="goToPayments(rent.id)"
+                      class="text-green-600 hover:text-green-800 focus:outline-none"
+                      title="Payments"
+                    >
+                      Payments
                     </button>
                   </td>
                 </tr>
@@ -314,11 +311,12 @@ export default {
     this.fetchRents();
   },
   methods: {
-   goToPayments(rental_id) {
-      this.$router.push({
-        path: "/rents_payments",
-        query: { rent_id: rental_id },
-      });
+   goToPayments(rentId) {
+   
+     this.$router.push({
+          name: "rents_payment_detail",
+          params: { id: rentId },
+        });
     },
 
     rentDetail(rent_id) {

@@ -171,6 +171,15 @@
                       Approve
                     </button> -->
                     <button
+                      @click="selectedSaleId = sale.id; showModal = true"
+                      class="relative px-4 py-2 text-green-600 border border-green-600 rounded-lg
+                        hover:text-white hover:bg-green-600
+                        transition duration-300 ease-in-out"
+                      title="Pay Rent"
+                    >
+                      <i class="fas fa-credit-card mr-2"></i> Pay
+                    </button>
+                    <button
                       @click="goToPayment(sale.id)"
                       class="text-blue-600 hover:text-blue-800 focus:outline-none"
                       title="View Payment"
@@ -248,13 +257,20 @@
       <AddSale
         :visible="showAddSale"
         @close="showAddSale = false"
-        @success="fetchSales()"
+        @ref="fetchSales()"
       />
 
       <UpdateSale
         :visible="showUpdateSale"
         :sale="selectedSale"
         @close="showUpdateSale = false"
+        @refresh="fetchSales()"
+      />
+      <MakePaymentModal
+        v-if="showModal"
+        :visible="showModal"
+        :saleId="selectedSaleId"
+        @close="showModal = false"
         @success="fetchSales()"
       />
     </div>
@@ -266,6 +282,7 @@ import ConfirmModal from "@/components/ConfirmModal.vue";
 import Toast from "@/components/Toast.vue";
 import AddSale from "./add.vue";
 import UpdateSale from "./update.vue";
+import MakePaymentModal from "@/views/closed/PropertySales/addSalePayment.vue";
 
 const SortIcon = {
   props: ["field", "sortKey", "sortAsc"],
@@ -286,7 +303,7 @@ const SortIcon = {
 
 export default {
   name: "propertySalesView",
-  components: { SortIcon, ConfirmModal, Toast, AddSale, UpdateSale },
+  components: { SortIcon, ConfirmModal, Toast, AddSale, UpdateSale,MakePaymentModal },
   data() {
     return {
       searchTerm: "",
@@ -305,6 +322,8 @@ export default {
       showUpdateSale: false,
       selectedSale: null,
       status:"",
+      showModal: false,
+      selectedSaleId: "",
     };
   },
   computed: {

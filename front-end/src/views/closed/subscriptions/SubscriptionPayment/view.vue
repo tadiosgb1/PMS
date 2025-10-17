@@ -409,6 +409,8 @@ export default {
         this.sortAsc = true;
       }
     },
+
+
     async approve(payment) {
       const payload = { id: payment.id, status: "paid" };
       const res = await this.$apiPatch(`/update_subscription_payment`, payment.id, payload);
@@ -422,6 +424,8 @@ export default {
         }
       }
     },
+    
+
     async reject(payment) {
       const payload = { id: payment.id, status: "canceled" };
       const res = await this.$apiPatch(`/update_subscription_payment`, payment.id, payload);
