@@ -17,82 +17,74 @@
           </button>
         </div>
 
-        <!-- Content -->
+        <!-- Filters -->
         <div class="p-6">
-        <!-- Search & Filters -->
-  <div class="flex flex-wrap justify-between items-center gap-4 mb-6 filters-container">
-    <!-- Search -->
-    <div class="w-full md:w-1/3 lg:w-1/4">
-      <input
-        v-model="searchTerm"
-        @input="fetchProperties()"
-        type="search"
-        placeholder="Search properties..."
-        class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-      />
-    </div>
+          <div class="flex flex-wrap justify-between items-center gap-4 mb-6 filters-container">
+            <div class="w-full md:w-1/3 lg:w-1/4">
+              <input
+                v-model="searchTerm"
+                @input="fetchProperties()"
+                type="search"
+                placeholder="Search properties..."
+                class="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              />
+            </div>
 
-    <!-- Property Zone -->
-    <div v-if="!zone_id_query_set" class="w-full md:w-1/3 lg:w-1/4">
-      <label class="block text-gray-700 text-sm mb-1">Property Zone</label>
-      <select
-        v-model="zone_id"
-        @change="fetchProperties()"
-        class="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-      >
-        <option value="">Select Zone</option>
-        <option v-for="zone in zones" :key="zone.id" :value="zone.id">
-          {{ zone.name }}
-        </option>
-      </select>
-    </div>
+            <div v-if="!zone_id_query_set" class="w-full md:w-1/3 lg:w-1/4">
+              <label class="block text-gray-700 text-sm mb-1">Property Zone</label>
+              <select
+                v-model="zone_id"
+                @change="fetchProperties()"
+                class="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">Select Zone</option>
+                <option v-for="zone in zones" :key="zone.id" :value="zone.id">
+                  {{ zone.name }}
+                </option>
+              </select>
+            </div>
 
-    <!-- Status -->
-    <div class="w-full md:w-1/3 lg:w-1/4">
-      <label class="block text-gray-700 text-sm mb-1">Status</label>
-      <select
-        v-model="status"
-        @change="fetchProperties()"
-        class="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-      >
-        <option value="">All</option>
-        <option value="rent">Rent</option>
-        <option value="sale">Sale</option>
-        <option value="available">Available</option>
-        <option value="under_maintenance">Under Maintenance</option>
-      </select>
-    </div>
+            <div class="w-full md:w-1/3 lg:w-1/4">
+              <label class="block text-gray-700 text-sm mb-1">Status</label>
+              <select
+                v-model="status"
+                @change="fetchProperties()"
+                class="w-full border rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              >
+                <option value="">All</option>
+                <option value="rent">Rent</option>
+                <option value="sale">Sale</option>
+                <option value="available">Available</option>
+                <option value="under_maintenance">Under Maintenance</option>
+              </select>
+            </div>
 
-    <!-- Page Size -->
-    <div class="w-full md:w-1/3 lg:w-1/6">
-      <label for="pageSize" class="block text-gray-700 text-sm mb-1">Show</label>
-      <div class="flex items-center">
-        <select
-          id="pageSize"
-          v-model="pageSize"
-          @change="fetchProperties()"
-          class="border px-3 py-2 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
-        >
-          <option v-for="size in pageSizes" :key="size" :value="size">
-            {{ size }}
-          </option>
-        </select>
-        <span class="ml-1 text-gray-700 text-sm">per page</span>
-      </div>
-    </div>
-  </div>
+            <div class="w-full md:w-1/3 lg:w-1/6">
+              <label for="pageSize" class="block text-gray-700 text-sm mb-1">Show</label>
+              <div class="flex items-center">
+                <select
+                  id="pageSize"
+                  v-model="pageSize"
+                  @change="fetchProperties()"
+                  class="border px-3 py-2 rounded-md text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+                >
+                  <option v-for="size in pageSizes" :key="size" :value="size">
+                    {{ size }}
+                  </option>
+                </select>
+                <span class="ml-1 text-gray-700 text-sm">per page</span>
+              </div>
+            </div>
+          </div>
 
-          <!-- Table -->
-          <div class="overflow-x-auto">
+          <!-- Desktop Table -->
+          <div class="hidden md:block overflow-x-auto">
             <table
               class="min-w-full table-auto border-collapse border border-gray-300 text-sm"
             >
               <thead>
                 <tr class="bg-gray-200 text-gray-700 text-left">
-                  <th
-                    class="border border-gray-300 px-3 py-2 cursor-pointer"
-                    @click="changeOrdering('name')"
-                  >
+                  <th class="border border-gray-300 px-3 py-2 cursor-pointer" @click="changeOrdering('name')">
                     Name
                   </th>
                   <th class="border border-gray-300 px-3 py-2">Owner</th>
@@ -100,10 +92,8 @@
                   <th class="border border-gray-300 px-3 py-2">Zone</th>
                   <th class="border border-gray-300 px-3 py-2">Type</th>
                   <th class="border border-gray-300 px-3 py-2">City</th>
-                  <th class="border border-gray-300 px-3 py-2">Status</th>
-                  <th class="border border-gray-300 px-3 py-2 text-center">
-                    Actions
-                  </th>
+                  <th class="border border-gray-300 px-3 py-2 text-center">Status</th>
+                  <th class="border border-gray-300 px-3 py-2 text-center">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -112,69 +102,54 @@
                   :key="property.id"
                   class="hover:bg-gray-100"
                 >
+                  <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">{{ property.name }}</td>
                   <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
-                    {{ property.name }}
-                  </td>
-                  <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
-                    {{ property.ownerName }}   <button
-                      @click="goToUserDetail(property.owner_id)"
-                      class="text-green-600 hover:text-green-800"
-                      title="Detail"
-                      :disabled="!property.id"
-                    >
-                      <i class="fas fa-info-circle"></i>
-                    </button>
-                  </td>
-                  <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
-                    {{ property.managerName }}  <button
-                      @click="goToUserDetail(property.manager_id)"
-                      class="text-green-600 hover:text-green-800"
-                      title="Detail"
-                      :disabled="!property.id"
-                    >
-                      <i class="fas fa-info-circle"></i>
-                    </button>
-                  </td>
-                  <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
-                    {{ property.zoneName }}  <button
-                      @click="goToZoneDetail(property.property_zone_id)"
-                      class="text-green-600 hover:text-green-800"
-                      title="Detail"
-                      :disabled="!property.id"
-                    >
-                      <i class="fas fa-info-circle"></i>
-                    </button>
-                  </td>
-                  <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
-                    {{ property.property_type }}
-                  </td>
-                  <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
-                    {{ property.city }}
-                  </td>
-                <td class="border border-gray-300 px-3 py-2 whitespace-nowrap text-center">
-  <span 
-    class="px-3 py-1 rounded-full text-white text-xs font-semibold"
-    :class="{
-      'bg-green-600': property.status === 'available',
-      'bg-blue-600': property.status === 'rent',
-      'bg-yellow-600': property.status === 'sale',
-      'bg-pink-400': property.status === 'under_maintenance'
-    }"
-  >
-    {{ property.status }}
-  </span>
-</td>
-
-
-                  <td
-                    class="border border-gray-300 px-3 py-2 text-center space-x-2"
-                  >
+                    {{ property.ownerName }}
                     <button
-                      @click="goToDetail(property.id)"
-                      class="text-green-600 hover:text-green-800"
+                      @click="goToUserDetail(property.owner_id)"
+                      class="text-green-600 hover:text-green-800 ml-1"
                       title="Detail"
-                      :disabled="!property.id"
                     >
+                      <i class="fas fa-info-circle"></i>
+                    </button>
+                  </td>
+                  <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
+                    {{ property.managerName }}
+                    <button
+                      @click="goToUserDetail(property.manager_id)"
+                      class="text-green-600 hover:text-green-800 ml-1"
+                      title="Detail"
+                    >
+                      <i class="fas fa-info-circle"></i>
+                    </button>
+                  </td>
+                  <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
+                    {{ property.zoneName }}
+                    <button
+                      @click="goToZoneDetail(property.property_zone_id)"
+                      class="text-green-600 hover:text-green-800 ml-1"
+                      title="Detail"
+                    >
+                      <i class="fas fa-info-circle"></i>
+                    </button>
+                  </td>
+                  <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">{{ property.property_type }}</td>
+                  <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">{{ property.city }}</td>
+                  <td class="border border-gray-300 px-3 py-2 text-center">
+                    <span
+                      class="px-3 py-1 rounded-full text-white text-xs font-semibold"
+                      :class="{
+                        'bg-green-600': property.status === 'available',
+                        'bg-blue-600': property.status === 'rent',
+                        'bg-yellow-600': property.status === 'sale',
+                        'bg-pink-400': property.status === 'under_maintenance'
+                      }"
+                    >
+                      {{ property.status }}
+                    </span>
+                  </td>
+                  <td class="border border-gray-300 px-3 py-2 text-center space-x-2">
+                    <button @click="goToDetail(property.id)" class="text-green-600 hover:text-green-800" title="Detail">
                       <i class="fas fa-info-circle"></i>
                     </button>
                     <button
@@ -197,19 +172,77 @@
                       @click="rentPay(property.id)"
                       class="text-green-600 hover:text-green-800"
                       title="Rent Payment"
-                      :disabled="!property.id"
                     >
                       <i class="fas fa-money-bill-wave"></i>
                     </button>
                   </td>
                 </tr>
                 <tr v-if="properties.length === 0">
-                  <td colspan="8" class="text-center py-6 text-gray-500">
-                    No properties found.
-                  </td>
+                  <td colspan="8" class="text-center py-6 text-gray-500">No properties found.</td>
                 </tr>
               </tbody>
             </table>
+          </div>
+
+          <!-- Mobile & Tablet View -->
+          <div class="block md:hidden space-y-4">
+            <div
+              v-for="property in properties"
+              :key="property.id"
+              class="border border-gray-300 rounded-lg shadow-sm p-4 bg-white"
+            >
+              <div class="flex justify-between items-center mb-2">
+                <h3 class="font-semibold text-lg text-gray-800">{{ property.name }}</h3>
+                <span
+                  class="px-3 py-1 rounded-full text-white text-xs font-semibold"
+                  :class="{
+                    'bg-green-600': property.status === 'available',
+                    'bg-blue-600': property.status === 'rent',
+                    'bg-yellow-600': property.status === 'sale',
+                    'bg-pink-400': property.status === 'under_maintenance'
+                  }"
+                >
+                  {{ property.status }}
+                </span>
+              </div>
+
+              <div class="text-sm text-gray-700 space-y-1">
+                <p><strong>Owner:</strong> {{ property.ownerName }}</p>
+                <p><strong>Manager:</strong> {{ property.managerName }}</p>
+                <p><strong>Zone:</strong> {{ property.zoneName }}</p>
+                <p><strong>Type:</strong> {{ property.property_type }}</p>
+                <p><strong>City:</strong> {{ property.city }}</p>
+              </div>
+
+              <div class="flex justify-end mt-3 space-x-3">
+                <button @click="goToDetail(property.id)" class="text-green-600 hover:text-green-800" title="Detail">
+                  <i class="fas fa-info-circle"></i>
+                </button>
+                <button
+                  v-if="$hasPermission('pms.change_property')"
+                  @click="editProperty(property)"
+                  class="text-blue-600 hover:text-blue-800"
+                  title="Edit"
+                >
+                  <i class="fas fa-edit"></i>
+                </button>
+                <button
+                  v-if="$hasPermission('pms.delete_property')"
+                  @click="askDeleteConfirmation(property)"
+                  class="text-red-600 hover:text-red-800"
+                  title="Delete"
+                >
+                  <i class="fas fa-trash-alt"></i>
+                </button>
+                <button
+                  @click="rentPay(property.id)"
+                  class="text-green-600 hover:text-green-800"
+                  title="Rent Payment"
+                >
+                  <i class="fas fa-money-bill-wave"></i>
+                </button>
+              </div>
+            </div>
           </div>
 
           <!-- Pagination -->

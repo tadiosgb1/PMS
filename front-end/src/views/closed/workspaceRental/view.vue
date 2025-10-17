@@ -5,49 +5,46 @@
     <div class="min-h-screen bg-gray-100 m-3">
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
         <!-- Header -->
-        <div class="bg-primary text-white px-6 py-4 text-xl font-bold flex justify-between items-center">
+        <div class="bg-primary text-white px-4 md:px-6 py-3 md:py-4 text-lg md:text-xl font-bold flex justify-between items-center">
           Workspace Rentals
           <button
             @click="showAddRental = true"
-            class="bg-white text-blue-700 font-semibold px-2 lg:px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300 flex items-center"
+            class="bg-white text-blue-700 font-semibold px-2 md:px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300 flex items-center"
           >
             <span class="text-primary mr-1">+</span> Add
           </button>
         </div>
 
         <!-- Search & Page Size -->
-        <div class="p-6 flex justify-between items-center mb-6">
+        <div class="p-4 md:p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
           <input
             v-model="searchTerm"
             type="search"
             placeholder="Search Rentals..."
-            class="w-full max-w-md px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="w-full md:max-w-md px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 
-          <div class="ml-4 flex items-center">
-            <label for="pageSize" class="mr-2 text-gray-700">Show</label>
+          <div class="flex items-center gap-2">
+            <label for="pageSize" class="text-gray-700">Show</label>
             <select
               id="pageSize"
               v-model="pageSize"
               @change="fetchRentals()"
               class="border px-2 py-1 rounded"
             >
-              <option v-for="size in pageSizes" :key="size" :value="size">
-                {{ size }}
-              </option>
+              <option v-for="size in pageSizes" :key="size" :value="size">{{ size }}</option>
             </select>
-            <span class="ml-1 text-gray-700">per page</span>
+            <span class="text-gray-700">per page</span>
           </div>
         </div>
 
-        <!-- Table -->
-        <div class="overflow-x-auto p-6">
+        <!-- Desktop Table -->
+        <div class="hidden md:block overflow-x-auto p-4">
           <table class="min-w-full table-auto border-collapse border border-gray-300 text-sm">
             <thead>
               <tr class="bg-gray-200 text-gray-700">
                 <th class="border border-gray-300 px-4 py-2 cursor-pointer" @click="sortBy('guest_name')">
-                  Guest Name
-                  <SortIcon :field="'guest_name'" :sort-key="sortKey" :sort-asc="sortAsc" />
+                  Guest Name <SortIcon :field="'guest_name'" :sort-key="sortKey" :sort-asc="sortAsc" />
                 </th>
                 <th class="border border-gray-300 px-4 py-2">Email</th>
                 <th class="border border-gray-300 px-4 py-2">Phone</th>
@@ -68,26 +65,24 @@
                 <td class="border border-gray-300 px-4 py-2">{{ rental.cycle }}</td>
                 <td class="border border-gray-300 px-4 py-2">{{ rental.start_date }}</td>
                 <td class="border border-gray-300 px-4 py-2">{{ rental.is_active ? "Yes" : "No" }}</td>
-                <td class="border border-gray-300 px-4 py-2">{{ rental.space.name || rental.space }}  <button
-                      @click="goToSpaceDetail(rental.space.id)"
-                      class="text-blue-600 hover:text-blue-800 focus:outline-none"
-                      title="View Payment"
-                    >
-                      View 
-                    </button></td>
-                <td class="border border-gray-300 px-4 py-2 text-center space-x-2" >
-                  <button v-if="rental.is_active==false" @click="openPaymentModal(rental.id)" class="relative px-3 py-1 text-green-600 border border-green-600 rounded-lg hover:text-white hover:bg-green-600 transition duration-300 ease-in-out">
+                <td class="border border-gray-300 px-4 py-2">
+                  {{ rental.space.name || rental.space }}
+                  <button
+                    @click="goToSpaceDetail(rental.space.id)"
+                    class="text-blue-600 hover:text-blue-800 focus:outline-none ml-1"
+                    title="View Payment"
+                  >View</button>
+                </td>
+                <td class="border border-gray-300 px-4 py-2 text-center space-x-2">
+                  <button v-if="!rental.is_active" @click="openPaymentModal(rental.id)" class="px-3 py-1 text-green-600 border border-green-600 rounded-lg hover:text-white hover:bg-green-600 transition duration-300 ease-in-out">
                     <i class="fas fa-credit-card mr-1"></i> Pay
                   </button>
-
                   <button @click="editRental(rental)" class="text-green-600 hover:text-green-800">
                     <i class="fas fa-edit"></i>
                   </button>
-
                   <button @click="askDeleteConfirmation(rental)" class="text-red-600 hover:text-red-800">
                     <i class="fas fa-trash"></i>
                   </button>
-
                   <button @click="goToPayments(rental.id)" class="text-blue-600 hover:text-blue-800">
                     Payments
                   </button>
@@ -100,36 +95,52 @@
           </table>
         </div>
 
+        <!-- Mobile Card View -->
+        <div class="md:hidden grid gap-4 p-4">
+          <div v-for="rental in filteredAndSortedRentals" :key="rental.id" class="border rounded-lg bg-white shadow-sm p-4 space-y-2">
+            <div class="flex justify-between items-center">
+              <p class="font-semibold text-gray-800">{{ rental.guest_name }}</p>
+              <span class="text-sm text-gray-600">{{ rental.is_active ? "Active" : "Inactive" }}</span>
+            </div>
+            <p class="text-sm text-gray-600"><strong>Email:</strong> {{ rental.guest_email }}</p>
+            <p class="text-sm text-gray-600"><strong>Phone:</strong> {{ rental.guest_phone }}</p>
+            <p class="text-sm text-gray-600"><strong>Created By:</strong> {{ rental.user.first_name }}</p>
+            <p class="text-sm text-gray-600"><strong>Cycle:</strong> {{ rental.cycle }}</p>
+            <p class="text-sm text-gray-600"><strong>Start Date:</strong> {{ rental.start_date }}</p>
+            <p class="text-sm text-gray-600">
+              <strong>Space:</strong> {{ rental.space.name || rental.space }}
+              <button @click="goToSpaceDetail(rental.space.id)" class="text-blue-600 hover:text-blue-800 text-sm ml-1">View</button>
+            </p>
+            <div class="flex flex-wrap justify-end gap-2 pt-2">
+              <button v-if="!rental.is_active" @click="openPaymentModal(rental.id)" class="text-green-600 hover:text-green-800 text-sm">Pay</button>
+              <button @click="editRental(rental)" class="text-green-600 hover:text-green-800 text-sm">Edit</button>
+              <button @click="askDeleteConfirmation(rental)" class="text-red-600 hover:text-red-800 text-sm">Delete</button>
+              <button @click="goToPayments(rental.id)" class="text-blue-600 hover:text-blue-800 text-sm">Payments</button>
+            </div>
+          </div>
+        </div>
+
         <!-- Pagination -->
-        <div class="flex justify-between items-center p-6">
+        <div class="flex justify-between items-center p-4 md:p-6">
           <button :disabled="!previous" @click="fetchRentals(previous)" class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50">
             Previous
           </button>
-          <span class="text-gray-600">Page {{ currentPage }} of {{ totalPages }}</span>
+          <span class="text-gray-600 text-sm">Page {{ currentPage }} of {{ totalPages }}</span>
           <button :disabled="!next" @click="fetchRentals(next)" class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50">
             Next
           </button>
         </div>
       </div>
 
-      <!-- Add & Update Modals -->
+      <!-- Modals -->
       <AddRental :visible="showAddRental" @close="showAddRental = false" @success="fetchRentals" />
       <WorkspaceRentalUpdate :visible="updateVisible" :rental="rentalToEdit" @close="updateVisible = false" @refresh="fetchRentals" />
-
-      <!-- Delete Confirmation Modal -->
       <ConfirmModal :visible="confirmVisible" title="Confirm Deletion" message="Are you sure you want to delete this rental?" @confirm="confirmDelete" @cancel="confirmVisible = false" />
-
-      <!-- Payment Modal -->
-      <WorkspaceRentalPay
-        v-if="paymentVisible"
-        :visible="paymentVisible"
-        :rentalId="selectedRentalId"
-        @close="paymentVisible = false"
-        @success="fetchRentals"
-      />
+      <WorkspaceRentalPay v-if="paymentVisible" :visible="paymentVisible" :rentalId="selectedRentalId" @close="paymentVisible = false" @success="fetchRentals" />
     </div>
   </div>
 </template>
+
 
 <script>
 import Toast from "@/components/Toast.vue";

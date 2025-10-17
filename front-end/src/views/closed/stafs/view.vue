@@ -2,7 +2,7 @@
   <div>
     <Toast ref="toast" />
 
-    <div class="min-h-screen bg-gray-100 ">
+    <div class="min-h-screen bg-gray-100 m-3">
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
         <!-- Header -->
         <div
@@ -18,16 +18,16 @@
         </div>
 
         <!-- Search & Page Size -->
-        <div class="p-6 flex justify-between items-center mb-6">
+        <div class="p-6 flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
           <input
             v-model="searchTerm"
             type="search"
             placeholder="Search Staff..."
-            class="w-full max-w-md px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="w-full md:max-w-md px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 
-          <div class="ml-4 flex items-center">
-            <label for="pageSize" class="mr-2 text-gray-700">Show</label>
+          <div class="flex items-center gap-2">
+            <label for="pageSize" class="text-gray-700">Show</label>
             <select
               id="pageSize"
               v-model="pageSize"
@@ -38,127 +38,88 @@
                 {{ size }}
               </option>
             </select>
-            <span class="ml-1 text-gray-700">per page</span>
+            <span class="text-gray-700">per page</span>
           </div>
         </div>
 
-        <!-- Table -->
-        <div class="overflow-x-auto p-6">
-          <table
-            class="min-w-full table-auto border-collapse border border-gray-300 text-sm"
-          >
-            <thead>
-              <tr class="bg-gray-200 text-gray-700">
-                <th
-                  class="border border-gray-300 px-4 py-2 cursor-pointer"
-                  @click="sortBy('fullName')"
-                >
-                  Full Name
-                  <SortIcon
-                    :field="'fullName'"
-                    :sort-key="sortKey"
-                    :sort-asc="sortAsc"
-                  />
-                </th>
-                <th class="border border-gray-300 px-4 py-2">Email</th>
-                <th class="border border-gray-300 px-4 py-2">Phone</th>
-                <th class="border border-gray-300 px-4 py-2">Groups</th>
-                <th class="border border-gray-300 px-4 py-2">Active</th>
-                <th class="border border-gray-300 px-4 py-2 text-center">
-                  Actions
-                </th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="staff in filteredAndSortedStaffs"
-                :key="staff.id"
-                class="hover:bg-gray-100"
-              >
-                <td class="border border-gray-300 px-4 py-2">
-                  {{ staff.staff.first_name }} {{ staff.middle_name }}
-                  {{ staff.staff.last_name }}
-                </td>
-                <td class="border border-gray-300 px-4 py-2">
-                  {{ staff.staff.email }}
-                </td>
-                <td class="border border-gray-300 px-4 py-2">
-                  {{ staff.staff.phone_number }}
-                </td>
-                <td class="border border-gray-300 px-4 py-2">
-                  {{ staff.staff.groups.join(",") }}
-                </td>
-                <td class="border border-gray-300 px-4 py-2">
-                  {{ staff.staff.is_active ? "Yes" : "No" }}
-                </td>
-                <td
-                  class="border border-gray-300 px-4 py-2 text-center space-x-2"
-                >
-                  <router-link
-                    :to="`/user_detail/${staff.staff.id}`"
-                    class="text-green-600 hover:text-green-800"
-                    title="View"
-                  >
-                    <i class="fas fa-eye"></i>
-                  </router-link>
-                  <button
-                    v-if="!staff.is_active"
-                    @click="activateUser(staff.id)"
-                    class="text-blue-600 hover:text-blue-800"
-                    title="Activate Staff"
-                  >
-                    Activate
-                  </button>
-                  <button
-                    v-if="staff.is_active"
-                    @click="deactivateUser(staff.id)"
-                    class="text-blue-600 hover:text-blue-800"
-                    title="Deactivate Staff"
-                  >
-                    Deactivate
-                  </button>
-                </td>
-              </tr>
-              <tr v-if="filteredAndSortedStaffs.length === 0">
-                <td colspan="6" class="text-center py-6 text-gray-500">
-                  No staffs found.
-                </td>
-              </tr>
-            </tbody>
-          </table>
+    <!-- Table / List Hybrid -->
+<div class="overflow-x-auto p-6">
+  <!-- Desktop Table -->
+  <table class="min-w-full table-auto border-collapse border border-gray-300 text-sm hidden md:table">
+    <thead class="bg-gray-200 text-gray-700">
+      <tr>
+        <th class="border border-gray-300 px-4 py-2 cursor-pointer" @click="sortBy('fullName')">
+          Full Name <SortIcon :field="'fullName'" :sort-key="sortKey" :sort-asc="sortAsc" />
+        </th>
+        <th class="border border-gray-300 px-4 py-2">Email</th>
+        <th class="border border-gray-300 px-4 py-2">Phone</th>
+        <th class="border border-gray-300 px-4 py-2">Groups</th>
+        <th class="border border-gray-300 px-4 py-2">Active</th>
+        <th class="border border-gray-300 px-4 py-2 text-center">Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr v-for="staff in filteredAndSortedStaffs" :key="staff.id" class="hover:bg-gray-100">
+        <td class="border border-gray-300 px-4 py-2">{{ staff.staff.first_name }} {{ staff.middle_name }} {{ staff.staff.last_name }}</td>
+        <td class="border border-gray-300 px-4 py-2">{{ staff.staff.email }}</td>
+        <td class="border border-gray-300 px-4 py-2">{{ staff.staff.phone_number }}</td>
+        <td class="border border-gray-300 px-4 py-2">{{ staff.staff.groups.join(", ") }}</td>
+        <td class="border border-gray-300 px-4 py-2">{{ staff.staff.is_active ? "Yes" : "No" }}</td>
+        <td class="border border-gray-300 px-4 py-2 text-center space-x-2">
+          <router-link :to="`/user_detail/${staff.staff.id}`" class="text-green-600 hover:text-green-800" title="View">
+            <i class="fas fa-eye"></i>
+          </router-link>
+          <button v-if="!staff.is_active" @click="activateUser(staff.id)" class="text-blue-600 hover:text-blue-800" title="Activate Staff">Activate</button>
+          <button v-if="staff.is_active" @click="deactivateUser(staff.id)" class="text-blue-600 hover:text-blue-800" title="Deactivate Staff">Deactivate</button>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- Mobile / Tablet List -->
+  <div class="flex flex-col gap-4 md:hidden">
+    <div v-for="staff in filteredAndSortedStaffs" :key="staff.id" class="bg-white border border-gray-300 rounded-lg shadow p-4">
+      <div class="flex justify-between items-start mb-2">
+        <div>
+          <h3 class="font-semibold text-gray-700">{{ staff.staff.first_name }} {{ staff.middle_name }} {{ staff.staff.last_name }}</h3>
+          <p class="text-gray-500 text-sm">{{ staff.staff.email }}</p>
+          <p class="text-gray-500 text-sm">{{ staff.staff.phone_number }}</p>
         </div>
+        <div class="text-right space-y-1">
+          <span class="inline-block px-2 py-1 text-xs font-semibold rounded-full" :class="staff.staff.is_active ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'">
+            {{ staff.staff.is_active ? 'Active' : 'Inactive' }}
+          </span>
+        </div>
+      </div>
+      <div class="flex justify-between items-center mt-2 flex-wrap gap-2">
+        <p class="text-gray-500 text-sm"><strong>Groups:</strong> {{ staff.staff.groups.join(", ") }}</p>
+        <div class="flex gap-2 flex-wrap">
+          <router-link :to="`/user_detail/${staff.staff.id}`" class="text-green-600 hover:text-green-800" title="View"><i class="fas fa-eye"></i></router-link>
+          <button v-if="!staff.is_active" @click="activateUser(staff.id)" class="text-blue-600 hover:text-blue-800 text-sm">Activate</button>
+          <button v-if="staff.is_active" @click="deactivateUser(staff.id)" class="text-blue-600 hover:text-blue-800 text-sm">Deactivate</button>
+        </div>
+      </div>
+    </div>
+    <div v-if="filteredAndSortedStaffs.length === 0" class="text-center text-gray-500 py-6">No staffs found.</div>
+  </div>
+</div>
+
+
 
         <!-- Pagination -->
-        <div class="flex justify-between items-center p-6">
-          <button
-            :disabled="!previous"
-            @click="fetchStaffs(previous)"
-            class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
-          >
-            Previous
-          </button>
-          <span class="text-gray-600"
-            >Page {{ currentPage }} of {{ totalPages }}</span
-          >
-          <button
-            :disabled="!next"
-            @click="fetchStaffs(next)"
-            class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
-          >
-            Next
-          </button>
+        <div class="flex flex-col md:flex-row justify-between items-center p-6 gap-2">
+          <button :disabled="!previous" @click="fetchStaffs(previous)" class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50">Previous</button>
+          <span class="text-gray-600">Page {{ currentPage }} of {{ totalPages }}</span>
+          <button :disabled="!next" @click="fetchStaffs(next)" class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50">Next</button>
         </div>
       </div>
 
       <!-- Add Staff Modal -->
-      <AddStaff
-        :visible="showAddStaff"
-        @close="showAddStaff = false"
-        @success="fetchStaffs()"
-      />
+      <AddStaff :visible="showAddStaff" @close="showAddStaff = false" @success="fetchStaffs()" />
     </div>
   </div>
 </template>
+
 
 <script>
 import Toast from "@/components/Toast.vue";

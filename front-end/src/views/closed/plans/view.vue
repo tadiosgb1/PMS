@@ -1,128 +1,130 @@
 <template>
-  <div  >
-    <Toast ref="toast"/>
-  <div class="min-h-screen bg-gray-100 p-6">
-    <div class="bg-white shadow-md rounded-lg overflow-hidden">
-      <div class="bg-orange-500 text-white px-6 py-4 text-xl font-bold flex justify-between items-center">
-        Plans
-         <button
-  @click="visible = true"
-  class="bg-white text-blue-700 font-semibold px-1 lg:px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300"
->
-   <span class="text-primary">+</span>  Add 
-</button>
-      </div>
+  <div>
+    <Toast ref="toast" />
 
-      <div class="p-6">
-        <!-- Search -->
-       <input
-        v-model="searchTerm"
-        type="search"
-        placeholder="Search Plan..."
-        class="w-full max-w-md px-4 py-2 mb-6 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-      />
+    <div class="min-h-screen bg-gray-100 p-6">
+      <div class="bg-white shadow-md rounded-lg overflow-hidden">
+        <!-- Header -->
+        <div
+          class="bg-orange-500 text-white px-6 py-4 text-xl font-bold flex justify-between items-center"
+        >
+          Plans
+          <button
+            @click="visible = true"
+            class="bg-white text-blue-700 font-semibold px-2 lg:px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300"
+          >
+            <span class="text-primary">+</span> Add
+          </button>
+        </div>
 
-        <!-- Table -->
-        <div class="overflow-x-auto">
-          <table class="min-w-full table-auto border-collapse border border-gray-300">
-            <thead>
-              <tr class="bg-gray-200 text-gray-700">
-                <th class="border border-gray-300 px-4 py-2 cursor-pointer" @click="sortBy('name')">
-                  Name
-                  <SortIcon :field="'name'" :sort-key="sortKey" :sort-asc="sortAsc" />
-                </th>
-                <th class="border border-gray-300 px-4 py-2 cursor-pointer" @click="sortBy('max_locations')">
-                  Max Locations
-                  <SortIcon :field="'max_locations'" :sort-key="sortKey" :sort-asc="sortAsc" />
-                </th>
-                <th class="border border-gray-300 px-4 py-2 cursor-pointer" @click="sortBy('max_staff')">
-                  Max Staff
-                  <SortIcon :field="'max_staff'" :sort-key="sortKey" :sort-asc="sortAsc" />
-                </th>
-                <th class="border border-gray-300 px-4 py-2 cursor-pointer" @click="sortBy('max_users')">
-                  Max Users
-                  <SortIcon :field="'max_users'" :sort-key="sortKey" :sort-asc="sortAsc" />
-                </th>
-                <!-- <th class="border border-gray-300 px-4 py-2 cursor-pointer" @click="sortBy('max_kds')">
-                  Max KDS
-                  <SortIcon :field="'max_kds'" :sort-key="sortKey" :sort-asc="sortAsc" />
-                </th>
-                <th class="border border-gray-300 px-4 py-2 cursor-pointer" @click="sortBy('kds_enabled')">
-                  KDS Enabled
-                  <SortIcon :field="'kds_enabled'" :sort-key="sortKey" :sort-asc="sortAsc" />
-                </th> -->
-                <th class="border border-gray-300 px-4 py-2 cursor-pointer" @click="sortBy('price')">
-                  Price
-                  <SortIcon :field="'price'" :sort-key="sortKey" :sort-asc="sortAsc" />
-                </th>
-                <th class="border border-gray-300 px-4 py-2 cursor-pointer" @click="sortBy('billing_cycle')">
-                  Billing Cycle
-                  <SortIcon :field="'billing_cycle'" :sort-key="sortKey" :sort-asc="sortAsc" />
-                </th>
-                <th class="border border-gray-300 px-4 py-2 text-center">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="plan in filteredAndSortedPlans"
-                :key="plan.id"
-                class="hover:bg-gray-100"
-              >
-                <td class="border border-gray-300 px-4 py-2">{{ plan.name }}</td>
-                <td class="border border-gray-300 px-4 py-2">{{ plan.max_locations }}</td>
-                <td class="border border-gray-300 px-4 py-2">{{ plan.max_staff }}</td>
-                <td class="border border-gray-300 px-4 py-2">{{ plan.max_users }}</td>
-                <!-- <td class="border border-gray-300 px-4 py-2">{{ plan.max_kds }}</td>
-                <td class="border border-gray-300 px-4 py-2">{{ plan.kds_enabled ? 'Yes' : 'No'}}</td> -->
-                <td class="border border-gray-300 px-4 py-2">{{ plan.price }}</td>
-                <td class="border border-gray-300 px-4 py-2">{{ plan.billing_cycle }}</td>
-                <td class="border border-gray-300 px-4 py-2 text-center space-x-2">
-                  <button
-                    @click="editPlan(plan)"
-                    class="text-blue-600 hover:text-blue-800 focus:outline-none"
-                    title="Edit"
-                  >
+        <div class="p-6">
+          <!-- Search -->
+          <input
+            v-model="searchTerm"
+            type="search"
+            placeholder="Search Plan..."
+            class="w-full max-w-md px-4 py-2 mb-6 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          />
+
+          <!-- Desktop Table -->
+          <div class="overflow-x-auto hidden md:block">
+            <table class="min-w-full table-auto border-collapse border border-gray-300">
+              <thead>
+                <tr class="bg-gray-200 text-gray-700">
+                  <th class="border border-gray-300 px-4 py-2 cursor-pointer" @click="sortBy('name')">
+                    Name <SortIcon :field="'name'" :sort-key="sortKey" :sort-asc="sortAsc" />
+                  </th>
+                  <th class="border border-gray-300 px-4 py-2 cursor-pointer" @click="sortBy('max_locations')">
+                    Max Locations <SortIcon :field="'max_locations'" :sort-key="sortKey" :sort-asc="sortAsc" />
+                  </th>
+                  <th class="border border-gray-300 px-4 py-2 cursor-pointer" @click="sortBy('max_staff')">
+                    Max Staff <SortIcon :field="'max_staff'" :sort-key="sortKey" :sort-asc="sortAsc" />
+                  </th>
+                  <th class="border border-gray-300 px-4 py-2 cursor-pointer" @click="sortBy('max_users')">
+                    Max Users <SortIcon :field="'max_users'" :sort-key="sortKey" :sort-asc="sortAsc" />
+                  </th>
+                  <th class="border border-gray-300 px-4 py-2 cursor-pointer" @click="sortBy('price')">
+                    Price <SortIcon :field="'price'" :sort-key="sortKey" :sort-asc="sortAsc" />
+                  </th>
+                  <th class="border border-gray-300 px-4 py-2 cursor-pointer" @click="sortBy('billing_cycle')">
+                    Billing Cycle <SortIcon :field="'billing_cycle'" :sort-key="sortKey" :sort-asc="sortAsc" />
+                  </th>
+                  <th class="border border-gray-300 px-4 py-2 text-center">Actions</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="plan in filteredAndSortedPlans" :key="plan.id" class="hover:bg-gray-100">
+                  <td class="border border-gray-300 px-4 py-2">{{ plan.name }}</td>
+                  <td class="border border-gray-300 px-4 py-2">{{ plan.max_locations }}</td>
+                  <td class="border border-gray-300 px-4 py-2">{{ plan.max_staff }}</td>
+                  <td class="border border-gray-300 px-4 py-2">{{ plan.max_users }}</td>
+                  <td class="border border-gray-300 px-4 py-2">{{ plan.price }}</td>
+                  <td class="border border-gray-300 px-4 py-2">{{ plan.billing_cycle }}</td>
+                  <td class="border border-gray-300 px-4 py-2 text-center space-x-2">
+                    <button @click="editPlan(plan)" class="text-blue-600 hover:text-blue-800">
+                      <i class="fas fa-edit"></i>
+                    </button>
+                    <button @click="askDeleteConfirmation(plan)" class="text-red-600 hover:text-red-800">
+                      <i class="fas fa-trash-alt"></i>
+                    </button>
+                  </td>
+                </tr>
+                <tr v-if="filteredAndSortedPlans.length === 0">
+                  <td colspan="7" class="text-center py-6 text-gray-500">No plans found.</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Mobile / Tablet Card View -->
+          <div class="md:hidden space-y-4">
+            <div
+              v-for="plan in filteredAndSortedPlans"
+              :key="plan.id"
+              class="border rounded-lg p-4 bg-gray-50 shadow-sm"
+            >
+              <div class="flex justify-between items-center mb-2">
+                <span class="font-semibold text-lg">{{ plan.name }}</span>
+                <div class="space-x-2">
+                  <button @click="editPlan(plan)" class="text-blue-600 hover:text-blue-800">
                     <i class="fas fa-edit"></i>
                   </button>
-                  <button
-                    @click="askDeleteConfirmation(plan)"
-                    class="text-red-600 hover:text-red-800 focus:outline-none"
-                    title="Delete"
-                  >
+                  <button @click="askDeleteConfirmation(plan)" class="text-red-600 hover:text-red-800">
                     <i class="fas fa-trash-alt"></i>
                   </button>
-                </td>
-              </tr>
-              <tr v-if="filteredAndSortedPlans.length === 0">
-                <td colspan="9" class="text-center py-6 text-gray-500">No plans found.</td>
-              </tr>
-            </tbody>
-          </table>
+                </div>
+              </div>
+              <p><span class="font-semibold">Max Locations:</span> {{ plan.max_locations }}</p>
+              <p><span class="font-semibold">Max Staff:</span> {{ plan.max_staff }}</p>
+              <p><span class="font-semibold">Max Users:</span> {{ plan.max_users }}</p>
+              <p><span class="font-semibold">Price:</span> {{ plan.price }}</p>
+              <p><span class="font-semibold">Billing Cycle:</span> {{ plan.billing_cycle }}</p>
+            </div>
+          </div>
         </div>
       </div>
     </div>
 
-    <AddPlan v-if="visible" :visible="visible" @close="visible = false; " />
+    <!-- Modals -->
+    <AddPlan v-if="visible" :visible="visible" @close="visible = false" />
     <ConfirmModal
-  v-if="confirmVisible"
-  :visible="confirmVisible"
-  title="Confirm Deletion"
-  message="Are you sure you want to delete this plan?"
-  @confirm="confirmDelete"
-  @cancel="confirmVisible = false"
-/>
-
-<UpdatePlan
-  v-if="updateVisible"
-  :visible="updateVisible"
-  :plan="planToEdit"
-  @close="updateVisible = false  "
-  @refresh="fetchPlans"
- 
-/>
- </div>
- </div>
+      v-if="confirmVisible"
+      :visible="confirmVisible"
+      title="Confirm Deletion"
+      message="Are you sure you want to delete this plan?"
+      @confirm="confirmDelete"
+      @cancel="confirmVisible = false"
+    />
+    <UpdatePlan
+      v-if="updateVisible"
+      :visible="updateVisible"
+      :plan="planToEdit"
+      @close="updateVisible = false"
+      @refresh="fetchPlans"
+    />
+  </div>
 </template>
+
 
 <script>
 import AddPlan from '@/views/closed/plans/add.vue';

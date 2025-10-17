@@ -5,49 +5,46 @@
     <div class="min-h-screen bg-gray-100 mt-3 mx-3">
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
         <!-- Header -->
-        <div class="bg-primary text-white px-6 py-4 text-xl font-bold flex justify-between items-center">
+        <div class="bg-primary text-white px-4 md:px-6 py-3 md:py-4 text-lg md:text-xl font-bold flex justify-between items-center">
           Co-Working Spaces
           <button
             @click="showAddSpace = true"
-            class="bg-white text-blue-700 font-semibold px-2 lg:px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300 flex items-center"
+            class="bg-white text-blue-700 font-semibold px-2 md:px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300 flex items-center"
           >
             <span class="text-primary mr-1">+</span> Add
           </button>
         </div>
 
         <!-- Search & Page Size -->
-        <div class="p-6 flex justify-between items-center mb-6">
+        <div class="p-4 md:p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
           <input
             v-model="searchTerm"
             type="search"
             placeholder="Search Spaces..."
-            class="w-full max-w-md px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="w-full md:max-w-md px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 
-          <div class="ml-4 flex items-center">
-            <label for="pageSize" class="mr-2 text-gray-700">Show</label>
+          <div class="flex items-center gap-2">
+            <label for="pageSize" class="text-gray-700">Show</label>
             <select
               id="pageSize"
               v-model="pageSize"
               @change="fetchSpaces()"
               class="border px-2 py-1 rounded"
             >
-              <option v-for="size in pageSizes" :key="size" :value="size">
-                {{ size }}
-              </option>
+              <option v-for="size in pageSizes" :key="size" :value="size">{{ size }}</option>
             </select>
-            <span class="ml-1 text-gray-700">per page</span>
+            <span class="text-gray-700">per page</span>
           </div>
         </div>
 
-        <!-- Table -->
-        <div class="overflow-x-auto p-6">
+        <!-- Desktop Table -->
+        <div class="hidden md:block overflow-x-auto p-4">
           <table class="min-w-full table-auto border-collapse border border-gray-300 text-sm">
             <thead>
               <tr class="bg-gray-200 text-gray-700">
                 <th class="border border-gray-300 px-4 py-2 cursor-pointer" @click="sortBy('name')">
-                  Name
-                  <SortIcon :field="'name'" :sort-key="sortKey" :sort-asc="sortAsc" />
+                  Name <SortIcon :field="'name'" :sort-key="sortKey" :sort-asc="sortAsc" />
                 </th>
                 <th class="border border-gray-300 px-4 py-2">Location</th>
                 <th class="border border-gray-300 px-4 py-2">Description</th>
@@ -90,8 +87,34 @@
           </table>
         </div>
 
+        <!-- Mobile Card View -->
+        <div class="md:hidden grid gap-4 p-4">
+          <div
+            v-for="space in filteredAndSortedSpaces"
+            :key="space.id"
+            class="border rounded-lg bg-white shadow-sm p-4 space-y-2"
+          >
+            <div class="flex justify-between items-center">
+              <p class="font-semibold text-gray-800">{{ space.name }}</p>
+              <span class="text-sm text-gray-600">{{ space.zone }}</span>
+            </div>
+            <p class="text-sm text-gray-600"><strong>Location:</strong> {{ space.location }}</p>
+            <p class="text-sm text-gray-600"><strong>Description:</strong> {{ space.description }}</p>
+            <p class="text-sm text-gray-600"><strong>Capacity:</strong> {{ space.capacity }}</p>
+            <p class="text-sm text-gray-600"><strong>Daily Price:</strong> {{ space.price_daily }}</p>
+            <p class="text-sm text-gray-600"><strong>Monthly Price:</strong> {{ space.price_monthly }}</p>
+            <p class="text-sm text-gray-600"><strong>Quarterly Price:</strong> {{ space.price_quarterly }}</p>
+            <p class="text-sm text-gray-600"><strong>Yearly Price:</strong> {{ space.price_yearly }}</p>
+            <div class="flex justify-end gap-2 pt-2">
+              <button @click="editSpace(space)" class="text-green-600 hover:text-green-800 text-sm">Edit</button>
+              <button @click="askDeleteConfirmation(space)" class="text-red-600 hover:text-red-800 text-sm">Delete</button>
+              <button @click="goToRentals(space.id)" class="text-blue-600 hover:text-blue-800 text-sm">Payments</button>
+            </div>
+          </div>
+        </div>
+
         <!-- Pagination -->
-        <div class="flex justify-between items-center p-6">
+        <div class="flex justify-between items-center p-4 md:p-6">
           <button
             :disabled="!previous"
             @click="fetchSpaces(previous)"
@@ -99,7 +122,7 @@
           >
             Previous
           </button>
-          <span class="text-gray-600">Page {{ currentPage }} of {{ totalPages }}</span>
+          <span class="text-gray-600 text-sm">Page {{ currentPage }} of {{ totalPages }}</span>
           <button
             :disabled="!next"
             @click="fetchSpaces(next)"
@@ -113,7 +136,6 @@
       <!-- Modals -->
       <AddSpace :visible="showAddSpace" @close="showAddSpace = false" @success="fetchSpaces" />
       <UpdateCoworkspace :visible="updateVisible" :space="spaceToEdit" @close="updateVisible = false" @refresh="fetchSpaces" />
-
       <ConfirmModal
         v-if="confirmVisible"
         :visible="confirmVisible"
@@ -125,6 +147,7 @@
     </div>
   </div>
 </template>
+
 
 <script>
 import Toast from "@/components/Toast.vue";

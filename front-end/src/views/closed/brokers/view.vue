@@ -6,7 +6,7 @@
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
         <!-- Header -->
         <div
-          class="bg-primary text-white px-6 py-4 text-xl font-bold flex justify-between items-center"
+          class="bg-primary text-white px-6 py-4 text-xl font-bold flex flex-col sm:flex-row justify-between items-center gap-2"
         >
           Brokers
           <button
@@ -18,17 +18,17 @@
         </div>
 
         <!-- Search & Page Size -->
-        <div class="p-6 flex justify-between items-center mb-6">
+        <div class="p-6 flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
           <input
             v-model="searchTerm"
             type="search"
             placeholder="Search Brokers..."
             @input="onSearchInput"
-            class="w-full max-w-md px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+            class="w-full sm:max-w-md px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
 
-          <div class="ml-4 flex items-center">
-            <label for="pageSize" class="mr-2 text-gray-700">Show</label>
+          <div class="flex items-center gap-2">
+            <label for="pageSize" class="text-gray-700">Show</label>
             <select
               id="pageSize"
               v-model="pageSize"
@@ -39,17 +39,17 @@
                 {{ size }}
               </option>
             </select>
-            <span class="ml-1 text-gray-700">per page</span>
+            <span class="text-gray-700">per page</span>
           </div>
         </div>
 
-        <!-- Table -->
-        <div class="overflow-x-auto p-6">
+        <!-- ✅ Desktop Table -->
+        <div class="hidden md:block overflow-x-auto p-6">
           <table class="min-w-full table-auto border-collapse border border-gray-300 text-sm">
             <thead>
               <tr class="bg-gray-200 text-gray-700">
                 <th class="border border-gray-300 px-4 py-2 cursor-pointer" @click="sortBy('name')">
-                 Broker name
+                  Broker Name
                   <SortIcon :field="'name'" :sort-key="sortKey" :sort-asc="sortAsc" />
                 </th>
                 <th class="border border-gray-300 px-4 py-2">License Number</th>
@@ -59,18 +59,10 @@
               </tr>
             </thead>
             <tbody>
-              <tr
-                v-for="broker in brokers"
-                :key="broker.id"
-                class="hover:bg-gray-100"
-              >
+              <tr v-for="broker in brokers" :key="broker.id" class="hover:bg-gray-100">
                 <td class="border border-gray-300 px-4 py-2">
                   {{ broker.first_name }} {{ broker.middle_name }} {{ broker.last_name }}
-                  <button
-                    @click="goToUserDetail(broker.user)"
-                    class="text-green-600 hover:text-green-800 ml-2"
-                    title="Detail"
-                  >
+                  <button @click="goToUserDetail(broker.user)" class="text-green-600 hover:text-green-800 ml-2" title="Detail">
                     <i class="fas fa-info-circle"></i>
                   </button>
                 </td>
@@ -78,75 +70,59 @@
                 <td class="border border-gray-300 px-4 py-2">{{ broker.commission_rate }}</td>
                 <td class="border border-gray-300 px-4 py-2">{{ broker.wallet }}</td>
                 <td class="border border-gray-300 px-4 py-2 text-center space-x-2">
-                  <button
-                    @click="openUpdateModal(broker.id)"
-                    class="text-green-600 hover:text-green-800"
-                  >
+                  <button @click="openUpdateModal(broker.id)" class="text-green-600 hover:text-green-800">
                     <i class="fas fa-edit"></i>
                   </button>
-                  <button
-                    @click="askDeleteConfirmation(broker)"
-                    class="text-red-600 hover:text-red-800"
-                  >
+                  <button @click="askDeleteConfirmation(broker)" class="text-red-600 hover:text-red-800">
                     <i class="fas fa-trash"></i>
                   </button>
                 </td>
               </tr>
               <tr v-if="brokers.length === 0">
-                <td colspan="5" class="text-center py-6 text-gray-500">
-                  No brokers found.
-                </td>
+                <td colspan="5" class="text-center py-6 text-gray-500">No brokers found.</td>
               </tr>
             </tbody>
           </table>
         </div>
 
+        <!-- ✅ Mobile & Tablet Cards -->
+        <div class="block md:hidden p-4 space-y-4">
+          <div v-for="broker in brokers" :key="broker.id" class="bg-gray-50 border border-gray-200 rounded-xl p-4 shadow-sm hover:shadow-md transition">
+            <div class="flex justify-between items-center mb-2">
+              <h3 class="font-semibold text-gray-900 text-base">
+                {{ broker.first_name }} {{ broker.middle_name }} {{ broker.last_name }}
+              </h3>
+            </div>
+            <p class="text-sm text-gray-700"><strong>License:</strong> {{ broker.license_number }}</p>
+            <p class="text-sm text-gray-700"><strong>Commission Rate:</strong> {{ broker.commission_rate }}</p>
+            <p class="text-sm text-gray-700"><strong>Wallet:</strong> {{ broker.wallet }}</p>
+            <div class="mt-3 flex flex-wrap gap-2">
+              <button @click="goToUserDetail(broker.user)" class="px-3 py-1.5 bg-blue-50 text-blue-700 text-sm font-medium rounded-lg border border-blue-200 hover:bg-blue-100 transition">Details</button>
+              <button v-if="broker" @click="openUpdateModal(broker.id)" class="px-3 py-1.5 bg-green-50 text-green-700 text-sm font-medium rounded-lg border border-green-200 hover:bg-green-100 transition">Edit</button>
+              <button v-if="broker" @click="askDeleteConfirmation(broker)" class="px-3 py-1.5 bg-red-50 text-red-700 text-sm font-medium rounded-lg border border-red-200 hover:bg-red-100 transition">Delete</button>
+            </div>
+          </div>
+          <div v-if="brokers.length === 0" class="text-center text-gray-500 py-6">No brokers found.</div>
+        </div>
+
         <!-- Pagination -->
         <div class="flex justify-between items-center p-6">
-          <button
-            :disabled="!previous"
-            @click="fetchBrokers(previous)"
-            class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
-          >
-            Previous
-          </button>
-          <span class="text-gray-600">
-            Page {{ currentPage }} of {{ totalPages }}
-          </span>
-          <button
-            :disabled="!next"
-            @click="fetchBrokers(next)"
-            class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50"
-          >
-            Next
-          </button>
+          <button :disabled="!previous" @click="fetchBrokers(previous)" class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50">Previous</button>
+          <span class="text-gray-600">Page {{ currentPage }} of {{ totalPages }}</span>
+          <button :disabled="!next" @click="fetchBrokers(next)" class="px-4 py-2 rounded bg-gray-200 hover:bg-gray-300 disabled:opacity-50">Next</button>
         </div>
       </div>
 
       <!-- Add & Update Modals -->
-      <AddBroker
-        :visible="showAddBroker"
-        @close="showAddBroker = false"
-        @success="fetchBrokers"
-      />
-      <UpdateBroker
-        :visible="showUpdateModal"
-        :brokerId="selectedBrokerId"
-        @close="showUpdateModal = false"
-        @success="fetchBrokers"
-      />
+      <AddBroker :visible="showAddBroker" @close="showAddBroker = false" @success="fetchBrokers" />
+      <UpdateBroker :visible="showUpdateModal" :brokerId="selectedBrokerId" @close="showUpdateModal = false" @success="fetchBrokers" />
 
       <!-- Delete Confirmation Modal -->
-      <ConfirmModal
-        :visible="confirmVisible"
-        title="Confirm Deletion"
-        message="Are you sure you want to delete this broker?"
-        @confirm="confirmDelete"
-        @cancel="confirmVisible = false"
-      />
+      <ConfirmModal :visible="confirmVisible" title="Confirm Deletion" message="Are you sure you want to delete this broker?" @confirm="confirmDelete" @cancel="confirmVisible = false" />
     </div>
   </div>
 </template>
+
 
 <script>
 import Toast from "@/components/Toast.vue";

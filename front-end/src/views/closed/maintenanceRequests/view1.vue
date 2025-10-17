@@ -1,41 +1,39 @@
 <template>
-  <div class="min-h-screen bg-gray-100 p-6">
+  <div class="min-h-screen bg-gray-100 p-4 md:p-6">
     <Toast ref="toast" />
 
     <div class="bg-white shadow-md rounded-lg overflow-hidden">
       <!-- Header -->
       <div
-        class="bg-orange-500 text-white px-6 py-4 text-xl font-bold flex justify-between items-center"
+        class="bg-orange-500 text-white px-4 md:px-6 py-3 md:py-4 text-lg md:text-xl font-bold flex justify-between items-center"
       >
         Maintenance Requests
-        <div class="flex items-center gap-4">
-          <!-- Add button -->
+        <div v-if="!propertyId" class="flex items-center">
           <button
-          v-if="!this.propertyId"
             @click="visible = true"
-            class="bg-white text-blue-700 font-semibold px-1 lg:px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300"
+            class="bg-white text-blue-700 font-semibold px-3 md:px-4 py-2 rounded shadow hover:bg-gray-100 border border-gray-300 transition-all"
           >
             <span class="text-primary">+</span> Add
           </button>
         </div>
       </div>
 
-      <div class="p-6">
-        <!-- Filters + Rows per page -->
-        <div class="mb-6 flex flex-col md:flex-row gap-4 md:items-end justify-between">
-          <!-- Left side: Filters -->
-          <div class="flex flex-col md:flex-row gap-4 md:items-end">
-            <div>
+      <!-- Filters Section -->
+      <div class="p-4 md:p-6">
+        <div class="flex flex-col md:flex-row justify-between gap-4 mb-4">
+          <!-- Filters -->
+          <div class="flex flex-col sm:flex-row gap-4 w-full md:w-auto">
+            <div class="flex-1">
               <label class="block text-sm font-medium text-gray-700">Start Date</label>
               <input v-model="startDate" type="date" class="border rounded p-2 w-full" />
             </div>
-            <div>
+            <div class="flex-1">
               <label class="block text-sm font-medium text-gray-700">End Date</label>
               <input v-model="endDate" type="date" class="border rounded p-2 w-full" />
             </div>
-            <div>
-              <label class="block text-gray-700 mb-1">Filter By</label>
-              <select v-model="filter_by" class="custom-input">
+            <div class="flex-1">
+              <label class="block text-sm font-medium text-gray-700">Filter By</label>
+              <select v-model="filter_by" class="border rounded p-2 w-full">
                 <option value="" disabled>Select</option>
                 <option value="requested_at">Requested At</option>
                 <option value="resolved_at">Resolved At</option>
@@ -43,26 +41,24 @@
             </div>
             <button
               @click="applyDateFilter()"
-              class="px-4 py-2 bg-primary text-white rounded hover:bg-orange-600"
+              class="px-4 py-2 bg-primary text-white rounded hover:bg-orange-600 mt-2 sm:mt-auto"
               :disabled="!filter_by"
             >
               Apply
             </button>
           </div>
 
-          <!-- Right side: Rows per page -->
-          <div class="flex items-center gap-2">
-            <label class="text-sm text-gray-700">Rows per page:</label>
-            <select v-model.number="pageSize" class="border rounded p-1 text-black">
-              <option v-for="size in [5, 10, 50, 100]" :key="size" :value="size">
-                {{ size }}
-              </option>
+          <!-- Rows per page -->
+          <div class="flex items-center gap-2 self-start md:self-end">
+            <label class="text-sm text-gray-700">Rows:</label>
+            <select v-model.number="pageSize" class="border rounded p-2 text-sm">
+              <option v-for="size in [5, 10, 50, 100]" :key="size" :value="size">{{ size }}</option>
             </select>
           </div>
         </div>
 
-        <!-- Table -->
-        <div class="overflow-x-auto border rounded">
+        <!-- Desktop Table -->
+        <div class="hidden md:block overflow-x-auto border rounded-lg">
           <table class="min-w-full table-auto border-collapse border border-gray-300 text-sm">
             <thead>
               <tr class="bg-gray-200 text-gray-700 text-left">
@@ -80,33 +76,32 @@
                 </th>
                 <th class="border border-gray-300 px-3 py-2">Property</th>
                 <th class="border border-gray-300 px-3 py-2">User</th>
-                <th class="border border-gray-300 px-3 py-2">Actions</th>
+                <th class="border border-gray-300 px-3 py-2 text-center">Actions</th>
               </tr>
             </thead>
             <tbody>
               <tr
                 v-for="maint in paginatedData"
                 :key="maint.id"
-                class="hover:bg-gray-100"
+                class="hover:bg-gray-100 transition-colors"
               >
-                <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
-                  {{ maint.description }}
+                <td class="border border-gray-300 px-3 py-2">{{ maint.description }}</td>
+                <td
+                  class="border border-gray-300 px-3 py-2 font-semibold"
+                  :class="{
+                    'text-orange-500': maint.status === 'pending',
+                    'text-green-600': maint.status === 'resolved'
+                  }"
+                >
+                  {{ maint.status }}
                 </td>
-                <td class="border border-gray-300 px-3 py-2 whitespace-nowrap font-semibold"
-    :class="{
-      'text-orange-500': maint.status === 'pending',
-      'text-green-600': maint.status === 'resolved'
-    }"
->
-  {{ maint.status }}
-</td>
-                <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
+                <td class="border border-gray-300 px-3 py-2">
                   {{ formatDate(maint.requested_at) }}
                 </td>
-                <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
-                  {{ maint.resolved_at ? formatDate(maint.resolved_at) : "N/A" }}
+                <td class="border border-gray-300 px-3 py-2">
+                  {{ maint.resolved_at ? formatDate(maint.resolved_at) : 'N/A' }}
                 </td>
-                <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
+                <td class="border border-gray-300 px-3 py-2">
                   <router-link
                     v-if="maint.property_id"
                     :to="`/dashboard/properties/${maint.property_id.id}`"
@@ -116,7 +111,7 @@
                   </router-link>
                   <span v-else>N/A</span>
                 </td>
-                <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
+                <td class="border border-gray-300 px-3 py-2">
                   <router-link
                     v-if="maint.user_id"
                     :to="`/user_detail/${maint.user_id.id}`"
@@ -126,38 +121,100 @@
                   </router-link>
                   <span v-else>N/A</span>
                 </td>
-                <td class="border border-gray-300 px-3 py-2 whitespace-nowrap text-center">
-  <button
-    v-if="maint.status === 'pending'"
-    @click="confirm = true; selectedId = maint.id"
-    class="px-3 py-1 bg-orange-500 text-white rounded hover:bg-orange-600 transition"
-  >
-    Resolve
-  </button>
-  <button
-    v-else
-    disabled
-    class="px-3 py-1 bg-gray-300 text-gray-600 rounded cursor-not-allowed"
-  >
-    Resolved
-  </button>
-</td>
+                <td class="border border-gray-300 px-3 py-2 text-center">
+                  <button
+                    v-if="maint.status === 'pending'"
+                    @click="confirm = true; selectedId = maint.id"
+                    class="px-3 py-1 bg-orange-500 text-white rounded hover:bg-orange-600"
+                  >
+                    Resolve
+                  </button>
+                  <button
+                    v-else
+                    disabled
+                    class="px-3 py-1 bg-gray-300 text-gray-600 rounded cursor-not-allowed"
+                  >
+                    Resolved
+                  </button>
+                </td>
               </tr>
               <tr v-if="filteredData.length === 0">
-                <td colspan="7" class="text-center py-6 text-gray-500">
-                  No maintenance requests found.
-                </td>
+                <td colspan="7" class="text-center py-6 text-gray-500">No maintenance requests found.</td>
               </tr>
             </tbody>
           </table>
         </div>
 
+        <!-- Mobile List View -->
+        <div class="md:hidden grid gap-4">
+          <div
+            v-for="maint in paginatedData"
+            :key="maint.id"
+            class="border rounded-lg bg-white shadow-sm p-4 space-y-2"
+          >
+            <div class="flex justify-between items-center">
+              <p class="font-semibold text-gray-800">{{ maint.description }}</p>
+              <span
+                class="text-xs font-semibold px-2 py-1 rounded"
+                :class="{
+                  'bg-orange-100 text-orange-600': maint.status === 'pending',
+                  'bg-green-100 text-green-700': maint.status === 'resolved'
+                }"
+              >
+                {{ maint.status }}
+              </span>
+            </div>
+            <p class="text-sm text-gray-600">
+              <strong>Requested:</strong> {{ formatDate(maint.requested_at) }}
+            </p>
+            <p class="text-sm text-gray-600">
+              <strong>Resolved:</strong>
+              {{ maint.resolved_at ? formatDate(maint.resolved_at) : 'N/A' }}
+            </p>
+            <p class="text-sm text-gray-600">
+              <strong>Property:</strong>
+              <router-link
+                v-if="maint.property_id"
+                :to="`/dashboard/properties/${maint.property_id.id}`"
+                class="text-blue-600 hover:underline"
+              >
+                {{ maint.property_id.name }}
+              </router-link>
+              <span v-else>N/A</span>
+            </p>
+            <p class="text-sm text-gray-600">
+              <strong>User:</strong>
+              <router-link
+                v-if="maint.user_id"
+                :to="`/user_detail/${maint.user_id.id}`"
+                class="text-blue-600 hover:underline"
+              >
+                {{ fullName(maint.user_id) }}
+              </router-link>
+              <span v-else>N/A</span>
+            </p>
+            <div class="pt-2 flex justify-end">
+              <button
+                v-if="maint.status === 'pending'"
+                @click="confirm = true; selectedId = maint.id"
+                class="px-3 py-1 bg-orange-500 text-white text-sm rounded hover:bg-orange-600"
+              >
+                Resolve
+              </button>
+              <button
+                v-else
+                disabled
+                class="px-3 py-1 bg-gray-300 text-gray-600 text-sm rounded cursor-not-allowed"
+              >
+                Resolved
+              </button>
+            </div>
+          </div>
+        </div>
+
         <!-- Pagination -->
-        <div
-          v-if="filteredData.length > 0"
-          class="mt-4 flex justify-between items-center"
-        >
-          <div></div>
+        <div v-if="filteredData.length > 0" class="mt-6 flex justify-center md:justify-between items-center">
+          <div class="hidden md:block"></div>
           <div class="flex items-center gap-4">
             <button
               @click="prevPage"
@@ -166,7 +223,7 @@
             >
               Previous
             </button>
-            <span class="text-gray-700">Page {{ currentPage }} of {{ totalPages }}</span>
+            <span class="text-gray-700 text-sm">Page {{ currentPage }} of {{ totalPages }}</span>
             <button
               @click="nextPage"
               :disabled="currentPage === totalPages"
@@ -180,16 +237,13 @@
     </div>
 
     <!-- Confirm Resolve Modal -->
-    <div
-      v-if="confirm"
-      class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-10"
-    >
+    <div v-if="confirm" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-10">
       <div class="bg-white rounded-lg shadow-md max-w-sm w-full p-6 text-center">
-        <p class="text-orange-400 mb-6">Do you want to make it resolved</p>
+        <p class="text-orange-400 mb-6">Do you want to mark this as resolved?</p>
         <div class="flex justify-center space-x-4">
           <button
             @click="confirm = false"
-            class="px-4 py-2 rounded bg-orange-400 text-white hover:bg-orange-500"
+            class="px-4 py-2 rounded bg-gray-200 text-gray-700 hover:bg-gray-300"
           >
             Cancel
           </button>
