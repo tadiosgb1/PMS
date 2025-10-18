@@ -156,15 +156,30 @@ export default {
       this.resetForm();
       this.managerVisible = false;
     },
-    async submitForm() {
-      console.log("this.form", this.form);
-      const res = await this.$apiPost("/sign_up", this.form);
+async submitForm() {
+  console.log("this.form", this.form);
+  
+  try {
+    const res = await this.$apiPost("/sign_up", this.form);
+    console.log("res manager add", res);
 
-      console.log("res manager add", res);
+    // ✅ Show success toast
+    this.$root.$refs.toast.showToast("Manager successfully added", "success");
 
-      this.resetForm();
-      this.close();
-    },
+    this.resetForm();
+    this.$reloadPage();
+    this.close();
+  } catch (error) {
+    console.error("Error adding manager:", error);
+
+    // ❌ Show error toast
+    this.$root.$refs.toast.showToast(
+      error.message || "Failed to add manager.",
+      "error"
+    );
+  }
+}
+,
     resetForm() {
       this.form = {
         email: "",

@@ -120,6 +120,35 @@
             <label class="block text-gray-700 mb-1">Deposit Amount</label>
             <input v-model="form.deposit_amount" type="number" class="custom-input" required />
           </div>
+             <div class="relative">
+            <label class="block text-gray-700 mb-1">Broker</label>
+            <input
+              v-model="brokerSearch"
+              type="text"
+              class="custom-input"
+              placeholder="Search Broker..."
+              @input="fetchBrokers"
+              @focus="brokerDropdown = true"
+              @blur="hideDropdown('broker')"
+              required
+            />
+            <ul
+              v-if="brokers.length > 0 && brokerDropdown"
+              class="absolute z-50 w-full max-h-48 overflow-y-auto bg-white border border-gray-300 rounded shadow mt-1"
+            >
+              <li
+                v-for="broker in brokers"
+                :key="broker.id"
+                class="p-2 hover:bg-gray-100 cursor-pointer"
+                @mousedown.prevent="selectBroker(broker)"
+              >
+                <!-- Display broker name (update based on your API response) -->
+                {{ broker.user?.first_name }} {{ broker.user?.last_name }}
+                <span class="text-sm text-gray-500">({{ broker.license_number }})</span>
+              </li>
+            </ul>
+          </div>
+
 
           <div class="md:col-span-2 text-right pt-4">
             <button
@@ -172,6 +201,8 @@ export default {
   },
   data() {
     return {
+      brokers: [],
+      brokerDropdown: false,
       loading: false,
       form: {
         property_id: this.propertyId || "",
@@ -182,6 +213,8 @@ export default {
         rent_amount: "",
         deposit_amount: "",
         status: "pending",
+        broker:"",
+        brokerSearch:"",
       },
       tenant: {
         password: "",
@@ -204,6 +237,26 @@ export default {
     };
   },
   methods: {
+      async fetchBrokers() {
+      try {
+        const search = this.brokerSearch || "";
+        const params = { user__first_name: search };
+        const res = await this.$apiGet("/get_broker_profiles",params );
+        this.brokers = res.data || [];
+        this.brokerDropdown = true;
+        console.log("brokers", this.brokers);
+      } catch (err) {
+        console.error("Failed to fetch brokers:", err);
+      }
+    },
+
+    // ✅ Select Broker
+    selectBroker(broker) {
+      console.log("broker",broker)
+      this.form.broker = broker.id;
+      this.brokerSearch =broker.user;
+      this.brokerDropdown = false;
+    },
     async fetchProperties(url = null) {
       try {
         const pageUrl =

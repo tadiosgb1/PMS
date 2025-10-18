@@ -67,7 +67,7 @@
                 <td class="border border-gray-300 px-4 py-2">{{ space.price_monthly }}</td>
                 <td class="border border-gray-300 px-4 py-2">{{ space.price_quarterly }}</td>
                 <td class="border border-gray-300 px-4 py-2">{{ space.price_yearly }}</td>
-                <td class="border border-gray-300 px-4 py-2">{{ space.zone }}</td>
+                <td class="border border-gray-300 px-4 py-2">{{ space.zone }} view zone <i @click="goToZoneDetail(space.zone)" class=""></i></td>
                 <td class="border border-gray-300 px-4 py-2 text-center space-x-2">
                   <button @click="editSpace(space)" class="text-green-600 hover:text-green-800">
                     <i class="fas fa-edit"></i>
@@ -272,6 +272,13 @@ export default {
         path: "/coworking-space-rentals",
         query: { workspace_id },
       });
+    },
+    goToZoneDetail(propertyZoneId) {
+      if (propertyZoneId)
+        this.$router.push({
+          name: "zoneDetail",
+          params: { id: propertyZoneId },
+        });
     },
   },
 };
