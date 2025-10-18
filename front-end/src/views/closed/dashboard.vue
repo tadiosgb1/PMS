@@ -8,9 +8,9 @@
         <div class="flex items-center space-x-3">
           <!-- Sidebar toggle (mobile only) -->
           <button
-            v-if="showToggleButton"
+            v-if="screenWidth < 1024"
             @click="toggleSidebar"
-            class="text-blue-500 hover:text-yellow-400 focus:outline-none sm:hidden"
+            class="text-blue-500 hover:text-yellow-400 focus:outline-none"
             aria-label="Toggle sidebar"
           >
             <i class="fas fa-bars text-2xl"></i>
@@ -45,7 +45,7 @@
             <!-- Notification Badge -->
             <span
               v-if="notifications.length > 0"
-              class="curosr-pointer absolute -top-3 -right-2 bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow"
+              class="cursor-pointer absolute -top-3 -right-2 bg-red-600 text-white text-xs font-bold px-2 py-0.5 rounded-full shadow"
             >
               {{ notifications.length }}
             </span>
@@ -149,29 +149,34 @@
 
     <!-- Main Content -->
     <div class="flex flex-1 overflow-hidden">
-      <!-- Sidebar always visible on large screens (lg+), hidden on md and below -->
-      <div class="hidden lg:block w-64 h-full bg-white">
+      <!-- Sidebar for desktop -->
+      <div v-if="screenWidth > 1024" class="w-64 h-full bg-white shadow-md">
         <Sidebar />
       </div>
 
-      <!-- Overlay and Slide-in Sidebar for tablet and mobile -->
-      <div
-        v-if="showSidebar && screenWidth < 1024"
-        class="fixed inset-0 bg-black bg-opacity-50 z-40"
-        @click="toggleSidebar"
-      ></div>
-      <div
-        v-if="showSidebar && screenWidth < 1024"
-        class="fixed left-0 top-0 w-64 bg-white shadow-lg z-50 h-full overflow-y-auto"
-      >
-        <button
-          class="absolute top-4 right-4 text-gray-600"
+      <!-- Overlay and Slide-in Sidebar for mobile and tablet -->
+      <transition name="slide">
+        <div
+          v-if="showSidebar && screenWidth <= 1024"
+          class="fixed inset-0 bg-black bg-opacity-50 z-40"
           @click="toggleSidebar"
+        ></div>
+      </transition>
+
+      <transition name="slide">
+        <div
+          v-if="showSidebar && screenWidth <= 1024"
+          class="fixed left-0 top-0 w-64 bg-white shadow-lg z-50 h-full overflow-y-auto transition-transform duration-300"
         >
-          <i class="fas fa-times text-xl"></i>
-        </button>
-        <Sidebar />
-      </div>
+          <button
+            class="absolute top-4 right-4 text-gray-600"
+            @click="toggleSidebar"
+          >
+            <i class="fas fa-times text-xl"></i>
+          </button>
+          <Sidebar />
+        </div>
+      </transition>
 
       <!-- Main content slot -->
       <main class="flex-1 overflow-y-auto">
@@ -179,6 +184,7 @@
       </main>
     </div>
 
+    <!-- Profile Modal -->
     <Profile
       :visible="showProfileModal"
       @close="closeProfile"
@@ -205,24 +211,28 @@ export default {
       isNotificationDropdownOpen: false,
       screenWidth: window.innerWidth,
       currentLanguage: "English",
-      showToggleButton: window.innerWidth < 1024,
     };
   },
   async created() {
     window.addEventListener("resize", this.handleResize);
     this.name = localStorage.getItem("name");
 
-    const params = { page_size: 1000000 };
-    const res = await this.$apiGetById(`/get_unread_notifications`,localStorage.getItem('userId'));
-    this.notifications = res.data;
-    console.log("notifications", this.notifications);
+    try {
+      const res = await this.$apiGetById(
+        `/get_unread_notifications`,
+        localStorage.getItem("userId")
+      );
+      this.notifications = res.data || [];
+    } catch (error) {
+      console.error("Failed to load notifications:", error);
+    }
   },
-  unmounted() {
+  beforeUnmount() {
     window.removeEventListener("resize", this.handleResize);
   },
   methods: {
     openProfile() {
-      this.isProfileDropdownOpen = false; // close dropdown
+      this.isProfileDropdownOpen = false;
       this.showProfileModal = true;
     },
     closeProfile() {
@@ -236,10 +246,13 @@ export default {
     },
     goToNotification(id) {
       this.$router.push({ name: "notificationDetail", params: { id } });
+      this.isNotificationDropdownOpen = false;
     },
     handleResize() {
       this.screenWidth = window.innerWidth;
-      this.showToggleButton = this.screenWidth < 1024;
+      if (this.screenWidth > 1024) {
+        this.showSidebar = false; // prevent mobile sidebar from sticking open
+      }
     },
     toggleSidebar() {
       this.showSidebar = !this.showSidebar;
@@ -249,29 +262,6 @@ export default {
     },
     toggleNotificationDropdown() {
       this.isNotificationDropdownOpen = !this.isNotificationDropdownOpen;
-    },
-    getNotificationText(notif) {
-      if (notif.user_id) return "New user activity";
-      if (notif.maintenance_request_id) return "New maintenance request";
-      if (notif.payment_id) return "New payment notification";
-      if (notif.rent_id) return "New rent notification";
-      return "General notification";
-    },
-    openNotification(notif) {
-      if (notif.user_id) {
-        this.$router.push(`/users/${notif.user_id}`);
-      } else if (notif.maintenance_request_id) {
-        this.$router.push(`/maintenance/${notif.maintenance_request_id}`);
-      } else if (notif.payment_id) {
-        this.$router.push(`/payments/${notif.payment_id}`);
-      } else if (notif.rent_id) {
-        this.$router.push(`/rents/${notif.rent_id}`);
-      }
-      this.isNotificationDropdownOpen = false;
-    },
-    changeLang(lang) {
-      this.currentLanguage = lang;
-      this.isLangOpen = false;
     },
     logout() {
       localStorage.clear();
@@ -289,5 +279,14 @@ export default {
 .fade-enter,
 .fade-leave-to {
   opacity: 0;
+}
+
+.slide-enter-active,
+.slide-leave-active {
+  transition: all 0.3s ease;
+}
+.slide-enter-from,
+.slide-leave-to {
+  transform: translateX(-100%);
 }
 </style>
