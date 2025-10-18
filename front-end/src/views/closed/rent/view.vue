@@ -89,7 +89,7 @@
                       <i class="fas fa-credit-card mr-2"></i> Pay
                     </button>
                     <button @click="rentDetail(rent.id)" class="text-blue-600 hover:text-blue-800">
-                      <i class="fas fa-info-circle"></i>
+                      <i class="fas fa-eye"></i>
                     </button>
                     <button @click="goToPayments(rent.id)" class="text-green-600 hover:text-green-800">
                       Payments

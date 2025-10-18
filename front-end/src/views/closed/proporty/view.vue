@@ -110,7 +110,7 @@
                       class="text-green-600 hover:text-green-800 ml-1"
                       title="Detail"
                     >
-                      <i class="fas fa-info-circle"></i>
+                      <i class="fas fa-eye"></i>
                     </button>
                   </td>
                   <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
@@ -120,7 +120,7 @@
                       class="text-green-600 hover:text-green-800 ml-1"
                       title="Detail"
                     >
-                      <i class="fas fa-info-circle"></i>
+                      <i class="fas fa-eye"></i>
                     </button>
                   </td>
                   <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
@@ -130,7 +130,7 @@
                       class="text-green-600 hover:text-green-800 ml-1"
                       title="Detail"
                     >
-                      <i class="fas fa-info-circle"></i>
+                      <i class="fas fa-eye"></i>
                     </button>
                   </td>
                   <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">{{ property.property_type }}</td>
@@ -150,7 +150,7 @@
                   </td>
                   <td class="border border-gray-300 px-3 py-2 text-center space-x-2">
                     <button @click="goToDetail(property.id)" class="text-green-600 hover:text-green-800" title="Detail">
-                      <i class="fas fa-info-circle"></i>
+                      <i class="fas fa-eye"></i>
                     </button>
                     <button
                       v-if="$hasPermission('pms.change_property')"
@@ -216,7 +216,7 @@
 
               <div class="flex justify-end mt-3 space-x-3">
                 <button @click="goToDetail(property.id)" class="text-green-600 hover:text-green-800" title="Detail">
-                  <i class="fas fa-info-circle"></i>
+                  <i class="fas fa-eye"></i>
                 </button>
                 <button
                   v-if="$hasPermission('pms.change_property')"
