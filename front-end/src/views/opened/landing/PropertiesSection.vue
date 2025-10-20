@@ -4,7 +4,9 @@
       <!-- Header -->
       <div class="text-center mb-6">
         <h2 class="text-3xl font-bold text-gray-800">Our Properties</h2>
-        <p class="text-gray-500 mt-2">Find your perfect space for rent, sale, or work in Ethiopia</p>
+        <p class="text-gray-500 mt-2">
+          Find your perfect space for rent, sale, or work in Ethiopia
+        </p>
       </div>
 
       <!-- Tabs -->
@@ -38,6 +40,21 @@
           <datalist id="cityList">
             <option v-for="city in cities" :key="city" :value="city" />
           </datalist>
+
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="absolute right-4 top-2.5 h-5 w-5 text-gray-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            stroke-width="2"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+            />
+          </svg>
         </div>
       </div>
 
@@ -47,7 +64,10 @@
       </div>
 
       <!-- Property Grid -->
-      <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div
+        v-else
+        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+      >
         <div
           v-for="item in paginatedItems"
           :key="item.id"
@@ -55,13 +75,21 @@
         >
           <!-- Image Section -->
           <div class="relative w-full h-52 rounded-t-2xl overflow-hidden" v-if="currentTab !== 'cowork'">
+            <!-- Show actual image if exists -->
             <img
-              :src="item.property_pictures && item.property_pictures.length > 0
-                ? item.property_pictures[item.imageIndex].property_image
-                : placeholder"
+              v-if="item.property_pictures && item.property_pictures.length > 0"
+              :src="getCurrentImage(item)"
               class="w-full h-52 object-cover cursor-pointer"
-              @click="openZoom(item.property_pictures ? item.imageIndex : null, item.property_pictures)"
+              @click="openZoom(item)"
             />
+
+            <!-- Show placeholder background if no image -->
+            <div
+              v-else
+              class="w-full h-52 bg-gray-200 flex items-center justify-center text-gray-400 font-semibold text-lg"
+            >
+              No Image
+            </div>
 
             <!-- Carousel arrows -->
             <div
@@ -91,7 +119,7 @@
             </div>
           </div>
 
-          <!-- Cowork placeholder -->
+          <!-- Placeholder for Coworking -->
           <div
             class="w-full h-52 flex items-center justify-center bg-gray-100 text-gray-400 text-lg font-semibold"
             v-else
@@ -115,13 +143,21 @@
               <p>Monthly: ${{ item.price_monthly }}</p>
             </div>
 
+            <!-- Action Button -->
             <button
               @click="item.showDownload = true"
               class="bg-primary text-white px-4 py-2 rounded-full w-full hover:opacity-90 transition"
             >
-              {{ currentTab === "rent" ? "Rent Now" : currentTab === "sale" ? "Buy Now" : "Book Now" }}
+              {{
+                currentTab === "rent"
+                  ? "Rent Now"
+                  : currentTab === "sale"
+                  ? "Buy Now"
+                  : "Book Now"
+              }}
             </button>
 
+            <!-- Download Button for this card -->
             <button
               v-if="item.showDownload"
               class="mt-3 bg-primary text-white px-4 py-2 rounded-full w-full hover:opacity-90 transition"
@@ -176,25 +212,6 @@
         </button>
       </div>
     </div>
-
-    <!-- Modal -->
-    <div
-      v-if="zoomImage"
-      class="fixed inset-0 bg-black/70 flex items-center justify-center z-50"
-      @click="closeZoom"
-    >
-      <img
-        :src="zoomImage"
-        class="max-h-[90%] max-w-[90%] rounded-lg shadow-lg"
-        @click.stop
-      />
-      <button
-        @click="closeZoom"
-        class="absolute top-5 right-5 text-white text-2xl font-bold"
-      >
-        &times;
-      </button>
-    </div>
   </section>
 </template>
 
@@ -215,8 +232,6 @@ export default {
       currentPage: 0,
       itemsPerPage: 3,
       searchQuery: "",
-      zoomImage: null,
-      placeholder: "https://via.placeholder.com/400x250?text=No+Image",
       cities: [
         "Addis Ababa",
         "Adama",
@@ -233,7 +248,8 @@ export default {
   },
   computed: {
     currentTabLabel() {
-      return this.tabs.find((t) => t.key === this.currentTab)?.label.toLowerCase() || "";
+      const tab = this.tabs.find((t) => t.key === this.currentTab);
+      return tab ? tab.label.toLowerCase() : "";
     },
     totalPages() {
       return Math.ceil(this.filteredItems.length / this.itemsPerPage);
@@ -258,7 +274,10 @@ export default {
     async fetchData() {
       try {
         this.loading = true;
-        const url = this.currentTab === "cowork" ? "/get_coworking_spaces" : "/get_properties";
+        const url =
+          this.currentTab === "cowork"
+            ? "/get_coworking_spaces"
+            : "/get_properties";
         const res = await this.$apiGet(url);
         this.items = (res.data || []).map((item) => ({
           ...item,
@@ -267,7 +286,7 @@ export default {
         }));
         this.filteredItems = [...this.items];
       } catch (error) {
-        console.error(error);
+        console.error("Error fetching data:", error);
         this.items = [];
         this.filteredItems = [];
       } finally {
@@ -294,22 +313,26 @@ export default {
       this.currentPage = page;
     },
     getImageCount(item) {
-      return item.property_pictures?.length || 0;
+      return item.property_pictures ? item.property_pictures.length : 0;
+    },
+    getCurrentImage(item) {
+      return item.property_pictures && item.property_pictures.length > 0
+        ? item.property_pictures[item.imageIndex].property_image
+        : null;
     },
     nextImage(item) {
       const pictures = item.property_pictures || [];
-      if (pictures.length > 1) item.imageIndex = (item.imageIndex + 1) % pictures.length;
+      if (pictures.length > 1)
+        item.imageIndex = (item.imageIndex + 1) % pictures.length;
     },
     prevImage(item) {
       const pictures = item.property_pictures || [];
-      if (pictures.length > 1) item.imageIndex = (item.imageIndex - 1 + pictures.length) % pictures.length;
+      if (pictures.length > 1)
+        item.imageIndex = (item.imageIndex - 1 + pictures.length) % pictures.length;
     },
-    openZoom(index, pictures) {
-      if (!pictures || pictures.length === 0) return;
-      this.zoomImage = pictures[index].property_image;
-    },
-    closeZoom() {
-      this.zoomImage = null;
+    openZoom(item) {
+      // Implement your modal or lightbox zoom here
+      console.log("Zoom image for", item.name);
     },
   },
 };
