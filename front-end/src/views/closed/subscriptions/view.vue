@@ -106,6 +106,12 @@
                     >
                       <i class="fas fa-credit-card mr-1"></i> Pay
                     </button>
+                    <button 
+                @click="Deactivate(subscription.id)"
+                class="flex items-center px-3 py-1.5 bg-orange-50 text-orange-700 text-sm font-medium rounded-lg border border-orange-200 hover:bg-orange-100 transition"
+              >
+                <i class="fas fa-exchange-alt mr-1"></i> Deactivate
+              </button>
                     <button
                       @click="payment(subscription.id)"
                       class="flex items-center px-3 py-1.5 bg-green-50 text-green-700 text-sm font-medium rounded-lg border border-green-200 hover:bg-green-100 transition"
@@ -163,7 +169,13 @@
                 @click="payment(subscription.id)"
                 class="flex items-center px-3 py-1.5 bg-green-50 text-green-700 text-sm font-medium rounded-lg border border-green-200 hover:bg-green-100 transition"
               >
-                <i class="fas fa-info-circle mr-1"></i> Payments
+                <i class="fas fa-info-circle mr-1"></i> Paymentsgdfgcf
+              </button>
+              <button 
+                @click="Deactivate(subscription.id)"
+                class="flex items-center px-3 py-1.5 bg-orange-50 text-orange-700 text-sm font-medium rounded-lg border border-orange-200 hover:bg-orange-100 transition"
+              >
+                <i class="fas fa-exchange-alt mr-1"></i> Deactivate
               </button>
               <button v-if="is_super_user!='true'"
                 @click="openUpgradeModal(subscription)"
@@ -196,6 +208,24 @@
       </div>
 
       <!-- Modals here (unchanged) -->
+       <!-- ✅ Payment Modal -->
+<PaymentModal
+  v-if="paymentVisible"
+  :visible="paymentVisible"
+  :payload="paymentPayload"
+  @close="paymentVisible = false"
+  @paid="handlePaymentSuccess"
+/>
+
+<!-- ✅ Upgrade Subscription Modal -->
+<UpgradeSubscriptionModal
+  v-if="showUpgradeModal"
+  :visible="showUpgradeModal"
+  :subscriptionId="selectedSubscriptionId"
+  @close="showUpgradeModal = false"
+  @plan-upgraded="fetchSubscriptions"
+/>
+
     </div>
   </div>
 </template>
@@ -397,6 +427,20 @@ export default {
           name: "subscriptionsPayment_view",
           params: { id: subscriptionId },
         });
+    },
+    async Deactivate(subscription_id){
+       try{
+await this.$apiPatch(`/update_subscription`,{status:"terminated"},subscription_id);
+        this.$root.$refs.toast.showToast(
+          "Subscription Deactivated successfully",
+          "success"
+        );
+       }catch (e){
+this.$root.$refs.toast.showToast(
+          "Failed to Deactivate subscription",
+          "error"
+        );
+       }
     },
     handlePaymentSuccess() {
       this.$root.$refs.toast.showToast("Payment successful", "success");

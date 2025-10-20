@@ -48,7 +48,7 @@
         </div>
 
         <!-- Cycle Start -->
-        <div>
+        <!-- <div>
           <label class="block text-gray-700 mb-1">Cycle Start</label>
           <input
             v-model="form.cycle_start"
@@ -56,7 +56,7 @@
             class="w-full border rounded p-2"
             required
           />
-        </div>
+        </div> -->
 
         <!-- Cycle End -->
         <div>
@@ -70,13 +70,13 @@
         </div>
 
         <!-- Status -->
-        <div>
+        <!-- <div>
           <label class="block text-gray-700 mb-1">Status</label>
           <select v-model="form.status" class="w-full border rounded p-2" required>
             <option value="pending">Pending</option>
             <option value="paid">Paid</option>
           </select>
-        </div>
+        </div> -->
 
         <!-- Actions -->
         <div class="flex justify-end space-x-3 mt-6 md:col-span-2">
@@ -115,7 +115,7 @@ export default {
         status: "pending",
         payment_method: "",
         transaction_id: "",
-        cycle_start: "",
+        // cycle_start: "",
         cycle_end: "",
         rental: this.rentalId,
       },
