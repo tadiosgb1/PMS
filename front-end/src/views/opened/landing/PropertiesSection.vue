@@ -144,7 +144,7 @@
             </p>
 
             <div class="text-gray-600 text-sm mb-3" v-if="currentTab !== 'cowork'">
-              <p>🛏 {{ item.bed_rooms }} | 🛁 {{ item.bath_rooms }}</p>
+              <p>Bedrooms {{ item.bed_rooms }} | Bathrooms{{ item.bath_rooms }}</p>
               <p>💰 ${{ item.price }}</p>
             </div>
 
