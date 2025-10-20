@@ -75,7 +75,7 @@
           <div class="md:col-span-2 text-right">
             <button
               type="submit"
-              class="bg-primary hover:bg-blue-700 text-white font-semibold px-6 py-3 rounded shadow"
+              class="bg-primary hover:bg-orange-600 text-white font-semibold px-6 py-3 rounded shadow"
             >
               Update Space
             </button>
