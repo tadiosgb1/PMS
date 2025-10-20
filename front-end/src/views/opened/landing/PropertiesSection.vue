@@ -134,7 +134,7 @@
 
             <div class="text-gray-600 text-sm mb-3" v-if="currentTab !== 'cowork'">
               <p>Bedrooms {{ item.bed_rooms }} | Bathrooms {{ item.bath_rooms }}</p>
-              <p>💰 ${{ item.price }}</p>
+              <p>Price: ${{ item.price }}</p>
             </div>
 
             <div class="text-gray-600 text-sm mb-3" v-else>
