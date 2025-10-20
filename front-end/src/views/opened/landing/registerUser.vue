@@ -180,9 +180,8 @@ export default {
           payload
         );
         console.log("User registered successfully:", response.data);
-
         // Optionally send password reset email
-        if (response.data?.email) {
+        if (response) {
           const resetPayload = { email: this.form.email };
           const resetResponse = await axios.post(
             "https://alphapms.sunriseworld.org/api/send_password_reset_email",
@@ -190,7 +189,6 @@ export default {
           );
           console.log("Password reset email sent:", resetResponse.data);
         }
-
         // Close modal
         this.$emit("close");
       } catch (error) {
