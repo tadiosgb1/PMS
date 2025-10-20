@@ -99,6 +99,7 @@
 
    <Features />
 
+   <PropertiesSection />
     <!-- Plans Section -->
     <Plans id="plans" />
 
@@ -143,6 +144,7 @@ import LoginModal from '../auth/login.vue'
 import Hero from './hero.vue'
 import Features from './features.vue'
 import ContactUs from './contactUs.vue'
+import PropertiesSection from './PropertiesSection.vue'
 export default {
   components:{
     Plans,
@@ -152,7 +154,8 @@ export default {
     LoginModal,
     Hero,
     Features,
-    ContactUs
+    ContactUs,
+    PropertiesSection
   },
   data() {
     return {
