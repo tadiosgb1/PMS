@@ -4,9 +4,7 @@
       <!-- Header -->
       <div class="text-center mb-6">
         <h2 class="text-3xl font-bold text-gray-800">Our Properties</h2>
-        <p class="text-gray-500 mt-2">
-          Find your perfect space for rent, sale, or work in Ethiopia
-        </p>
+        <p class="text-gray-500 mt-2">Find your perfect space for rent, sale, or work in Ethiopia</p>
       </div>
 
       <!-- Tabs -->
@@ -40,21 +38,6 @@
           <datalist id="cityList">
             <option v-for="city in cities" :key="city" :value="city" />
           </datalist>
-
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="absolute right-4 top-2.5 h-5 w-5 text-gray-400"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-            stroke-width="2"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-            />
-          </svg>
         </div>
       </div>
 
@@ -64,24 +47,23 @@
       </div>
 
       <!-- Property Grid -->
-      <div
-        v-else
-        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
-      >
+      <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
         <div
           v-for="item in paginatedItems"
           :key="item.id"
           class="bg-white rounded-2xl shadow hover:shadow-lg transition overflow-hidden"
         >
-          <!-- Image for Rent/Sale -->
-          <div class="relative w-full h-52" v-if="currentTab !== 'cowork'">
+          <!-- Image Section -->
+          <div class="relative w-full h-52 rounded-t-2xl overflow-hidden" v-if="currentTab !== 'cowork'">
             <img
-              :src="getCurrentImage(item)"
-              alt="Property image"
-              class="w-full h-52 object-cover"
+              :src="item.property_pictures && item.property_pictures.length > 0
+                ? item.property_pictures[item.imageIndex].property_image
+                : placeholder"
+              class="w-full h-52 object-cover cursor-pointer"
+              @click="openZoom(item.property_pictures ? item.imageIndex : null, item.property_pictures)"
             />
 
-            <!-- Carousel arrows if more than 1 image -->
+            <!-- Carousel arrows -->
             <div
               v-if="getImageCount(item) > 1"
               class="absolute inset-0 flex justify-between items-center px-2"
@@ -90,43 +72,26 @@
                 @click.stop="prevImage(item)"
                 class="bg-white/80 text-gray-800 p-2 rounded-full shadow hover:bg-primary hover:text-white transition"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7" />
-                </svg>
+                ‹
               </button>
               <button
                 @click.stop="nextImage(item)"
                 class="bg-white/80 text-gray-800 p-2 rounded-full shadow hover:bg-primary hover:text-white transition"
               >
-                <svg
-                  xmlns="http://www.w3.org/2000/svg"
-                  class="h-5 w-5"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  stroke-width="2"
-                >
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 5l7 7-7 7" />
-                </svg>
+                ›
               </button>
             </div>
 
             <!-- Image counter -->
             <div
+              v-if="getImageCount(item) > 0"
               class="absolute bottom-2 right-2 bg-white/80 text-xs text-gray-800 px-2 py-1 rounded-full"
             >
               {{ item.imageIndex + 1 }} / {{ getImageCount(item) }}
             </div>
           </div>
 
-          <!-- Placeholder for Coworking -->
+          <!-- Cowork placeholder -->
           <div
             class="w-full h-52 flex items-center justify-center bg-gray-100 text-gray-400 text-lg font-semibold"
             v-else
@@ -136,15 +101,11 @@
 
           <!-- Info -->
           <div class="p-5">
-            <h3 class="text-lg font-semibold text-gray-800 mb-1">
-              {{ item.name }}
-            </h3>
-            <p class="text-gray-500 text-sm mb-2">
-              {{ item.address || item.location }}, {{ item.city }}
-            </p>
+            <h3 class="text-lg font-semibold text-gray-800 mb-1">{{ item.name }}</h3>
+            <p class="text-gray-500 text-sm mb-2">{{ item.address || item.location }}, {{ item.city }}</p>
 
             <div class="text-gray-600 text-sm mb-3" v-if="currentTab !== 'cowork'">
-              <p>Bedrooms {{ item.bed_rooms }} | Bathrooms{{ item.bath_rooms }}</p>
+              <p>Bedrooms {{ item.bed_rooms }} | Bathrooms {{ item.bath_rooms }}</p>
               <p>💰 ${{ item.price }}</p>
             </div>
 
@@ -154,21 +115,13 @@
               <p>Monthly: ${{ item.price_monthly }}</p>
             </div>
 
-            <!-- Action Button -->
             <button
               @click="item.showDownload = true"
               class="bg-primary text-white px-4 py-2 rounded-full w-full hover:opacity-90 transition"
             >
-              {{
-                currentTab === "rent"
-                  ? "Rent Now"
-                  : currentTab === "sale"
-                  ? "Buy Now"
-                  : "Book Now"
-              }}
+              {{ currentTab === "rent" ? "Rent Now" : currentTab === "sale" ? "Buy Now" : "Book Now" }}
             </button>
 
-            <!-- Download Button for this card -->
             <button
               v-if="item.showDownload"
               class="mt-3 bg-primary text-white px-4 py-2 rounded-full w-full hover:opacity-90 transition"
@@ -223,6 +176,25 @@
         </button>
       </div>
     </div>
+
+    <!-- Modal -->
+    <div
+      v-if="zoomImage"
+      class="fixed inset-0 bg-black/70 flex items-center justify-center z-50"
+      @click="closeZoom"
+    >
+      <img
+        :src="zoomImage"
+        class="max-h-[90%] max-w-[90%] rounded-lg shadow-lg"
+        @click.stop
+      />
+      <button
+        @click="closeZoom"
+        class="absolute top-5 right-5 text-white text-2xl font-bold"
+      >
+        &times;
+      </button>
+    </div>
   </section>
 </template>
 
@@ -243,6 +215,8 @@ export default {
       currentPage: 0,
       itemsPerPage: 3,
       searchQuery: "",
+      zoomImage: null,
+      placeholder: "https://via.placeholder.com/400x250?text=No+Image",
       cities: [
         "Addis Ababa",
         "Adama",
@@ -259,8 +233,7 @@ export default {
   },
   computed: {
     currentTabLabel() {
-      const tab = this.tabs.find((t) => t.key === this.currentTab);
-      return tab ? tab.label.toLowerCase() : "";
+      return this.tabs.find((t) => t.key === this.currentTab)?.label.toLowerCase() || "";
     },
     totalPages() {
       return Math.ceil(this.filteredItems.length / this.itemsPerPage);
@@ -285,10 +258,7 @@ export default {
     async fetchData() {
       try {
         this.loading = true;
-        const url =
-          this.currentTab === "cowork"
-            ? "/get_coworking_spaces"
-            : "/get_properties";
+        const url = this.currentTab === "cowork" ? "/get_coworking_spaces" : "/get_properties";
         const res = await this.$apiGet(url);
         this.items = (res.data || []).map((item) => ({
           ...item,
@@ -297,7 +267,7 @@ export default {
         }));
         this.filteredItems = [...this.items];
       } catch (error) {
-        console.error("Error fetching data:", error);
+        console.error(error);
         this.items = [];
         this.filteredItems = [];
       } finally {
@@ -324,25 +294,22 @@ export default {
       this.currentPage = page;
     },
     getImageCount(item) {
-      return item.property_pictures ? item.property_pictures.length : 1;
+      return item.property_pictures?.length || 0;
     },
-  getCurrentImage(item) {
-  const pictures = item.property_pictures && item.property_pictures.length > 0
-    ? item.property_pictures
-    : [{ property_image: "https://via.placeholder.com/400x250" }];
-  const index = item.imageIndex ?? 0;
-  return pictures[index]?.property_image || "https://via.placeholder.com/400x250";
-},
     nextImage(item) {
       const pictures = item.property_pictures || [];
-      if (pictures.length > 1)
-        item.imageIndex = (item.imageIndex + 1) % pictures.length;
+      if (pictures.length > 1) item.imageIndex = (item.imageIndex + 1) % pictures.length;
     },
     prevImage(item) {
       const pictures = item.property_pictures || [];
-      if (pictures.length > 1)
-        item.imageIndex =
-          (item.imageIndex - 1 + pictures.length) % pictures.length;
+      if (pictures.length > 1) item.imageIndex = (item.imageIndex - 1 + pictures.length) % pictures.length;
+    },
+    openZoom(index, pictures) {
+      if (!pictures || pictures.length === 0) return;
+      this.zoomImage = pictures[index].property_image;
+    },
+    closeZoom() {
+      this.zoomImage = null;
     },
   },
 };
