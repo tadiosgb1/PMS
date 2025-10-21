@@ -162,13 +162,11 @@ export default {
     async submitForm() {
       this.passwordMismatch = false;
       this.emailExistsError = "";
-
       // Validate password confirmation
       if (this.form.password !== this.form.confirmPassword) {
         this.passwordMismatch = true;
         return;
       }
-
       try {
         // Prepare payload
         const payload = { ...this.form };
@@ -179,18 +177,23 @@ export default {
           "https://alphapms.sunriseworld.org/api/sign_up",
           payload
         );
-        console.log("User registered successfully:", response.data);
+        console.log("User registered successfully:", response);
         // Optionally send password reset email
         if (response) {
-          const resetPayload = { email: this.form.email };
-          const resetResponse = await axios.post(
-            "https://alphapms.sunriseworld.org/api/send_password_reset_email",
-            resetPayload
-          );
-          console.log("Password reset email sent:", resetResponse.data);
+          this.$router.push('/email-activate-message')
+          // const resetPayload = { email: this.form.email };
+          // const resetResponse = await axios.post(
+          //   "https://alphapms.sunriseworld.org/api/send_password_reset_email",
+          //   resetPayload
+          // );
+          // console.log("Password reset email sent:", resetResponse.data);
+
+          // if(resetResponse){
+          //   this.$router.push('/email-activate-mail')
+          // }
         }
         // Close modal
-        this.$emit("close");
+        //this.$emit("close");
       } catch (error) {
         // Handle errors
         const errorMsg = error.response?.data?.error;

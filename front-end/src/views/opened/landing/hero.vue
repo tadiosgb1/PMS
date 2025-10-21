@@ -27,16 +27,16 @@
           From real-time monitoring to financial tracking and tenant management — everything you need in one platform.
         </p>
         <div class="flex flex-wrap justify-center gap-4 animate-fade-in delay-500">
-          <button
+          <button 
             class="bg-green-500 hover:bg-green-600 text-white font-semibold py-2 px-6 rounded shadow hover:shadow-neon transition duration-300"
           >
             Get Started
           </button>
-          <button
+          <!-- <button
             class="bg-transparent border border-white hover:bg-white hover:text-black text-white font-semibold py-2 px-6 rounded transition duration-300"
           >
             Learn More
-          </button>
+          </button> -->
         </div>
       </div>
     </section>

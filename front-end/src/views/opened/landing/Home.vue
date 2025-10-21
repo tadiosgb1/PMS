@@ -235,6 +235,9 @@ export default {
         alert('Something went wrong.');
       }
     },
+    controlLogin(status){
+      this.showLoginModal=status
+    },
     goToLogin() {
       this.$router.push('/login');
     },

@@ -3,7 +3,7 @@ import Home from '../views/opened/landing/Home.vue'
 import Login from '../views/opened/auth/login.vue'
 import ResetPassword from '../views/opened/auth/ResetPassword.vue'
 import ForgotPasssword from '../views/opened/auth/forgotPassword.vue'
-
+import ActivateEmailMessage from '../views/opened/landing/activateEmailMessage.vue'
 import Registration from '../views/opened/auth/login.vue'
 import ForgotPassword from '../views/opened/auth/forgotPassword.vue';
 import Reset from '../views/opened/auth/reset.vue';
@@ -19,10 +19,10 @@ import PropertyZone from '../views/closed/Zones/view.vue';
 import PropertyPicture from '../views/closed/proportyPicture/view.vue';
 
 import Payments from '../views/closed/payments/view.vue';
-const Maintenance = { template: '<div class="p-6 text-gray-800">Maintenance Page</div>' };
-const Leases = { template: '<div class="p-6 text-gray-800">Leases Page</div>' };
-const Messages = { template: '<div class="p-6 text-gray-800">Messages Page</div>' };
-const Settings = { template: '<div class="p-6 text-gray-800">Settings Page</div>' };
+// const Maintenance = { template: '<div class="p-6 text-gray-800">Maintenance Page</div>' };
+// const Leases = { template: '<div class="p-6 text-gray-800">Leases Page</div>' };
+// const Messages = { template: '<div class="p-6 text-gray-800">Messages Page</div>' };
+// const Settings = { template: '<div class="p-6 text-gray-800">Settings Page</div>' };
 
 import Rents from '../views/closed/rent/view.vue';
 import RentDetail from '../views/closed/rent/rentDetail.vue';
@@ -89,6 +89,12 @@ const routes = [
       { requiresGuest: true }
   },
 
+  {
+    path: "/email-activate-message", name: "email-activate-message",
+    component: ActivateEmailMessage,
+    meta:
+      { requiresGuest: true }
+  },
   // router/index.js
    {
     path: '/forgot-password',
@@ -149,11 +155,9 @@ const routes = [
       { path: '/pictures', name: 'pictures', component: PropertyPicture },
       { path: '/tenants', name: 'tenants', component: Tenants },
       { path: '/payments', name: 'payments', component: Payments },
-      { path: '/maintenance', name: 'maintenance', component: Maintenance },
-      { path: '/leases', name: 'leases', component: Leases },
+     
       { path: '/reports', name: 'reports', component: Reports },
-      { path: '/messages', name: 'messages', component: Messages },
-      { path: '/settings', name: 'settings', component: Settings },
+    
       { path: '/notifications', name: 'notifications', component: Notifications },
       { path: 'notification/:id', name: 'notificationDetail', component: notificationDetail },
       { path: '/sale-commissions', name: 'sale-commissions', component:saleCommissions },

@@ -3,7 +3,7 @@
     <div class="container mx-auto px-4">
       <!-- Header -->
       <div class="text-center mb-6">
-        <h2 class="text-3xl font-bold text-gray-800">Our Properties</h2>
+        <h2 class="text-3xl font-bold text-gray-800">Explore Properties</h2>
         <p class="text-gray-500 mt-2">
           Find your perfect space for rent, sale, or work in Ethiopia
         </p>
