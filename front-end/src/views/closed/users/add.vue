@@ -121,7 +121,8 @@ export default {
       try {
         const payload = { ...this.form };
         await this.$apiPost("/post_user", payload);
-        this.$emit("success"); // notify parent to refresh users
+        this.$root.$refs.toast.showToast("User Successfully registered","success")
+       // this.$emit("success"); // notify parent to refresh users
         this.$emit("close");   // close modal after success
       } catch (error) {
         console.error("Failed to create user:", error);

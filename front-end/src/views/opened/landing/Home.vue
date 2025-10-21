@@ -94,10 +94,8 @@
       </div>
     </header>
   </section>
-    <Hero />
-
-
-   <Features />
+    <Hero @openLogin="showLoginModal=true" />
+     <Features />
 
    <PropertiesSection />
     <!-- Plans Section -->
@@ -127,7 +125,7 @@
     <Fqs />
     <ContactUs />
     <Footer />
-    <LoginModal :visible="showLoginModal" @close="showLoginModal = false" />
+    <LoginModal :visible="showLoginModal" @close="showLoginModal = false" @open="showLoginModal=true" />
 
 
   </div>
@@ -234,6 +232,9 @@ export default {
         console.error(err);
         alert('Something went wrong.');
       }
+    },
+    controlLogin(status){
+      this.showLoginModal=status
     },
     goToLogin() {
       this.$router.push('/login');
