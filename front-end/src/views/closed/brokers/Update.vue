@@ -58,7 +58,7 @@
           </div>
 
           <!-- User ID -->
-          <div>
+          <!-- <div>
             <label class="block text-sm font-medium text-gray-700 mb-1"
               >User ID</label
             >
@@ -68,7 +68,7 @@
               class="w-full border rounded-lg px-3 py-2 focus:ring-2 focus:ring-blue-500 focus:outline-none"
               placeholder="Enter user ID"
             />
-          </div>
+          </div> -->
 
           <!-- Actions -->
           <div class="flex justify-end space-x-3 mt-6">
@@ -82,7 +82,7 @@
             <button
               type="submit"
               :disabled="loading"
-              class="px-4 py-2 rounded-lg bg-blue-600 text-white hover:bg-blue-700 disabled:opacity-50"
+              class="px-4 py-2 rounded-lg bg-orange-500 text-white hover:bg-orange-600 disabled:opacity-50"
             >
               <span v-if="loading">Updating...</span>
               <span v-else>Update</span>
@@ -122,13 +122,14 @@ export default {
   methods: {
     async fetchBroker() {
       try {
-        const res = await this.$apiGetBYyId(`/get_broker_profile`,this.brokerId);
+        const res = await this.$apiGet(`/get_broker_profile/${this.brokerId}`);
+            const broker = res.data 
         if (res) {
           this.form = {
-            license_number: res.license_number || "",
-            commission_rate: res.commission_rate || "",
-            wallet: res.wallet || "",
-            user: res.user || "",
+            license_number: broker.license_number || "",
+            commission_rate: broker.commission_rate || "",
+            wallet: broker.wallet || "",
+            user: broker.user || "",
           };
         }
       } catch (err) {

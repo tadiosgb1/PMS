@@ -65,7 +65,7 @@
           </thead>
           <tbody>
             <tr
-              v-for="manager in filteredAndSortedManagers"
+              v-for="manager in managers"
               :key="manager.id"
               class="hover:bg-gray-100"
             >
@@ -108,7 +108,7 @@
                 </button>
               </td>
             </tr>
-            <tr v-if="filteredAndSortedManagers.length === 0">
+            <tr v-if="managers.length === 0">
               <td colspan="5" class="text-center py-6 text-gray-500">
                 No managers found.
               </td>
@@ -120,7 +120,7 @@
       <!-- ✅ Mobile & Tablet Card Layout -->
       <div class="block md:hidden p-4 space-y-4">
         <div
-          v-for="manager in filteredAndSortedManagers"
+          v-for="manager in managers"
           :key="manager.id"
           class="bg-gray-50 border border-gray-200 rounded-xl p-4 shadow-sm hover:shadow-md transition"
         >
@@ -168,7 +168,7 @@
           </div>
         </div>
 
-        <div v-if="filteredAndSortedManagers.length === 0" class="text-center text-gray-500 py-6">
+        <div v-if="managers.length === 0" class="text-center text-gray-500 py-6">
           No managers found.
         </div>
       </div>
@@ -243,31 +243,40 @@ export default {
       pageSize: 5,
       pageSizes: [5, 10, 20, 50, 100],
       showAddManager: false,
+      searchTimeout: null, // debounce timer
     };
   },
-  computed: {
-    filteredAndSortedManagers() {
-      const term = this.searchTerm.toLowerCase();
-      let filtered = this.managers.filter(
-        (manager) =>
-          `${manager.first_name} ${manager.middle_name} ${manager.last_name}`
-            .toLowerCase()
-            .includes(term) ||
-          manager.groups.join(", ").toLowerCase().includes(term) ||
-          (manager.is_active ? "yes" : "no").includes(term)
-      );
+  // computed: {
+  //   filteredAndSortedManagers() {
+  //     const term = this.searchTerm.toLowerCase();
+  //     let filtered = this.managers.filter(
+  //       (manager) =>
+  //         `${manager.first_name} ${manager.middle_name} ${manager.last_name}`
+  //           .toLowerCase()
+  //           .includes(term) ||
+  //         manager.groups.join(", ").toLowerCase().includes(term) ||
+  //         (manager.is_active ? "yes" : "no").includes(term)
+  //     );
 
-      filtered.sort((a, b) => {
-        let aVal =
-          `${a.first_name} ${a.middle_name} ${a.last_name}`.toLowerCase();
-        let bVal =
-          `${b.first_name} ${b.middle_name} ${b.last_name}`.toLowerCase();
-        if (aVal < bVal) return this.sortAsc ? -1 : 1;
-        if (aVal > bVal) return this.sortAsc ? 1 : -1;
-        return 0;
-      });
+  //     filtered.sort((a, b) => {
+  //       let aVal =
+  //         `${a.first_name} ${a.middle_name} ${a.last_name}`.toLowerCase();
+  //       let bVal =
+  //         `${b.first_name} ${b.middle_name} ${b.last_name}`.toLowerCase();
+  //       if (aVal < bVal) return this.sortAsc ? -1 : 1;
+  //       if (aVal > bVal) return this.sortAsc ? 1 : -1;
+  //       return 0;
+  //     });
 
-      return filtered;
+  //     return filtered;
+  //   },
+  // },
+  watch: {
+    searchTerm(newVal) {
+      clearTimeout(this.searchTimeout);
+      this.searchTimeout = setTimeout(() => {
+        this.fetchManagers(null, newVal);
+      }, 400); // delay 400ms
     },
   },
   mounted() {
@@ -281,9 +290,9 @@ export default {
     this.fetchManagers();
   },
   methods: {
-    async fetchManagers(url = null) {
+    async fetchManagers(url = null, searchTerm = "") {
       try {
-        const result = await this.$getManagers(); // Global function handles URL & params
+        const result = await this.$getManagers(searchTerm); // Global function handles URL & params
         console.log("result", result);
         this.managers = result.managers;
         console.log("accepted managers",this.managers);

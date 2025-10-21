@@ -18,19 +18,32 @@
           @submit.prevent="submitForm"
           class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6"
         >
-          <div>
-            <label class="block text-gray-700">Zone manager</label>
-            <select v-model="form.manager_id" class="custom-input">
-              <option value="">Select Manager</option>
-              <option
-                v-for="manager in managers"
-                :key="manager.id"
-                :value="manager.manager.id"
-              >
-                {{ manager.manager.first_name }}
-              </option>
-            </select>
-          </div>
+          <div class="relative">
+  <label class="block text-gray-700 mb-1">Zone Manager</label>
+  <input
+    v-model="managerSearch"
+    type="text"
+    class="custom-input"
+    placeholder="Search Manager..."
+    @input="searchManagers"
+    @focus="managerDropdown = true"
+    @blur="hideDropdown('manager')"
+    required
+  />
+  <ul
+    v-if="managers.length > 0 && managerDropdown"
+    class="absolute z-50 w-full max-h-48 overflow-y-auto bg-white border border-gray-300 rounded shadow mt-1"
+  >
+    <li
+      v-for="manager in managers"
+      :key="manager.manager.id"
+      class="p-2 hover:bg-gray-100 cursor-pointer"
+      @mousedown.prevent="selectManager(manager)"
+    >
+      {{ manager.manager.first_name }} {{ manager.manager.last_name || '' }}
+    </li>
+  </ul>
+</div>
 
           <div>
             <label class="block text-gray-700">Name</label>
@@ -74,6 +87,8 @@ export default {
   components: { Toast },
   data() {
     return {
+       managerSearch: "",
+    managerDropdown: false,
       managers: [],
       loading: false,
       form: {
@@ -88,19 +103,37 @@ export default {
   },
   async mounted() {
     try {
-      if (localStorage.getItem("is_superuser") == "true") {
-        const res = await this.$apiGet(`/get_managers`);
-        this.managers = res.data || [];
-      } else {
-        const params = { owner__id: localStorage.getItem("userId") };
-        const res = await this.$apiGet(`/get_owner_managers`, params);
-        this.managers = res.data || [];
-      }
+        const result = await this.$getManagers(); // Global function handles URL & params
+        console.log("result", result);
+        this.managers = result.managers;
     } catch (err) {
       console.error("Error fetching managers:", err);
     }
   },
   methods: {
+     searchManagers() {
+    if (!this.managerSearch) {
+      this.fetchManagers();
+    } else {
+      this.managers = this.managers.filter(m =>
+        `${m.manager.first_name} ${m.manager.last_name || ''}`
+          .toLowerCase()
+          .includes(this.managerSearch.toLowerCase())
+      );
+    }
+  },
+
+  selectManager(manager) {
+    this.form.manager_id = manager.manager.id;
+    this.managerSearch = `${manager.manager.first_name} ${manager.manager.last_name || ''}`;
+    this.managerDropdown = false;
+  },
+
+  hideDropdown(type) {
+    setTimeout(() => {
+      if (type === "manager") this.managerDropdown = false;
+    }, 200);
+  },
     async submitForm() {
       this.loading = true;
       try {
