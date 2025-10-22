@@ -74,7 +74,7 @@
                   >View</button>
                 </td>
                 <td class="border border-gray-300 px-4 py-2 text-center space-x-2">
-                  <button v-if="!rental.is_active" @click="openPaymentModal(rental.id)" class="px-3 py-1 text-green-600 border border-green-600 rounded-lg hover:text-white hover:bg-green-600 transition duration-300 ease-in-out">
+                  <button v-if="rental.is_active" @click="openPaymentModal(rental.id)" class="px-3 py-1 text-green-600 border border-green-600 rounded-lg hover:text-white hover:bg-green-600 transition duration-300 ease-in-out">
                     <i class="fas fa-credit-card mr-1"></i> Pay
                   </button>
                   <button @click="editRental(rental)" class="text-green-600 hover:text-green-800">

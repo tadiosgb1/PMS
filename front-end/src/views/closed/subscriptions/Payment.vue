@@ -49,9 +49,9 @@
     <div class="p-3 bg-gray-100 border-l-4 border-blue-500 rounded">
       <p class="text-sm text-gray-700 font-semibold">Payment Instructions</p>
       <ul class="mt-2 text-sm text-gray-600 space-y-1">
-        <li>💳 <strong>CBE Account:</strong> 1000 2000 3000 (Your Company Name)</li>
-        <li>📱 <strong>TeleBirr:</strong> +2519XXXXXXXX</li>
-        <li class="text-xs text-gray-500">👉 Please transfer to one of the above and provide the Transaction ID & Remark below.</li>
+        <li><strong>CBE Account:</strong> 1000 2000 3000 </li>
+        <li> <strong>TeleBirr:</strong> +2519-------</li>
+        <li class="text-xs text-gray-500"> Please transfer to one of the above and provide the Transaction ID & Remark below.</li>
       </ul>
     </div>
 
