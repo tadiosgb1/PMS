@@ -45,7 +45,7 @@
                 class="px-2 py-1 border rounded-md text-sm"
               >
                 <option value="">All</option>
-                <option value="tellebirr">Tellebirr</option>
+                <option value="telebirr">Tellebirr</option>
                 <option value="cash">Cash</option>
               </select>
             </div>

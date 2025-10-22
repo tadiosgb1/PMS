@@ -1,10 +1,10 @@
 <template>
   <div
     v-if="visible"
-    class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4 overflow-auto"
+    class="fixed inset-0 z-50 bg-black bg-opacity-50 flex items-center justify-center p-4 overflow-y-auto"
   >
     <div
-      class="bg-white w-full max-w-full sm:max-w-[90%] md:max-w-[900px] lg:max-w-[1050px] rounded-lg shadow-lg overflow-hidden relative mx-auto"
+      class="bg-white w-full max-w-full sm:max-w-[90%] md:max-w-[900px] lg:max-w-[1050px] rounded-lg shadow-lg overflow-visible relative mx-auto"
     >
       <!-- Header -->
       <div
@@ -135,14 +135,14 @@ export default {
   },
   data() {
     return {
-      isSaving: false, // 👈 Track saving state
+      isSaving: false,
       form: {
         guest_name: "",
         guest_email: "",
         guest_phone: "",
         cycle: "",
         start_date: "",
-        is_active: false,
+        is_active: true,
         user: localStorage.getItem("userId") || 0,
         space: "",
       },
@@ -159,6 +159,7 @@ export default {
       try {
         const response = await this.$getCoworkingSpaces();
         this.spaces = response.spaces || [];
+        console.log("spaces", this.spaces);
       } catch (err) {
         console.error("Failed to fetch spaces:", err);
       }
@@ -191,7 +192,6 @@ export default {
       }, 200);
     },
 
-    // ✅ Submit form with saving animation
     async submitForm() {
       this.isSaving = true;
       try {
@@ -201,12 +201,11 @@ export default {
         this.$emit("success");
         this.resetForm();
         this.$emit("close");
-        //this.$reloadPage();
       } catch (err) {
         console.error("Failed to add rental:", err);
         alert("Failed to add workspace rental.");
       } finally {
-        this.isSaving = false; // ✅ Always reset saving state
+        this.isSaving = false;
       }
     },
 
