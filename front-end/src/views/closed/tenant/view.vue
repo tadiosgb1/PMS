@@ -66,7 +66,7 @@
             </thead>
             <tbody>
               <tr
-                v-for="tenant in filteredAndSortedTenants"
+                v-for="tenant in tenants"
                 :key="tenant.id"
                 class="hover:bg-gray-100"
               >
@@ -115,7 +115,7 @@
                   </button>
                 </td>
               </tr>
-              <tr v-if="filteredAndSortedTenants.length === 0">
+              <tr v-if="tenants.length === 0">
                 <td colspan="9" class="text-center py-6 text-gray-500">
                   No tenants found.
                 </td>
@@ -127,7 +127,7 @@
         <!-- Mobile / Tablet Card View -->
         <div class="block lg:hidden p-4 space-y-4">
           <div
-            v-for="tenant in filteredAndSortedTenants"
+            v-for="tenant in tenants"
             :key="tenant.id"
             class="bg-white border border-gray-200 rounded-lg shadow-sm p-4 space-y-2"
           >
@@ -187,7 +187,7 @@
             </div>
           </div>
 
-          <div v-if="filteredAndSortedTenants.length === 0" class="text-center py-6 text-gray-500">
+          <div v-if="tenants.length === 0" class="text-center py-6 text-gray-500">
             No tenants found.
           </div>
         </div>
@@ -299,6 +299,11 @@ export default {
     return filtered;
   },
 },
+watch: {
+  searchTerm() {
+    this.fetchTenants();
+  }
+},
 
   mounted() {
     this.fetchTenants();
@@ -324,11 +329,13 @@ export default {
       this.$router.push(`/user_detail/${id}`);
     },
 
-    async fetchTenants(url = null) {
+    async fetchTenants(url) {
       try {
        // const pageUrl = url || `/get_tenants?page=1&page_size=${this.pageSize}`;
 
-        const response = await this.$getTenants();
+        const response = await this.$getTenants(  url,
+      this.pageSize,
+      this.searchTerm);
         console.log("response", response);
         this.tenants = response.tenants || response.data || [];
         this.currentPage = response.currentPage || 1;

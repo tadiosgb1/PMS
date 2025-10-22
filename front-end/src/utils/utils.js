@@ -615,7 +615,7 @@ export async function getZones(url = null, pageSize = 10) {
 
 
 
-export async function getManagers() {
+export async function getManagers(searchTerm = "") {
   try {
     const isSuperUser =
       localStorage.getItem("is_superuser") == "1" ||
@@ -624,23 +624,33 @@ export async function getManagers() {
     const groups = JSON.parse(localStorage.getItem("groups") || "[]");
     const userId = localStorage.getItem("userId");
 
-    let params = {};
-    let apiUrl = "/get_managers?page=1&page_size=1000"; // default URL
+    let params = {
+      page: 1,
+      page_size: 1000,
+      search: searchTerm.trim(),
+    };
+    let apiUrl =  `/get_managers`; // default URL
 
     if (isSuperUser || groups.includes("super_staff")) {
-      // Superuser or staff: empty params, default URL
-      params = {};
-      apiUrl = "/get_owner_managers?page=1&page_size=1000";
+      apiUrl = `/get_owner_managers`;
+      // ✅ keep search + pagination
     } else if (groups.includes("owner")) {
-      // Owner: use owner-specific URL and params
-      apiUrl = "/get_owner_managers?page=1&page_size=1000";
-      params = { owner__id: userId };
-
+      apiUrl = `/get_owner_managers`;
+      params = {
+        ...params,
+        owner__id: userId, // ✅ merge instead of replace
+      };
     } else if (groups.includes("staff")) {
-      // Manager: default URL with manager filter
-      apiUrl = "/get_owner_managers?page=1&page_size=10";
-      params = { owner__id: userId };
+      apiUrl = `/get_owner_managers`;
+      params = {
+        ...params,
+        owner__id: userId, // ✅ merge instead of replace
+      };
     }
+
+    //  if (searchTerm && searchTerm.trim() !== "") {
+    //   params.search = searchTerm.trim();
+    // }
     console.log("params are ", params);
     const response = await this.$apiGet(apiUrl, params);
     console.log("Response managers", response);
@@ -754,7 +764,7 @@ export async function getProperties(
 }
 
 
-export async function getTenants(url = null, pageSize = 10) {
+export async function getTenants(url = null, pageSize = 10,searchTerm="") {
   try {
     const isSuperUser =
       localStorage.getItem("is_superuser") === "1" ||
@@ -763,17 +773,19 @@ export async function getTenants(url = null, pageSize = 10) {
     const groups = JSON.parse(localStorage.getItem("groups") || "[]");
     const email = localStorage.getItem("email");
 
-    let params = {};
+    let params = {
+   search: searchTerm,
+    };
 
     if (!isSuperUser) {
       if (groups.includes("manager")) {
-        params = { property_id__property_zone_id__manager_id__email: email };
+        params.property_id__property_zone_id__manager_id__email = email;
       } else if (groups.includes("owner")) {
-        params = { property_id__property_zone_id__owner_id__email: email };
+        params.property_id__property_zone_id__owner_id__email = email;
       } else if (groups.includes("staff")) {
-        params = { staff_id__email: email };
+        params.staff_id__email = email;
       } else if (groups.includes("super_staff")) {
-        params = {};
+        // no restriction
       }
     }
 
@@ -785,7 +797,7 @@ export async function getTenants(url = null, pageSize = 10) {
 
     // console.log("params", params);
     // console.log("apiUrl", apiUrl);
-
+console.log("tenant params",params)
     const response = await this.$apiGet(apiUrl, params);
 console.log("response rents",response)
     // Normalize tenants

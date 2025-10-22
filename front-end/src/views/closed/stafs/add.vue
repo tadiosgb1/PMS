@@ -164,6 +164,9 @@ async submitForm() {
       this.$root.$refs.toast.showToast("Successfully registered", "success");
       // or if you prefer alert:
       // alert("Successfully registered");
+       this.$emit('close')
+      this.$emit('success')
+     
     }
 
     this.resetForm();
@@ -172,10 +175,9 @@ async submitForm() {
   } catch (err) {
     console.error("Error registering staff:", err);
     this.$root.$refs.toast.showToast(err.message || "Failed to register", "error");
-
-  } finally {
-    // any cleanup logic or loading state reset can go here
-  }
+     this.$emit('close')
+      
+  } 
 },
 
     resetForm() {

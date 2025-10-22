@@ -55,7 +55,7 @@
 
             <tbody>
               <tr
-                v-for="owner in filteredAndSortedOwners"
+                v-for="owner in owners"
                 :key="owner.id"
                 class="hover:bg-gray-100"
               >
@@ -89,7 +89,7 @@
                 </td>
               </tr>
 
-              <tr v-if="filteredAndSortedOwners.length === 0">
+              <tr v-if="owners.length === 0">
                 <td colspan="2" class="text-center py-6 text-gray-500">
                   No owners found.
                 </td>
@@ -101,7 +101,7 @@
         <!-- Mobile / Tablet Cards -->
         <div class="md:hidden p-4 space-y-4">
           <div
-            v-for="owner in filteredAndSortedOwners"
+            v-for="owner in owners"
             :key="owner.id"
             class="border border-gray-200 bg-white rounded-lg shadow-sm p-4"
           >
@@ -137,14 +137,14 @@
                 @click="deactivateUser(owner.id)"
                 class="flex items-center gap-1 px-3 py-1.5 bg-orange-50 text-orange-700 text-sm font-medium rounded-lg border border-orange-200 hover:bg-orange-100 transition"
               >
-                <i class="fas fa-ban"></i> Deactivate
+                <i class="fas fa-ban"></i> Deactivate 
               </button>
             </div>
           </div>
 
-          <div v-if="filteredAndSortedOwners.length === 0" class="text-center py-6 text-gray-500">
+          <div v-if="owners.length === 0" class="text-center py-6 text-gray-500">
             No owners found.
-          </div>
+          </div> 
         </div>
       </div>
 
@@ -203,23 +203,24 @@ export default {
       sortAsc: true,
       owners: [],
       groupPermissions:"",
+      ordering:"-id"
     };
   },
-  computed: {
-    filteredAndSortedOwners() {
-      const term = this.searchTerm.toLowerCase();
-      let filtered = this.owners.filter(o =>
-        o.full_name.toLowerCase().includes(term)
-      );
-      filtered.sort((a, b) => {
-        let res = 0;
-        if (a[this.sortKey] < b[this.sortKey]) res = -1;
-        if (a[this.sortKey] > b[this.sortKey]) res = 1;
-        return this.sortAsc ? res : -res;
-      });
-      return filtered;
-    }
-  },
+  // computed: {
+  //   filteredAndSortedOwners() {
+  //     const term = this.searchTerm.toLowerCase();
+  //     let filtered = this.owners.filter(o =>
+  //       o.full_name.toLowerCase().includes(term)
+  //     );
+  //     filtered.sort((a, b) => {
+  //       let res = 0;
+  //       if (a[this.sortKey] < b[this.sortKey]) res = -1;
+  //       if (a[this.sortKey] > b[this.sortKey]) res = 1;
+  //       return this.sortAsc ? res : -res;
+  //     });
+  //     return filtered;
+  //   }
+  // },
 async   mounted() {
     this.fetchOwners();
     const payload={
@@ -251,7 +252,7 @@ async   mounted() {
     },
     async fetchOwners() {
       try {
-        const response = await this.$apiGet('/get_owners');
+        const response = await this.$apiGet(`/get_owners?search=${this.searchTerm}&ordering=${this.ordering}`);
 
         this.owners = response.owners || [];
 
