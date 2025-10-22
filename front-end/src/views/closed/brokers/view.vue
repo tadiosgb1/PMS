@@ -70,9 +70,10 @@
                 <td class="border border-gray-300 px-4 py-2">{{ broker.commission_rate }}</td>
                 <td class="border border-gray-300 px-4 py-2">{{ broker.wallet }}</td>
                 <td class="border border-gray-300 px-4 py-2 text-center space-x-2">
-                  <button @click="openUpdateModal(broker.id)" class="text-green-600 hover:text-green-800">
-                    <i class="fas fa-edit"></i>
-                  </button>
+             
+<button @click="openUpdateModal(broker)" class="text-green-600 hover:text-green-800">
+  <i class="fas fa-edit"></i>
+</button>
                   <button @click="askDeleteConfirmation(broker)" class="text-red-600 hover:text-red-800">
                     <i class="fas fa-trash"></i>
                   </button>
@@ -98,7 +99,11 @@
             <p class="text-sm text-gray-700"><strong>Wallet:</strong> {{ broker.wallet }}</p>
             <div class="mt-3 flex flex-wrap gap-2">
               <button @click="goToUserDetail(broker.user)" class="px-3 py-1.5 bg-blue-50 text-blue-700 text-sm font-medium rounded-lg border border-blue-200 hover:bg-blue-100 transition">Details</button>
-              <button v-if="broker" @click="openUpdateModal(broker.id)" class="px-3 py-1.5 bg-green-50 text-green-700 text-sm font-medium rounded-lg border border-green-200 hover:bg-green-100 transition">Edit</button>
+              <button @click="openUpdateModal(broker)" class="text-green-600 hover:text-green-800">
+  <i class="fas fa-edit"></i>
+</button>
+
+
               <button v-if="broker" @click="askDeleteConfirmation(broker)" class="px-3 py-1.5 bg-red-50 text-red-700 text-sm font-medium rounded-lg border border-red-200 hover:bg-red-100 transition">Delete</button>
             </div>
           </div>
@@ -115,7 +120,13 @@
 
       <!-- Add & Update Modals -->
       <AddBroker :visible="showAddBroker" @close="showAddBroker = false" @success="fetchBrokers" />
-      <UpdateBroker :visible="showUpdateModal" :brokerId="selectedBrokerId" @close="showUpdateModal = false" @success="fetchBrokers" />
+      <UpdateBroker
+  :visible="showUpdateModal"
+  :broker="selectedBroker"
+  @close="showUpdateModal = false"
+  @success="fetchBrokers"
+/>
+
 
       <!-- Delete Confirmation Modal -->
       <ConfirmModal :visible="confirmVisible" title="Confirm Deletion" message="Are you sure you want to delete this broker?" @confirm="confirmDelete" @cancel="confirmVisible = false" />
@@ -159,7 +170,7 @@ export default {
       totalPages: 1,
       next: null,
       previous: null,
-      pageSize: 100,
+      pageSize: 5,
       pageSizes: [5, 10, 20, 50, 100],
       showAddBroker: false,
       showUpdateModal: false,
@@ -168,6 +179,7 @@ export default {
       sortKey: "name",
       sortAsc: true,
       searchTimeout: null,
+      selectedBroker: null,
     };
   },
   mounted() {
@@ -177,10 +189,11 @@ export default {
     goToUserDetail(id) {
       this.$router.push(`/user_detail/${id}`);
     },
-    openUpdateModal(id) {
-      this.selectedBrokerId = id;
-      this.showUpdateModal = true;
-    },
+   openUpdateModal(broker) {
+  this.selectedBroker = { ...broker }; // Clone full object
+  this.showUpdateModal = true;
+}
+,
     // Debounced search input
     onSearchInput() {
       clearTimeout(this.searchTimeout);
