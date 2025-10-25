@@ -274,6 +274,18 @@ export default {
     async fetchData() {
       try {
         this.loading = true;
+        let params={}
+        if(this.currentTab=='rent'){
+          params={
+             PROPERTY_RENT : "rent",
+          }
+        }else if(this.currentTab=='sale'){
+          params={
+             PROPERTY_RENT : "sale",
+          }
+        }else{
+         params={}
+        }
         const url =
           this.currentTab === "cowork"
             ? "/get_coworking_spaces"

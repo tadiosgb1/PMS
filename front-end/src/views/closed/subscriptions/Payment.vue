@@ -42,18 +42,18 @@
 
         <!-- Modal Body -->
   <!-- Modal Body -->
-<div class="px-4 mt-4 space-y-4">
-  <!-- Manual Payment -->
-  <div v-if="mode === 'manual'">
-    <!-- Info Section -->
-    <div class="p-3 bg-gray-100 border-l-4 border-blue-500 rounded">
-      <p class="text-sm text-gray-700 font-semibold">Payment Instructions</p>
-      <ul class="mt-2 text-sm text-gray-600 space-y-1">
-        <li><strong>CBE Account:</strong> 1000 2000 3000 </li>
-        <li> <strong>TeleBirr:</strong> +2519-------</li>
-        <li class="text-xs text-gray-500"> Please transfer to one of the above and provide the Transaction ID & Remark below.</li>
-      </ul>
-    </div>
+    <div class="px-4 mt-4 space-y-4">
+      <!-- Manual Payment -->
+      <div v-if="mode === 'manual'">
+        <!-- Info Section -->
+        <div class="p-3 bg-gray-100 border-l-4 border-blue-500 rounded">
+          <p class="text-sm text-gray-700 font-semibold">Payment Instructions</p>
+          <ul class="mt-2 text-sm text-gray-600 space-y-1">
+            <li><strong>CBE Account:</strong> 1000 2000 3000 </li>
+            <li> <strong>TeleBirr:</strong> +2519-------</li>
+            <li class="text-xs text-gray-500"> Please transfer to one of the above and provide the Transaction ID & Remark below.</li>
+          </ul>
+        </div>
 
     <!-- Fields -->
    <div>
@@ -92,30 +92,32 @@
     </div>
   </div>
 
+
+
   <!-- Online Payment -->
   <div v-else>
     <p class="text-gray-600">Choose an online payment provider:</p>
     <div class="flex space-x-4 mt-4">
-      <!-- ArifPay button -->
-      <button
-        @click="payOnline('arifpay')"
-        class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 animate-pulse"
-        :disabled="loading"
-      >
-        Pay with santimPay
-      </button>
+          <!-- ArifPay button -->
+          <button
+            @click="payOnline('arifpay')"
+            class="flex-1 px-4 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 animate-pulse"
+            :disabled="loading"
+          >
+            Pay with santimPay
+          </button>
 
-      <!-- TeleBirr button -->
-      <button
-        @click="payOnline('telebirr')"
-        class="flex-1 px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 animate-pulse"
-        :disabled="loading"
-      >
-        Pay with TeleBirr
-      </button>
+          <!-- TeleBirr button -->
+          <button
+            @click="payOnline('telebirr')"
+            class="flex-1 px-4 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 animate-pulse"
+            :disabled="loading"
+          >
+            Pay with TeleBirr
+          </button>
+        </div>
+      </div>
     </div>
-  </div>
-</div>
 
 
         <!-- Modal Actions -->
