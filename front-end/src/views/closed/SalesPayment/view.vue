@@ -347,8 +347,16 @@ export default {
       const payload = { id: payment.id, status: "complete" };
       const res = await this.$apiPatch("/update_sales_payments", payment.id, payload);
       if (res) {
-        this.$root.$refs.toast.showToast("Payment Approved Successfully", "success");
-        this.fetchPayments(this.currentPage);
+       // this.$root.$refs.toast.showToast("Payment Approved Successfully", "success");
+        const salePayload={
+         id:payment.property_zone_sale_id,
+         status:"active"
+        }
+
+        console.log("payment",payment);
+          const res = await this.$apiPatch("/update_property_zone_sale", payment.property_zone_sale_id, salePayload);
+          console.log("res update the sale property",res);
+        //this.fetchPayments(this.currentPage);
       }
     },
 

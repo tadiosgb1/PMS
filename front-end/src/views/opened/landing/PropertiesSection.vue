@@ -216,6 +216,8 @@
 </template>
 
 <script>
+import axios from 'axios'
+
 export default {
   name: "PropertiesSection",
   data() {
@@ -288,10 +290,16 @@ export default {
         }
         const url =
           this.currentTab === "cowork"
-            ? "/get_coworking_spaces"
-            : "/get_properties";
-        const res = await this.$apiGet(url);
-        this.items = (res.data || []).map((item) => ({
+            ? "get_coworking_spaces"
+            : "get_properties";
+        //const res = await this.$apiGet(url);
+
+         const res = await axios.get(
+          `https://alphapms.sunriseworld.org/api/${url}`,
+          params
+        );
+
+        this.items = (res.data.data || []).map((item) => ({
           ...item,
           imageIndex: 0,
           showDownload: false,

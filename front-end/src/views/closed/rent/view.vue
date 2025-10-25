@@ -1,6 +1,7 @@
 <template>
   <div>
     <Toast ref="toast" />
+
     <button
       @click="$router.back()"
       class="mb-4 ml-5 mt-5 px-4 py-2 bg-orange-300 rounded hover:bg-orange-400"
@@ -54,19 +55,16 @@
             <table class="min-w-full table-auto border-collapse border border-gray-300">
               <thead>
                 <tr class="bg-gray-200 text-gray-700">
-                  <th class="border border-gray-300 px-4 py-2 cursor-pointer" @click="sortBy('property_id')">
-                    Property <SortIcon :field="'property_id'" :sort-key="sortKey" :sort-asc="sortAsc" />
-                  </th>
-                  <th class="border border-gray-300 px-4 py-2 cursor-pointer" @click="sortBy('user_id')">
-                    Tenant <SortIcon :field="'user_id'" :sort-key="sortKey" :sort-asc="sortAsc" />
-                  </th>
-                  <th class="border border-gray-300 px-4 py-2 cursor-pointer" @click="sortBy('rent_type')">
-                    Rent Type <SortIcon :field="'rent_type'" :sort-key="sortKey" :sort-asc="sortAsc" />
-                  </th>
-                  <th class="border border-gray-300 px-4 py-2 cursor-pointer" @click="sortBy('status')">
-                    Status <SortIcon :field="'status'" :sort-key="sortKey" :sort-asc="sortAsc" />
-                  </th>
-                  <th class="px-4 py-2 border text-center">Actions</th>
+                  <th class="border border-gray-300 px-4 py-2">Property</th>
+                  <th class="border border-gray-300 px-4 py-2">Tenant</th>
+                  <th class="border border-gray-300 px-4 py-2">Rent Type</th>
+                  <th class="border border-gray-300 px-4 py-2">Payment Cycle</th>
+                  <th class="border border-gray-300 px-4 py-2">Start Date</th>
+                  <th class="border border-gray-300 px-4 py-2">End Date</th>
+                  <th class="border border-gray-300 px-4 py-2">Rent Amount</th>
+                  <th class="border border-gray-300 px-4 py-2">Deposit</th>
+                  <th class="border border-gray-300 px-4 py-2">Status</th>
+                  <th class="border border-gray-300 px-4 py-2 text-center">Actions</th>
                 </tr>
               </thead>
 
@@ -76,10 +74,47 @@
                   :key="rent.id"
                   class="hover:bg-gray-100"
                 >
-                  <td class="border border-gray-300 px-4 py-2">{{ rent.property_id?.name }}</td>
-                  <td class="border border-gray-300 px-4 py-2">{{ rent.user_id?.first_name }}</td>
+                  <!-- Property -->
+                  <td
+                    class="border border-gray-300 px-4 py-2 text-blue-600 hover:underline cursor-pointer"
+                    @click="goToPropertyDetail(rent.property_id.id)"
+                  >
+                    {{ rent.property_id?.name || 'N/A' }}
+                  </td>
+
+                  <!-- Tenant -->
+                  <td
+                    class="border border-gray-300 px-4 py-2 text-blue-600 hover:underline cursor-pointer"
+                    @click="goToUserDetail(rent.user_id.id)"
+                  >
+                    {{ rent.user_id?.first_name }} {{ rent.user_id?.last_name }}
+                  </td>
+
                   <td class="border border-gray-300 px-4 py-2">{{ rent.rent_type }}</td>
-                  <td class="border border-gray-300 px-4 py-2">{{ rent.status }}</td>
+                  <td class="border border-gray-300 px-4 py-2">{{ rent.payment_cycle }}</td>
+                  <td class="border border-gray-300 px-4 py-2">
+                    {{ new Date(rent.start_date).toLocaleDateString() }}
+                  </td>
+                  <td class="border border-gray-300 px-4 py-2">
+                    {{ new Date(rent.end_date).toLocaleDateString() }}
+                  </td>
+                  <td class="border border-gray-300 px-4 py-2">{{ rent.rent_amount }}</td>
+                  <td class="border border-gray-300 px-4 py-2">{{ rent.deposit_amount }}</td>
+
+                  <!-- Status -->
+                  <td class="border border-gray-300 px-4 py-2">
+                    <span
+                      class="px-2 py-1 rounded text-xs font-semibold"
+                      :class="{
+                        'bg-green-100 text-green-700': rent.status === 'active',
+                        'bg-red-100 text-red-700': rent.status !== 'active'
+                      }"
+                    >
+                      {{ rent.status }}
+                    </span>
+                  </td>
+
+                  <!-- Actions -->
                   <td class="border border-gray-300 px-4 py-2 text-center space-x-2">
                     <button
                       @click="selectedRentId = rent.id; showModal = true"
@@ -91,7 +126,7 @@
                     <button @click="rentDetail(rent.id)" class="text-blue-600 hover:text-blue-800">
                       <i class="fas fa-eye"></i>
                     </button>
-                    <button @click="goToPayments(rent.id)" class="text-green-600 hover:text-green-800">
+                    <button @click="goToPayments(rent.id)" class="text-orange-600 hover:text-orange-800">
                       Payments
                     </button>
                   </td>
@@ -112,19 +147,32 @@
               class="bg-white border rounded-lg shadow-sm p-4 flex flex-col space-y-2"
             >
               <div class="flex justify-between items-center">
-                <h3 class="font-semibold text-gray-800">{{ rent.property_id?.name }}</h3>
+                <h3
+                  class="font-semibold text-blue-600 hover:underline cursor-pointer"
+                  @click="$router.push({ path: `/property-detail/${rent.property_id?.id}` })"
+                >
+                  {{ rent.property_id?.name || 'N/A' }}
+                </h3>
                 <span
                   class="text-sm font-medium px-2 py-1 rounded-full"
                   :class="{
                     'bg-green-100 text-green-700': rent.status === 'active',
-                    'bg-red-100 text-red-700': rent.status === 'inactive'
+                    'bg-red-100 text-red-700': rent.status !== 'active'
                   }"
                 >
                   {{ rent.status }}
                 </span>
               </div>
-              <p class="text-gray-600"><strong>Tenant:</strong> {{ rent.user_id?.first_name }}</p>
+              <p
+                class="text-blue-600 hover:underline cursor-pointer"
+                @click="$router.push({ path: `/user-detail/${rent.user_id?.id}` })"
+              >
+                <strong>Tenant:</strong> {{ rent.user_id?.first_name }} {{ rent.user_id?.last_name }}
+              </p>
               <p class="text-gray-600"><strong>Type:</strong> {{ rent.rent_type }}</p>
+              <p class="text-gray-600"><strong>Payment Cycle:</strong> {{ rent.payment_cycle }}</p>
+              <p class="text-gray-600"><strong>Rent Amount:</strong> {{ rent.rent_amount }}</p>
+              <p class="text-gray-600"><strong>Deposit:</strong> {{ rent.deposit_amount }}</p>
 
               <div class="flex justify-end gap-2 mt-3">
                 <button
@@ -148,10 +196,7 @@
               </div>
             </div>
 
-            <p
-              v-if="filteredAndSortedRents.length === 0"
-              class="text-center text-gray-500"
-            >
+            <p v-if="filteredAndSortedRents.length === 0" class="text-center text-gray-500">
               No rents found.
             </p>
           </div>
@@ -165,9 +210,7 @@
             >
               Previous
             </button>
-            <span class="text-gray-600">
-              Page {{ currentPage }} of {{ totalPages }}
-            </span>
+            <span class="text-gray-600">Page {{ currentPage }} of {{ totalPages }}</span>
             <button
               :disabled="!next"
               @click="fetchRents(next)"
@@ -228,25 +271,9 @@ import Toast from "@/components/Toast.vue";
 import AddPictureModal from "@/views/closed/rent/addRentPicture.vue";
 import MakePaymentModal from "@/views/closed/rent/addRentPayment.vue";
 
-const SortIcon = {
-  props: ["field", "sortKey", "sortAsc"],
-  template: `<span class="inline-block ml-1 text-gray-500">
-    <svg v-if="sortKey !== field" xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"/>
-    </svg>
-    <svg v-else-if="sortAsc" xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 13l4 4 4-4m0-6l-4-4-4 4"/>
-    </svg>
-    <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"/>
-    </svg>
-  </span>`,
-};
-
 export default {
   name: "RentsView",
   components: {
-    SortIcon,
     AddRent,
     UpdateRent,
     ConfirmModal,
@@ -304,8 +331,8 @@ export default {
     goToPayments(rentId) {
       this.$router.push({ name: "rents_payment_detail", params: { id: rentId } });
     },
-    rentDetail(rent_id) {
-      this.$router.push({ name: "rent-detail", params: { id: rent_id } });
+    rentDetail(rentId) {
+      this.$router.push({ name: "rent-detail", params: { id: rentId } });
     },
     buildRoleParams(params = {}) {
       const isSuperUser =
@@ -317,23 +344,44 @@ export default {
       if (!isSuperUser) {
         if (groups.includes("manager")) {
           params["property_id__property_zone_id__manager_id__email"] = email;
+         
         } else if (groups.includes("owner")) {
           params["property_id__property_zone_id__owner_id__email"] = email;
+             
         } else if (groups.includes("staff")) {
           params["property_id__property_zone_id__staff_id__email"] = email;
+            
         }
       }
       return params;
     },
-    async fetchRents() {
-      let params = this.buildRoleParams();
+    async fetchRents(url = "/get_rents") {
       try {
-        const response = await this.$apiGet("/get_rents", params);
-        this.rents = Array.isArray(response.data) ? response.data : [];
+        const params = this.buildRoleParams();
+        const response = await this.$apiGet(url, params);
+       console.log("response rents",response);
+
+        if (response && response.data) {
+          this.rents = response.data || [];
+          this.next = response.data.next;
+          this.previous = response.data.previous;
+          this.currentPage = response.data.current_page;
+          this.totalPages = response.data.total_pages;
+        }
       } catch (error) {
         console.error("Failed to fetch rents:", error);
         this.rents = [];
       }
+    },
+    goToPropertyDetail(propertyId) {
+      if (propertyId)
+        this.$router.push({
+          name: "PropertyDetail",
+          params: { id: propertyId },
+        });
+    },
+    goToUserDetail(id) {
+      this.$router.push(`/user_detail/${id}`);
     },
     onSearch() {
       this.currentPage = 1;
@@ -351,7 +399,6 @@ export default {
 </script>
 
 <style scoped>
-/* Optional: smooth hover and card shadow tweaks */
 @media (max-width: 768px) {
   .card {
     transition: box-shadow 0.2s ease-in-out;
