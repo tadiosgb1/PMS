@@ -5,13 +5,12 @@
       class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 px-4"
     >
       <div class="bg-white rounded-xl shadow-lg w-full max-w-lg relative">
-        <!-- Header -->
-        <div class="flex justify-between items-center px-6 py-4 border-b">
-          <h2 class="text-xl font-semibold text-gray-800">Update Broker</h2>
-          <button
-            @click="$emit('close')"
-            class="text-gray-400 hover:text-gray-600"
-          >
+         <!-- Header -->
+        <div
+          class="bg-primary text-white px-6 py-4 text-xl font-semibold flex justify-between items-center"
+        >
+          Update Broker
+          <button @click="$emit('close')" class="text-white hover:text-gray-200 text-lg font-bold">
             ✕
           </button>
         </div>
@@ -45,6 +44,8 @@
           </div>
 
           <!-- Wallet -->
+
+          {{ this.brokerId }}
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-1"
               >Wallet</label
@@ -99,7 +100,7 @@ export default {
   name: "UpdateBroker",
   props: {
     visible: { type: Boolean, default: false },
-    brokerId: { type: Number, required: true },
+    broker: { type: Object, default: null },
   },
   data() {
     return {
@@ -113,46 +114,46 @@ export default {
     };
   },
   watch: {
+    // Watch for modal visibility
     visible(val) {
-      if (val) {
-        this.fetchBroker();
+      if (val && this.broker) {
+        this.fillForm(this.broker);
       }
+    },
+    // Also watch if broker prop changes
+    broker: {
+      handler(newVal) {
+        if (newVal && this.visible) {
+          this.fillForm(newVal);
+        }
+      },
+      deep: true,
     },
   },
   methods: {
-    async fetchBroker() {
-      try {
-        const res = await this.$apiGet(`/get_broker_profile/${this.brokerId}`);
-            const broker = res.data 
-        if (res) {
-          this.form = {
-            license_number: broker.license_number || "",
-            commission_rate: broker.commission_rate || "",
-            wallet: broker.wallet || "",
-            user: broker.user || "",
-          };
-        }
-      } catch (err) {
-        console.error("Failed to fetch broker:", err);
-      }
+    fillForm(broker) {
+      this.form = {
+        license_number: broker.license_number || "",
+        commission_rate: broker.commission_rate || "",
+        wallet: broker.wallet || "",
+        user: broker.user || "",
+      };
     },
     async updateBroker() {
       this.loading = true;
       try {
         const payload = { ...this.form };
-        const res = await this.$apiPatch(`/update_broker`, this.brokerId, payload);
-
+        const res = await this.$apiPatch(`/update_broker_profile`, this.broker.id, payload);
         if (res) {
-          this.$root.$refs.toast.showToast(
-            "Broker updated successfully",
-            "success"
-          );
+          this.$root.$refs.toast.showToast("Broker updated successfully", "success");
           this.$emit("success");
           this.$emit("close");
         }
       } catch (err) {
         console.error("Failed to update broker:", err);
         this.$root.$refs.toast.showToast("Failed to update broker", "error");
+         this.$emit("success");
+        this.$emit("close")
       } finally {
         this.loading = false;
       }
