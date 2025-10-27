@@ -84,14 +84,14 @@
                   </button>
                   <button
                     v-if="!user.is_active"
-                    @click="activateUser(user.id)"
+                    @click="askConfirmation('activate',user.id)"
                     class="flex items-center px-3 py-1.5 bg-green-50 text-green-700 text-sm font-medium rounded-lg border border-green-200 hover:bg-green-100 transition"
                   >
                     <i class="fas fa-check-circle"></i> Activate
                   </button>
                   <button
                     v-else
-                    @click="deactivateUser(user.id)"
+                     @click="askConfirmation('deactivate',user.id)"
                     class="flex items-center px-3 py-1.5 bg-orange-50 text-orange-700 text-sm font-medium rounded-lg border border-orange-200 hover:bg-orange-100 transition"
                   >
                     <i class="fas fa-ban mr-1"></i> Deactivate
@@ -154,14 +154,14 @@
               </button>
               <button
                 v-if="!user.is_active"
-                @click="activateUser(user.id)"
+                @click="askConfirmation('activate',user.id)"
                 class="flex items-center px-3 py-1.5 bg-green-50 text-green-700 text-sm font-medium rounded-lg border border-green-200 hover:bg-green-100 transition"
               >
                 <i class="fas fa-check-circle"></i> Activate
               </button>
               <button
                 v-else
-                @click="deactivateUser(user.id)"
+                @click="askConfirmation('deactivate',user.id)"
                 class="flex items-center px-3 py-1.5 bg-orange-50 text-orange-700 text-sm font-medium rounded-lg border border-orange-200 hover:bg-orange-100 transition"
               >
                 <i class="fas fa-ban"></i> Deactivate
@@ -206,6 +206,13 @@
       @close="showAddModal = false"
       @success="fetchUsers"
     />
+   <ConfirmModal
+  :visible="showConfirm"
+  :title="confirmTitle"
+  :message="confirmMessage"
+  @cancel="showConfirm = false"
+  @confirm="confirmAction"
+/>
   </div>
 </template>
 
@@ -213,10 +220,11 @@
 <script>
 import Toast from "@/components/Toast.vue";
 import Add from "./add.vue";
+import ConfirmModal from "@/components/ConfirmModal.vue";
 
 export default {
   name: "UsersView",
-  components: { Toast, Add },
+  components: { Toast, Add,ConfirmModal },
   data() {
     return {
       users: [],
@@ -229,11 +237,26 @@ export default {
         previous: null,
       },
       showAddModal: false,
+       showConfirm: false,
+    selectedUser: null,
+    selectedAction: null, // 'activate' or 'deactivate'
     };
   },
   mounted() {
     this.fetchUsers();
   },
+  computed: {
+  confirmTitle() {
+    return this.selectedAction === "activate"
+      ? "Activate User"
+      : "Deactivate User";
+  },
+  confirmMessage() {
+    return this.selectedAction === "activate"
+      ? "Are you sure you want to activate this user?"
+      : "Are you sure you want to deactivate this user?";
+  },
+},
   methods: {
     async fetchUsers(page = 1) {
       try {
@@ -273,7 +296,31 @@ export default {
         this.fetchUsers(this.pagination.current_page);
       });
     },
+  askConfirmation(action, id) {
+    this.selectedUser = id;
+    this.selectedAction = action;
+    this.showConfirm = true;
+  },
 
+  confirmAction() {
+    if (!this.selectedUser || !this.selectedAction) return;
+
+    if (this.selectedAction === "activate") {
+      this.$apiPost(`/activate_user/${this.selectedUser}`, { id: this.selectedUser })
+        .then(() => {
+          this.$root.$refs.toast.showToast("User activated successfully", "success");
+          this.fetchUsers(this.pagination.current_page);
+        });
+    } else {
+      this.$apiDelete(`/deactivate_user`, this.selectedUser)
+        .then(() => {
+          this.$root.$refs.toast.showToast("User deactivated successfully", "success");
+          this.fetchUsers(this.pagination.current_page);
+        });
+    }
+
+    this.showConfirm = false;
+  },
     changePage(page) {
       this.fetchUsers(page);
     },

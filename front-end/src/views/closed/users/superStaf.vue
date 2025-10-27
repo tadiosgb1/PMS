@@ -68,14 +68,14 @@
 
                 <button
                   v-if="!user.is_active"
-                  @click="activateUser(user.id)"
+                  @click="askConfirmation('activate', user.id)"
                   class="px-3 py-1.5 bg-green-50 text-green-700 text-sm font-medium rounded-lg border border-green-200 hover:bg-green-100 transition"
                 >
                   Activate
                 </button>
                 <button
                   v-else
-                  @click="deactivateUser(user.id)"
+                  @click="askConfirmation('deactivate', user.id)"
                   class="px-3 py-1.5 bg-orange-50 text-orange-700 text-sm font-medium rounded-lg border border-orange-200 hover:bg-orange-100 transition"
                 >
                   Deactivate
@@ -124,7 +124,7 @@
 
             <button
               v-if="!user.is_active"
-              @click="activateUser(user.id)"
+              @click="askConfirmation('activate', user.id)"
               class="px-3 py-1.5 bg-green-50 text-green-700 text-sm font-medium rounded-lg border border-green-200 hover:bg-green-100 transition"
             >
               Activate
@@ -132,7 +132,7 @@
 
             <button
               v-else
-              @click="deactivateUser(user.id)"
+             @click="askConfirmation('deactivate', user.id)"
               class="px-3 py-1.5 bg-orange-50 text-orange-700 text-sm font-medium rounded-lg border border-orange-200 hover:bg-orange-100 transition"
             >
               Deactivate
@@ -153,12 +153,20 @@
       @close="showAddModal = false"
       @success="fetchUsers"
     />
+    <ConfirmModal
+  :visible="showConfirm"
+  :title="confirmTitle"
+  :message="confirmMessage"
+  @cancel="showConfirm = false"
+  @confirm="confirmAction"
+/>
   </div>
 </template>
 
 
 <script>
 import Addsuperstaff from "./addSuperStaff.vue";
+import ConfirmModal from "@/components/ConfirmModal.vue";
 
 const SortIcon = {
   props: ["field", "sortKey", "sortAsc"],
@@ -181,6 +189,7 @@ export default {
   components: {
     Addsuperstaff,
     SortIcon,
+    ConfirmModal
   },
   data() {
     return {
@@ -188,6 +197,9 @@ export default {
       sortKey: "fullName",
       sortAsc: true,
       showAddModal: false, // ✅ only one variable now
+       showConfirm: false,
+    selectedUser: null,
+    selectedAction: null, // 'activate' or 'deactivate'
     };
   },
   computed: {
@@ -203,6 +215,16 @@ export default {
         return 0;
       });
     },
+    confirmTitle() {
+    return this.selectedAction === "activate"
+      ? "Activate User"
+      : "Deactivate User";
+  },
+  confirmMessage() {
+    return this.selectedAction === "activate"
+      ? "Are you sure you want to activate this user?"
+      : "Are you sure you want to deactivate this user?";
+  },
   },
   mounted() {
     this.fetchUsers();
@@ -234,7 +256,31 @@ export default {
         this.fetchUsers(this.pagination.current_page);
       });
     },
+ askConfirmation(action, id) {
+    this.selectedUser = id;
+    this.selectedAction = action;
+    this.showConfirm = true;
+  },
 
+  confirmAction() {
+    if (!this.selectedUser || !this.selectedAction) return;
+
+    if (this.selectedAction === "activate") {
+      this.$apiPost(`/activate_user/${this.selectedUser}`, { id: this.selectedUser })
+        .then(() => {
+          this.$root.$refs.toast.showToast("User activated successfully", "success");
+          this.fetchUsers(this.pagination.current_page);
+        });
+    } else {
+      this.$apiDelete(`/deactivate_user`, this.selectedUser)
+        .then(() => {
+          this.$root.$refs.toast.showToast("User deactivated successfully", "success");
+          this.fetchUsers(this.pagination.current_page);
+        });
+    }
+
+    this.showConfirm = false;
+  },
     
     goToDetail(id) {
       this.$router.push(`/user_detail/${id}`);

@@ -29,7 +29,8 @@
 
         <div class="text-right">
           <button
-            type="submit"
+            type="button"
+            @click="updateModalVisible = true"
             class="bg-primary hover:bg-primary text-white font-semibold px-6 py-2 rounded shadow"
           >
             Update Permission
@@ -37,15 +38,25 @@
         </div>
       </form>
     </div>
+
+     <ConfirmModal
+        :visible="updateModalVisible"
+        title="Update Permission"
+        :message="`Are you sure you want to update '${form?.name}'?`"
+        @cancel="updateModalVisible = false"
+        @confirm="submitForm"
+      />
   </div>
   </div>
 </template>
 
 <script>
 import Toast from '../../../components/Toast.vue';
+import ConfirmModal from "@/components/ConfirmModal.vue";
 
 export default {
   name: "UpdatePermission",
+  components:{Toast,ConfirmModal},
   props: {
     visible: Boolean,
     permission: Object,
@@ -58,6 +69,7 @@ export default {
         name: '',
         codename: '',
       },
+      updateModalVisible:false
     };
   },
   watch: {
@@ -72,6 +84,7 @@ export default {
   },
   methods: {
     async submitForm() {
+      this.updateModalVisible=false
       try {
         await this.$apiPut("/update_permission", this.form.id, this.form);
         this.$root.$refs.toast.showToast('Permission Updated successfully ', 'success');

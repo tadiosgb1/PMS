@@ -64,7 +64,8 @@
 
           <div class="md:col-span-2 text-right">
             <button
-              type="submit"
+               type="button"
+            @click="updateModalVisible = true"
               class="bg-orange-500 hover:bg-orange-600 text-white font-semibold px-6 py-3 rounded shadow"
             >
               Update
@@ -72,16 +73,25 @@
           </div>
         </form>
       </div>
+
+      <ConfirmModal
+        :visible="updateModalVisible"
+        title="Update Property Zone Picture"
+        :message="`Are you sure you want to update Property Zone Picture ?`"
+        @cancel="updateModalVisible = false"
+        @confirm="submitForm"
+      />
     </div>
   </div>
 </template>
 
 <script>
 import Toast from "@/components/Toast.vue";
+import ConfirmModal from "@/components/ConfirmModal.vue";
 
 export default {
   name: "UpdatePropertyZonePicture",
-  components: { Toast },
+  components: { Toast,ConfirmModal },
   props: {
     visible: Boolean,
     picture: Object,
@@ -97,6 +107,7 @@ export default {
         file: null,
         preview: null,
       },
+      updateModalVisible:false
     };
   },
   watch: {
@@ -123,6 +134,7 @@ export default {
       this.form.preview = URL.createObjectURL(file);
     },
     async submitForm() {
+      this.updateModalVisible=false
       try {
         const fd = new FormData();
         fd.append("description", this.form.description);

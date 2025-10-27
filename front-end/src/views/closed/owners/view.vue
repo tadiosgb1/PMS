@@ -73,14 +73,14 @@
 
                     <button
                       v-if="!owner.is_active"
-                      @click="activateUser(owner.id)"
+                       @click="askConfirmation('activate',owner.id)"
                       class="flex items-center gap-1 px-3 py-1.5 bg-green-50 text-green-700 text-sm font-medium rounded-lg border border-green-200 hover:bg-green-100 transition"
                     >
                       <i class="fas fa-check-circle"></i> Activate
                     </button>
                     <button
                       v-else
-                      @click="deactivateUser(owner.id)"
+                      @click="askConfirmation('deactivate',owner.id)"
                       class="flex items-center gap-1 px-3 py-1.5 bg-orange-50 text-orange-700 text-sm font-medium rounded-lg border border-orange-200 hover:bg-orange-100 transition"
                     >
                       <i class="fas fa-ban"></i> Deactivate
@@ -127,14 +127,14 @@
 
               <button
                 v-if="!owner.is_active"
-                @click="activateUser(owner.id)"
+                @click="askConfirmation('activate',owner.id)"
                 class="flex items-center gap-1 px-3 py-1.5 bg-green-50 text-green-700 text-sm font-medium rounded-lg border border-green-200 hover:bg-green-100 transition"
               >
                 <i class="fas fa-check-circle"></i> Activate
               </button>
               <button
                 v-else
-                @click="deactivateUser(owner.id)"
+                @click="askConfirmation('deactivate',owner.id)"
                 class="flex items-center gap-1 px-3 py-1.5 bg-orange-50 text-orange-700 text-sm font-medium rounded-lg border border-orange-200 hover:bg-orange-100 transition"
               >
                 <i class="fas fa-ban"></i> Deactivate 
@@ -164,6 +164,14 @@
         @close="updateVisible = false"
         @updated="fetchOwners"
       />
+
+       <ConfirmModal
+  :visible="showConfirm"
+  :title="confirmTitle"
+  :message="confirmMessage"
+  @cancel="showConfirm = false"
+  @confirm="confirmAction"
+/>
     </div>
   </div>
 </template>
@@ -172,6 +180,7 @@
 import Toast from '../../../components/Toast.vue';
 import AddOwner from './add.vue';
 import UpdateOwner from './edit.vue';
+import ConfirmModal from "@/components/ConfirmModal.vue";
 
 const SortIcon = {
   props: ['field', 'sortKey', 'sortAsc'],
@@ -192,7 +201,7 @@ const SortIcon = {
 
 export default {
   name: 'OwnersView',
-  components: { SortIcon, AddOwner, UpdateOwner, Toast },
+  components: { SortIcon, AddOwner, UpdateOwner, Toast,ConfirmModal },
   data() {
     return {
       searchTerm: '',
@@ -203,7 +212,11 @@ export default {
       sortAsc: true,
       owners: [],
       groupPermissions:"",
-      ordering:"-id"
+      ordering:"-id",
+
+      showConfirm: false,
+    selectedUser: null,
+    selectedAction: null, // 'activate' or 'deactivate'
     };
   },
   // computed: {
@@ -230,7 +243,44 @@ async   mounted() {
       console.log("response owners",response)
 
   },
+  computed: {
+  confirmTitle() {
+    return this.selectedAction === "activate"
+      ? "Activate User"
+      : "Deactivate User";
+  },
+  confirmMessage() {
+    return this.selectedAction === "activate"
+      ? "Are you sure you want to activate this user?"
+      : "Are you sure you want to deactivate this user?";
+  },
+},
   methods: {
+     askConfirmation(action, id) {
+    this.selectedUser = id;
+    this.selectedAction = action;
+    this.showConfirm = true;
+  },
+
+  confirmAction() {
+    if (!this.selectedUser || !this.selectedAction) return;
+
+    if (this.selectedAction === "activate") {
+      this.$apiPost(`/activate_user/${this.selectedUser}`, { id: this.selectedUser })
+        .then(() => {
+          this.$root.$refs.toast.showToast("User activated successfully", "success");
+          this.fetchOwners();
+        });
+    } else {
+      this.$apiDelete(`/deactivate_user`, this.selectedUser)
+        .then(() => {
+          this.$root.$refs.toast.showToast("User deactivated successfully", "success");
+          this.fetchOwners();
+        });
+    }
+
+    this.showConfirm = false;
+  },
       activateUser(id) {
       this.$apiPost(`/activate_user/${id}`, { id }).then(() => {
         this.$root.$refs.toast.showToast("User activated successfully", "success");

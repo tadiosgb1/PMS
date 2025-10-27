@@ -37,7 +37,8 @@
         <!-- Submit -->
         <div class="text-right">
           <button
-            type="submit"
+           type="button"
+            @click="updateModalVisible = true"
             class="bg-primary hover:bg-primary text-white font-semibold px-6 py-3 rounded shadow"
           >
             Update Group
@@ -45,16 +46,25 @@
         </div>
       </form>
     </div>
+
+     <ConfirmModal
+        :visible="updateModalVisible"
+        title="Update Group"
+        :message="`Are you sure you want to update '${form?.name}'?`"
+        @cancel="updateModalVisible = false"
+        @confirm="submitForm"
+      />
   </div>
   </div>
 </template>
 
 <script>
 import Toast from '../../../components/Toast.vue';
+import ConfirmModal from "@/components/ConfirmModal.vue";
 
 export default {
   name: 'UpdateGroup',
-  components: { Toast },
+  components: { Toast,ConfirmModal },
   props: {
     visible: Boolean,
     groupData: Object
@@ -66,7 +76,8 @@ export default {
         name: '',
         permissions: []
       },
-      availablePermissions: []
+      availablePermissions: [],
+      updateModalVisible:false
     };
   },
   watch: {
@@ -95,6 +106,7 @@ export default {
       }
     },
     async submitForm() {
+      this.updateModalVisible=false
       try {
         const payload = {
           name: this.form.name,

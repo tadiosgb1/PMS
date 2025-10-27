@@ -107,7 +107,7 @@
                       <i class="fas fa-credit-card mr-1"></i> Pay
                     </button>
                     <button 
-                @click="Deactivate(subscription.id)"
+                @click="askDeactivateConfirmation(subscription.id)"
                 class="flex items-center px-3 py-1.5 bg-orange-50 text-orange-700 text-sm font-medium rounded-lg border border-orange-200 hover:bg-orange-100 transition"
               >
                 <i class="fas fa-exchange-alt mr-1"></i> Deactivate
@@ -172,7 +172,7 @@
                 <i class="fas fa-info-circle mr-1"></i> Paymentsgdfgcf
               </button>
               <button 
-                @click="Deactivate(subscription.id)"
+                @click="askDeactivateConfirmation(subscription)"
                 class="flex items-center px-3 py-1.5 bg-orange-50 text-orange-700 text-sm font-medium rounded-lg border border-orange-200 hover:bg-orange-100 transition"
               >
                 <i class="fas fa-exchange-alt mr-1"></i> Deactivate
@@ -225,7 +225,15 @@
   @close="showUpgradeModal = false"
   @plan-upgraded="fetchSubscriptions"
 />
-
+ <!-- Modals -->
+      <ConfirmModal
+        v-if="confirmVisible"
+        :visible="confirmVisible"
+        title="Confirm Deactivate"
+        message="Are you sure you want to deactivate this subscription?"
+        @confirm="Deactivate"
+        @cancel="confirmVisible = false"
+      />
     </div>
   </div>
 </template>
@@ -273,7 +281,8 @@ export default {
       pageSize: 10,
       pageSizes: [5, 10, 20, 50, 100],
       status:"",
-      ordering: "-id"
+      ordering: "-id",
+      subscriptionToAD:null
      
     };
   },
@@ -428,9 +437,14 @@ export default {
           params: { id: subscriptionId },
         });
     },
-    async Deactivate(subscription_id){
+     askDeactivateConfirmation(subscription) {
+      this.subscriptionToAD=subscription
+      this.confirmVisible = true;
+    },
+    async Deactivate(){
+      this.confirmVisible=false
        try{
-await this.$apiPatch(`/update_subscription`,{status:"terminated"},subscription_id);
+await this.$apiPatch(`/update_subscription`,{status:"terminated"},this.subscriptionToAD.id);
         this.$root.$refs.toast.showToast(
           "Subscription Deactivated successfully",
           "success"

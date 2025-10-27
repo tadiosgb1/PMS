@@ -119,7 +119,8 @@
 
         <div class="md:col-span-2 text-right">
           <button
-            type="submit"
+            type="button"
+            @click="updateModalVisible = true"
             class="bg-primary hover:bg-orange-600 text-white font-semibold px-6 py-3 rounded shadow"
           >
             Update
@@ -127,15 +128,23 @@
         </div>
       </form>
     </div>
+    <ConfirmModal
+        :visible="updateModalVisible"
+        title="Update Property"
+        :message="`Are you sure you want to update '${form?.name}'?`"
+        @cancel="updateModalVisible = false"
+        @confirm="submitForm"
+      />
   </div>
   </div>
 </template>
 
 <script>
 import Toast from "../../../components/Toast.vue";
+import ConfirmModal from "@/components/ConfirmModal.vue";
 export default {
   name: 'UpdateProperty',
-  components:{Toast},
+  components:{Toast,ConfirmModal},
   props: {
     visible: Boolean,
     property: Object
@@ -145,6 +154,7 @@ export default {
 
       zones: [],
       managers: [],
+      updateModalVisible:false,
       form: {
         id: null,
         name: '',
@@ -197,6 +207,7 @@ export default {
   },
   methods: {
     async submitForm() {
+      this.updateModalVisible=false
       try {
         const res = await this.$apiPut('/update_property', this.form.id, this.form);
        if(res & res.error){

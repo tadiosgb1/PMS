@@ -94,14 +94,14 @@
                 </router-link>
                 <button
                   v-if="!manager.is_active"
-                  @click="activateUser(manager.id)"
+                   @click="askConfirmation('activate',manager.id)"
                   class="px-3 py-1 bg-green-50 text-green-700 text-sm rounded-lg border border-green-200 hover:bg-green-100 transition"
                 >
                   Activate
                 </button>
                 <button
                   v-else
-                  @click="deactivateUser(manager.id)"
+                  @click="askConfirmation('deactivate',manager.id)"
                   class="px-3 py-1 bg-orange-50 text-orange-700 text-sm rounded-lg border border-orange-200 hover:bg-orange-100 transition"
                 >
                   Deactivate
@@ -153,14 +153,14 @@
             </router-link>
             <button
               v-if="!manager.is_active"
-              @click="activateUser(manager.id)"
+               @click="askConfirmation('activate',manager.id)"
               class="px-3 py-1.5 bg-green-50 text-green-700 text-sm font-medium rounded-lg border border-green-200 hover:bg-green-100 transition"
             >
               Activate
             </button>
             <button
               v-else
-              @click="deactivateUser(manager.id)"
+              @click="askConfirmation('deactivate',manager.id)"
               class="px-3 py-1.5 bg-orange-50 text-orange-700 text-sm font-medium rounded-lg border border-orange-200 hover:bg-orange-100 transition"
             >
               Deactivate
@@ -202,6 +202,14 @@
       @close="showAddManager = false"
       @success="fetchManagers"
     />
+
+    <ConfirmModal
+  :visible="showConfirm"
+  :title="confirmTitle"
+  :message="confirmMessage"
+  @cancel="showConfirm = false"
+  @confirm="confirmAction"
+/>
   </div>
 </template>
 
@@ -209,6 +217,7 @@
 <script>
 import Toast from "@/components/Toast.vue";
 import AddManager from "./add.vue";
+import ConfirmModal from "@/components/ConfirmModal.vue";
 
 const SortIcon = {
   props: ["field", "sortKey", "sortAsc"],
@@ -229,7 +238,7 @@ const SortIcon = {
 
 export default {
   name: "ManagersView",
-  components: { SortIcon, Toast, AddManager },
+  components: { SortIcon, Toast, AddManager,ConfirmModal },
   data() {
     return {
       searchTerm: "",
@@ -244,6 +253,10 @@ export default {
       pageSizes: [5, 10, 20, 50, 100],
       showAddManager: false,
       searchTimeout: null, // debounce timer
+
+        showConfirm: false,
+    selectedUser: null,
+    selectedAction: null, // 'activate' or 'deactivate'
     };
   },
   // computed: {
@@ -289,7 +302,18 @@ export default {
       })
     }
   },
-  
+  computed: {
+  confirmTitle() {
+    return this.selectedAction === "activate"
+      ? "Activate User"
+      : "Deactivate User";
+  },
+  confirmMessage() {
+    return this.selectedAction === "activate"
+      ? "Are you sure you want to activate this user?"
+      : "Are you sure you want to deactivate this user?";
+  },
+},
   methods: {
     async fetchManagers(url = null, searchTerm = "") {
       try {
@@ -329,6 +353,31 @@ export default {
         this.fetchManagers();
       });
     },
+    askConfirmation(action, id) {
+    this.selectedUser = id;
+    this.selectedAction = action;
+    this.showConfirm = true;
+  },
+
+  confirmAction() {
+    if (!this.selectedUser || !this.selectedAction) return;
+
+    if (this.selectedAction === "activate") {
+      this.$apiPost(`/activate_user/${this.selectedUser}`, { id: this.selectedUser })
+        .then(() => {
+          this.$root.$refs.toast.showToast("User activated successfully", "success");
+          this.fetchManagers();
+        });
+    } else {
+      this.$apiDelete(`/deactivate_user`, this.selectedUser)
+        .then(() => {
+          this.$root.$refs.toast.showToast("User deactivated successfully", "success");
+          this.fetchManagers();
+        });
+    }
+
+    this.showConfirm = false;
+  },
   },
 };
 </script>

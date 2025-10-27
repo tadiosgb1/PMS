@@ -14,23 +14,35 @@
         <div><label class="block text-gray-700">State</label><input v-model="form.state" class="custom-input" /></div>
         <div><label class="block text-gray-700">Manager ID</label><input v-model="form.manager_id" type="number" class="custom-input" /></div>
         <div class="md:col-span-2 text-right">
-          <button type="submit" class="bg-primary hover:bg-orange-600 text-white px-6 py-2 rounded">Update</button>
+          <button 
+            type="button"
+            @click="updateModalVisible = true"
+           class="bg-primary hover:bg-orange-600 text-white px-6 py-2 rounded">Update</button>
         </div>
       </form>
     </div>
+
+     <ConfirmModal
+        :visible="updateModalVisible"
+        title="Update Property Zone"
+        :message="`Are you sure you want to update '${form?.name}'?`"
+        @cancel="updateModalVisible = false"
+        @confirm="submitForm"
+      />
   </div>
   </div>
 </template>
 
 <script>
 import Toast from "../../../components/Toast.vue";
+import ConfirmModal from "@/components/ConfirmModal.vue";
 
 export default {
   props: {
     visible: Boolean,
     zone: Object
   },
-  components:{Toast},
+  components:{Toast,ConfirmModal},
   data() {
     return {
       form: {
@@ -41,7 +53,8 @@ export default {
         state: '',
         owner_id: null,
         manager_id: null
-      }
+      },
+      updateModalVisible:false
     };
   },
   watch: {
@@ -56,6 +69,7 @@ export default {
   },
   methods: {
     async submitForm() {
+      this.updateModalVisible=false
       try {
         const response= await this.$apiPut("/update_property_zone", this.form.id, this.form);
         
@@ -63,6 +77,8 @@ export default {
        this.$root.$refs.toast.showToast(response.error || "Failed to update property zone", "error");
         }else {
         this.$root.$refs.toast.showToast('Property zone updated successfully ', 'success');
+        this.$emit('refresh')
+        this.$emit('close')
         }
         
       } catch (err) {
