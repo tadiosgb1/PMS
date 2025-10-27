@@ -91,7 +91,15 @@ export default {
     },
   },
   mounted() {
-    this.fetchCommissions();
+   const is_super_user=localStorage.getItem('is_superuser');
+    //console.log("haspermission=",this.$hasPermission("pms.view_plan"));
+    if(is_super_user=='true'){
+       this.fetchCommissions();
+    }else{
+      this.$router.push({
+        name:'accessDenied'
+      });
+    }
   },
   methods: {
     async fetchCommissions() {

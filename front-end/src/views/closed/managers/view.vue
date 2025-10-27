@@ -279,16 +279,17 @@ export default {
       }, 400); // delay 400ms
     },
   },
+
   mounted() {
-    if(this.$hasPermission('pms.view_ownermanager')){
-      const a=this.$hasPermission('pms.view_ownermanager');
-      console.log("a",a);
-      console.log("true")
+    if(this.$hasPermission('pms.view_ownermanager')==true){
+     this.fetchManagers();
     }else{
-      console.log("false")
+      this.$router.push({
+        name:'accessDenied'
+      })
     }
-    this.fetchManagers();
   },
+  
   methods: {
     async fetchManagers(url = null, searchTerm = "") {
       try {
