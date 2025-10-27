@@ -57,7 +57,10 @@
                   :sort-asc="sortAsc"
                 />
               </th>
+              <th class="border border-gray-300 px-4 py-2">Email</th>
+              <th class="border border-gray-300 px-4 py-2">Phone Number</th>
               <th class="border border-gray-300 px-4 py-2">Owner</th>
+              
               <th class="border border-gray-300 px-4 py-2">Groups</th>
               <th class="border border-gray-300 px-4 py-2">Active</th>
               <th class="border border-gray-300 px-4 py-2 text-center">Actions</th>
@@ -72,9 +75,18 @@
               <td class="border border-gray-300 px-4 py-2">
                 {{ manager.manager.first_name }} {{ manager.manager.middle_name }} {{ manager.manager.last_name }}
               </td>
+
+                <td class="border border-gray-300 px-4 py-2">
+                {{ manager.manager.email }}
+              </td>
+               <td class="border border-gray-300 px-4 py-2">
+                {{ manager.manager.phone_number }}
+              </td>
               <td class="border border-gray-300 px-4 py-2">
                 {{ manager.owner.first_name }} {{ manager.owner.middle_name }} {{ manager.owner.last_name }}
               </td>
+
+
               <td class="border border-gray-300 px-4 py-2">
                 {{ manager.manager.groups.join(", ") }}
               </td>
@@ -289,7 +301,7 @@ export default {
       })
     }
   },
-  
+
   methods: {
     async fetchManagers(url = null, searchTerm = "") {
       try {
