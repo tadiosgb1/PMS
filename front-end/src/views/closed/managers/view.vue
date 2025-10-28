@@ -314,7 +314,6 @@ export default {
       })
     }
   },
-<<<<<<< HEAD
   computed: {
   confirmTitle() {
     return this.selectedAction === "activate"
@@ -327,9 +326,7 @@ export default {
       : "Are you sure you want to deactivate this user?";
   },
 },
-=======
 
->>>>>>> 73b3edfa0b913a3ebeaf0cc56dc971fbdbfd3b84
   methods: {
     async fetchManagers(url = null, searchTerm = "") {
       try {

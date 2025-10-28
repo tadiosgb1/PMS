@@ -134,14 +134,14 @@
                   <td class="px-3 py-2 text-center">
                     <button
                       v-if="p.status === 'pending' || p.status === 'canceled'"
-                      @click="approve(p)"
+                      @click="askConfirmation('approve', p)"
                       class="text-blue-600 hover:text-blue-800"
                     >
                       Approve
                     </button>
                     <button
                       v-if="p.status === 'pending' || p.status === 'paid'"
-                      @click="reject(p)"
+                      @click="askConfirmation('reject', p)"
                       class="ml-2 text-red-600 hover:text-red-800"
                     >
                       Reject
@@ -215,14 +215,14 @@
               <div class="flex justify-end mt-3 space-x-3">
                 <button
                   v-if="p.status === 'pending' || p.status === 'canceled'"
-                  @click="approve(p)"
+                  @click="askConfirmation('approve', p)"
                   class="text-blue-600 hover:text-blue-800"
                 >
                   Approve
                 </button>
                 <button
                   v-if="p.status === 'pending' || p.status === 'paid'"
-                  @click="reject(p)"
+                 @click="askConfirmation('reject', p)"
                   class="text-red-600 hover:text-red-800"
                 >
                   Reject
@@ -257,16 +257,25 @@
           </div>
         </div>
       </div>
+      <ConfirmModal
+  :visible="showConfirm"
+  :title="confirmTitle"
+  :message="confirmMessage"
+  @cancel="showConfirm = false"
+  @confirm="confirmAction"
+/>
+
     </div>
   </div>
 </template>
 
 <script>
 import Toast from "@/components/Toast.vue";
+import ConfirmModal from "@/components/ConfirmModal.vue";
 
 export default {
   name: "subscriptionPaymentView",
-  components: { Toast },
+  components: { Toast,ConfirmModal },
   data() {
     return {
       payments: [],
@@ -280,6 +289,9 @@ export default {
       next: null,
       previous: null,
       payment_method: "",
+      showConfirm: false,
+selectedPayment: null,
+selectedAction: "", // 'approve' or 'reject'
     };
   },
   computed: {
@@ -307,6 +319,17 @@ export default {
         0
       );
     },
+
+    confirmTitle() {
+    return this.selectedAction === "approve"
+      ? "Approve Payment"
+      : "Reject Payment";
+  },
+  confirmMessage() {
+    return this.selectedAction === "approve"
+      ? "Do you want to approve this payment?"
+      : "Are you sure you want to reject this payment?";
+  },
   },
   mounted() {
     this.fetchPayments(1);
@@ -404,6 +427,38 @@ export default {
         }
       }
     },
+     askConfirmation(action, payment) {
+    this.selectedPayment = payment;
+    this.selectedAction = action;
+    this.showConfirm = true;
+  },
+
+  async confirmAction() {
+    if (!this.selectedPayment) return;
+
+    if (this.selectedAction === "approve") {
+      const payload = { id: this.selectedPayment.id, status: "paid" };
+      const res = await this.$apiPatch(`/update_subscription_payment`, this.selectedPayment.id, payload);
+      if (res) {
+        const subPayload = { id: res.subscription_id, status: "active" };
+        await this.$apiPatch(`/update_subscription`, res.subscription_id, subPayload);
+        this.$root.$refs.toast.showToast("Payment approved successfully!", "success");
+      }
+    }
+
+    if (this.selectedAction === "reject") {
+      const payload = { id: this.selectedPayment.id, status: "canceled" };
+      const res = await this.$apiPatch(`/update_subscription_payment`, this.selectedPayment.id, payload);
+      if (res) {
+        const subPayload = { id: res.subscription_id, status: "pending" };
+        await this.$apiPatch(`/update_subscription`, res.subscription_id, subPayload);
+        this.$root.$refs.toast.showToast("Payment rejected successfully!", "success");
+      }
+    }
+
+    this.showConfirm = false;
+    this.fetchPayments(this.currentPage);
+  },
   },
 };
 </script>

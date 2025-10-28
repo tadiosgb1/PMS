@@ -101,14 +101,14 @@
                   </button>
                   <button
                     v-if="!tenant.is_active"
-                    @click="activateUser(tenant.id)"
+                    @click="askConfirmation('activate',tenant.id)"
                     class="px-3 py-1.5 bg-green-50 text-green-700 rounded-lg border border-green-200 hover:bg-green-100 transition"
                   >
                     Activate
                   </button>
                   <button
                     v-else
-                    @click="deactivateUser(tenant.id)"
+                     @click="askConfirmation('deactivate',tenant.id)"
                     class="px-3 py-1.5 bg-orange-50 text-orange-700 rounded-lg border border-orange-200 hover:bg-orange-100 transition"
                   >
                     Deactivate
@@ -172,14 +172,14 @@
               </button>
               <button
                 v-if="!tenant.is_active"
-                @click="activateUser(tenant.id)"
+                @click="askConfirmation('activate',tenant.id)"
                 class="flex-1 py-1.5 bg-green-50 text-green-700 rounded-lg border border-green-200 hover:bg-green-100 transition text-sm"
               >
                 Activate
               </button>
               <button
                 v-else
-                @click="deactivateUser(tenant.id)"
+                @click="askConfirmation('deactivate',tenant.id)"
                 class="flex-1 py-1.5 bg-orange-50 text-orange-700 rounded-lg border border-orange-200 hover:bg-orange-100 transition text-sm"
               >
                 Deactivate
@@ -214,13 +214,12 @@
 
       <!-- Modals -->
       <ConfirmModal
-        v-if="confirmVisible"
-        :visible="confirmVisible"
-        title="Confirm Deletion"
-        message="Are you sure you want to delete this tenant?"
-        @confirm="confirmDelete"
-        @cancel="confirmVisible = false"
-      />
+  :visible="showConfirm"
+  :title="confirmTitle"
+  :message="confirmMessage"
+  @cancel="showConfirm = false"
+  @confirm="confirmAction"
+/>
 
       <addTenant
         v-if="addTenantVisible"
@@ -271,6 +270,10 @@ export default {
 
       confirmVisible: false,
       tenantToDelete: null,
+
+       showConfirm: false,
+    selectedUser: null,
+    selectedAction: null, // 'activate' or 'deactivate'
     };
   },
  computed: {
@@ -298,6 +301,16 @@ export default {
 
     return filtered;
   },
+   confirmTitle() {
+    return this.selectedAction === "activate"
+      ? "Activate User"
+      : "Deactivate User";
+  },
+  confirmMessage() {
+    return this.selectedAction === "activate"
+      ? "Are you sure you want to activate this user?"
+      : "Are you sure you want to deactivate this user?";
+  },
 },
 watch: {
   searchTerm() {
@@ -309,6 +322,30 @@ watch: {
     this.fetchTenants();
   },
   methods: {
+   askConfirmation(action, id) {
+    this.selectedUser = id;
+    this.selectedAction = action;
+    this.showConfirm = true;
+  },
+  confirmAction() {
+    if (!this.selectedUser || !this.selectedAction) return;
+
+    if (this.selectedAction === "activate") {
+      this.$apiPost(`/activate_user/${this.selectedUser}`, { id: this.selectedUser })
+        .then(() => {
+          this.$root.$refs.toast.showToast("User activated successfully", "success");
+          this.fetchUsers(this.pagination.current_page);
+        });
+    } else {
+      this.$apiDelete(`/deactivate_user`, this.selectedUser)
+        .then(() => {
+          this.$root.$refs.toast.showToast("User deactivated successfully", "success");
+          this.fetchUsers(this.pagination.current_page);
+        });
+    }
+
+    this.showConfirm = false;
+  },
        activateUser(id) {
       this.$apiPost(`/activate_user/${id}`, { id }).then(() => {
         this.$root.$refs.toast.showToast("User activated successfully", "success");
