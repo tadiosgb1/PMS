@@ -57,11 +57,11 @@ function handleApiError(error) {
         429: "Too many requests. Slow down!",
       };
       message =
-        error.response.data ||  error.response.data.message ||
+        error.response.data || error.response.data.message ||
         errorMessages[status] ||
         `Client Error: ${status}. Please check your request.`;
 
-        console.log("message",error.response.data);
+      console.log("message", error.response.data);
     } else if (status >= 500 && status < 600) {
       const errorMessages = {
         500: "Internal server error.",
@@ -158,7 +158,7 @@ export async function apiPost(url, data, customHeaders = {}) {
   try {
     const headers = getDefaultHeaders(customHeaders);
     const response = await apiClient.post(url, data, { headers });
-    console.log("error ibeeeeeeeeeeeeeeeeeeeeeerrrrrrrrrrrrrrrr",response.error)
+    console.log("error ibeeeeeeeeeeeeeeeeeeeeeerrrrrrrrrrrrrrrr", response.error)
     return response.data;
   } catch (error) {
     console.log("error in post", error);
@@ -513,7 +513,7 @@ export async function loadPermissions($apiPost) {
 export function hasPermission(permission) {
   const userPermissions = JSON.parse(localStorage.getItem("permissions") || "[]");
 
- // console.log("userPermissions", userPermissions);
+  // console.log("userPermissions", userPermissions);
 
   return userPermissions.includes(permission);
 }
@@ -571,7 +571,7 @@ export async function getZones(url = null, pageSize = 10) {
     const apiUrl = url || `/get_property_zones?page=1&page_size=${pageSize}`;
     const response = await this.$apiGet(apiUrl, params);
     const zones = response.data || [];
-  
+
 
     // Safely fetch owner and manager names
     for (const zone of zones) {
@@ -629,7 +629,7 @@ export async function getManagers(searchTerm = "") {
       page_size: 1000,
       search: searchTerm.trim(),
     };
-    let apiUrl =  `/get_managers`; // default URL
+    let apiUrl = `/get_managers`; // default URL
 
     if (isSuperUser || groups.includes("super_staff")) {
       apiUrl = `/get_owner_managers`;
@@ -677,7 +677,6 @@ export async function getManagers(searchTerm = "") {
 
 
 
-
 export async function getProperties(
   url = "/get_properties?page=1&page_size=10",
   extraParams = null
@@ -693,32 +692,40 @@ export async function getProperties(
     let params = {};
 
     if (isSuperUser) {
-      params = {};
+      // no restrictions
     } else if (groups.includes("owner")) {
-      params = { property_zone_id__owner_id__email: email };
+      params.property_zone_id__owner_id__email = email;
     } else if (groups.includes("manager")) {
-      params = { property_zone_id__manager_id__email: email };
+      params.property_zone_id__manager_id__email = email;
     } else if (groups.includes("staff")) {
-      params = { property_zone_id__staff_id__email: email };
+      params.property_zone_id__staff_id__email = email;
     }
 
-    // Merge extra params
+    // ✅ Merge extraParams (and include dynamic pageSize or page if given)
     if (extraParams && typeof extraParams === "object") {
       params = { ...params, ...extraParams };
     }
 
-    console.log("Params and url in properties:", params,url);
+    // ✅ Extract page and page_size from extraParams or url for clarity
+    const urlObj = new URL(url, window.location.origin);
+    const page = params.page || urlObj.searchParams.get("page") || 1;
+    const pageSize =
+      params.page_size || urlObj.searchParams.get("page_size") || 10;
 
-    const response = await this.$apiGet(url, params);
+    // ✅ Rebuild URL with correct pagination
+    const finalUrl = `/get_properties?page=${page}&page_size=${pageSize}`;
 
-    console.log("response properties",response);
+    console.log("Params and url in properties:", params, finalUrl);
+
+    const response = await this.$apiGet(finalUrl, params);
+
+    console.log("response properties", response);
 
     const properties = response.data || [];
 
-    // Fetch owner, manager, and zone name for each property
+    // Fetch related names (owner, manager, zone)
     await Promise.all(
       properties.map(async (property) => {
-        // Owner
         if (property.owner_id) {
           const ownerRes = await this.$apiGetById("get_user", property.owner_id);
           property.ownerName = ownerRes.first_name || "-";
@@ -726,7 +733,6 @@ export async function getProperties(
           property.ownerName = "-";
         }
 
-        // Manager
         if (property.manager_id) {
           const managerRes = await this.$apiGetById("get_user", property.manager_id);
           property.managerName = managerRes.first_name || "-";
@@ -734,7 +740,6 @@ export async function getProperties(
           property.managerName = "-";
         }
 
-        // Zone Name
         if (property.property_zone_id) {
           const zoneRes = await this.$apiGetById("get_property_zone", property.property_zone_id);
           property.zoneName = zoneRes.name || "-";
@@ -764,7 +769,9 @@ export async function getProperties(
 }
 
 
-export async function getTenants(url = null, pageSize = 10,searchTerm="") {
+
+
+export async function getTenants(url = null, pageSize = 10, searchTerm = "") {
   try {
     const isSuperUser =
       localStorage.getItem("is_superuser") === "1" ||
@@ -774,7 +781,7 @@ export async function getTenants(url = null, pageSize = 10,searchTerm="") {
     const email = localStorage.getItem("email");
 
     let params = {
-   search: searchTerm,
+      search: searchTerm,
     };
 
     if (!isSuperUser) {
@@ -797,13 +804,13 @@ export async function getTenants(url = null, pageSize = 10,searchTerm="") {
 
     // console.log("params", params);
     // console.log("apiUrl", apiUrl);
-console.log("tenant params",params)
+    console.log("tenant params", params)
     const response = await this.$apiGet(apiUrl, params);
-console.log("response rents",response)
+    console.log("response rents", response)
     // Normalize tenants
     let tenants = [];
     // if (apiUrl.includes("/get_rents")) {
-      tenants = (response.data || []).map(r => r.user_id).filter(Boolean);
+    tenants = (response.data || []).map(r => r.user_id).filter(Boolean);
     // } else {
     //   tenants = response.data || [];
     // }
@@ -886,7 +893,7 @@ export async function getWorkspaceRentals(url = null, pageSize = 100) {
 
     const groups = JSON.parse(localStorage.getItem("groups") || "[]");
     const email = localStorage.getItem("email");
-    const id= localStorage.getItem("userId");
+    const id = localStorage.getItem("userId");
 
     let params = {};
 
@@ -904,10 +911,10 @@ export async function getWorkspaceRentals(url = null, pageSize = 100) {
 
     let apiUrl = url || `/get_workspace_rentals?page=1&page_size=${pageSize}`;
 
-  console.log("params rentals",params);
+    console.log("params rentals", params);
 
     const response = await this.$apiGet(apiUrl, params);
-    console.log("response rentals",response);
+    console.log("response rentals", response);
 
     let rentals = response.data?.results || response.data || [];
 
@@ -932,7 +939,7 @@ export async function getWorkspaceRentals(url = null, pageSize = 100) {
 
 export async function getWorkspacePayments(url = null, params = {}) {
 
-  console.log("params rentals",params);
+  console.log("params rentals", params);
 
   try {
     const isSuperUser =
@@ -944,7 +951,7 @@ export async function getWorkspacePayments(url = null, params = {}) {
 
     // Always include rental_id if provided (detail mode), even for superuser
     const rentalId = params.rental__id || null;
-    console.log("rental_id   hkjhkhjlkjkhljhl",rentalId);
+    console.log("rental_id   hkjhkhjlkjkhljhl", rentalId);
 
     // Add access control only if not in detail mode
     if (!isSuperUser) {
@@ -960,7 +967,7 @@ export async function getWorkspacePayments(url = null, params = {}) {
     }
 
     let apiUrl = url || `/get_rental_payments?page=1&page_size=${params.page_size || 10}`;
-console.log("params workspace rental payment",params)
+    console.log("params workspace rental payment", params)
     const response = await this.$apiGet(apiUrl, params);
 
     let payments = response.data?.results || response.data || [];

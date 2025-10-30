@@ -14,7 +14,9 @@
         class="bg-white shadow-md rounded-2xl p-5 flex flex-col justify-between border border-gray-100 hover:shadow-lg transition-all"
       >
         <div>
-          <h2 class="text-gray-500 text-sm capitalize">{{ key.replace('total', '').trim() }}</h2>
+          <h2 class="text-gray-500 text-sm capitalize">
+            {{ key.replace("total", "").trim() }}
+          </h2>
           <p class="text-3xl font-bold text-gray-800 mt-2">{{ value }}</p>
         </div>
         <div class="mt-2 border-t pt-2">
@@ -28,7 +30,9 @@
       v-if="is_superuser === 'true'"
       class="bg-white rounded-2xl shadow-md border border-gray-100 mb-10 p-6"
     >
-      <div class="flex flex-col md:flex-row md:items-center justify-between mb-6">
+      <div
+        class="flex flex-col md:flex-row md:items-center justify-between mb-6"
+      >
         <h2 class="text-xl font-semibold text-gray-800 mb-4 md:mb-0">
           Pricing Plan Analytics
         </h2>
@@ -172,7 +176,10 @@ export default {
     },
 
     async refreshAllReports() {
-      await Promise.all([this.fetchSubscriptionReport(), this.fetchUserTypeReport()]);
+      await Promise.all([
+        this.fetchSubscriptionReport(),
+        this.fetchUserTypeReport(),
+      ]);
     },
 
     // 🟢 Fetch subscription report
@@ -198,24 +205,32 @@ export default {
         ];
 
         if (this.start_date && this.end_date)
-          this.$root.$refs.toast?.showToast("Report loaded successfully", "success");
+          this.$root.$refs.toast?.showToast(
+            "Report loaded successfully",
+            "success"
+          );
       } catch (err) {
         console.error(err);
-        this.$root.$refs.toast?.showToast("Failed to load subscription report", "error");
+        this.$root.$refs.toast?.showToast(
+          "Failed to load subscription report",
+          "error"
+        );
       }
     },
 
     // 🟢 Fetch user type report (replaces fetchAndGroupUsers)
     async fetchUserTypeReport() {
       try {
+        const params = {
+          user_id: localStorage.getItem("userId"),
+        };
         let url = "/get_user_type_report";
         if (this.start_date && this.end_date) {
           url += `?start_date=${this.start_date}&end_date=${this.end_date}`;
         }
 
-        const res = await this.$apiGet(url);
+        const res = await this.$apiGet(url, params);
         const data = res.data || res;
-
         const { groups = [], counts = [] } = data;
 
         this.userChartOptions = {
@@ -225,36 +240,75 @@ export default {
         this.userSeries = counts;
 
         if (this.start_date && this.end_date)
-          this.$root.$refs.toast?.showToast("User type report loaded", "success");
+          this.$root.$refs.toast?.showToast(
+            "User type report loaded",
+            "success"
+          );
       } catch (err) {
         console.error(err);
-        this.$root.$refs.toast?.showToast("Failed to load user type report", "error");
+        this.$root.$refs.toast?.showToast(
+          "Failed to load user type report",
+          "error"
+        );
       }
     },
 
     // ---- Stats fetchers ----
     async fetchTotalProperties() {
       try {
-        const res = await this.$apiGet("/get_properties", { page_size: this.hugePageSize });
-        this.stats.totalProperties = res.count ?? res.data?.results?.length ?? 0;
+        //  const res = await this.$apiGet("/get_properties", { page_size: this.hugePageSize });
+        const pageSize = this.hugePageSize;
+        const params = {};
+        const pageUrl = "/get_properties?page=1&page_size=1000000000";
+        const res = await this.$getProperties(pageUrl, params);
+        console.log("res properties", res);
+        //alert("hi");
+        this.stats.totalProperties = res.properties?.length ?? 0;
       } catch {}
     },
+
     async fetchTotalZones() {
       try {
-        const res = await this.$apiGet("/get_property_zones", { page_size: this.hugePageSize });
-        this.stats.totalZones = res.count ?? res.data?.results?.length ?? 0;
+        const pageUrl = "/get_property_zones?page=1&page_size=10000000000";
+        const params = {};
+        const res = await this.$getZones(pageUrl, params);
+        console.log("res zones", res);
+        this.stats.totalZones = res.zones?.length ?? 0;
       } catch {}
     },
+
     async fetchTotalSubscriptions() {
       try {
-        const res = await this.$apiGet("/get_subscription", { page_size: this.hugePageSize });
-        this.stats.totalSubscriptions = res.count ?? res.data?.results?.length ?? 0;
+        let params = {
+          user_id__id: localStorage.getItem("userId"),
+          page: 1,
+          page_size: 10000000000,
+        };
+
+        if (localStorage.getItem("is_superuser") == "true") {
+          params = {
+            page: 1,
+            page_size: 10000000000,
+          };
+        }
+        const pageUrl = `/get_subscription`;
+        const res = await this.$apiGet(pageUrl, params);
+        console.log("res", res);
+        console.log("res for subscriptions", res);
+        this.stats.totalSubscriptions = res.count;
       } catch {}
     },
+
     async fetchTotalTenants() {
       try {
-        const res = await this.$apiGet("/get_tenants", { page_size: this.hugePageSize });
-        this.stats.totalTenants = res.count ?? res.data?.results?.length ?? 0;
+        const pageUrl = `/get_rents`;
+        const params = {
+          page_size: 10000000000,
+        };
+        const res = await this.$getTenants(pageUrl, params);
+        console.log("res for tenants", res);
+
+        this.stats.totalTenants = res.tenants.length ?? 0;
       } catch {}
     },
 
@@ -289,7 +343,9 @@ export default {
         const salesByMonth = sumByMonth(sales);
         const subsByMonth = sumByMonth(subs);
         const workspaceByMonth = sumByMonth(
-          subs.filter((s) => (s.plan_name ?? "").toLowerCase().includes("workspace"))
+          subs.filter((s) =>
+            (s.plan_name ?? "").toLowerCase().includes("workspace")
+          )
         );
 
         const months = [
@@ -308,11 +364,20 @@ export default {
         this.incomeSeries = [
           { name: "Rent", data: months.map((m) => rentByMonth[m] || 0) },
           { name: "Sale", data: months.map((m) => salesByMonth[m] || 0) },
-          { name: "Subscription", data: months.map((m) => subsByMonth[m] || 0) },
-          { name: "Workspace", data: months.map((m) => workspaceByMonth[m] || 0) },
+          {
+            name: "Subscription",
+            data: months.map((m) => subsByMonth[m] || 0),
+          },
+          {
+            name: "Workspace",
+            data: months.map((m) => workspaceByMonth[m] || 0),
+          },
         ];
       } catch {
-        this.$root.$refs.toast?.showToast("Failed to load income data", "error");
+        this.$root.$refs.toast?.showToast(
+          "Failed to load income data",
+          "error"
+        );
       }
     },
   },
