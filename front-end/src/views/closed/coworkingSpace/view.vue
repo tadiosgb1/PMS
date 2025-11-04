@@ -69,15 +69,16 @@
                 <td class="border border-gray-300 px-4 py-2">{{ space.price_yearly }}</td>
                 <td class="border border-gray-300 px-4 py-2"> view zone <i @click="goToZoneDetail(space.zone)" class="fa fa-eye text-green-500"></i></td>
                 <td class="border border-gray-300 px-4 py-2 text-center space-x-2">
+                   <button @click="goToRentals(space.id)" class="text-blue-600 hover:text-blue-800">
+                    Rentals
+                  </button>
                   <button @click="editSpace(space)" class="text-green-600 hover:text-green-800">
                     <i class="fas fa-edit"></i>
                   </button>
                   <button @click="askDeleteConfirmation(space)" class="text-red-600 hover:text-red-800">
                     <i class="fas fa-trash"></i>
                   </button>
-                  <button @click="goToRentals(space.id)" class="text-blue-600 hover:text-blue-800">
-                    Rentals
-                  </button>
+                
 
                    <button v-if="showAddRental" @click="goToRentals(space.id)" class="bg-blue-100 text-blue-600 hover:text-green-800">
                     <i class="fas fa-plus mr-2"></i>Add rental
@@ -111,9 +112,10 @@
             <p class="text-sm text-gray-600"><strong>Quarterly Price:</strong> {{ space.price_quarterly }}</p>
             <p class="text-sm text-gray-600"><strong>Yearly Price:</strong> {{ space.price_yearly }}</p>
             <div class="flex justify-end gap-2 pt-2">
+              <button @click="goToRentals(space.id)" class="text-blue-600 hover:text-blue-800 text-sm">Rentals</button>
               <button @click="editSpace(space)" class="text-green-600 hover:text-green-800 text-sm">Edit</button>
               <button @click="askDeleteConfirmation(space)" class="text-red-600 hover:text-red-800 text-sm">Delete</button>
-              <button @click="goToRentals(space.id)" class="text-blue-600 hover:text-blue-800 text-sm">Rentals</button>
+        
               <button v-if="showAddRental" @click="goToRentals(space.id)" class="text-blue-600 hover:text-blue-800 text-sm"><i class="fas fa-plus mr-1"></i> Add rental</button>
             </div>
           </div>

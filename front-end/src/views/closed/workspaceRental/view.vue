@@ -77,15 +77,16 @@
                   <button v-if="rental.is_active" @click="openPaymentModal(rental.id)" class="px-3 py-1 text-green-600 border border-green-600 rounded-lg hover:text-white hover:bg-green-600 transition duration-300 ease-in-out">
                     <i class="fas fa-credit-card mr-1"></i> Pay
                   </button>
+                   <button @click="goToPayments(rental.id)" class="text-blue-600 hover:text-blue-800">
+                    Payments
+                  </button>
                   <button @click="editRental(rental)" class="text-green-600 hover:text-green-800">
                     <i class="fas fa-edit"></i>
                   </button>
                   <button @click="askDeleteConfirmation(rental)" class="text-red-600 hover:text-red-800">
                     <i class="fas fa-trash"></i>
                   </button>
-                  <button @click="goToPayments(rental.id)" class="text-blue-600 hover:text-blue-800">
-                    Payments
-                  </button>
+                 
                 </td>
               </tr>
               <tr v-if="filteredAndSortedRentals.length === 0">
@@ -112,10 +113,11 @@
               <button @click="goToSpaceDetail(rental.space.id)" class="text-blue-600 hover:text-blue-800 text-sm ml-1">View</button>
             </p>
             <div class="flex flex-wrap justify-end gap-2 pt-2">
-              <button v-if="!rental.is_active" @click="openPaymentModal(rental.id)" class="text-green-600 hover:text-green-800 text-sm">Pay</button>
+              <button v-if="rental.is_active" @click="openPaymentModal(rental.id)" class="border border-gray-200 rounded-lg p-1 text-green-600 hover:text-green-800 text-sm">Pay</button>
+              <button @click="goToPayments(rental.id)" class="text-blue-600 hover:text-blue-800 text-sm">Payments</button>
               <button @click="editRental(rental)" class="text-green-600 hover:text-green-800 text-sm">Edit</button>
               <button @click="askDeleteConfirmation(rental)" class="text-red-600 hover:text-red-800 text-sm">Delete</button>
-              <button @click="goToPayments(rental.id)" class="text-blue-600 hover:text-blue-800 text-sm">Payments</button>
+      
             </div>
           </div>
         </div>
