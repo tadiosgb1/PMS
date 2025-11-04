@@ -11,7 +11,9 @@
           class="bg-primary text-white px-6 py-4 flex justify-between items-center text-xl font-semibold"
         >
           Add Property Zone
-          <button @click="$emit('close')" class="text-white font-bold">✕</button>
+          <button @click="$emit('close')" class="text-white font-bold">
+            ✕
+          </button>
         </div>
 
         <form
@@ -19,31 +21,32 @@
           class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6"
         >
           <div class="relative">
-  <label class="block text-gray-700 mb-1">Zone Manager</label>
-  <input
-    v-model="managerSearch"
-    type="text"
-    class="custom-input"
-    placeholder="Search Manager..."
-    @input="searchManagers"
-    @focus="managerDropdown = true"
-    @blur="hideDropdown('manager')"
-    required
-  />
-  <ul
-    v-if="managers.length > 0 && managerDropdown"
-    class="absolute z-50 w-full max-h-48 overflow-y-auto bg-white border border-gray-300 rounded shadow mt-1"
-  >
-    <li
-      v-for="manager in managers"
-      :key="manager.manager.id"
-      class="p-2 hover:bg-gray-100 cursor-pointer"
-      @mousedown.prevent="selectManager(manager)"
-    >
-      {{ manager.manager.first_name }} {{ manager.manager.last_name || '' }}
-    </li>
-  </ul>
-</div>
+            <label class="block text-gray-700 mb-1">Zone Manager</label>
+            <input
+              v-model="managerSearch"
+              type="text"
+              class="custom-input"
+              placeholder="Search Manager..."
+              @input="searchManagers"
+              @focus="managerDropdown = true"
+              @blur="hideDropdown('manager')"
+              required
+            />
+            <ul
+              v-if="managers.length > 0 && managerDropdown"
+              class="absolute z-50 w-full max-h-48 overflow-y-auto bg-white border border-gray-300 rounded shadow mt-1"
+            >
+              <li
+                v-for="manager in managers"
+                :key="manager.manager.id"
+                class="p-2 hover:bg-gray-100 cursor-pointer"
+                @mousedown.prevent="selectManager(manager)"
+              >
+                {{ manager.manager.first_name }}
+                {{ manager.manager.last_name || "" }}
+              </li>
+            </ul>
+          </div>
 
           <div>
             <label class="block text-gray-700">Name</label>
@@ -63,6 +66,16 @@
           <div>
             <label class="block text-gray-700">State</label>
             <input v-model="form.state" class="custom-input" />
+          </div>
+
+          <div>
+            <label class="block text-gray-700">Latitude</label>
+            <input v-model="form.latitude" class="custom-input" />
+          </div>
+
+          <div>
+            <label class="block text-gray-700">longitude</label>
+            <input v-model="form.longitude" class="custom-input" />
           </div>
 
           <div class="md:col-span-2 text-right">
@@ -87,10 +100,11 @@ export default {
   components: { Toast },
   data() {
     return {
-       managerSearch: "",
-    managerDropdown: false,
+      managerSearch: "",
+      managerDropdown: false,
       managers: [],
       loading: false,
+
       form: {
         owner_id: localStorage.getItem("userId"),
         name: "",
@@ -98,42 +112,44 @@ export default {
         city: "",
         state: "",
         manager_id: "",
+        latitude: "",
+        longitude: "",
       },
     };
   },
   async mounted() {
     try {
-        const result = await this.$getManagers(); // Global function handles URL & params
-        console.log("result", result);
-        this.managers = result.managers;
+      const result = await this.$getManagers(); // Global function handles URL & params
+      console.log("result", result);
+      this.managers = result.managers;
     } catch (err) {
       console.error("Error fetching managers:", err);
     }
   },
   methods: {
-     searchManagers() {
-    if (!this.managerSearch) {
-      this.fetchManagers();
-    } else {
-      this.managers = this.managers.filter(m =>
-        `${m.manager.first_name} ${m.manager.last_name || ''}`
-          .toLowerCase()
-          .includes(this.managerSearch.toLowerCase())
-      );
-    }
-  },
+    searchManagers() {
+      if (!this.managerSearch) {
+        this.fetchManagers();
+      } else {
+        this.managers = this.managers.filter((m) =>
+          `${m.manager.first_name} ${m.manager.last_name || ""}`
+            .toLowerCase()
+            .includes(this.managerSearch.toLowerCase())
+        );
+      }
+    },
 
-  selectManager(manager) {
-    this.form.manager_id = manager.manager.id;
-    this.managerSearch = `${manager.manager.first_name} ${manager.manager.last_name || ''}`;
-    this.managerDropdown = false;
-  },
+    selectManager(manager) {
+      this.form.manager_id = manager.manager.id;
+      this.managerSearch = `${manager.manager.first_name} ${manager.manager.last_name || ""}`;
+      this.managerDropdown = false;
+    },
 
-  hideDropdown(type) {
-    setTimeout(() => {
-      if (type === "manager") this.managerDropdown = false;
-    }, 200);
-  },
+    hideDropdown(type) {
+      setTimeout(() => {
+        if (type === "manager") this.managerDropdown = false;
+      }, 200);
+    },
     async submitForm() {
       this.loading = true;
       try {
