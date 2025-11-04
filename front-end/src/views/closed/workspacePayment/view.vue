@@ -39,7 +39,7 @@
                 class="px-2 py-1 border rounded-md text-sm"
               >
                 <option value="">All</option>
-                <option value="paid">Paid</option>
+                <option value="complete">Paid</option>
                 <option value="pending">Pending</option>
                 <option value="cancelled">Cancelled</option>
               </select>
@@ -368,6 +368,8 @@ export default {
           else params = { page: urlOrPage || 1, payment_method:this.payment_method, page_size: this.perPage };
         }
 
+
+        console.log("params",params);
        const res = await this.$getWorkspacePayments(null, params);
 
        console.log("cow-payments",res);
