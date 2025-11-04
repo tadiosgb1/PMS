@@ -70,7 +70,7 @@
 
               <tbody>
                 <tr
-                  v-for="rent in filteredAndSortedRents"
+                  v-for="rent in rents"
                   :key="rent.id"
                   class="hover:bg-gray-100"
                 >
@@ -132,7 +132,7 @@
                   </td>
                 </tr>
 
-                <tr v-if="filteredAndSortedRents.length === 0">
+                <tr v-if="rents.length === 0">
                   <td colspan="10" class="text-center py-6 text-gray-500">No rents found.</td>
                 </tr>
               </tbody>
@@ -142,7 +142,7 @@
           <!-- ✅ List view for Mobile -->
           <div class="md:hidden space-y-4">
             <div
-              v-for="rent in filteredAndSortedRents"
+              v-for="rent in rents"
               :key="rent.id"
               class="bg-white border rounded-lg shadow-sm p-4 flex flex-col space-y-2"
             >
@@ -196,7 +196,7 @@
               </div>
             </div>
 
-            <p v-if="filteredAndSortedRents.length === 0" class="text-center text-gray-500">
+            <p v-if="rents.length === 0" class="text-center text-gray-500">
               No rents found.
             </p>
           </div>
@@ -355,7 +355,7 @@ export default {
       }
       return params;
     },
-    async fetchRents(url = "/get_rents") {
+    async fetchRents(url = `/get_rents?search=${this.searchTerm}&page_size=${this.pageSize}`) {
       try {
         const params = this.buildRoleParams();
         const response = await this.$apiGet(url, params);
@@ -363,10 +363,10 @@ export default {
 
         if (response && response.data) {
           this.rents = response.data || [];
-          this.next = response.data.next;
-          this.previous = response.data.previous;
-          this.currentPage = response.data.current_page;
-          this.totalPages = response.data.total_pages;
+          this.next = response.next;
+          this.previous = response.previous;
+          this.currentPage = response.current_page;
+          this.totalPages = response.total_pages;
         }
       } catch (error) {
         console.error("Failed to fetch rents:", error);

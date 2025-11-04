@@ -83,12 +83,19 @@
             </button>
           </div>
 
-          <!-- Pictures -->
-          <div class="mt-6">
-            <h3 class="text-lg font-bold mb-2">Pictures</h3>
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+          <!-- 🆕 UPDATED: Pictures section now matches PropertyDetail.vue -->
+          <div class="mt-8">
+            <h3 class="text-lg font-bold mb-2 flex items-center">
+              Pictures
+            </h3>
+
+            <!-- 🆕 Picture grid with limited display and “+X More” -->
+            <div
+              v-if="pictures?.length"
+              class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8"
+            >
               <div
-                v-for="pic in pictures"
+                v-for="pic in visiblePictures"
                 :key="pic.id"
                 class="border rounded overflow-hidden cursor-pointer hover:shadow-lg relative"
               >
@@ -98,6 +105,9 @@
                   class="w-full h-32 object-cover"
                   @click="previewImage(pic.rent_image)"
                 />
+
+                <!-- 🆕 Added description -->
+                <p class="text-sm p-2">{{ pic.description }}</p>
 
                 <!-- Picture Actions -->
                 <div class="absolute top-2 right-2 flex space-x-1">
@@ -115,7 +125,18 @@
                   </button>
                 </div>
               </div>
+
+              <!-- 🆕 “+X More” Button -->
+              <div
+                v-if="remainingPicturesCount > 0 && !showAllPictures"
+                @click="showAllPictures = true"
+                class="flex items-center justify-center border border-primary text-primary rounded hover:bg-primary hover:text-white transition cursor-pointer h-32"
+              >
+                +{{ remainingPicturesCount }} More
+              </div>
             </div>
+
+            <div v-else class="mb-8 text-gray-500">No pictures available.</div>
           </div>
         </div>
       </div>
@@ -198,7 +219,19 @@ export default {
       pictureToDelete: null,
       imagePreviewVisible: false,
       imageToPreview: null,
+      showAllPictures: false,
     };
+  },
+   computed: {
+    // 🆕 ADDED Computed Properties for picture display
+    visiblePictures() {
+      if (!this.pictures) return [];
+      return this.showAllPictures ? this.pictures : this.pictures.slice(0, 3);
+    },
+    remainingPicturesCount() {
+      if (!this.pictures) return 0;
+      return Math.max(0, this.pictures.length - 3);
+    },
   },
   mounted() {
     this.rentId = this.$route.params.id;
