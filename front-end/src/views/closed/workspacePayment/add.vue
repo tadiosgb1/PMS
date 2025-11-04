@@ -87,7 +87,7 @@
 
 <script>
 export default {
-  name: "AddRental",
+  name: "AddPayment",
   props: {
     visible: { type: Boolean, default: false },
   },

@@ -133,7 +133,7 @@
                 <td class="border border-gray-300 px-4 py-2">
                   <span
                     :class="{
-                      'bg-green-600 text-white px-2 py-1 rounded': payment.status === 'paid',
+                      'bg-green-600 text-white px-2 py-1 rounded': payment.status === 'complete',
                       'bg-yellow-500 text-white px-2 py-1 rounded': payment.status === 'pending',
                       'bg-red-600 text-white px-2 py-1 rounded': payment.status === 'cancelled'
                     }"
@@ -182,7 +182,7 @@
               </h3>
               <span
                 :class="{
-                  'bg-green-600 text-white px-2 py-1 rounded': payment.status === 'paid',
+                  'bg-green-600 text-white px-2 py-1 rounded': payment.status === 'complete',
                   'bg-yellow-500 text-white px-2 py-1 rounded': payment.status === 'pending',
                   'bg-red-600 text-white px-2 py-1 rounded': payment.status === 'cancelled'
                 }"
@@ -387,9 +387,13 @@ export default {
       else this.sortKey = key;
     },
 
+
+
     approve(payment) {
       this.updatePaymentStatus(payment, "complete", "Payment Approved Successfully");
     },
+
+
 
     disApprove(payment) {
       this.updatePaymentStatus(payment, "pending", "Payment Disapproved Successfully");
@@ -398,21 +402,29 @@ export default {
    async updatePaymentStatus(payment, status, message) {
   try {
     console.log("payment", payment);
-
+const payload={
+  status:status
+}
     // 1️⃣ Update rental payment first
-    const res1 = await this.$apiPatch("/update_rental_payment", payment.id, { status });
+    const res1 = await this.$apiPatch("/update_rental_payment", payment.id, payload);
 
     if (res1 ) {
       // 2️⃣ Only if the first update succeeds, update workspace rental
-      const payloadWorkspaceRental = { is_active: true };
+      let payloadWorkspaceRental = { is_active: false };
+      if(status=='pending'){
+        payloadWorkspaceRental={
+          is_active:true
+        }
+      }
       const res2 = await this.$apiPatch("/update_workspace_rental", payment.rental, payloadWorkspaceRental);
 
       if (res2) {
         this.$root.$refs.toast.showToast(message, "success");
         this.fetchPayments(this.currentPage);
-      } else {
+      }else {
         this.$refs.toast.showToast("Failed to update workspace rental", "error");
       }
+
       this.$reloadPage();
     } else {
       this.$refs.toast.showToast("Failed to update rental payment", "error");

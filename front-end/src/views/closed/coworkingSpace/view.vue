@@ -76,8 +76,13 @@
                     <i class="fas fa-trash"></i>
                   </button>
                   <button @click="goToRentals(space.id)" class="text-blue-600 hover:text-blue-800">
-                    Payments
+                    Rentals
                   </button>
+
+                   <button v-if="showAddRental" @click="goToRentals(space.id)" class="bg-blue-100 text-blue-600 hover:text-green-800">
+                    <i class="fas fa-plus mr-2"></i>Add rental
+                  </button>
+                  
                 </td>
               </tr>
               <tr v-if="filteredAndSortedSpaces.length === 0">
@@ -108,7 +113,8 @@
             <div class="flex justify-end gap-2 pt-2">
               <button @click="editSpace(space)" class="text-green-600 hover:text-green-800 text-sm">Edit</button>
               <button @click="askDeleteConfirmation(space)" class="text-red-600 hover:text-red-800 text-sm">Delete</button>
-              <button @click="goToRentals(space.id)" class="text-blue-600 hover:text-blue-800 text-sm">Payments</button>
+              <button @click="goToRentals(space.id)" class="text-blue-600 hover:text-blue-800 text-sm">Rentals</button>
+              <button v-if="showAddRental" @click="goToRentals(space.id)" class="text-blue-600 hover:text-blue-800 text-sm"><i class="fas fa-plus mr-1"></i> Add rental</button>
             </div>
           </div>
         </div>
