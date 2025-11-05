@@ -1,9 +1,8 @@
 <template>
-  <div class="p-8 bg-gray-100 min-h-screen">
+  <div class="p-4 bg-gray-100 min-h-screen">
     <!-- Header -->
     <div class="flex justify-between items-center mb-8">
-      <h1 class="text-2xl font-bold text-gray-800">Dashboard Overview</h1>
-      <p class="text-gray-500 text-sm">Performance summary and analytics</p>
+      <h1 class="text-lg font-bold text-gray-800">Dashboard Overview and analytics</h1>
     </div>
 
     <!-- Stats Cards -->
@@ -26,25 +25,28 @@
     </div>
 
     <!-- Pricing Analytics (only for superuser) -->
-   <div
-  class="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl shadow-lg border border-gray-200 mb-10 p-6"
+<div v-if="is_superuser=='true'"
+  class="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl shadow-lg border border-gray-200 mb-10 p-5"
 >
   <div class="flex flex-col md:flex-row md:items-center justify-between mb-6">
-    <h2 class="text-2xl font-bold text-purple-700 tracking-wide mb-4 md:mb-0">
+    <h2 class="text-lg font-bold text-purple-700 tracking-wide mb-4 md:mb-0">
       PRICING PLAN ANALYTICS
     </h2>
 
     <div class="flex flex-wrap gap-3">
-      <input
+      <div class="flex flex-row space-x-2">
+         <input
         type="date"
         v-model="start_date"
-        class="border-2 border-blue-300 rounded-lg px-3 py-2 text-gray-800 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition"
+        class="border-2 border-blue-300 rounded-lg px-1 py-1 text-gray-800 focus:ring-2 focus:ring-blue-400 focus:border-blue-400 transition"
       />
       <input
         type="date"
         v-model="end_date"
-        class="border-2 border-purple-300 rounded-lg px-3 py-2 text-gray-800 focus:ring-2 focus:ring-purple-400 focus:border-purple-400 transition"
+        class="border-2 border-purple-300 rounded-lg px-1 py-1 text-gray-800 focus:ring-2 focus:ring-purple-400 focus:border-purple-400 transition"
       />
+      </div>
+     
       <button
         @click="refreshAllReports"
         class="bg-gradient-to-r from-purple-600 to-blue-600 hover:from-blue-700 hover:to-purple-700 text-white font-semibold px-5 py-2 rounded-lg shadow-md transition"
@@ -64,22 +66,87 @@
   </div>
 
 
-    <!-- Income & Users Charts -->
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-      <!-- Income Chart -->
-      <div class="bg-white rounded-2xl shadow-md border border-gray-100 p-6">
-        <h2 class="text-lg font-semibold text-gray-800 mb-4">
-          Income Overview
-        </h2>
+   <div class="bg-white rounded-2xl shadow-md border border-gray-100 p-6 space-y-6">
+    <!-- ======================= HEADER WITH DATE FILTERS ======================= -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+      <h2 class="text-xl font-semibold text-gray-800">Income / Expense Overview</h2>
+
+      <div class="flex flex-row items-center gap-3">
+        <!-- Start Date -->
+        <div class="flex flex-col">
+          <label class="text-sm text-gray-600">Start Date</label>
+          <input
+            type="date"
+            v-model="revenue_start_date"
+            @change="fetchIncomeData"
+            class="border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 text-sm"
+          />
+        </div>
+
+        <!-- End Date -->
+        <div class="flex flex-col">
+          <label class="text-sm text-gray-600">End Date</label>
+          <input
+            type="date"
+            v-model="revenue_end_date"
+            @change="fetchIncomeData"
+            class="border border-gray-300 rounded-lg p-2 focus:ring-2 focus:ring-blue-400 text-sm"
+          />
+        </div>
+      </div>
+    </div>
+
+    <!-- Divider -->
+    <div class="border-t border-gray-200"></div>
+
+    <!-- ======================= ALL INCOME GRAPHS ======================= -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+         <!-- Subscription -->
+      <div class="p-4 rounded-xl border border-gray-100 bg-gray-50" >
+        <h3 class="text-md font-semibold text-gray-700 mb-3"> Subscription Overview(Expense)</h3>
         <apexchart
           type="bar"
-          height="320"
-          :options="incomeChartOptions"
-          :series="incomeSeries"
+          height="280"
+          :options="chartOptions('Subscription', incomeData.months)"
+          :series="[{ name: 'Subscription', data: incomeData.subscription }]"
+        />
+      </div>
+      <!-- Rent -->
+      <div class="p-4 rounded-xl border border-gray-100 bg-gray-50">
+        <h3 class="text-md font-semibold text-gray-700 mb-3">Rent Overview(Income)</h3>
+        <apexchart
+          type="bar"
+          height="280"
+          :options="chartOptions('Rent', incomeData.months)"
+          :series="[{ name: 'Rent', data: incomeData.rent }]"
         />
       </div>
 
-      <!-- User Distribution -->
+      <!-- Sale -->
+      <div class="p-4 rounded-xl border border-gray-100 bg-gray-50">
+        <h3 class="text-md font-semibold text-gray-700 mb-3">Sales Overview(Income)</h3>
+        <apexchart
+          type="bar"
+          height="280"
+          :options="chartOptions('Sale', incomeData.months)"
+          :series="[{ name: 'Sale', data: incomeData.sale }]"
+        />
+      </div>
+
+   
+
+      <!-- Workspace -->
+      <div class="p-4 rounded-xl border border-gray-100 bg-gray-50">
+        <h3 class="text-md font-semibold text-gray-700 mb-3">Workspace Overview(Income)</h3>
+        <apexchart
+          type="bar"
+          height="280"
+          :options="chartOptions('Workspace', incomeData.months)"
+          :series="[{ name: 'Workspace', data: incomeData.workspace }]"
+        />
+      </div>
+    </div>
+    <!-- User Distribution -->
       <div v-if="is_superuser=='true'" class="bg-white rounded-2xl shadow-md border border-gray-100 p-6">
         <h2 class="text-lg font-semibold text-gray-800 mb-4">
           User Distribution by Group
@@ -91,7 +158,7 @@
           :series="userSeries"
         />
       </div>
-    </div>
+  </div>
   </div>
 </template>
 
@@ -109,6 +176,10 @@ export default {
       hugePageSize: 10000000000,
       start_date: "",
       end_date: "",
+
+      revenue_start_date: new Date(new Date().getFullYear(), 0, 1).toISOString().split("T")[0],
+      revenue_end_date: new Date().toISOString().split("T")[0],
+
 
       // Pricing report
       pricingSeries: [
@@ -130,12 +201,15 @@ export default {
       },
 
       // Income report
-      incomeSeries: [
-        { name: "Rent", data: [] },
-        { name: "Sale", data: [] },
-        { name: "Subscription", data: [] },
-        { name: "Workspace", data: [] },
-      ],
+      incomeData: {
+        months: [],
+        rent: [],
+        sale: [],
+        subscription: [],
+        workspace: [],
+      },
+
+
       incomeChartOptions: {
         chart: { id: "income-chart", stacked: false, toolbar: { show: false } },
         xaxis: { categories: [] },
@@ -178,6 +252,83 @@ export default {
         this.fetchSubscriptionReport(),
         this.fetchUserTypeReport(),
       ]);
+    },
+    chartOptions(title, months) {
+      return {
+        chart: { id: `${title}-chart` },
+        xaxis: { categories: months },
+        dataLabels: { enabled: false },
+        grid: { strokeDashArray: 4 },
+        title: {
+          text: title,
+          align: "center",
+          style: { fontSize: "14px", color: "#374151" },
+        },
+        tooltip: { y: { formatter: (val) => val.toLocaleString() } },
+        colors: ["#2563eb"],
+      };
+    },
+
+    async fetchIncomeData() {
+     // alert("hii")
+     // if (!this.revenue_start_date || !this.revenue_end_date) return;
+
+
+      const isSuperUser =
+      localStorage.getItem("is_superuser") === "1" ||
+      localStorage.getItem("is_superuser") === "true";
+
+  const groups = JSON.parse(localStorage.getItem("groups") || "[]");
+   const userId=localStorage.getItem('userId');
+    let params = {};
+
+    if (!isSuperUser) {
+      if (groups.includes("manager")) {
+        params = { 
+        rent_id__property_id__property_zone_id__manager_id__id: userId,
+        subscription_id__user_id__id:userId,
+        space__zone__manager_id__id:userId,
+        start_date: this.revenue_start_date,
+        end_date: this.revenue_end_date,
+        };
+      } else if (groups.includes("owner")) {
+        params = {
+             rent_id__property_id__property_zone_id__owner_id__id: userId,
+             property_zone_sale_id__property_zone_id__owner_id__id:userId,
+             subscription_id__user_id__id:userId,
+             space__zone__owner_id__id:userId,
+             start_date: this.revenue_start_date,
+             end_date: this.revenue_end_date,
+         };
+      } else if (groups.includes("staff")) {
+        params={rent_id__property_id__property_zone_id__staff_id__id: userId,
+        subscription_id__user_id__id:userId,
+        space__zone__staff_id__id:userId,
+        start_date: this.revenue_start_date,
+        end_date: this.revenue_end_date,
+        };
+      } else if (groups.includes("super_staff")) {
+        params = {
+            start_date: this.revenue_start_date,
+            end_date: this.revenue_end_date,
+        };
+      }
+    }else{
+        params = {
+            start_date: this.revenue_start_date,
+            end_date: this.revenue_end_date,
+        };
+      }
+      console.log("Fetching with params for income:", params);
+
+      try {
+        const res = await this.$apiGet("/get_revenue_report", params);
+        console.log("resin", res);
+        this.incomeData = res;
+      } catch (error) {
+        console.error("Failed to load income data:", error);
+        this.$root.$refs.toast?.showToast("Failed to load income data", "error");
+      }
     },
 
     // 🟢 Fetch subscription report
@@ -370,74 +521,6 @@ async fetchSubscriptionReport() {
       } catch {}
     },
 
-    // 🟢 Income data aggregation
-    async fetchIncomeData() {
-      const params = { page_size: this.hugePageSize };
-      try {
-        const [rentRes, salesRes, subsRes] = await Promise.all([
-          this.$apiGet("/get_payments", params),
-          this.$apiGet("/get_sales_payments", params),
-          this.$apiGet("/get_subscription_payment", params),
-        ]);
-
-        const rents = rentRes.data?.results ?? rentRes.data ?? [];
-        const sales = salesRes.data?.results ?? salesRes.data ?? [];
-        const subs = subsRes.data?.results ?? subsRes.data ?? [];
-
-        const sumByMonth = (arr) => {
-          const map = {};
-          arr.forEach((item) => {
-            const d = new Date(item.payment_date ?? item.date);
-            const month = !isNaN(d)
-              ? `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}`
-              : "";
-            const amount = parseFloat(item.amount ?? item.price ?? 0) || 0;
-            map[month] = (map[month] || 0) + amount;
-          });
-          return map;
-        };
-
-        const rentByMonth = sumByMonth(rents);
-        const salesByMonth = sumByMonth(sales);
-        const subsByMonth = sumByMonth(subs);
-        const workspaceByMonth = sumByMonth(
-          subs.filter((s) =>
-            (s.plan_name ?? "").toLowerCase().includes("workspace")
-          )
-        );
-
-        const months = [
-          ...new Set([
-            ...Object.keys(rentByMonth),
-            ...Object.keys(salesByMonth),
-            ...Object.keys(subsByMonth),
-            ...Object.keys(workspaceByMonth),
-          ]),
-        ].sort();
-
-        this.incomeChartOptions = {
-          ...this.incomeChartOptions,
-          xaxis: { categories: months },
-        };
-        this.incomeSeries = [
-          { name: "Rent", data: months.map((m) => rentByMonth[m] || 0) },
-          { name: "Sale", data: months.map((m) => salesByMonth[m] || 0) },
-          {
-            name: "Subscription",
-            data: months.map((m) => subsByMonth[m] || 0),
-          },
-          {
-            name: "Workspace",
-            data: months.map((m) => workspaceByMonth[m] || 0),
-          },
-        ];
-      } catch {
-        this.$root.$refs.toast?.showToast(
-          "Failed to load income data",
-          "error"
-        );
-      }
-    },
   },
 };
 </script>

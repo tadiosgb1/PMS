@@ -19,7 +19,9 @@
         </div>
 
         <!-- Search & Page Size -->
-        <div class="p-4 flex flex-col lg:flex-row justify-between items-center gap-4">
+        <div
+          class="p-4 flex flex-col lg:flex-row justify-between items-center gap-4"
+        >
           <input
             v-model="searchTerm"
             @input="onSearch"
@@ -29,7 +31,9 @@
           />
 
           <div class="flex items-center">
-            <label for="pageSize" class="mr-2 text-gray-700 text-sm">Show</label>
+            <label for="pageSize" class="mr-2 text-gray-700 text-sm"
+              >Show</label
+            >
             <select
               id="pageSize"
               v-model="pageSize"
@@ -51,24 +55,53 @@
           >
             <thead>
               <tr class="bg-gray-200 text-gray-700">
-                <th class="border px-4 py-2 cursor-pointer" @click="sortBy('name')">
+                <th
+                  class="border px-4 py-2 cursor-pointer"
+                  @click="sortBy('name')"
+                >
                   Name
-                  <SortIcon :field="'name'" :sort-key="sortKey" :sort-asc="sortAsc" />
+                  <SortIcon
+                    :field="'name'"
+                    :sort-key="sortKey"
+                    :sort-asc="sortAsc"
+                  />
                 </th>
-                <th class="border px-4 py-2 cursor-pointer" @click="sortBy('address')">
+                <th
+                  class="border px-4 py-2 cursor-pointer"
+                  @click="sortBy('address')"
+                >
                   Address
-                  <SortIcon :field="'address'" :sort-key="sortKey" :sort-asc="sortAsc" />
+                  <SortIcon
+                    :field="'address'"
+                    :sort-key="sortKey"
+                    :sort-asc="sortAsc"
+                  />
                 </th>
-                <th class="border px-4 py-2 cursor-pointer" @click="sortBy('city')">
+                <th
+                  class="border px-4 py-2 cursor-pointer"
+                  @click="sortBy('city')"
+                >
                   City
-                  <SortIcon :field="'city'" :sort-key="sortKey" :sort-asc="sortAsc" />
+                  <SortIcon
+                    :field="'city'"
+                    :sort-key="sortKey"
+                    :sort-asc="sortAsc"
+                  />
                 </th>
-                <th class="border px-4 py-2 cursor-pointer" @click="sortBy('state')">
+                <th
+                  class="border px-4 py-2 cursor-pointer"
+                  @click="sortBy('state')"
+                >
                   State
-                  <SortIcon :field="'state'" :sort-key="sortKey" :sort-asc="sortAsc" />
+                  <SortIcon
+                    :field="'state'"
+                    :sort-key="sortKey"
+                    :sort-asc="sortAsc"
+                  />
                 </th>
                 <th class="border px-4 py-2">Owner</th>
                 <th class="border px-4 py-2">Manager</th>
+                <th class="border px-4 py-2">Locations</th>
                 <th class="border px-4 py-2 text-center">Actions</th>
               </tr>
             </thead>
@@ -91,6 +124,7 @@
                     Details
                   </button>
                 </td>
+
                 <td class="border px-4 py-2">
                   {{ zone.managerName }}
                   <button
@@ -100,6 +134,25 @@
                     Details
                   </button>
                 </td>
+
+                <td class="border px-4 py-2">
+                  <a
+                    href="https://www.google.com/maps?q=13.4967,39.4753&z=15"
+                    target="_blank"
+                    style="
+                      text-decoration: none;
+                      color: #0078ff;
+                      font-size: 16px;
+                    "
+                  >
+                    <i
+                      class="fa-solid fa-location-dot"
+                      style="color: red; margin-right: 6px"
+                    ></i>
+                    View on Maps
+                  </a>
+                </td>
+
                 <td class="border px-4 py-2 text-center space-x-2">
                   <button
                     @click="goToZoneDetail(zone.id)"
@@ -212,6 +265,7 @@
                 Properties
               </button>
 
+<<<<<<< HEAD
               <button
   
     @click="openSaleModal(zone.id)"
@@ -221,6 +275,19 @@
     <i class="fas fa-tag"></i>
   </button>
 
+=======
+              <a
+                href="https://www.google.com/maps?q=13.4967,39.4753&z=15"
+                target="_blank"
+                style="text-decoration: none; color: #0078ff; font-size: 16px"
+              >
+                <i
+                  class="fa-solid fa-location-dot"
+                  style="color: red; margin-right: 6px"
+                ></i>
+                View on Maps
+              </a>
+>>>>>>> 4f017abe9239f9583e380e830f4f713decd9339c
             </div>
           </div>
 
@@ -287,7 +354,6 @@
     </div>
   </div>
 </template>
-
 
 <script>
 import Toast from "../../../components/Toast.vue";
@@ -356,14 +422,14 @@ salePropertyId: null,
 },
     async fetchZones() {
       try {
-      const params = {
-            ordering: "-id",
-          };
-            console.log("params in fetching zones",params);
+        const params = {
+          ordering: "-id",
+        };
+        console.log("params in fetching zones", params);
         const url = `/get_property_zones?page=${this.currentPage}&page_size=${this.pageSize}&search=${this.searchTerm}`;
-      
-        const result = await this.$getZones(url,params);
-        console.log("result for zones",result)
+
+        const result = await this.$getZones(url, params);
+        console.log("result for zones", result);
         this.globalZones = result.zones;
         this.currentPage = result.currentPage;
         this.totalPages = result.totalPages;
@@ -393,13 +459,20 @@ salePropertyId: null,
     async confirmDelete() {
       this.confirmVisible = false;
       try {
-        const response =await this.$apiDelete(`/delete_property_zone/${this.zoneToDelete.id}`);
-        if(response && response.error){
-       this.$root.$refs.toast.showToast(response.error || "Failed to delete zone", "error");
-        }else {
-       this.$root.$refs.toast.showToast("Zone deleted successfully", "success");
-        await this.fetchZones();
-
+        const response = await this.$apiDelete(
+          `/delete_property_zone/${this.zoneToDelete.id}`
+        );
+        if (response && response.error) {
+          this.$root.$refs.toast.showToast(
+            response.error || "Failed to delete zone",
+            "error"
+          );
+        } else {
+          this.$root.$refs.toast.showToast(
+            "Zone deleted successfully",
+            "success"
+          );
+          await this.fetchZones();
         }
       } catch (err) {
         this.$root.$refs.toast.showToast("Failed to delete zone", "error");
