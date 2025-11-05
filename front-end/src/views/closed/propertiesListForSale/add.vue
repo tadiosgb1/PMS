@@ -88,8 +88,12 @@ export default {
           listing_price: this.listingPrice,
         };
 
+        console.log("payload",payload);
+
         const res = await this.$apiPost("/create_property_sale_listing", payload);
 
+
+        
         if (res && res.error) {
           this.$root.$refs.toast.showToast(res.error, "error");
         } else {

@@ -265,17 +265,14 @@
                 Properties
               </button>
 
-<<<<<<< HEAD
-              <button
-  
-    @click="openSaleModal(zone.id)"
-    class="text-yellow-600 hover:text-yellow-800"
-    title="List for Sale"
-  >
-    <i class="fas fa-tag"></i>
-  </button>
+          <button
+              @click="openSaleModal(zone.id)"
+              class="text-yellow-600 hover:text-yellow-800"
+              title="List for Sale"
+            >
+              <i class="fas fa-tag"></i>
+            </button>
 
-=======
               <a
                 href="https://www.google.com/maps?q=13.4967,39.4753&z=15"
                 target="_blank"
@@ -287,7 +284,6 @@
                 ></i>
                 View on Maps
               </a>
->>>>>>> 4f017abe9239f9583e380e830f4f713decd9339c
             </div>
           </div>
 
@@ -397,7 +393,7 @@ export default {
       pageSize: 10,
       pageSizes: [1, 5, 10, 20, 50, 100],
       saleVisible: false,
-salePropertyId: null,
+      salePropertyId: null,
     };
   },
   computed: {
