@@ -57,6 +57,7 @@ import saleCommissions from '../views/closed/saleCommissions/view.vue'
 import rentCommissions from '../views/closed/rentCommissions/view.vue'
 import Transactions from '../views/closed/transactions/transactions_view.vue'
 import Contacts from '../views/closed/contacts/view.vue'
+import CropertiesListForSale from '../views/closed/propertiesListForSale/view.vue'
 
 import Configurations from '../views/closed/Configurations/view.vue'
 import CoworkspacePayments from '../views/closed/workspacePayment/view.vue'
@@ -165,6 +166,7 @@ const routes = [
       
     { path: '/transactions', name: 'transactions', component:Transactions },
     { path: '/contacts', name: 'contacts', component:Contacts },
+    { path: '/propertiesListForSale', name: 'propertiesListForSale', component:CropertiesListForSale },
       
       { path: '/configurations', name: 'configurations', component:Configurations },
       { path: '/rents', name: 'rents', component: Rents },

@@ -175,6 +175,17 @@
                     >
                       <i class="fas fa-money-bill-wave"></i>
                     </button>
+
+
+                                   <!-- ✅ New Sale Button -->
+  <button
+    
+    @click="openSaleModal(property.id)"
+    class="text-yellow-600 hover:text-yellow-800"
+    title="List for Sale"
+  >
+    <i class="fas fa-tag"></i>
+  </button>
                   </td>
                 </tr>
                 <tr v-if="properties.length === 0">
@@ -241,6 +252,16 @@
                 >
                   <i class="fas fa-money-bill-wave"></i>
                 </button>
+
+                 <!-- ✅ New Sale Button -->
+  <button
+  
+    @click="openSaleModal(property.id)"
+    class="text-yellow-600 hover:text-yellow-800"
+    title="List for Sale"
+  >
+    <i class="fas fa-tag"></i>
+  </button>
               </div>
             </div>
           </div>
@@ -290,6 +311,15 @@
         @confirm="confirmDelete"
         @cancel="confirmVisible = false"
       />
+
+      <SaleModal
+  v-if="saleVisible"
+  :visible="saleVisible"
+  :propertyId="salePropertyId"
+  @close="saleVisible = false"
+  @refresh="fetchProperties"
+/>
+
     </div>
   </div>
 </template>
@@ -300,10 +330,11 @@ import UpdateProperty from "@/views/closed/proporty/update.vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
 import Toast from "../../../components/Toast.vue";
 import Manager from "../managers/add.vue";
+import SaleModal from "../propertiesListForSale/add.vue";
 
 export default {
   name: "PropertyView",
-  components: { AddProperty, UpdateProperty, ConfirmModal, Toast, Manager },
+  components: { AddProperty, UpdateProperty, ConfirmModal, Toast, Manager,SaleModal },
   data() {
     return {
       zones: [],
@@ -325,6 +356,9 @@ export default {
       ordering: "-id", // default ordering
       status:"",
       is_super_user:false,
+      saleVisible: false,
+salePropertyId: null,
+      
     };
   },
   async mounted() {
@@ -338,6 +372,11 @@ export default {
     await this.fetchProperties();
   },
   methods: {
+
+    openSaleModal(propertyId) {
+  this.salePropertyId = propertyId;
+  this.saleVisible = true;
+},
     //if per(view_property)
     async fetchProperties(url = null) {
       try {

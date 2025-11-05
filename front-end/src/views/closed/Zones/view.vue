@@ -129,6 +129,14 @@
                   >
                     Properties
                   </button>
+                  <button
+  
+    @click="openSaleModal(zone.id)"
+    class="text-yellow-600 hover:text-yellow-800"
+    title="List for Sale"
+  >
+    <i class="fas fa-tag"></i>
+  </button>
                 </td>
               </tr>
 
@@ -203,6 +211,16 @@
               >
                 Properties
               </button>
+
+              <button
+  
+    @click="openSaleModal(zone.id)"
+    class="text-yellow-600 hover:text-yellow-800"
+    title="List for Sale"
+  >
+    <i class="fas fa-tag"></i>
+  </button>
+
             </div>
           </div>
 
@@ -258,6 +276,14 @@
         @confirm="confirmDelete"
         @cancel="confirmVisible = false"
       />
+
+       <SaleModal
+  v-if="saleVisible"
+  :visible="saleVisible"
+  :propertyId="salePropertyId"
+  @close="saleVisible = false"
+  @refresh="fetchZones"
+/>
     </div>
   </div>
 </template>
@@ -268,6 +294,7 @@ import Toast from "../../../components/Toast.vue";
 import AddZone from "./add.vue";
 import UpdateZone from "./update.vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
+import SaleModal from "../propertiesListForSale/add.vue";
 
 const SortIcon = {
   props: ["field", "sortKey", "sortAsc"],
@@ -287,7 +314,7 @@ const SortIcon = {
 };
 
 export default {
-  components: { AddZone, UpdateZone, ConfirmModal, SortIcon, Toast },
+  components: { AddZone, UpdateZone, ConfirmModal, SortIcon, Toast,SaleModal },
   data() {
     return {
       globalZones: [],
@@ -303,6 +330,8 @@ export default {
       totalPages: 1,
       pageSize: 10,
       pageSizes: [1, 5, 10, 20, 50, 100],
+      saleVisible: false,
+salePropertyId: null,
     };
   },
   computed: {
@@ -321,6 +350,10 @@ export default {
     await this.fetchZones();
   },
   methods: {
+     openSaleModal(propertyId) {
+  this.salePropertyId = propertyId;
+  this.saleVisible = true;
+},
     async fetchZones() {
       try {
       const params = {

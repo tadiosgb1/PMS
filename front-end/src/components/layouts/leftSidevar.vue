@@ -174,6 +174,12 @@ export default {
           icon: "fas fa-user", // ✅ fa-money-bill-wave → fixed
           color: "#22c55e",
         },
+         {
+          name: "List of Property for sale",
+          route: "propertiesListForSale",
+          icon: "fas fa-building", // ✅ fa-money-bill-wave → fixed
+          color: "#22c55e",
+        },
       ],
     };
   },
