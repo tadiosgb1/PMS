@@ -61,7 +61,7 @@
               Managers
             </button>
 
-            <button
+            <button v-if="is_superuser"
               @click="activeTab = 'brokers'"
               class="tab-link"
               :class="{ 'tab-active': activeTab === 'brokers' }"

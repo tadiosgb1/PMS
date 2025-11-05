@@ -25,8 +25,8 @@
     </div>
 
     <!-- Pricing Analytics (only for superuser) -->
-<div
-  class="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl shadow-lg border border-gray-200 mb-10 p-2"
+<div v-if="is_superuser=='true'"
+  class="bg-gradient-to-br from-blue-50 to-purple-50 rounded-2xl shadow-lg border border-gray-200 mb-10 p-5"
 >
   <div class="flex flex-col md:flex-row md:items-center justify-between mb-6">
     <h2 class="text-lg font-bold text-purple-700 tracking-wide mb-4 md:mb-0">
@@ -101,7 +101,16 @@
 
     <!-- ======================= ALL INCOME GRAPHS ======================= -->
     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-      
+         <!-- Subscription -->
+      <div class="p-4 rounded-xl border border-gray-100 bg-gray-50" >
+        <h3 class="text-md font-semibold text-gray-700 mb-3"> Subscription Overview(Expense)</h3>
+        <apexchart
+          type="bar"
+          height="280"
+          :options="chartOptions('Subscription', incomeData.months)"
+          :series="[{ name: 'Subscription', data: incomeData.subscription }]"
+        />
+      </div>
       <!-- Rent -->
       <div class="p-4 rounded-xl border border-gray-100 bg-gray-50">
         <h3 class="text-md font-semibold text-gray-700 mb-3">Rent Overview(Income)</h3>
@@ -124,16 +133,7 @@
         />
       </div>
 
-      <!-- Subscription -->
-      <div class="p-4 rounded-xl border border-gray-100 bg-gray-50">
-        <h3 class="text-md font-semibold text-gray-700 mb-3"> Subscription Overview(Expense)</h3>
-        <apexchart
-          type="bar"
-          height="280"
-          :options="chartOptions('Subscription', incomeData.months)"
-          :series="[{ name: 'Subscription', data: incomeData.subscription }]"
-        />
-      </div>
+   
 
       <!-- Workspace -->
       <div class="p-4 rounded-xl border border-gray-100 bg-gray-50">
@@ -146,6 +146,18 @@
         />
       </div>
     </div>
+    <!-- User Distribution -->
+      <div v-if="is_superuser=='true'" class="bg-white rounded-2xl shadow-md border border-gray-100 p-6">
+        <h2 class="text-lg font-semibold text-gray-800 mb-4">
+          User Distribution by Group
+        </h2>
+        <apexchart
+          type="donut"
+          height="300"
+          :options="userChartOptions"
+          :series="userSeries"
+        />
+      </div>
   </div>
   </div>
 </template>
@@ -165,8 +177,9 @@ export default {
       start_date: "",
       end_date: "",
 
-       revenue_start_date: "",
-      revenue_end_date: "",
+      revenue_start_date: new Date(new Date().getFullYear(), 0, 1).toISOString().split("T")[0],
+      revenue_end_date: new Date().toISOString().split("T")[0],
+
 
       // Pricing report
       pricingSeries: [
@@ -260,12 +273,53 @@ export default {
      // alert("hii")
      // if (!this.revenue_start_date || !this.revenue_end_date) return;
 
-      const params = {
+
+      const isSuperUser =
+      localStorage.getItem("is_superuser") === "1" ||
+      localStorage.getItem("is_superuser") === "true";
+
+  const groups = JSON.parse(localStorage.getItem("groups") || "[]");
+   const userId=localStorage.getItem('userId');
+    let params = {};
+
+    if (!isSuperUser) {
+      if (groups.includes("manager")) {
+        params = { 
+        rent_id__property_id__property_zone_id__manager_id__id: userId,
+        subscription_id__user_id__id:userId,
+        space__zone__manager_id__id:userId,
         start_date: this.revenue_start_date,
         end_date: this.revenue_end_date,
-      };
-
-      console.log("Fetching with params:", params);
+        };
+      } else if (groups.includes("owner")) {
+        params = {
+             rent_id__property_id__property_zone_id__owner_id__id: userId,
+             property_zone_sale_id__property_zone_id__owner_id__id:userId,
+             subscription_id__user_id__id:userId,
+             space__zone__owner_id__id:userId,
+             start_date: this.revenue_start_date,
+             end_date: this.revenue_end_date,
+         };
+      } else if (groups.includes("staff")) {
+        params={rent_id__property_id__property_zone_id__staff_id__id: userId,
+        subscription_id__user_id__id:userId,
+        space__zone__staff_id__id:userId,
+        start_date: this.revenue_start_date,
+        end_date: this.revenue_end_date,
+        };
+      } else if (groups.includes("super_staff")) {
+        params = {
+            start_date: this.revenue_start_date,
+            end_date: this.revenue_end_date,
+        };
+      }
+    }else{
+        params = {
+            start_date: this.revenue_start_date,
+            end_date: this.revenue_end_date,
+        };
+      }
+      console.log("Fetching with params for income:", params);
 
       try {
         const res = await this.$apiGet("/get_revenue_report", params);

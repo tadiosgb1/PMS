@@ -30,7 +30,7 @@
               @input="searchManagers"
               @focus="managerDropdown = true"
               @blur="hideDropdown('manager')"
-              required
+             
             />
             <ul
               v-if="managers.length > 0 && managerDropdown"
