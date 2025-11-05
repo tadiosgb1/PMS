@@ -553,7 +553,6 @@ export async function getZones(url = null, pageSize = 10) {
 
     const groups = JSON.parse(localStorage.getItem("groups") || "[]");
     const email = localStorage.getItem("email");
-
     let params = {};
 
     if (!isSuperUser) {
@@ -562,7 +561,7 @@ export async function getZones(url = null, pageSize = 10) {
       } else if (groups.includes("owner")) {
         params = { owner_id__email: email };
       } else if (groups.includes("staff")) {
-        params = { owner_id__email: email };
+        params = { staff_id__email: email };
       } else if (groups.includes("super_staff")) {
         params = {};
       }
