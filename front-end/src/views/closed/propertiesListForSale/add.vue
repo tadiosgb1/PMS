@@ -13,7 +13,7 @@
         <div
           class="bg-primary text-white px-6 py-4 text-2xl font-semibold flex justify-between items-center"
         >
-          Add Property for Sale
+          {{ modalTitle }}
           <button
             @click="$emit('close')"
             class="text-white hover:text-gray-200 text-lg font-bold"
@@ -70,7 +70,18 @@ export default {
   components: { Toast },
   props: {
     visible: Boolean,
-    propertyId: Number,
+    sourceType: {
+      type: String,
+      required: true, // 'property' or 'zone'
+    },
+    propertyId: {
+      type: Number,
+      default: null,
+    },
+    propertyZoneId: {
+      type: Number,
+      default: null,
+    },
   },
   data() {
     return {
@@ -78,15 +89,28 @@ export default {
       loading: false,
     };
   },
+  computed: {
+    modalTitle() {
+      return this.sourceType === "zone"
+        ? "Add Property Zone for Sale"
+        : "Add Property for Sale";
+    },
+  },
   methods: {
     async submitSale() {
-    
       try {
         this.loading = true;
+
         const payload = {
-          property_id: this.propertyId,
           listing_price: this.listingPrice,
         };
+
+        // Dynamically include ID based on source
+        if (this.sourceType === "zone") {
+          payload.property_zone_id = this.propertyZoneId;
+        } else {
+          payload.property_id = this.propertyId;
+        }
 
         const res = await this.$apiPost("/create_property_sale_listing", payload);
 
@@ -94,7 +118,7 @@ export default {
           this.$root.$refs.toast.showToast(res.error, "error");
         } else {
           this.$root.$refs.toast.showToast(
-            "Property listed for sale successfully!",
+            `${this.modalTitle} successfully!`,
             "success"
           );
           this.$emit("close");

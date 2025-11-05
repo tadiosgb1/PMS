@@ -347,7 +347,8 @@
        <SaleModal
   v-if="saleVisible"
   :visible="saleVisible"
-  :propertyId="salePropertyId"
+  :propertyZoneId="salePropertyId"
+  sourceType="zone"
   @close="saleVisible = false"
   @refresh="fetchZones"
 />
@@ -416,8 +417,8 @@ salePropertyId: null,
     await this.fetchZones();
   },
   methods: {
-     openSaleModal(propertyId) {
-  this.salePropertyId = propertyId;
+     openSaleModal(propertyZoneId) {
+  this.salePropertyId = propertyZoneId;
   this.saleVisible = true;
 },
     async fetchZones() {

@@ -316,6 +316,7 @@
   v-if="saleVisible"
   :visible="saleVisible"
   :propertyId="salePropertyId"
+  sourceType="property"
   @close="saleVisible = false"
   @refresh="fetchProperties"
 />
