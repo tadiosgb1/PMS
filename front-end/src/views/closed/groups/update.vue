@@ -37,14 +37,14 @@
 
           <!-- Permissions -->
           <div>
-            <label class="block text-gray-700 mb-1">Select Permissions</label>
+            <label class="block text-gray-700 mb-1 ">Select Permissions</label>
             <div
-              class="grid grid-cols-1 sm:grid-cols-2 gap-2 max-h-40 overflow-y-auto border rounded p-2"
+              class="grid grid-cols-1 sm:grid-cols-2 gap-2 overflow-y-auto border rounded p-2 " style="height: 500px;"
             >
-              <label
+              <label 
                 v-for="perm in availablePermissions"
                 :key="perm.codename"
-                class="flex items-center space-x-2"
+                class="flex items-center space-x-2 "
               >
                 <input
                   type="checkbox"
