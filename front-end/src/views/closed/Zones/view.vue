@@ -109,13 +109,13 @@
               <tr
                 v-for="zone in filteredAndSortedZones"
                 :key="zone.id"
-                class="hover:bg-gray-100"
+                class="hover:bg-gray-100 "
               >
-                <td class="border px-4 py-2">{{ zone.name }}</td>
-                <td class="border px-4 py-2">{{ zone.address }}</td>
-                <td class="border px-4 py-2">{{ zone.city }}</td>
-                <td class="border px-4 py-2">{{ zone.state }}</td>
-                <td class="border px-4 py-2">
+                <td class="text-xss border px-4 py-1">{{ zone.name }}</td>
+                <td class="text-xss border px-4 py-1">{{ zone.address }}</td>
+                <td class="text-xss border px-4 py-1">{{ zone.city }}</td>
+                <td class="text-xss border px-4 py-1">{{ zone.state }}</td>
+                <td class="text-xss border px-4 py-1">
                   {{ zone.ownerName }}
                   <button
                     class="ml-2 text-blue-600 hover:underline"
@@ -184,7 +184,7 @@
     class="text-yellow-600 hover:text-yellow-800"
     title="List for Sale"
   >
-    <i class="fas fa-tag"></i>
+    <i class="fas fa-tag"></i> Sale
   </button>
                 </td>
               </tr>
@@ -266,7 +266,7 @@
               class="text-yellow-600 hover:text-yellow-800"
               title="List for Sale"
             >
-              <i class="fas fa-tag"></i>
+              <i class="fas fa-tag"></i> Sale
             </button>
 
               <a

@@ -160,9 +160,8 @@ async submitForm() {
   console.log("this.form", this.form);
   
   try {
-    const res = await this.$apiPost("/sign_up", this.form);
+    const res = await this.$apiPost("/create_manager", this.form);
     console.log("res manager add", res);
-
     // ✅ Show success toast
     this.$root.$refs.toast.showToast("Manager successfully added", "success");
 

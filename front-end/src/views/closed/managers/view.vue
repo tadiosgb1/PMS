@@ -306,6 +306,8 @@ export default {
   },
 
   mounted() {
+
+
     if(this.$hasPermission('pms.view_ownermanager')==true){
      this.fetchManagers();
     }else{

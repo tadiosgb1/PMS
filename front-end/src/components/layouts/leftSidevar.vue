@@ -125,13 +125,7 @@ export default {
           color: "#3b82f6",
           permission: "pms.view_rent",
         },
-        {
-          name: "Maintenance Requests",
-          route: "maintenance-requests",
-          icon: "fas fa-screwdriver-wrench", // ✅ fa-tools → modern name
-          color: "#ef4444",
-          permission: "pms.view_maintenancerequest",
-        },
+     
         {
           name: "Payments",
           route: "payments",
@@ -149,6 +143,13 @@ export default {
           route: "coworking-space-rentals",
           icon: "fas fa-file-signature", // ✅ relevant for contracts
           color: "#22c55e",
+        },
+           {
+          name: "Maintenance Requests",
+          route: "maintenance-requests",
+          icon: "fas fa-screwdriver-wrench", // ✅ fa-tools → modern name
+          color: "#ef4444",
+          permission: "pms.view_maintenancerequest",
         },
         {
           name: "Transactions",

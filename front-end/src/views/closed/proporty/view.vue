@@ -363,6 +363,14 @@ salePropertyId: null,
     };
   },
   async mounted() {
+
+const params={
+  manager_id:localStorage.getItem('userId')
+}
+    const a=this.$apiGet(`/get_owner_managers`,params);
+    console.log("a",a);
+
+
       this.is_super_user=localStorage.getItem('is_superuser');
     if (this.$route.query.zone_id) {
       this.zone_id_query_set = true;

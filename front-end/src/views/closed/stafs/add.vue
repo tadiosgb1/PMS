@@ -157,7 +157,7 @@ async submitForm() {
   console.log("this.form", this.form);
 
   try {
-    const res = await this.$apiPost('/sign_up', this.form);
+    const res = await this.$apiPost('/create_staff', this.form);
     console.log("res staff add", res);
 
     if (res) {
