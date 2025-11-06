@@ -66,24 +66,24 @@
       <!-- Property Grid -->
       <div
         v-else
-        class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6"
+        class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4"
       >
         <div
-          v-for="item in paginatedItems"
+          v-for="item in filteredItems"
           :key="item.id"
           class="bg-white rounded-2xl shadow hover:shadow-lg transition overflow-hidden"
         >
           <!-- Image Section -->
-          <div class="relative w-full h-52 rounded-t-2xl overflow-hidden" v-if="currentTab !== 'cowork'">
-            <!-- Show actual image if exists -->
+          <div
+            class="relative w-full h-52 rounded-t-2xl overflow-hidden"
+            v-if="currentTab !== 'cowork'"
+          >
             <img
               v-if="item.property_pictures && item.property_pictures.length > 0"
               :src="getCurrentImage(item)"
               class="w-full h-52 object-cover cursor-pointer"
               @click="openZoom(item)"
             />
-
-            <!-- Show placeholder background if no image -->
             <div
               v-else
               class="w-full h-52 bg-gray-200 flex items-center justify-center text-gray-400 font-semibold text-lg"
@@ -143,7 +143,6 @@
               <p>Monthly: ${{ item.price_monthly }}</p>
             </div>
 
-            <!-- Action Button -->
             <button
               @click="item.showDownload = true"
               class="bg-primary text-white px-4 py-2 rounded-full w-full hover:opacity-90 transition"
@@ -157,7 +156,6 @@
               }}
             </button>
 
-            <!-- Download Button for this card -->
             <button
               v-if="item.showDownload"
               class="mt-3 bg-primary text-white px-4 py-2 rounded-full w-full hover:opacity-90 transition"
@@ -176,39 +174,29 @@
         No {{ currentTabLabel }} found in {{ searchQuery || "Ethiopia" }}.
       </div>
 
-      <!-- Pagination -->
+      <!-- Server Pagination -->
       <div
-        v-if="filteredItems.length > itemsPerPage"
+        v-if="!loading && (nextPageUrl || prevPageUrl)"
         class="flex justify-center items-center mt-10 space-x-2"
       >
         <button
-          @click="prevPage"
-          :disabled="currentPage === 0"
+          @click="loadPrevious"
+          :disabled="!prevPageUrl"
           class="p-2 bg-white border border-gray-300 rounded-full hover:bg-primary hover:text-white disabled:opacity-50"
         >
-          ‹
+          ‹ Prev
         </button>
 
-        <button
-          v-for="page in totalPages"
-          :key="page"
-          @click="goToPage(page - 1)"
-          :class="[
-            'px-4 py-1 rounded-full text-sm font-medium transition',
-            currentPage === page - 1
-              ? 'bg-primary text-white'
-              : 'bg-white border border-gray-300 text-gray-700 hover:bg-gray-100'
-          ]"
-        >
-          {{ page }}
-        </button>
+        <span class="px-4 py-1 text-sm text-gray-600">
+          Page {{ currentPage }} of {{ totalPages }}
+        </span>
 
         <button
-          @click="nextPage"
-          :disabled="currentPage >= totalPages - 1"
+          @click="loadNext"
+          :disabled="!nextPageUrl"
           class="p-2 bg-white border border-gray-300 rounded-full hover:bg-primary hover:text-white disabled:opacity-50"
         >
-          ›
+          Next ›
         </button>
       </div>
     </div>
@@ -231,9 +219,11 @@ export default {
       items: [],
       filteredItems: [],
       loading: false,
-      currentPage: 0,
-      itemsPerPage: 3,
       searchQuery: "",
+      currentPage: 1,
+      totalPages: 1,
+      nextPageUrl: null,
+      prevPageUrl: null,
       cities: [
         "Addis Ababa",
         "Adama",
@@ -253,13 +243,6 @@ export default {
       const tab = this.tabs.find((t) => t.key === this.currentTab);
       return tab ? tab.label.toLowerCase() : "";
     },
-    totalPages() {
-      return Math.ceil(this.filteredItems.length / this.itemsPerPage);
-    },
-    paginatedItems() {
-      const start = this.currentPage * this.itemsPerPage;
-      return this.filteredItems.slice(start, start + this.itemsPerPage);
-    },
   },
   mounted() {
     this.fetchData();
@@ -268,43 +251,39 @@ export default {
     async changeTab(tabKey) {
       if (this.currentTab !== tabKey) {
         this.currentTab = tabKey;
-        this.currentPage = 0;
         this.searchQuery = "";
+        this.currentPage = 1;
         this.fetchData();
       }
     },
-    async fetchData() {
+
+    async fetchData(url = null) {
       try {
         this.loading = true;
-        let params={}
-        if(this.currentTab=='rent'){
-          params={
-             PROPERTY_RENT : "rent",
-          }
-        }else if(this.currentTab=='sale'){
-          params={
-             PROPERTY_RENT : "sale",
-          }
-        }else{
-         params={}
-        }
-        const url =
+
+        const baseUrl =
           this.currentTab === "cowork"
-            ? "get_coworking_spaces"
-            : "get_properties";
-        //const res = await this.$apiGet(url);
+            ? "https://alphapms.sunriseworld.org/api/get_coworking_spaces"
+            : "https://alphapms.sunriseworld.org/api/get_properties";
 
-         const res = await axios.get(
-          `https://alphapms.sunriseworld.org/api/${url}`,
-          params
-        );
+        const params = {};
+        if (this.currentTab === "rent") params.PROPERTY_RENT = "rent";
+        if (this.currentTab === "sale") params.PROPERTY_RENT = "sale";
 
-        this.items = (res.data.data || []).map((item) => ({
+        const res = await axios.get(url || baseUrl, { params });
+
+        const data = res.data;
+        this.items = (data.data || []).map((item) => ({
           ...item,
           imageIndex: 0,
           showDownload: false,
         }));
+
         this.filteredItems = [...this.items];
+        this.currentPage = data.current_page || 1;
+        this.totalPages = data.total_pages || 1;
+        this.nextPageUrl = data.next;
+        this.prevPageUrl = data.previous;
       } catch (error) {
         console.error("Error fetching data:", error);
         this.items = [];
@@ -313,6 +292,19 @@ export default {
         this.loading = false;
       }
     },
+
+    async loadNext() {
+      if (this.nextPageUrl) {
+        await this.fetchData(this.nextPageUrl);
+      }
+    },
+
+    async loadPrevious() {
+      if (this.prevPageUrl) {
+        await this.fetchData(this.prevPageUrl);
+      }
+    },
+
     filterByLocation() {
       const query = this.searchQuery.toLowerCase();
       this.filteredItems = this.items.filter(
@@ -321,17 +313,8 @@ export default {
           item.address?.toLowerCase().includes(query) ||
           item.location?.toLowerCase().includes(query)
       );
-      this.currentPage = 0;
     },
-    nextPage() {
-      if (this.currentPage < this.totalPages - 1) this.currentPage++;
-    },
-    prevPage() {
-      if (this.currentPage > 0) this.currentPage--;
-    },
-    goToPage(page) {
-      this.currentPage = page;
-    },
+
     getImageCount(item) {
       return item.property_pictures ? item.property_pictures.length : 0;
     },
@@ -351,7 +334,6 @@ export default {
         item.imageIndex = (item.imageIndex - 1 + pictures.length) % pictures.length;
     },
     openZoom(item) {
-      // Implement your modal or lightbox zoom here
       console.log("Zoom image for", item.name);
     },
   },
