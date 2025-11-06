@@ -10,17 +10,18 @@
         class="bg-white w-full sm:w-auto sm:max-w-[700px] md:max-w-[850px] lg:max-w-[950px] xl:max-w-[1050px] rounded-lg shadow-lg overflow-hidden relative mx-auto"
       >
         <!-- 🔹 Header -->
-        <div
-          class="bg-primary text-white px-6 py-4 text-2xl font-semibold flex justify-between items-center"
-        >
-          {{ modalTitle }}
-          <button
-            @click="$emit('close')"
-            class="text-white hover:text-gray-200 text-lg font-bold"
-          >
-            ✕
-          </button>
-        </div>
+       <div
+  class="bg-primary text-white px-6 py-4 text-2xl font-semibold flex justify-between items-center gap-8"
+>
+  {{ modalTitle }}
+  <button
+    @click="$emit('close')"
+    class="text-white hover:text-gray-200 text-lg font-bold"
+  >
+    ✕
+  </button>
+</div>
+
 
         <!-- 🔹 Form -->
         <form
