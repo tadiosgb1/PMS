@@ -134,13 +134,13 @@
 
             <div class="text-gray-600 text-sm mb-3" v-if="currentTab !== 'cowork'">
               <p>Bedrooms {{ item.bed_rooms }} | Bathrooms {{ item.bath_rooms }}</p>
-              <p>Price: ${{ item.price }}</p>
+              <p>Price: {{ item.price }}</p>
             </div>
 
             <div class="text-gray-600 text-sm mb-3" v-else>
               <p>Capacity: {{ item.capacity }}</p>
-              <p>Daily: ${{ item.price_daily }}</p>
-              <p>Monthly: ${{ item.price_monthly }}</p>
+              <p>Daily: {{ item.price_daily }}</p>
+              <p>Monthly: {{ item.price_monthly }}</p>
             </div>
 
             <button

@@ -69,14 +69,11 @@
           </div>
 
           <div>
-            <label class="block text-gray-700">Latitude</label>
-            <input v-model="form.latitude" class="custom-input" />
+            <label class="block text-gray-700">Latitude ,Longitude</label>
+            <input v-model="form.latitude" class="custom-input" placeholder="12.3,   67.12"/>
           </div>
 
-          <div>
-            <label class="block text-gray-700">longitude</label>
-            <input v-model="form.longitude" class="custom-input" />
-          </div>
+          
 
           <div class="md:col-span-2 text-right">
             <button

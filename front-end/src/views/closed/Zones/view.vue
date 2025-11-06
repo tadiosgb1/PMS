@@ -136,21 +136,17 @@
                 </td>
 
                 <td class="border px-4 py-2">
-                  <a
-                    href="https://www.google.com/maps?q=13.4967,39.4753&z=15"
-                    target="_blank"
-                    style="
-                      text-decoration: none;
-                      color: #0078ff;
-                      font-size: 16px;
-                    "
-                  >
-                    <i
-                      class="fa-solid fa-location-dot"
-                      style="color: red; margin-right: 6px"
-                    ></i>
-                    View on Maps
-                  </a>
+                 <a
+                :href="`https://www.google.com/maps?q=${zone.latlong}&z=15`"
+                target="_blank"
+                style="text-decoration: none; color: #0078ff; font-size: 16px"
+              >
+                <i
+                  class="fa-solid fa-location-dot"
+                  style="color: red; margin-right: 6px"
+                ></i>
+                View on Maps
+              </a>
                 </td>
 
                 <td class="border px-4 py-2 text-center space-x-2">
@@ -265,7 +261,7 @@
                 Properties
               </button>
 
-          <button
+            <button
               @click="openSaleModal(zone.id)"
               class="text-yellow-600 hover:text-yellow-800"
               title="List for Sale"
@@ -274,7 +270,7 @@
             </button>
 
               <a
-                href="https://www.google.com/maps?q=13.4967,39.4753&z=15"
+                :href="`https://www.google.com/maps?q=${zone.latlong}&z=15`"
                 target="_blank"
                 style="text-decoration: none; color: #0078ff; font-size: 16px"
               >
