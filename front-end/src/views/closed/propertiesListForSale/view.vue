@@ -16,12 +16,12 @@
           class="bg-orange-500 text-white px-6 py-4 text-xl font-bold flex justify-between items-center"
         >
           Property Sale Listings
-          <button
+          <!-- <button
             @click="visible = true"
             class="bg-white text-blue-700 font-semibold px-1 lg:px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300"
           >
             <span class="text-primary">+</span> Add
-          </button>
+          </button> -->
         </div>
 
         <div class="p-6">
@@ -70,14 +70,20 @@
                 >
                   <td
                     class="border border-gray-300 px-4 py-2 text-blue-600 hover:underline cursor-pointer"
-                    @click="goToZoneDetail(listing.property_zone_id?.id)"
+                    @click="goToZoneDetail(listing.property_zone_id?.id || listing.property_id?.id)"
                   >
-                    {{ listing.property_zone_id?.name || 'N/A' }}
+                    {{ listing.property_zone_id?.name || listing.property_id?.name || 'N/A' }}
                   </td>
                   <td class="border border-gray-300 px-4 py-2">
                     {{ formatCurrency(listing.listing_price) }}
                   </td>
                   <td class="border border-gray-300 px-4 py-2 text-center">
+                    <button
+                  @click="sale(listing.id)"
+                  class="px-3 py-1 text-xs text-blue-600 border border-blue-600 rounded hover:bg-blue-600 hover:text-white transition"
+                >
+                  Sale
+                </button>
                     <button
                       @click="viewDetail(listing.id)"
                       class="px-3 py-1 text-xs text-blue-600 border border-blue-600 rounded hover:bg-blue-600 hover:text-white transition"
@@ -104,9 +110,9 @@
               <div class="flex justify-between items-center">
                 <h3
                   class="font-semibold text-blue-600 hover:underline cursor-pointer"
-                  @click="goToZoneDetail(listing.property_zone_id?.id)"
+                  @click="goToZoneDetail(listing.property_zone_id?.id || listing.property_id?.id)"
                 >
-                  {{ listing.property_zone_id?.name || 'N/A' }}
+                  {{ listing.property_zone_id?.name || listing.property_id?.name || 'N/A' }}
                 </h3>
               </div>
               <p class="text-gray-600">
@@ -114,6 +120,12 @@
               </p>
 
               <div class="flex justify-end mt-3">
+                <button
+                  @click="sale(listing.id)"
+                  class="px-3 py-1 text-xs text-blue-600 border border-blue-600 rounded hover:bg-blue-600 hover:text-white transition"
+                >
+                  Sale
+                </button>
                 <button
                   @click="viewDetail(listing.id)"
                   class="px-3 py-1 text-xs text-blue-600 border border-blue-600 rounded hover:bg-blue-600 hover:text-white transition"
@@ -156,6 +168,14 @@
         @close="visible = false"
         @refresh="fetchListings"
       />
+
+      <MakePropertySale
+  v-if="saleVisible"
+  :visible="saleVisible"
+  :listing="selectedListing"
+  @close="saleVisible = false"
+  @success="fetchListings"
+/>
     </div>
   </div>
 </template>
@@ -163,15 +183,18 @@
 <script>
 import Toast from "@/components/Toast.vue";
 import AddPropertySaleListing from "@/views/closed/propertiesListForSale/add.vue";
+import MakePropertySale from "@/views/closed/propertiesListForSale/MakePropertySale.vue";
 
 export default {
   name: "PropertySaleListingView",
-  components: { Toast, AddPropertySaleListing },
+  components: { Toast, AddPropertySaleListing,MakePropertySale },
   data() {
     return {
       listings: [],
       visible: false,
       searchTerm: "",
+      saleVisible: false, // ✅ add this
+    selectedListing: null, // ✅ add this
       next: null,
       previous: null,
       pageSize: 10,
@@ -181,7 +204,7 @@ export default {
     };
   },
   mounted() {
-    alert("hii")
+   
     this.fetchListings();
   },
   methods: {
@@ -216,6 +239,13 @@ export default {
     },
     viewDetail(id) {
       this.$router.push({ name: "property-sale-detail", params: { id } });
+    },
+     sale(listingId) {
+      const listing = this.listings.find((item) => item.id === listingId);
+      if (listing) {
+        this.selectedListing = listing;
+        this.saleVisible = true;
+      }
     },
     formatCurrency(value) {
       if (!value) return "N/A";
