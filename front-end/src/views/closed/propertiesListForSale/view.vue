@@ -204,11 +204,8 @@ export default {
     };
   },
   mounted() {
-<<<<<<< HEAD
    // alert("hii")
-=======
    
->>>>>>> a2eded3a09ec9252f79908c0a9c4f8d70f64ef88
     this.fetchListings();
   },
   methods: {
