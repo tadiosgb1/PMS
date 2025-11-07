@@ -181,12 +181,14 @@ export default {
     };
   },
   mounted() {
+    alert("hii")
     this.fetchListings();
   },
   methods: {
-    async fetchListings(url = `/get_property_sale_listing?search=${this.searchTerm}&page_size=${this.pageSize}`) {
+    async fetchListings(url = `/get_property_zone_sales?search=${this.searchTerm}&page_size=${this.pageSize}`) {
       try {
         const response = await this.$apiGet(url);
+
         console.log("response listings", response);
 
         if (response && response.data) {
