@@ -358,27 +358,22 @@ export default {
       status:"",
       is_super_user:false,
       saleVisible: false,
-salePropertyId: null,
-      
+      salePropertyId: null,
     };
   },
-  async mounted() {
-
-const params={
-  manager_id:localStorage.getItem('userId')
-}
-    const a=this.$apiGet(`/get_owner_managers`,params);
-    console.log("a",a);
-
-
-      this.is_super_user=localStorage.getItem('is_superuser');
+ async  created(){
+    this.is_super_user=localStorage.getItem('is_superuser');
     if (this.$route.query.zone_id) {
       this.zone_id_query_set = true;
     }
     const resultZones = await this.$getZones();
     this.zones = resultZones.zones;
-
+    console.log("this.zones", resultZones);
     await this.fetchProperties();
+
+  },
+  async mounted() {
+  
   },
   methods: {
 

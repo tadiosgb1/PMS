@@ -155,7 +155,7 @@ export default {
       totalPages: 1,
       next: null,
       previous: null,
-      pageSize: 5,
+      pageSize: 100,
       pageSizes: [5, 10, 20, 50, 100],
       showAddStaff: false,
     };

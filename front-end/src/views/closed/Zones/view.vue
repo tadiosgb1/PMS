@@ -406,13 +406,15 @@ export default {
     },
   },
   async mounted() {
+
+    
     await this.fetchZones();
   },
   methods: {
      openSaleModal(propertyZoneId) {
-  this.salePropertyId = propertyZoneId;
-  this.saleVisible = true;
-},
+      this.salePropertyId = propertyZoneId;
+      this.saleVisible = true;
+      },
     async fetchZones() {
       try {
         const params = {

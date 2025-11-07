@@ -553,15 +553,42 @@ export async function getZones(url = null, pageSize = 10) {
 
     const groups = JSON.parse(localStorage.getItem("groups") || "[]");
     const email = localStorage.getItem("email");
+    const userId=localStorage.getItem('userId');
     let params = {};
 
     if (!isSuperUser) {
       if (groups.includes("manager")) {
-        params = { manager_id__email: email };
+            const params = { manager__id: userId };
+            const url = `/get_owner_managers`;
+            const a = await this.$apiGet(url, params);
+            console.log("get_owner_managers", a);
+            // Extract property_zone from each data item
+            const zones = a.data.map(item => item.property_zone);
+          return {
+            zones,
+            currentPage: 1,
+            totalPages: 1,
+            next: null,
+            previous: null,
+          };
+          
+
       } else if (groups.includes("owner")) {
         params = { owner_id__email: email };
       } else if (groups.includes("staff")) {
-        params = { staff_id__email: email };
+         const params = { staff__id: userId };
+            const url = `/get_owner_staffs`;
+            const a = await this.$apiGet(url, params);
+            console.log("get_owner_staffs", a);
+            // Extract property_zone from each data item
+            const zones = a.data.map(item => item.property_zone);
+          return {
+            zones,
+            currentPage: 1,
+            totalPages: 1,
+            next: null,
+            previous: null,
+          };
       } else if (groups.includes("super_staff")) {
         params = {};
       }

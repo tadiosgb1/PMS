@@ -181,7 +181,7 @@ export default {
     };
   },
   mounted() {
-    alert("hii")
+   // alert("hii")
     this.fetchListings();
   },
   methods: {
