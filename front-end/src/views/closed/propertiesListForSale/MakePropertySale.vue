@@ -23,7 +23,7 @@
         class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 max-h-[80vh] overflow-y-auto"
       >
         <!-- 🧍 Buyer Information -->
-        <div class="md:col-span-2 border-t pt-4">
+        <!-- <div class="md:col-span-2 border-t pt-4">
           <h3 class="text-lg font-semibold text-gray-800 mb-2">
             Buyer Information
           </h3>
@@ -77,7 +77,7 @@
               class="custom-input"
             />
           </div>
-        </div>
+        </div> -->
 
         <!-- Broker -->
           <div class="relative">
@@ -116,6 +116,28 @@
             v-model="listing.listing_price"
             disabled
             class="custom-input bg-gray-100 cursor-not-allowed"
+          />
+        </div>
+
+        <!-- 💳 Payment Details -->
+        <div>
+          <label class="block text-gray-700 mb-1">Payment Method</label>
+          <select v-model="payment_method" class="custom-input" required>
+            <option value="" disabled>Select Payment Method</option>
+            <option value="bank_transfer">Bank Transfer</option>
+            <option value="cash">Cash</option>
+            <option value="check">Check</option>
+            <option value="mobile_money">Mobile Money</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="block text-gray-700 mb-1">Transaction ID</label>
+          <input
+            v-model="transaction_id"
+            placeholder="Enter Transaction ID"
+            class="custom-input"
+            required
           />
         </div>
 
@@ -195,20 +217,22 @@ export default {
       brokerSearch: "",
       brokerDropdown: false,
       selectedBroker: null,
-      buyer: {
-        first_name: "",
-        middle_name: "",
-        last_name: "",
-        email: "",
-        phone_number: "",
-        password: "",
-        address: "",
-        date_joined: new Date().toISOString(),
-        last_login: new Date().toISOString(),
-        is_active: true,
-        is_staff: false,
-        is_superuser: false,
-      },
+      payment_method: "", // ✅ added
+      transaction_id: "", // ✅ added
+    //   buyer: {
+    //     first_name: "",
+    //     middle_name: "",
+    //     last_name: "",
+    //     email: "",
+    //     phone_number: "",
+    //     password: "",
+    //     address: "",
+    //     date_joined: new Date().toISOString(),
+    //     last_login: new Date().toISOString(),
+    //     is_active: true,
+    //     is_staff: false,
+    //     is_superuser: false,
+    //   },
     };
   },
 
@@ -249,22 +273,24 @@ export default {
       this.loading = true;
       try {
         // 1️⃣ Create buyer
-        const buyerRes = await this.$apiPost("/post_user", this.buyer);
-        if (!buyerRes?.id) throw new Error("Failed to create buyer");
+        // const buyerRes = await this.$apiPost("/post_user", this.buyer);
+        // if (!buyerRes?.id) throw new Error("Failed to create buyer");
 
         // 2️⃣ Assign buyer to group
-        await this.$apiPost("/set_user_groups", {
-          user_id: buyerRes.id,
-          groups: ["buyer"],
-        });
+        // await this.$apiPost("/set_user_groups", {
+        //   user_id: buyerRes.id,
+        //   groups: ["buyer"],
+        // });
 
         // 3️⃣ Post sale with broker info
        const payload = {
-  buyer_id: buyerRes.id,
-  listing_price: this.listing.listing_price,
-  property_zone_id: this.listing.property_zone_id?.id || null,
-  property_id: this.listing.property_id?.id || null,
+  //buyer_id: buyerRes.id,
+  buyer_id: 4,
+  selling_price: this.listing.listing_price,
+  property_zone_sale_id: this.listing.property_id?.id || null,
   broker_id: this.selectedBroker?.id || null, // ✅ Correct reference
+  payment_method: this.payment_method, // ✅ included
+          transaction_id: this.transaction_id, // ✅ included
   status:"pending"
 };
 
