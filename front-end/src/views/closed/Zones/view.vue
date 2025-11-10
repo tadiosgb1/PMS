@@ -1,21 +1,9 @@
 <template>
   <div>
     <Toast ref="toast" />
-
     <div class="min-h-screen bg-gray-100 p-4 lg:p-6 relative">
-      <!-- Loading Overlay -->
-      <div
-        v-if="loading"
-        class="absolute inset-0 flex items-center justify-center bg-white bg-opacity-70 z-50"
-      >
-        <div class="flex flex-col items-center space-y-2">
-          <div
-            class="w-10 h-10 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin"
-          ></div>
-          <p class="text-gray-600 text-sm font-medium">Loading zones...</p>
-        </div>
-      </div>
-
+      <!-- Reusable Loading Component -->
+      <Loading :visible="loading" message="Loading zones..." />
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
         <!-- Header -->
         <div
@@ -30,7 +18,6 @@
             <span class="text-primary">+</span> Add Zone
           </button>
         </div>
-
         <!-- Search & Page Size -->
         <div
           class="p-4 flex flex-col lg:flex-row justify-between items-center gap-4"
@@ -370,6 +357,7 @@ import AddZone from "./add.vue";
 import UpdateZone from "./update.vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
 import SaleModal from "../propertiesListForSale/add.vue";
+import Loading from "@/components/Loading.vue"; // <-- Added Loading
 
 const SortIcon = {
   props: ["field", "sortKey", "sortAsc"],
@@ -389,7 +377,7 @@ const SortIcon = {
 };
 
 export default {
-  components: { AddZone, UpdateZone, ConfirmModal, SortIcon, Toast, SaleModal },
+  components: { AddZone, UpdateZone, ConfirmModal, SortIcon, Toast, SaleModal, Loading },
   data() {
     return {
       globalZones: [],

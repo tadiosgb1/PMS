@@ -1,5 +1,7 @@
 <template>
   <div class="min-h-screen bg-gray-100 p-4 sm:p-6">
+    <Loading :visible="loading" message="Fetching users..." />
+
     <div class="bg-white shadow-md rounded-lg overflow-hidden">
       <!-- Header -->
       <div
@@ -91,7 +93,7 @@
         </table>
       </div>
 
-      <!-- ✅ Mobile / Tablet List View -->
+      <!-- Mobile / Tablet List View -->
       <div class="block md:hidden p-4 space-y-4">
         <div
           v-for="user in sortedSuperStaffs"
@@ -132,7 +134,7 @@
 
             <button
               v-else
-             @click="askConfirmation('deactivate', user.id)"
+              @click="askConfirmation('deactivate', user.id)"
               class="px-3 py-1.5 bg-orange-50 text-orange-700 text-sm font-medium rounded-lg border border-orange-200 hover:bg-orange-100 transition"
             >
               Deactivate
@@ -154,52 +156,47 @@
       @success="fetchUsers"
     />
     <ConfirmModal
-  :visible="showConfirm"
-  :title="confirmTitle"
-  :message="confirmMessage"
-  @cancel="showConfirm = false"
-  @confirm="confirmAction"
-/>
+      :visible="showConfirm"
+      :title="confirmTitle"
+      :message="confirmMessage"
+      @cancel="showConfirm = false"
+      @confirm="confirmAction"
+    />
   </div>
 </template>
-
 
 <script>
 import Addsuperstaff from "./addSuperStaff.vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
+import Loading from "@/components/Loading.vue";
 
 const SortIcon = {
   props: ["field", "sortKey", "sortAsc"],
-  template: `
-    <span class="inline-block ml-1 text-gray-500">
-      <svg v-if="sortKey !== field" xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"/>
-      </svg>
-      <svg v-else-if="sortAsc" xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 13l4 4 4-4m0-6l-4-4-4 4"/>
-      </svg>
-      <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"/>
-      </svg>
-    </span>
-  `,
+  template: `<span class="inline-block ml-1 text-gray-500">
+    <svg v-if="sortKey !== field" xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"/>
+    </svg>
+    <svg v-else-if="sortAsc" xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 13l4 4 4-4m0-6l-4-4-4 4"/>
+    </svg>
+    <svg v-else xmlns="http://www.w3.org/2000/svg" class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 9l4-4 4 4m0 6l-4 4-4-4"/>
+    </svg>
+  </span>`,
 };
 
 export default {
-  components: {
-    Addsuperstaff,
-    SortIcon,
-    ConfirmModal
-  },
+  components: { Addsuperstaff, SortIcon, ConfirmModal, Loading },
   data() {
     return {
       users: [],
       sortKey: "fullName",
       sortAsc: true,
-      showAddModal: false, // ✅ only one variable now
-       showConfirm: false,
-    selectedUser: null,
-    selectedAction: null, // 'activate' or 'deactivate'
+      showAddModal: false,
+      showConfirm: false,
+      selectedUser: null,
+      selectedAction: null,
+      loading: false, // ✅ new loading state
     };
   },
   computed: {
@@ -216,15 +213,13 @@ export default {
       });
     },
     confirmTitle() {
-    return this.selectedAction === "activate"
-      ? "Activate User"
-      : "Deactivate User";
-  },
-  confirmMessage() {
-    return this.selectedAction === "activate"
-      ? "Are you sure you want to activate this user?"
-      : "Are you sure you want to deactivate this user?";
-  },
+      return this.selectedAction === "activate" ? "Activate User" : "Deactivate User";
+    },
+    confirmMessage() {
+      return this.selectedAction === "activate"
+        ? "Are you sure you want to activate this user?"
+        : "Are you sure you want to deactivate this user?";
+    },
   },
   mounted() {
     this.fetchUsers();
@@ -232,56 +227,35 @@ export default {
   methods: {
     async fetchUsers() {
       try {
+        this.loading = true;
         const params = { page_size: 1000000 };
         const res = await this.$apiGet("/get_users", params);
         this.users = res.data;
       } catch (err) {
         console.error("Error fetching users:", err);
+      } finally {
+        this.loading = false;
       }
     },
     sortBy(key) {
-      if (this.sortKey === key) this.sortAsc = !this.sortAsc;
-      else this.sortKey = key;
+      this.sortKey === key ? (this.sortAsc = !this.sortAsc) : (this.sortKey = key);
     },
-     activateUser(id) {
-      this.$apiPost(`/activate_user/${id}`, { id }).then(() => {
-        this.$root.$refs.toast.showToast("User activated successfully", "success");
-        this.fetchUsers(this.pagination.current_page);
-      });
+    askConfirmation(action, id) {
+      this.selectedUser = id;
+      this.selectedAction = action;
+      this.showConfirm = true;
     },
-
-    deactivateUser(id) {
-      this.$apiDelete(`/deactivate_user`, id).then(() => {
-        this.$root.$refs.toast.showToast("User deactivated successfully", "success");
-        this.fetchUsers(this.pagination.current_page);
-      });
+    confirmAction() {
+      if (!this.selectedUser || !this.selectedAction) return;
+      if (this.selectedAction === "activate") {
+        this.$apiPost(`/activate_user/${this.selectedUser}`, { id: this.selectedUser })
+          .then(() => this.fetchUsers());
+      } else {
+        this.$apiDelete(`/deactivate_user`, this.selectedUser)
+          .then(() => this.fetchUsers());
+      }
+      this.showConfirm = false;
     },
- askConfirmation(action, id) {
-    this.selectedUser = id;
-    this.selectedAction = action;
-    this.showConfirm = true;
-  },
-
-  confirmAction() {
-    if (!this.selectedUser || !this.selectedAction) return;
-
-    if (this.selectedAction === "activate") {
-      this.$apiPost(`/activate_user/${this.selectedUser}`, { id: this.selectedUser })
-        .then(() => {
-          this.$root.$refs.toast.showToast("User activated successfully", "success");
-          this.fetchUsers(this.pagination.current_page);
-        });
-    } else {
-      this.$apiDelete(`/deactivate_user`, this.selectedUser)
-        .then(() => {
-          this.$root.$refs.toast.showToast("User deactivated successfully", "success");
-          this.fetchUsers(this.pagination.current_page);
-        });
-    }
-
-    this.showConfirm = false;
-  },
-    
     goToDetail(id) {
       this.$router.push(`/user_detail/${id}`);
     },
