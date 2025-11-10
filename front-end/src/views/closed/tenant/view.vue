@@ -1,6 +1,7 @@
 <template>
   <div>
     <Toast ref="toast" />
+    <Loading :visible="loading" message="Loading users..." />
 
     <div class="min-h-screen bg-gray-100">
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
@@ -235,6 +236,9 @@
 import ConfirmModal from "@/components/ConfirmModal.vue";
 import Toast from "@/components/Toast.vue";
 import addTenant from './add.vue'
+import Loading from "@/components/Loading.vue";
+
+
 const SortIcon = {
   props: ["field", "sortKey", "sortAsc"],
   template: `<span class="inline-block ml-1 text-gray-500">
@@ -252,7 +256,7 @@ const SortIcon = {
 
 export default {
   name: "TenantView",
-  components: { SortIcon, ConfirmModal, Toast,addTenant },
+  components: { SortIcon, ConfirmModal, Toast,addTenant ,Loading},
   data() {
     return {
       addTenantVisible:false,
@@ -274,6 +278,7 @@ export default {
        showConfirm: false,
     selectedUser: null,
     selectedAction: null, // 'activate' or 'deactivate'
+    loading:false,
     };
   },
  computed: {
@@ -367,6 +372,7 @@ watch: {
     },
 
     async fetchTenants(url) {
+      this.loading=true;
       try {
        // const pageUrl = url || `/get_tenants?page=1&page_size=${this.pageSize}`;
 
@@ -387,6 +393,8 @@ watch: {
         this.next = null;
         this.previous = null;
         alert("Failed to load tenants. Please try again later.");
+      }finally{
+        this.loading=false;
       }
     },
     sortBy(key) {

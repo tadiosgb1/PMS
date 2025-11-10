@@ -2,7 +2,10 @@
   <div>
     <Toast ref="toast" />
 
-    <div class="min-h-screen bg-gray-100 p-4">
+     <Loading :visible="loading" message="Loading Owners..." />
+
+
+     <div class="min-h-screen bg-gray-100 p-4">
       <!-- Card Container -->
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
         <!-- Header -->
@@ -181,6 +184,7 @@ import Toast from '../../../components/Toast.vue';
 import AddOwner from './add.vue';
 import UpdateOwner from './edit.vue';
 import ConfirmModal from "@/components/ConfirmModal.vue";
+import Loading from "@/components/Loading.vue"; // <-- Added Loading
 
 const SortIcon = {
   props: ['field', 'sortKey', 'sortAsc'],
@@ -201,7 +205,7 @@ const SortIcon = {
 
 export default {
   name: 'OwnersView',
-  components: { SortIcon, AddOwner, UpdateOwner, Toast,ConfirmModal },
+  components: { SortIcon, AddOwner, UpdateOwner, Toast,ConfirmModal,Loading },
   data() {
     return {
       searchTerm: '',
@@ -217,6 +221,7 @@ export default {
       showConfirm: false,
     selectedUser: null,
     selectedAction: null, // 'activate' or 'deactivate'
+     loading: false,
     };
   },
   // computed: {
@@ -301,6 +306,7 @@ async   mounted() {
       this.$router.push(`/user_detail/${id}`);
     },
     async fetchOwners() {
+       this.loading = true;
       try {
         const response = await this.$apiGet(`/get_owners?search=${this.searchTerm}&ordering=${this.ordering}`);
 
@@ -312,6 +318,8 @@ async   mounted() {
         console.error('Failed to fetch owners:', error);
         this.owners = [];
         alert('Failed to load owners. Please try again later.');
+      }finally{
+        this.loading=false;
       }
     },
     sortBy(key) {

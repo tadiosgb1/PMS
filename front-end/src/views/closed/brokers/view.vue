@@ -1,6 +1,7 @@
 <template>
   <div>
     <Toast ref="toast" />
+     <Loading :visible="loading" message="Loading users..." />
 
     <div class="min-h-screen bg-gray-100 m-3">
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
@@ -140,6 +141,7 @@ import Toast from "@/components/Toast.vue";
 import AddBroker from "./Add.vue";
 import UpdateBroker from "./Update.vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
+import Loading from "@/components/Loading.vue";
 
 const SortIcon = {
   props: ["field", "sortKey", "sortAsc"],
@@ -160,7 +162,7 @@ const SortIcon = {
 
 export default {
   name: "BrokersView",
-  components: { Toast, AddBroker, UpdateBroker, ConfirmModal, SortIcon },
+  components: { Toast, AddBroker, UpdateBroker, ConfirmModal, SortIcon ,Loading},
   data() {
     return {
       selectedBrokerId: null,
@@ -180,6 +182,7 @@ export default {
       sortAsc: true,
       searchTimeout: null,
       selectedBroker: null,
+      loading:false,
     };
   },
   mounted() {
@@ -203,6 +206,7 @@ export default {
     },
 
     async fetchBrokers(customUrl = null) {
+      this.loading=true
       try {
         let url = customUrl || "get_broker_profiles";
         const params = {
@@ -227,6 +231,7 @@ export default {
               console.error("Failed to fetch user", err);
               broker.userObj = { first_name: "", middle_name: "", last_name: "" };
             }
+            
           })
         );
 
@@ -239,6 +244,8 @@ export default {
       } catch (err) {
         console.error("Failed to fetch brokers:", err);
         this.brokers = [];
+      }finally{
+        this.loading=false;
       }
     },
 

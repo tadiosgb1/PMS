@@ -1,6 +1,7 @@
 <template>
   <div class="min-h-screen bg-gray-100 p-1 sm:p-1">
     <Toast ref="toast" />
+    <Loading :visible="loading" message="Loading users..." />
 
     <div class="bg-white shadow-md rounded-lg overflow-hidden">
       <!-- Header -->
@@ -230,7 +231,7 @@
 import Toast from "@/components/Toast.vue";
 import AddManager from "./add.vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
-
+import Loading from "@/components/Loading.vue";
 const SortIcon = {
   props: ["field", "sortKey", "sortAsc"],
   template: `
@@ -250,7 +251,7 @@ const SortIcon = {
 
 export default {
   name: "ManagersView",
-  components: { SortIcon, Toast, AddManager,ConfirmModal },
+  components: { SortIcon, Toast, AddManager,ConfirmModal,Loading },
   data() {
     return {
       searchTerm: "",
@@ -269,6 +270,7 @@ export default {
         showConfirm: false,
     selectedUser: null,
     selectedAction: null, // 'activate' or 'deactivate'
+    loading:false,
     };
   },
   // computed: {
@@ -331,6 +333,7 @@ export default {
 
   methods: {
     async fetchManagers(url = null, searchTerm = "") {
+      this.loading=true;
       try {
         const result = await this.$getManagers(searchTerm); // Global function handles URL & params
         console.log("result", result);
@@ -347,6 +350,8 @@ export default {
         this.totalPages = 1;
         this.next = null;
         this.previous = null;
+      }finally{
+        this.loading=false;
       }
     },
     sortBy(key) {
