@@ -107,7 +107,7 @@
                       <i class="fas fa-credit-card mr-1"></i> Pay
                     </button>
                     <button 
-                @click="askDeactivateConfirmation(subscription.id)"
+                @click="askDeactivateConfirmation(subscription)"
                 class="flex items-center px-3 py-1.5 bg-orange-50 text-orange-700 text-sm font-medium rounded-lg border border-orange-200 hover:bg-orange-100 transition"
               >
                 <i class="fas fa-exchange-alt mr-1"></i> Deactivate
@@ -444,6 +444,7 @@ export default {
     async Deactivate(){
       this.confirmVisible=false
        try{
+       console.log("subscription id",this.subscriptionToAD.id)
 await this.$apiPatch(`/update_subscription`,{status:"terminated"},this.subscriptionToAD.id);
         this.$root.$refs.toast.showToast(
           "Subscription Deactivated successfully",

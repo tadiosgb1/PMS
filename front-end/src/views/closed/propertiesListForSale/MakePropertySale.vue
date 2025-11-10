@@ -24,12 +24,12 @@
       >
         <!-- 🧍 Owner -->
         <div class="relative">
-          <label class="block text-gray-700 mb-1">Owner</label>
+          <label class="block text-gray-700 mb-1">Buyer</label>
           <input
             v-model="ownerSearch"
             type="text"
             class="custom-input"
-            placeholder="Search Owner..."
+            placeholder="Search Buyer..."
             @input="fetchOwners"
             @focus="ownerDropdown = true"
             @blur="hideDropdown('owner')"
