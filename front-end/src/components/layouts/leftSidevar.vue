@@ -99,21 +99,21 @@ export default {
         {
           name: "Zones",
           route: "zones",
-          icon: "fas fa-map-location-dot", // ✅ fa-map-marked-alt replaced
+          icon: "fas fa-map-location-dot", 
           color: "#3b82f6",
           permission: "pms.view_propertyzone",
         },
         {
           name: "Properties",
           route: "properties",
-          icon: "fas fa-building", // ✅ valid
+          icon: "fas fa-building", 
           color: "#6b7280",
           permission: "pms.view_property",
         },
         {
-          name: "Property Sales",
+          name: "Sale Requests",
           route: "property_sales",
-          icon: "fas fa-hand-holding-dollar", // ✅ fa-hand-holding-usd → updated name
+          icon: "fas fa-hand-holding-dollar", //  fa-hand-holding-usd → updated name
           color: "#6b7280",
           permission: "pms.view_propertyzonesale",
             //permission: "pms.view_propertysale",
@@ -121,7 +121,7 @@ export default {
         {
           name: "Rent Management",
           route: "rents",
-          icon: "fas fa-file-contract", // ✅ valid
+          icon: "fas fa-file-contract", //  valid
           color: "#3b82f6",
           permission: "pms.view_rent",
         },
@@ -129,56 +129,56 @@ export default {
         {
           name: "Payments",
           route: "payments",
-          icon: "fas fa-money-bill-wave", // ✅ valid
+          icon: "fas fa-money-bill-wave", //  valid
           color: "#22c55e",
         },
         {
           name: "Coworking Spaces",
           route: "coworking-spaces",
-          icon: "fas fa-people-roof", // ✅ better icon for shared spaces
+          icon: "fas fa-people-roof", //  better icon for shared spaces
           color: "#22c55e",
         },
         {
           name: "Coworking-space-rentals",
           route: "coworking-space-rentals",
-          icon: "fas fa-file-signature", // ✅ relevant for contracts
+          icon: "fas fa-file-signature", //  relevant for contracts
           color: "#22c55e",
         },
            {
           name: "Maintenance Requests",
           route: "maintenance-requests",
-          icon: "fas fa-screwdriver-wrench", // ✅ fa-tools → modern name
+          icon: "fas fa-screwdriver-wrench", //  fa-tools → modern name
           color: "#ef4444",
           permission: "pms.view_maintenancerequest",
         },
         {
           name: "Transactions",
           route: "transactions",
-          icon: "fas fa-arrows-rotate", // ✅ better for transactions
+          icon: "fas fa-arrows-rotate", //  better for transactions
           color: "#22c55e",
         },
         {
           name: "Reports",
           route: "reports",
-          icon: "fas fa-chart-line", // ✅ fa-file-alt → fa-chart-line (better match)
+          icon: "fas fa-chart-line", //  fa-file-alt → fa-chart-line (better match)
           color: "#22c55e",
         },
         {
           name: "Notifications",
           route: "notifications",
-          icon: "fas fa-bell", // ✅ fa-money-bill-wave → fixed
+          icon: "fas fa-bell", //  fa-money-bill-wave → fixed
           color: "#22c55e",
         },
          {
           name: "Contacts",
           route: "contacts",
-          icon: "fas fa-user", // ✅ fa-money-bill-wave → fixed
+          icon: "fas fa-user", //  fa-money-bill-wave → fixed
           color: "#22c55e",
         },
          {
           name: "List of Property for sale",
           route: "propertiesListForSale",
-          icon: "fas fa-building", // ✅ fa-money-bill-wave → fixed
+          icon: "fas fa-building", //  fa-money-bill-wave → fixed
           color: "#22c55e",
         },
       ],
