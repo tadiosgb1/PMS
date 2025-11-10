@@ -3,8 +3,20 @@
     <Toast ref="toast" />
 
     <div class="min-h-screen bg-gray-100 p-4 lg:p-6 relative">
-      <div class="bg-white shadow-md rounded-lg overflow-hidden relative">
+      <!-- Loading Overlay -->
+      <div
+        v-if="loading"
+        class="absolute inset-0 flex items-center justify-center bg-white bg-opacity-70 z-50"
+      >
+        <div class="flex flex-col items-center space-y-2">
+          <div
+            class="w-10 h-10 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin"
+          ></div>
+          <p class="text-gray-600 text-sm font-medium">Loading zones...</p>
+        </div>
+      </div>
 
+      <div class="bg-white shadow-md rounded-lg overflow-hidden">
         <!-- Header -->
         <div
           class="bg-primary text-white px-4 lg:px-6 py-4 text-lg lg:text-xl font-bold flex justify-between items-center"
@@ -36,7 +48,7 @@
             <select
               id="pageSize"
               v-model="pageSize"
-              @change="fetchZones"
+              @change="fetchZones()"
               class="border px-2 py-1 rounded text-sm"
             >
               <option v-for="size in pageSizes" :key="size" :value="size">
@@ -47,47 +59,8 @@
           </div>
         </div>
 
-
-
-
-
-
-        <!-- Loading Overlay -->
-        <div
-          v-if="loading"
-          class=" bg-white/80 flex flex-col justify-center items-center z-10"
-        >
-          <svg
-            class="animate-spin h-8 w-8 text-primary mb-3"
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-          >
-            <circle
-              class="opacity-25"
-              cx="12"
-              cy="12"
-              r="10"
-              stroke="currentColor"
-              stroke-width="4"
-            ></circle>
-            <path
-              class="opacity-75"
-              fill="currentColor"
-              d="M4 12a8 8 0 018-8v8H4z"
-            ></path>
-          </svg>
-          <p class="text-gray-700 text-sm font-medium">Loading zones...</p>
-        </div>
-
-
-
-
-
-
-
         <!-- Table (Desktop) -->
-        <div v-show="!loading" class="hidden lg:block overflow-x-auto p-4">
+        <div class="hidden lg:block overflow-x-auto p-4">
           <table
             class="min-w-full table-auto border-collapse text-[13px] font-medium text-gray-700"
           >
@@ -139,18 +112,10 @@
                     :sort-asc="sortAsc"
                   />
                 </th>
-                <th class="border-b border-gray-300 px-3 py-2 text-left">
-                  Owner
-                </th>
-                <th class="border-b border-gray-300 px-3 py-2 text-left">
-                  Manager
-                </th>
-                <th class="border-b border-gray-300 px-3 py-2 text-left">
-                  Location
-                </th>
-                <th class="border-b border-gray-300 px-3 py-2 text-center">
-                  Actions
-                </th>
+                <th class="border-b border-gray-300 px-3 py-2 text-left">Owner</th>
+                <th class="border-b border-gray-300 px-3 py-2 text-left">Manager</th>
+                <th class="border-b border-gray-300 px-3 py-2 text-left">Location</th>
+                <th class="border-b border-gray-300 px-3 py-2 text-center">Actions</th>
               </tr>
             </thead>
 
@@ -206,9 +171,7 @@
                   </a>
                 </td>
 
-                <td
-                  class="border-b border-gray-200 px-3 py-1.5 text-center space-x-2"
-                >
+                <td class="border-b border-gray-200 px-3 py-1.5 text-center space-x-2">
                   <button
                     @click="goToZoneDetail(zone.id)"
                     class="text-green-600 hover:text-green-800"
@@ -249,7 +212,7 @@
                 </td>
               </tr>
 
-              <tr v-if="filteredAndSortedZones.length === 0">
+              <tr v-if="!filteredAndSortedZones.length">
                 <td colspan="8" class="text-center py-4 text-gray-500 text-[13px]">
                   No zones found.
                 </td>
@@ -258,8 +221,95 @@
           </table>
         </div>
 
+        <!-- Mobile View -->
+        <div class="block lg:hidden p-4 space-y-4">
+          <div
+            v-for="zone in filteredAndSortedZones"
+            :key="zone.id"
+            class="bg-white border rounded-lg shadow-sm p-4"
+          >
+            <div class="flex justify-between items-center">
+              <h3 class="font-semibold text-gray-800">{{ zone.name }}</h3>
+              <span class="text-sm text-gray-500">{{ zone.state }}</span>
+            </div>
+            <p class="text-gray-600 text-sm mt-1">{{ zone.address }}</p>
+            <p class="text-gray-600 text-sm">{{ zone.city }}</p>
+
+            <div class="mt-3 text-sm">
+              <p>
+                <strong>Owner:</strong> {{ zone.ownerName }}
+                <button
+                  class="text-blue-600 ml-1"
+                  @click="goToDetail(zone.owner_id)"
+                >
+                  Details
+                </button>
+              </p>
+              <p>
+                <strong>Manager:</strong> {{ zone.managerName }}
+                <button
+                  class="text-blue-600 ml-1"
+                  @click="goToDetail(zone.manager_id)"
+                >
+                  Details
+                </button>
+              </p>
+            </div>
+
+            <div class="mt-3 flex flex-wrap gap-2">
+              <button
+                @click="goToZoneDetail(zone.id)"
+                class="px-3 py-1 text-green-700 border border-green-300 rounded-lg text-xs"
+              >
+                Detail
+              </button>
+              <button
+                v-if="$hasPermission('pms.change_propertyzone')"
+                @click="editZone(zone)"
+                class="px-3 py-1 text-blue-700 border border-blue-300 rounded-lg text-xs"
+              >
+                Edit
+              </button>
+              <button
+                v-if="$hasPermission('pms.delete_propertyzone')"
+                @click="askDeleteConfirmation(zone)"
+                class="px-3 py-1 text-red-700 border border-red-300 rounded-lg text-xs"
+              >
+                Delete
+              </button>
+              <button
+                @click="properties(zone.id)"
+                class="px-3 py-1 text-blue-700 border border-blue-300 rounded-lg text-xs"
+              >
+                Properties
+              </button>
+              <button
+                @click="openSaleModal(zone.id)"
+                class="text-yellow-600 hover:text-yellow-800 text-xs"
+                title="List for Sale"
+              >
+                <i class="fas fa-tag"></i> Sale
+              </button>
+              <a
+                :href="`https://www.google.com/maps?q=${zone.latlong}&z=15`"
+                target="_blank"
+                class="text-blue-600 text-xs flex items-center"
+              >
+                <i class="fa-solid fa-location-dot text-red-500 mr-1"></i> View Map
+              </a>
+            </div>
+          </div>
+
+          <div
+            v-if="!filteredAndSortedZones.length"
+            class="text-center text-gray-500 py-6"
+          >
+            No zones found.
+          </div>
+        </div>
+
         <!-- Pagination -->
-        <div v-show="!loading" class="flex justify-between items-center p-4 border-t">
+        <div class="flex justify-between items-center p-4 border-t">
           <button
             :disabled="currentPage <= 1"
             @click="changePage(currentPage - 1)"
@@ -267,9 +317,9 @@
           >
             Previous
           </button>
-          <span class="text-gray-600 text-sm">
-            Page {{ currentPage }} of {{ totalPages }}
-          </span>
+          <span class="text-gray-600 text-sm"
+            >Page {{ currentPage }} of {{ totalPages }}</span
+          >
           <button
             :disabled="currentPage >= totalPages"
             @click="changePage(currentPage + 1)"
@@ -354,7 +404,7 @@ export default {
       currentPage: 1,
       totalPages: 1,
       pageSize: 10,
-      pageSizes: [5, 10, 20, 50, 100],
+      pageSizes: [1, 5, 10, 20, 50, 100],
       saleVisible: false,
       salePropertyId: null,
       loading: false,
@@ -386,14 +436,12 @@ export default {
         const params = { ordering: "-id" };
         const url = `/get_property_zones?page=${this.currentPage}&page_size=${this.pageSize}&search=${this.searchTerm}`;
         const result = await this.$getZones(url, params);
-        this.globalZones = result.zones || [];
-        this.currentPage = result.currentPage || 1;
-        this.totalPages = result.totalPages || 1;
+        this.globalZones = result.zones;
+        this.currentPage = result.currentPage;
+        this.totalPages = result.totalPages;
       } catch (err) {
         console.error("Error fetching zones:", err);
         this.globalZones = [];
-        this.currentPage = 1;
-        this.totalPages = 1;
       } finally {
         this.loading = false;
       }
@@ -417,11 +465,19 @@ export default {
     async confirmDelete() {
       this.confirmVisible = false;
       try {
-        const response = await this.$apiDelete(`/delete_property_zone/${this.zoneToDelete.id}`);
+        const response = await this.$apiDelete(
+          `/delete_property_zone/${this.zoneToDelete.id}`
+        );
         if (response && response.error) {
-          this.$root.$refs.toast.showToast(response.error || "Failed to delete zone", "error");
+          this.$root.$refs.toast.showToast(
+            response.error || "Failed to delete zone",
+            "error"
+          );
         } else {
-          this.$root.$refs.toast.showToast("Zone deleted successfully", "success");
+          this.$root.$refs.toast.showToast(
+            "Zone deleted successfully",
+            "success"
+          );
           await this.fetchZones();
         }
       } catch (err) {
@@ -430,19 +486,20 @@ export default {
       }
       this.zoneToDelete = null;
     },
-    goToZoneDetail(id) {
-      if (id) this.$router.push({ name: "zoneDetail", params: { id } });
+    goToZoneDetail(propertyZoneId) {
+      if (propertyZoneId)
+        this.$router.push(`/pms/property-zone-detail/${propertyZoneId}`);
+    },
+    properties(zoneId) {
+      this.$router.push(`/pms/properties?zone=${zoneId}`);
     },
     goToDetail(id) {
-      this.$router.push(`/user_detail/${id}`);
+      if (id) this.$router.push(`/users/${id}`);
     },
-    properties(zone_id) {
-      this.$router.push({ path: "/properties", query: { zone_id } });
-    },
-    sortBy(key) {
-      if (this.sortKey === key) this.sortAsc = !this.sortAsc;
+    sortBy(field) {
+      if (this.sortKey === field) this.sortAsc = !this.sortAsc;
       else {
-        this.sortKey = key;
+        this.sortKey = field;
         this.sortAsc = true;
       }
     },
