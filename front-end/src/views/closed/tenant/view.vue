@@ -237,8 +237,6 @@ import ConfirmModal from "@/components/ConfirmModal.vue";
 import Toast from "@/components/Toast.vue";
 import addTenant from './add.vue'
 import Loading from "@/components/Loading.vue";
-
-
 const SortIcon = {
   props: ["field", "sortKey", "sortAsc"],
   template: `<span class="inline-block ml-1 text-gray-500">

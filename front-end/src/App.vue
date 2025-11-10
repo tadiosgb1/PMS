@@ -1,22 +1,37 @@
 <template>
-  <router-view :key="$route.fullPath"></router-view>
+  <div>
+    <router-view :key="$route.fullPath"></router-view>
     <Toast ref="toast" />
+    <!-- Global Loading Component -->
+    <Loading :visible="loading" message="Loading..." />
+  </div>
 </template>
 
 <script>
 import '@fortawesome/fontawesome-free/css/all.css';
 import Toast from './components/Toast1.vue';
+import Loading from './components/Loading.vue'; // import your Loading component
+import { reactive } from 'vue';
+
+// Global reactive loading state
+export const globalLoading = reactive({ value: false });
+
 export default {
   components: {
     Toast,
+    Loading,
   },
   data() {
     return {
       serviceBanks: [],
       blockBanks: [],
       inactivityTimeout: null, // Timeout for inactivity
-      inactivityDuration: 30 * 60 * 1000, // 30 minutes
     };
+  },
+  computed: {
+    loading() {
+      return globalLoading.value; // Bind to global loading state
+    },
   },
   created() {
     this.$store.dispatch('fetchBanks');
@@ -25,9 +40,6 @@ export default {
     }, 60000); // Fetch every 60 seconds
   },
   mounted() {
-    // Check if the user is already logged in
-   // this.checkUserSession();
-
     // Add global event listeners to track user activity
     document.addEventListener('mousemove', this.resetInactivityTimer);
     document.addEventListener('keypress', this.resetInactivityTimer);
@@ -44,31 +56,20 @@ export default {
   },
   methods: {
     resetInactivityTimer() {
-      // Clear the previous inactivity timer
       if (this.inactivityTimeout) {
         clearTimeout(this.inactivityTimeout);
       }
-      // Start a new inactivity timer
       this.inactivityTimeout = setTimeout(() => {
         this.handleInactivity();
-      }, this.inactivityDuration);
+      }, 30 * 60 * 1000); // 30 minutes
     },
     handleInactivity() {
-      // Check if the current route requires authentication
       if (this.$route.meta.requiresAuth) {
         console.log('User has been inactive for 30 minutes. Logging out.');
-        localStorage.removeItem('token'); // Remove the token from local storage
-        this.$router.push('/'); // Redirect to login page
+        localStorage.removeItem('token');
+        this.$router.push('/');
       }
     },
-
-    // checkUserSession() {
-    //   // Optionally verify if the token exists and is valid
-    //   const token = localStorage.getItem('token');
-    //   if (!token) {
-    //     this.$router.push('/'); // Redirect to login if no token
-    //   }
-    // },
   },
 };
 </script>
