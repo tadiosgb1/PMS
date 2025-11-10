@@ -1,6 +1,8 @@
 <template>
   <div>
     <Toast ref="toast" />
+     
+    <Loading :visible="loading" message="Loading users..." />
 
     <div class="min-h-screen bg-gray-100 m-3">
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
@@ -124,6 +126,7 @@
 <script>
 import Toast from "@/components/Toast.vue";
 import AddStaff from "./add.vue";
+import Loading from "@/components/Loading.vue";
 
 const SortIcon = {
   props: ["field", "sortKey", "sortAsc"],
@@ -144,7 +147,7 @@ const SortIcon = {
 
 export default {
   name: "StaffsView",
-  components: { SortIcon, Toast, AddStaff },
+  components: { SortIcon, Toast, AddStaff ,Loading},
   data() {
     return {
       searchTerm: "",
@@ -158,6 +161,7 @@ export default {
       pageSize: 100,
       pageSizes: [5, 10, 20, 50, 100],
       showAddStaff: false,
+      loading:false,
     };
   },
   computed: {
@@ -192,6 +196,7 @@ export default {
   },
   methods: {
   async fetchStaffs(customUrl = null) {
+    this.loading=true;
   try {
     let params = {};
     let url = customUrl;
@@ -227,6 +232,8 @@ export default {
     this.totalPages = 1;
     this.next = null;
     this.previous = null;
+  }finally{
+    this.loading=false;
   }
 },
     sortBy(key) {
