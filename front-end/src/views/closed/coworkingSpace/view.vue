@@ -1,7 +1,7 @@
 <template>
   <div>
     <Toast ref="toast" />
-
+     <Loading :visible="loading" message="Loading Co-working space..." />
     <div class="min-h-screen bg-gray-100 mt-3 mx-3">
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
         <!-- Header -->
@@ -162,6 +162,8 @@ import Toast from "@/components/Toast.vue";
 import AddSpace from "./Add.vue";
 import UpdateCoworkspace from "./update.vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
+import Loading from "@/components/Loading.vue"; // <-- Added Loading
+
 
 const SortIcon = {
   props: ["field", "sortKey", "sortAsc"],
@@ -182,7 +184,7 @@ const SortIcon = {
 
 export default {
   name: "CoworkingSpacesView",
-  components: { SortIcon, Toast, AddSpace, UpdateCoworkspace, ConfirmModal },
+  components: { SortIcon, Toast, AddSpace, UpdateCoworkspace, ConfirmModal ,Loading},
   data() {
     return {
       searchTerm: "",
@@ -200,6 +202,7 @@ export default {
       spaceToEdit: null,
       confirmVisible: false,
       spaceToDelete: null,
+      loading:false
     };
   },
   computed: {
@@ -238,6 +241,7 @@ export default {
   },
   methods: {
     async fetchSpaces(url = null) {
+      this.loading=true;
       try {
         const response = await this.$getCoworkingSpaces(url, this.pageSize);
         this.spaces = response.spaces || [];
@@ -248,6 +252,8 @@ export default {
       } catch (err) {
         console.error("Failed to fetch coworking spaces:", err);
         this.spaces = [];
+      }finally{
+        this.loading=false;
       }
     },
     sortBy(key) {

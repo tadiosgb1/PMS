@@ -1,5 +1,7 @@
 <template>
   <div class="min-h-screen bg-gray-100 p-4 sm:p-6 flex justify-center items-start">
+      <Loading :visible="loading" message="Loading Notification Detail..." />
+
     <div class="w-full">
       <!-- Header -->
       <div class="flex justify-between items-center mb-6">
@@ -71,11 +73,18 @@
 </template>
 
 <script>
+
+import Loading from "@/components/Loading.vue"; // <-- Added Loading
+
 export default {
+  components:{
+    Loading
+  },
   name: "NotificationDetail",
   data() {
     return {
       notification: {},
+      loading:false,
     };
   },
   mounted() {
@@ -83,6 +92,7 @@ export default {
   },
   methods: {
     async fetchNotification() {
+      this.loading=true;
       try {
         const id = this.$route.params.id;
         const res = await this.$apiGet(`/get_notification/${id}`);
@@ -90,6 +100,8 @@ export default {
       } catch (error) {
         console.error("Failed to fetch notification:", error);
         this.notification = {};
+      }finally{
+        this.loading=false;
       }
     },
     async markAsRead(id) {

@@ -1,6 +1,7 @@
 <template>
   <div class="min-h-screen bg-gray-100 p-4 md:p-6">
     <Toast ref="toast" />
+     <Loading :visible="loading" message="Loading Maintenance requests..." />
 
     <div class="bg-white shadow-md rounded-lg overflow-hidden">
       <!-- Header -->
@@ -269,10 +270,11 @@
 <script>
 import Toast from "../../../components/Toast.vue";
 import MaintenanceRequestAdd from "@/views/closed/maintenanceRequests/add.vue";
+import Loading from "@/components/Loading.vue"; // <-- Added Loading
 
 export default {
   name: "MaintenanceRequestView",
-  components: { Toast, MaintenanceRequestAdd },
+  components: { Toast, MaintenanceRequestAdd ,Loading},
    props: {
     propertyId: Number,
   },
@@ -290,6 +292,7 @@ export default {
       visible: false,
       confirm: false,
       selectedId: "",
+      loading:false,
     };
   },
   computed: {
@@ -341,6 +344,7 @@ export default {
     },
 
     async fetchMaintenance() {
+      this.loading=true;
       try {
         let params = this.buildRoleParams();
         const response = await this.$apiGet("get_maintenance_requests", params);
@@ -349,6 +353,8 @@ export default {
         console.error("Failed to fetch maintenance", err);
         this.maintenance = [];
         this.$refs.toast.showToast("Failed to load requests", "error");
+      }finally{
+        this.loading=false;
       }
     },
 

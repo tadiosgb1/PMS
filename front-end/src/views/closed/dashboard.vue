@@ -148,41 +148,36 @@
     </header>
 
     <!-- Main Content -->
-    <div class="flex flex-1 overflow-hidden">
-      <!-- Sidebar for desktop -->
-      <div v-if="screenWidth > 1024" class="w-64 h-full bg-white shadow-md">
-        <Sidebar />
-      </div>
+   <div class="flex flex-1 overflow-hidden">
+  <!-- Sidebar always visible on large screens (lg+), hidden on md and below -->
+  <div class="hidden lg:block w-64 bg-white h-[calc(100vh-4rem)] overflow-y-auto sticky top-16">
+    <Sidebar />
+  </div>
 
-      <!-- Overlay and Slide-in Sidebar for mobile and tablet -->
-      <transition name="slide">
-        <div
-          v-if="showSidebar && screenWidth <= 1024"
-          class="fixed inset-0 bg-black bg-opacity-50 z-40"
-          @click="toggleSidebar"
-        ></div>
-      </transition>
+  <!-- Overlay and Slide-in Sidebar for tablet and mobile -->
+  <div
+    v-if="showSidebar && screenWidth < 1024"
+    class="fixed inset-0 bg-black bg-opacity-50 z-40"
+    @click="toggleSidebar"
+  ></div>
+  <div
+    v-if="showSidebar && screenWidth < 1024"
+    class="fixed left-0 top-0 w-64 bg-white shadow-lg z-50 h-full overflow-y-auto"
+  >
+    <button
+      class="absolute top-4 right-4 text-gray-600"
+      @click="toggleSidebar"
+    >
+      <i class="fas fa-times text-xl"></i>
+    </button>
+    <Sidebar />
+  </div>
 
-      <transition name="slide">
-        <div
-          v-if="showSidebar && screenWidth <= 1024"
-          class="fixed left-0 top-0 w-64 bg-white shadow-lg z-50 h-full overflow-y-auto transition-transform duration-300"
-        >
-          <button
-            class="absolute top-4 right-4 text-gray-600"
-            @click="toggleSidebar"
-          >
-            <i class="fas fa-times text-xl"></i>
-          </button>
-          <Sidebar />
-        </div>
-      </transition>
-
-      <!-- Main content slot -->
-      <main class="flex-1 overflow-y-auto">
-        <router-view />
-      </main>
-    </div>
+  <!-- Main content slot -->
+  <main class="flex-1 overflow-y-auto">
+    <router-view />
+  </main>
+</div>
 
     <!-- Profile Modal -->
     <Profile

@@ -1,6 +1,7 @@
 <template>
   <div>
     <Toast ref="toast" />
+     <Loading :visible="loading" message="Loading Contacts..." />
 
     <div class="min-h-screen bg-gray-100 m-3">
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
@@ -103,10 +104,13 @@
 
 <script>
 import Toast from "@/components/Toast.vue";
+import Loading from "@/components/Loading.vue"; // <-- Added Loading
+
+
 
 export default {
   name: "ContactView",
-  components: { Toast },
+  components: { Toast,Loading },
   data() {
     return {
       contactMessages: [],
@@ -117,6 +121,7 @@ export default {
       contactTotalPages: 1,
       contactNext: null,
       contactPrev: null,
+      loading:false,
     };
   },
   mounted() {
@@ -124,6 +129,7 @@ export default {
   },
   methods: {
     async fetchContactUs(url = null) {
+      this.loading=true;
       try {
         const params = {
           page_size: this.contactPageSize,
@@ -149,6 +155,8 @@ export default {
         console.error("Failed to fetch contact messages:", error);
         this.contactMessages = [];
         this.$refs.toast?.showToast("Failed to fetch messages", "error");
+      }finally{
+        this.loading=false;
       }
     },
   },
