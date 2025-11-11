@@ -1,15 +1,14 @@
 <template>
   <div>
     <Toast ref="toast" />
-     <Loading :visible="loading" message="Loading users..." />
-
+    
     <div class="min-h-screen bg-gray-100 m-3">
        <!-- Reusable Loading Component -->
       <Loading :visible="loading" message="Loading Brokers..." />
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
         <!-- Header -->
         <div
-          class="bg-primary text-white px-6 py-4 text-xl font-bold flex flex-col sm:flex-row justify-between items-center gap-2"
+          class="bg-primary text-white px-6 py-1 text-xl font-bold flex flex-col sm:flex-row justify-between items-center gap-2"
         >
           Brokers
           <button

@@ -5,12 +5,12 @@
      <Loading :visible="loading" message="Loading Owners..." />
 
 
-     <div class="min-h-screen bg-gray-100 p-4">
+     <div class="min-h-screen bg-gray-100 p-0">
       <!-- Card Container -->
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
         <!-- Header -->
         <div
-          class="bg-primary text-white px-6 py-4 text-xl font-bold flex justify-between items-center flex-wrap gap-3"
+          class="bg-primary text-white px-6 py-3 text-xl font-bold flex justify-between items-center flex-wrap gap-3"
         >
           <span>Owners</span>
 

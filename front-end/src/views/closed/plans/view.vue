@@ -1,7 +1,7 @@
 <template>
   <div>
     <Toast ref="toast" />
-
+  <Loading :visible="loading" message="Loading Plans..." />
     <div class="min-h-screen bg-gray-100 p-6">
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
         <!-- Header -->
@@ -131,7 +131,7 @@ import AddPlan from '@/views/closed/plans/add.vue';
 import ConfirmModal from '@/components/ConfirmModal.vue'; // adjust path as needed
 import UpdatePlan from '@/views/closed/plans/update.vue';
 import Toast from "../../../components/Toast.vue";
-
+import Loading from "@/components/Loading.vue";
 
 const SortIcon = {
   props: ['field', 'sortKey', 'sortAsc'],
@@ -152,7 +152,7 @@ const SortIcon = {
 
 export default {
   name: 'plansView',
-  components: { SortIcon, AddPlan, ConfirmModal, UpdatePlan ,Toast },
+  components: { SortIcon, AddPlan, ConfirmModal, UpdatePlan ,Toast ,Loading},
   data() {
     return {
       searchTerm: '',
@@ -167,6 +167,7 @@ export default {
       sortKey: 'name',
       sortAsc: true,
       plans: [],
+      loading:false,
     };
   },
   computed: {
@@ -205,6 +206,7 @@ export default {
   },
   methods: {
     async fetchPlans() {
+      this.loading=true;
       try {
         const response = await this.$apiGet("/get_plans");
         if (Array.isArray(response.data)) {
@@ -217,6 +219,8 @@ export default {
         console.error("Failed to fetch plans:", error);
         this.plans = [];
         alert("Failed to load plans. Please try again later.");
+      }finally{
+        this.loading=false;
       }
     },
     sortBy(key) {

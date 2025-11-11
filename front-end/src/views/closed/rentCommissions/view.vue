@@ -1,5 +1,6 @@
 <template>
   <div class="p-6 min-h-screen bg-gray-100">
+      <Loading :visible="loading" message="Loading rent commussion..." />
     <!-- Card Container -->
     <div class="bg-white shadow-lg overflow-hidden rounded-lg">
       <!-- Header -->
@@ -73,14 +74,15 @@
 
 <script>
 import AddCommission from "./Add.vue";
-
+import Loading from "@/components/Loading.vue";
 export default {
   name: "CommissionView",
-  components: { AddCommission },
+  components: { AddCommission,Loading },
   data() {
     return {
       showModal: false,
       commissions: [],
+      loading:false,
     };
   },
   filters: {
@@ -102,11 +104,14 @@ export default {
   },
   methods: {
     async fetchCommissions() {
+      this.loading=true;
       try {
         const res = await this.$apiGet("/get_rent_commissions");
         this.commissions = res.data || [];
       } catch (err) {
         console.error("Failed to fetch commissions:", err);
+      }finally{
+        this.loading=false;
       }
     },
   },
