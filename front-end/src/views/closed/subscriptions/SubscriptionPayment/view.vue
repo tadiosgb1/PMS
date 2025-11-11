@@ -89,7 +89,7 @@
                   <th class="px-3 py-2 text-left">End Date</th>
                   <th class="px-3 py-2 text-left">Plan</th>
                   <th class="px-3 py-2 text-left">Status</th>
-                  <th class="px-3 py-2 text-center">Actions</th>
+                  <th v-if="$hasPermission('pms.change_subscriptionpayment')" class="px-3 py-2 text-center">Actions</th>
                 </tr>
               </thead>
               <tbody>
@@ -132,7 +132,7 @@
                       {{ p.status }}
                     </span>
                   </td>
-                  <td class="px-3 py-2 text-center">
+                  <td v-if="$hasPermission('pms.change_subscriptionpayment')" class="px-3 py-2 text-center">
                     <button
                       v-if="p.status === 'pending' || p.status === 'canceled'"
                       @click="askConfirmation('approve', p)"
@@ -213,7 +213,7 @@
                 </button>
               </div>
 
-              <div class="flex justify-end mt-3 space-x-3">
+              <div v-if="$hasPermission('pms.change_subscriptionpayment')" class="flex justify-end mt-3 space-x-3">
                 <button
                   v-if="p.status === 'pending' || p.status === 'canceled'"
                   @click="askConfirmation('approve', p)"

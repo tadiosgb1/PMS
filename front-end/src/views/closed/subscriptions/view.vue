@@ -63,74 +63,97 @@
           </div>
         </div>
 
-        <!-- Table for desktop -->
-        <div class="hidden md:block overflow-x-auto">
-          <table class="min-w-full table-auto border-collapse border border-gray-300">
-            <thead>
-              <tr class="bg-gray-200 text-gray-700">
-                <th class="px-4 py-2 border">Plan Name</th>
-                <th class="px-4 py-2 border">Price</th>
-                <th class="px-4 py-2 border">Start Date</th>
-                <th class="px-4 py-2 border">End Date</th>
-                <th class="px-4 py-2 border">Status</th>
-                <th class="px-4 py-2 border">Owner</th>
-                <th class="px-4 py-2 border text-center">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr
-                v-for="subscription in filteredSubscriptions"
-                :key="subscription.id"
-                class="hover:bg-gray-100"
-              >
-                <td class="px-4 py-2 border">{{ subscription.plan_name }}</td>
-                <td class="px-4 py-2 border">{{ subscription.price }}</td>
-                <td class="px-4 py-2 border">{{ formatDate(subscription.start_date) }}</td>
-                <td class="px-4 py-2 border">{{ formatDate(subscription.end_date) }}</td>
-                <td
-                  class="px-4 py-2 border rounded text-white font-bold"
-                  :class="{
-                    'bg-yellow-500': subscription.status =='pending',
-                    'bg-red-500': subscription.status =='expired',
-                    'bg-green-500': subscription.status =='active'
-                  }"
-                >
-                  {{ subscription.status.charAt(0).toUpperCase() + subscription.status.slice(1) }}
-                </td>
-                <td class="px-4 py-2 border">{{ subscription.ownerName || 'Unknown' }}</td>
-                <td class="px-4 py-2 border text-center">
-                  <div class="flex flex-wrap justify-center gap-2">
-                    <button
-                      v-if="is_super_user != 'true' && subscription.status === 'pending'"
-                      @click="pay(subscription)"
-                      class="flex items-center px-3 py-1.5 bg-green-600 text-white text-sm font-medium rounded-lg border border-green-700 hover:bg-green-700 transition"
-                    >
-                      <i class="fas fa-credit-card mr-1"></i> Pay
-                    </button>
-                    <button 
-                @click="askDeactivateConfirmation(subscription)"
-                class="flex items-center px-3 py-1.5 bg-orange-50 text-orange-700 text-sm font-medium rounded-lg border border-orange-200 hover:bg-orange-100 transition"
-              >
-                <i class="fas fa-exchange-alt mr-1"></i> Deactivate
-              </button>
-                    <button
-                      @click="payment(subscription.id)"
-                      class="flex items-center px-3 py-1.5 bg-green-50 text-green-700 text-sm font-medium rounded-lg border border-green-200 hover:bg-green-100 transition"
-                    >
-                      <i class="fas fa-info-circle mr-1"></i> Payments
-                    </button>
-                    <button v-if="is_super_user!='true'"
-                      @click="openUpgradeModal(subscription)"
-                      class="flex items-center px-3 py-1.5 bg-orange-50 text-orange-700 text-sm font-medium rounded-lg border border-orange-200 hover:bg-orange-100 transition"
-                    >
-                      <i class="fas fa-exchange-alt mr-1"></i> Upgrade/Downgrade
-                    </button>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
+        <!-- Table for Desktop -->
+<div class="hidden lg:block overflow-x-auto p-4">
+  <table
+    class="min-w-full table-auto border-collapse text-[13px] font-medium text-gray-700"
+  >
+    <thead>
+      <tr class="bg-gray-100 text-gray-800 uppercase tracking-wide text-[12px]">
+        <th class="border-b border-gray-300 px-3 py-2 text-left">Plan Name</th>
+        <th class="border-b border-gray-300 px-3 py-2 text-left">Price</th>
+        <th class="border-b border-gray-300 px-3 py-2 text-left">Start Date</th>
+        <th class="border-b border-gray-300 px-3 py-2 text-left">End Date</th>
+        <th class="border-b border-gray-300 px-3 py-2 text-left">Status</th>
+        <th class="border-b border-gray-300 px-3 py-2 text-left">Owner</th>
+        <th class="border-b border-gray-300 px-3 py-2 text-center">Actions</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr
+        v-for="subscription in filteredSubscriptions"
+        :key="subscription.id"
+        class="hover:bg-gray-50 even:bg-gray-50/40 transition-colors"
+      >
+        <td class="border-b border-gray-200 px-3 py-1.5 truncate">
+          {{ subscription.plan_name }}
+        </td>
+        <td class="border-b border-gray-200 px-3 py-1.5 truncate">
+          {{ subscription.price }}
+        </td>
+        <td class="border-b border-gray-200 px-3 py-1.5 truncate">
+          {{ formatDate(subscription.start_date) }}
+        </td>
+        <td class="border-b border-gray-200 px-3 py-1.5 truncate">
+          {{ formatDate(subscription.end_date) }}
+        </td>
+        <td
+          class="border-b border-gray-200 px-3 py-1.5 text-white font-bold text-center"
+          :class="{
+            'bg-yellow-500': subscription.status == 'pending',
+            'bg-red-500': subscription.status == 'expired',
+            'bg-green-500': subscription.status == 'active'
+          }"
+        >
+          {{ subscription.status.charAt(0).toUpperCase() + subscription.status.slice(1) }}
+        </td>
+        <td class="border-b border-gray-200 px-3 py-1.5 truncate">
+          {{ subscription.ownerName || 'Unknown' }}
+        </td>
+        <td class="border-b border-gray-200 px-3 py-1.5 text-center">
+          <div class="flex flex-wrap justify-center gap-2">
+            <button
+              v-if="is_super_user != 'true' && subscription.status === 'pending'"
+              @click="pay(subscription)"
+              class="flex items-center px-3 py-1.5 bg-green-600 text-white text-sm font-medium rounded-lg border border-green-700 hover:bg-green-700 transition"
+            >
+              <i class="fas fa-credit-card mr-1"></i> Pay
+            </button>
+
+            <button 
+              @click="askDeactivateConfirmation(subscription)"
+              class="flex items-center px-3 py-1.5 bg-orange-50 text-orange-700 text-sm font-medium rounded-lg border border-orange-200 hover:bg-orange-100 transition"
+            >
+              <i class="fas fa-exchange-alt mr-1"></i> Deactivate
+            </button>
+
+            <button
+              @click="payment(subscription.id)"
+              class="flex items-center px-3 py-1.5 bg-green-50 text-green-700 text-sm font-medium rounded-lg border border-green-200 hover:bg-green-100 transition"
+            >
+              <i class="fas fa-info-circle mr-1"></i> Payments
+            </button>
+
+            <button
+              v-if="is_super_user != 'true'"
+              @click="openUpgradeModal(subscription)"
+              class="flex items-center px-3 py-1.5 bg-orange-50 text-orange-700 text-sm font-medium rounded-lg border border-orange-200 hover:bg-orange-100 transition"
+            >
+              <i class="fas fa-exchange-alt mr-1"></i> Upgrade/Downgrade
+            </button>
+          </div>
+        </td>
+      </tr>
+
+      <tr v-if="!filteredSubscriptions.length">
+        <td colspan="7" class="text-center py-4 text-gray-500 text-[13px]">
+          No subscriptions found.
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
         <!-- Card/List for mobile/tablet -->
         <div class="md:hidden flex flex-col gap-4">

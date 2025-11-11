@@ -79,122 +79,148 @@
           </div>
 
           <!-- Desktop Table -->
-          <div class="hidden md:block overflow-x-auto">
-            <table
-              class="min-w-full table-auto border-collapse border border-gray-300 text-sm"
-            >
-              <thead>
-                <tr class="bg-gray-200 text-gray-700 text-left">
-                  <th class="border border-gray-300 px-3 py-2 cursor-pointer" @click="changeOrdering('name')">
-                    Name
-                  </th>
-                  <th class="border border-gray-300 px-3 py-2">Owner</th>
-                  <th class="border border-gray-300 px-3 py-2">Manager</th>
-                  <th class="border border-gray-300 px-3 py-2">Zone</th>
-                  <th class="border border-gray-300 px-3 py-2">Type</th>
-                  <th class="border border-gray-300 px-3 py-2">City</th>
-                  <th class="border border-gray-300 px-3 py-2 text-center">Status</th>
-                  <th class="border border-gray-300 px-3 py-2 text-center">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="property in properties"
-                  :key="property.id"
-                  class="hover:bg-gray-100"
-                >
-                  <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">{{ property.name }}</td>
-                  <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
-                    {{ property.ownerName }}
-                    <button
-                      @click="goToUserDetail(property.owner_id)"
-                      class="text-green-600 hover:text-green-800 ml-1"
-                      title="Detail"
-                    >
-                      <i class="fas fa-eye"></i>
-                    </button>
-                  </td>
-                  <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
-                    {{ property.managerName }}
-                    <button
-                      @click="goToUserDetail(property.manager_id)"
-                      class="text-green-600 hover:text-green-800 ml-1"
-                      title="Detail"
-                    >
-                      <i class="fas fa-eye"></i>
-                    </button>
-                  </td>
-                  <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">
-                    {{ property.zoneName }}
-                    <button
-                      @click="goToZoneDetail(property.property_zone_id)"
-                      class="text-green-600 hover:text-green-800 ml-1"
-                      title="Detail"
-                    >
-                      <i class="fas fa-eye"></i>
-                    </button>
-                  </td>
-                  <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">{{ property.property_type }}</td>
-                  <td class="border border-gray-300 px-3 py-2 whitespace-nowrap">{{ property.city }}</td>
-                  <td class="border border-gray-300 px-3 py-2 text-center">
-                    <span
-                      class="px-3 py-1 rounded-full text-white text-xs font-semibold"
-                      :class="{
-                        'bg-green-600': property.status === 'available',
-                        'bg-blue-600': property.status === 'rent',
-                        'bg-yellow-600': property.status === 'sale',
-                        'bg-pink-400': property.status === 'under_maintenance'
-                      }"
-                    >
-                      {{ property.status }}
-                    </span>
-                  </td>
-                  <td class="border border-gray-300 px-3 py-2 text-center space-x-2">
-                    <button @click="goToDetail(property.id)" class="text-green-600 hover:text-green-800" title="Detail">
-                      <i class="fas fa-eye"></i>
-                    </button>
-                    <button
-                      v-if="$hasPermission('pms.change_property')"
-                      @click="editProperty(property)"
-                      class="text-blue-600 hover:text-blue-800"
-                      title="Edit"
-                    >
-                      <i class="fas fa-edit"></i>
-                    </button>
-                    <button
-                      v-if="$hasPermission('pms.delete_property')"
-                      @click="askDeleteConfirmation(property)"
-                      class="text-red-600 hover:text-red-800"
-                      title="Delete"
-                    >
-                      <i class="fas fa-trash-alt"></i>
-                    </button>
-                    <button
-                      @click="rentPay(property.id)"
-                      class="text-green-600 hover:text-green-800"
-                      title="Rent Payment"
-                    >
-                      <i class="fas fa-money-bill-wave"></i>
-                    </button>
-
-
-                                   <!-- ✅ New Sale Button -->
-  <button
-    
-    @click="openSaleModal(property.id)"
-    class="text-yellow-600 hover:text-yellow-800"
-    title="List for Sale"
+<div class="hidden lg:block overflow-x-auto p-4">
+  <table
+    class="min-w-full table-auto border-collapse text-[13px] font-medium text-gray-700"
   >
-    <i class="fas fa-tag"></i>
-  </button>
-                  </td>
-                </tr>
-                <tr v-if="properties.length === 0">
-                  <td colspan="8" class="text-center py-6 text-gray-500">No properties found.</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+    <thead>
+      <tr class="bg-gray-100 text-gray-800 uppercase tracking-wide text-[12px]">
+        <th
+          class="border-b border-gray-300 px-3 py-2 text-left cursor-pointer hover:bg-gray-200 transition"
+          @click="changeOrdering('name')"
+        >
+          Name
+        </th>
+        <th class="border-b border-gray-300 px-3 py-2 text-left">Owner</th>
+        <th class="border-b border-gray-300 px-3 py-2 text-left">Manager</th>
+        <th class="border-b border-gray-300 px-3 py-2 text-left">Zone</th>
+        <th class="border-b border-gray-300 px-3 py-2 text-left">Type</th>
+        <th class="border-b border-gray-300 px-3 py-2 text-left">City</th>
+        <th class="border-b border-gray-300 px-3 py-2 text-center">Status</th>
+        <th class="border-b border-gray-300 px-3 py-2 text-center">Actions</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr
+        v-for="property in properties"
+        :key="property.id"
+        class="hover:bg-gray-50 even:bg-gray-50/40 transition-colors"
+      >
+        <td class="border-b border-gray-200 px-3 py-1.5 truncate whitespace-nowrap">
+          {{ property.name }}
+        </td>
+
+        <td class="border-b border-gray-200 px-3 py-1.5 truncate whitespace-nowrap">
+          {{ property.ownerName }}
+          <button
+            @click="goToUserDetail(property.owner_id)"
+            class="text-green-600 hover:text-green-800 ml-1"
+            title="Detail"
+          >
+            <i class="fas fa-eye"></i>
+          </button>
+        </td>
+
+        <td class="border-b border-gray-200 px-3 py-1.5 truncate whitespace-nowrap">
+          {{ property.managerName }}
+          <button
+            @click="goToUserDetail(property.manager_id)"
+            class="text-green-600 hover:text-green-800 ml-1"
+            title="Detail"
+          >
+            <i class="fas fa-eye"></i>
+          </button>
+        </td>
+
+        <td class="border-b border-gray-200 px-3 py-1.5 truncate whitespace-nowrap">
+          {{ property.zoneName }}
+          <button
+            @click="goToZoneDetail(property.property_zone_id)"
+            class="text-green-600 hover:text-green-800 ml-1"
+            title="Detail"
+          >
+            <i class="fas fa-eye"></i>
+          </button>
+        </td>
+
+        <td class="border-b border-gray-200 px-3 py-1.5 truncate whitespace-nowrap">
+          {{ property.property_type }}
+        </td>
+
+        <td class="border-b border-gray-200 px-3 py-1.5 truncate whitespace-nowrap">
+          {{ property.city }}
+        </td>
+
+        <td class="border-b border-gray-200 px-3 py-1.5 text-center">
+          <span
+            class="px-3 py-1 rounded-full text-white text-xs font-semibold"
+            :class="{
+              'bg-green-600': property.status === 'available',
+              'bg-blue-600': property.status === 'rent',
+              'bg-yellow-600': property.status === 'sale',
+              'bg-pink-400': property.status === 'under_maintenance'
+            }"
+          >
+            {{ property.status }}
+          </span>
+        </td>
+
+        <td class="border-b border-gray-200 px-3 py-1.5 text-center space-x-2">
+          <button
+            @click="goToDetail(property.id)"
+            class="text-green-600 hover:text-green-800"
+            title="Detail"
+          >
+            <i class="fas fa-eye"></i>
+          </button>
+
+          <button
+            v-if="$hasPermission('pms.change_property')"
+            @click="editProperty(property)"
+            class="text-blue-600 hover:text-blue-800"
+            title="Edit"
+          >
+            <i class="fas fa-edit"></i>
+          </button>
+
+          <button
+            v-if="$hasPermission('pms.delete_property')"
+            @click="askDeleteConfirmation(property)"
+            class="text-red-600 hover:text-red-800"
+            title="Delete"
+          >
+            <i class="fas fa-trash-alt"></i>
+          </button>
+
+          <button
+            @click="rentPay(property.id)"
+            class="text-green-600 hover:text-green-800"
+            title="Rent Payment"
+          >
+            <i class="fas fa-money-bill-wave"></i>
+          </button>
+
+          <!-- ✅ New Sale Button -->
+          <button
+            @click="openSaleModal(property.id)"
+            class="text-yellow-600 hover:text-yellow-800"
+            title="List for Sale"
+          >
+            <i class="fas fa-tag text-[13px]"></i> Sale
+          </button>
+        </td>
+      </tr>
+
+      <tr v-if="properties.length === 0">
+        <td colspan="8" class="text-center py-6 text-gray-500 text-[13px]">
+          No properties found.
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
 
           <!-- Mobile & Tablet View -->
           <div class="block md:hidden space-y-4">

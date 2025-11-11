@@ -40,15 +40,21 @@
             </select>
           </div>
 
-          <div>
-            <label class="block text-gray-700">Property Zone</label>
-            <select v-model="form.property_zone_id" class="custom-input">
-              <option value="">Select Zone</option>
-              <option v-for="zone in zones" :key="zone.id" :value="zone.id">
-                {{ zone.name }}
-              </option>
-            </select>
-          </div>
+          <!-- Property Zone -->
+<div>
+  <label class="block text-gray-700">Property Zone</label>
+  <select v-model="form.property_zone_id" class="custom-input">
+    <option value="">Select Zone</option>
+    <option
+      class="text-black"
+      v-for="zone in zones"
+      :key="zone.id"
+      :value="zone.id"
+    >
+      {{ zone.name }}
+    </option>
+  </select>
+</div>
 
           <div>
             <label class="block text-gray-700">Name</label>
