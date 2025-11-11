@@ -1,6 +1,7 @@
 <template>
   <div>
     <Toast ref="toast" />
+    <Loading :visible="loading" message="Loading Notifications..." />
 
     <div class="min-h-screen bg-gray-100 m-3">
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
@@ -34,76 +35,77 @@
 
         <!-- Desktop Table -->
         <div class="hidden md:block overflow-x-auto p-4">
-          <table class="min-w-full table-auto border-collapse border border-gray-300 text-sm">
-            <thead>
-              <tr class="bg-gray-200 text-gray-700">
-                <th class="border border-gray-300 px-4 py-2">Message</th>
-                <th class="border border-gray-300 px-4 py-2">Type</th>
-                <th class="border border-gray-300 px-4 py-2">User</th>
-                <th class="border border-gray-300 px-4 py-2">Maintenance detail</th>
-                <th class="border border-gray-300 px-4 py-2">Payment detail</th>
-                <th class="border border-gray-300 px-4 py-2">Rent detail</th>
-                <th class="border border-gray-300 px-4 py-2">Created At</th>
-                <th class="border border-gray-300 px-4 py-2">Status</th>
-                <th class="border border-gray-300 px-4 py-2">Read At</th>
-                <th class="border border-gray-300 px-4 py-2 text-center">Actions</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="notif in filteredNotifications" :key="notif.id" class="hover:bg-gray-100">
-                <td class="border border-gray-300 px-4 py-2">{{ notif.message }}</td>
-                <td class="border border-gray-300 px-4 py-2">{{ notif.notification_type }}</td>
-                <td class="border border-gray-300 px-4 py-2">
-                  {{ notif.user_id.first_name }} {{ notif.user_id.middle_name }} {{ notif.user_id.last_name }}
-                </td>
-                <td class="border border-gray-300 px-4 py-2">{{ notif.maintenance_request_id }}</td>
-                <td class="border border-gray-300 px-4 py-2">{{ notif.payment_id }}</td>
-                <td class="border border-gray-300 px-4 py-2">{{ notif.rent_id }}</td>
-                <td class="border border-gray-300 px-4 py-2">{{ formatDate(notif.created_at) }}</td>
-                <td class="border border-gray-300 px-4 py-2">{{ notif.is_read ? "Read" : "Unread" }}</td>
-                <td class="border border-gray-300 px-4 py-2">{{ notif.read_at }}</td>
-                <td class="border border-gray-300 px-4 py-2 text-center space-x-2">
-                  <button
-                    v-if="!notif.is_read"
-                    @click="markAsRead(notif.id)"
-                    class="text-blue-600 hover:text-blue-800 text-sm"
-                  >Mark as Read</button>
+         <table class="min-w-full table-auto border-collapse border border-gray-200 text-xs">
+  <thead>
+    <tr class="bg-gray-100 text-gray-700 uppercase tracking-wider">
+      <th class="border border-gray-200 px-2 py-1 text-left">Message</th>
+      <th class="border border-gray-200 px-2 py-1 text-left">Type</th>
+      <th class="border border-gray-200 px-2 py-1 text-left">User</th>
+      <th class="border border-gray-200 px-2 py-1 text-left">Maintenance Detail</th>
+      <th class="border border-gray-200 px-2 py-1 text-left">Payment Detail</th>
+      <th class="border border-gray-200 px-2 py-1 text-left">Rent Detail</th>
+      <th class="border border-gray-200 px-2 py-1 text-left">Created At</th>
+      <th class="border border-gray-200 px-2 py-1 text-left">Status</th>
+      <th class="border border-gray-200 px-2 py-1 text-left">Read At</th>
+      <th class="border border-gray-200 px-2 py-1 text-center">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr v-for="notif in filteredNotifications" :key="notif.id" class="hover:bg-gray-50 transition">
+      <td class="border border-gray-200 px-2 py-1">{{ notif.message }}</td>
+      <td class="border border-gray-200 px-2 py-1">{{ notif.notification_type }}</td>
+      <td class="border border-gray-200 px-2 py-1">
+        {{ notif.user_id.first_name }} {{ notif.user_id.middle_name }} {{ notif.user_id.last_name }}
+      </td>
+      <td class="border border-gray-200 px-2 py-1">{{ notif.maintenance_request_id }}</td>
+      <td class="border border-gray-200 px-2 py-1">{{ notif.payment_id }}</td>
+      <td class="border border-gray-200 px-2 py-1">{{ notif.rent_id }}</td>
+      <td class="border border-gray-200 px-2 py-1">{{ formatDate(notif.created_at) }}</td>
+      <td class="border border-gray-200 px-2 py-1">{{ notif.is_read ? "Read" : "Unread" }}</td>
+      <td class="border border-gray-200 px-2 py-1">{{ notif.read_at }}</td>
+      <td class="border border-gray-200 px-2 py-1 text-center space-x-1">
+        <button
+          v-if="!notif.is_read"
+          @click="markAsRead(notif.id)"
+          class="text-blue-600 hover:text-blue-800 text-xs"
+        >Mark as Read</button>
 
-                  <button
-                    @click="goToNotification(notif.id)"
-                    class="text-blue-600 hover:text-blue-800 text-sm"
-                  >Detail</button>
+        <button
+          @click="goToNotification(notif.id)"
+          class="text-blue-600 hover:text-blue-800 text-xs"
+        >Detail</button>
 
-                  <router-link
-                    v-if="notif.user_id"
-                    :to="`/users/${notif.user_id}`"
-                    class="text-green-600 hover:text-green-800 text-sm"
-                  ><i class="fas fa-user"></i></router-link>
+        <router-link
+          v-if="notif.user_id"
+          :to="`/users/${notif.user_id}`"
+          class="text-green-600 hover:text-green-800 text-xs"
+        ><i class="fas fa-user"></i></router-link>
 
-                  <router-link
-                    v-if="notif.maintenance_request_id"
-                    :to="`/maintenance/${notif.maintenance_request_id}`"
-                    class="text-yellow-600 hover:text-yellow-800 text-sm"
-                  ><i class="fas fa-tools"></i></router-link>
+        <router-link
+          v-if="notif.maintenance_request_id"
+          :to="`/maintenance/${notif.maintenance_request_id}`"
+          class="text-yellow-600 hover:text-yellow-800 text-xs"
+        ><i class="fas fa-tools"></i></router-link>
 
-                  <router-link
-                    v-if="notif.payment_id"
-                    :to="`/payments/${notif.payment_id}`"
-                    class="text-purple-600 hover:text-purple-800 text-sm"
-                  ><i class="fas fa-credit-card"></i></router-link>
+        <router-link
+          v-if="notif.payment_id"
+          :to="`/payments/${notif.payment_id}`"
+          class="text-purple-600 hover:text-purple-800 text-xs"
+        ><i class="fas fa-credit-card"></i></router-link>
 
-                  <router-link
-                    v-if="notif.rent_id"
-                    :to="`/rents/${notif.rent_id}`"
-                    class="text-orange-600 hover:text-orange-800 text-sm"
-                  ><i class="fas fa-home"></i></router-link>
-                </td>
-              </tr>
-              <tr v-if="filteredNotifications.length === 0">
-                <td colspan="10" class="text-center py-6 text-gray-500">No notifications found.</td>
-              </tr>
-            </tbody>
-          </table>
+        <router-link
+          v-if="notif.rent_id"
+          :to="`/rents/${notif.rent_id}`"
+          class="text-orange-600 hover:text-orange-800 text-xs"
+        ><i class="fas fa-home"></i></router-link>
+      </td>
+    </tr>
+    <tr v-if="filteredNotifications.length === 0">
+      <td colspan="10" class="text-center py-4 text-gray-500 text-xs">No notifications found.</td>
+    </tr>
+  </tbody>
+</table>
+
         </div>
 
         <!-- Mobile Card View -->
@@ -169,10 +171,13 @@
 
 <script>
 import Toast from "@/components/Toast.vue";
+import Loading from "@/components/Loading.vue"; // <-- Added Loading
+
+
 
 export default {
   name: "NotificationsView",
-  components: { Toast },
+  components: { Toast ,Loading},
   data() {
     return {
       notifications: [],
@@ -183,6 +188,7 @@ export default {
       previous: null,
       pageSize: 1000,
       pageSizes: [5, 10, 20, 50, 100],
+      loading:false,
     };
   },
   computed: {
@@ -204,6 +210,7 @@ export default {
     this.$router.push({ name: 'notificationDetail', params: { id } });
    },
     async fetchNotifications(customUrl = null) {
+      this.loading=true;
       try {
         let params = {
           user_id__email:localStorage.getItem('email'),
@@ -227,6 +234,8 @@ export default {
       } catch (err) {
         console.error("Failed to fetch notifications:", err);
         this.notifications = [];
+      }finally{
+        this.loading=false;
       }
     },
    async markAsRead(id) {

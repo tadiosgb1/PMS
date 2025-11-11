@@ -1,5 +1,6 @@
 <template>
   <div class="mt-6">
+          <Loading :visible="loading" message="Loading Brokers..." />
     <div class="overflow-x-auto border rounded">
       <table
         class="min-w-full table-auto border-collapse border border-gray-300 text-sm"
@@ -78,15 +79,21 @@
 </template>
 
 <script>
+import Loading from "@/components/Loading.vue"; // <-- Added Loading
+
 export default {
   name: "Maintenance",
   props: {
     propertyId: Number,
   },
+  components:{
+    Loading
+  },
   data() {
     return {
       maintenance: [], // initialize as empty array
       confirm:false,
+      loading:false,
     };
   },
   mounted() {
@@ -95,6 +102,7 @@ export default {
   },
   methods: {
     async fetchMaintenance() {
+      this.loading=false;
       const params = {
         property_id__id: this.propertyId,
       };
@@ -107,6 +115,8 @@ export default {
       } catch (err) {
         console.error("Failed to fetch maintenance", err);
         this.maintenance = [];
+      }finally{
+        this.loading=false;
       }
     },
     sortBy(field) {

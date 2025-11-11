@@ -186,6 +186,12 @@ export default {
           icon: "fas fa-user", //  fa-money-bill-wave → fixed
           color: "#22c55e",
         },
+
+
+
+
+          
+
         
       ],
     };

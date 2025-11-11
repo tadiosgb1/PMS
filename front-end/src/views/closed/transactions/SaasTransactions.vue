@@ -1,6 +1,7 @@
 <template>
   <div class="bg-white rounded-lg shadow p-4">
     <h2 class="text-xl font-semibold mb-4">SaaS Transactions</h2>
+      <Loading :visible="loading" message="Loading Saas transactions..." />
 
     <!-- Desktop Table -->
     <div class="hidden md:block overflow-x-auto">
@@ -49,22 +50,31 @@
 
 
 <script>
+import Loading from "@/components/Loading.vue";
 export default {
+  components:{
+   Loading
+  },
   data() {
     return {
       transactions: [],
+      loading:false,
     };
   },
   mounted() {
     this.fetchSaasTransactions();
   },
   methods: {
+
     async fetchSaasTransactions() {
+      this.loading=true
       try {
         const res = await this.$apiGet("/get_saas_transactions");
         this.transactions = res?.data || [];
       } catch (err) {
         console.error("Failed to load SaaS transactions:", err);
+      }finally{
+        this.loading=false;
       }
     },
     formatDate(dateStr) {

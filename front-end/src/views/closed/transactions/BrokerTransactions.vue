@@ -1,5 +1,7 @@
 <template>
   <div class="bg-white rounded-lg shadow p-4">
+        <Loading :visible="loading" message="Loading broker transactions..." />
+
     <h2 class="text-xl font-semibold mb-4">Broker Transactions</h2>
 
     <!-- Desktop Table -->
@@ -49,10 +51,15 @@
 
 
 <script>
+import Loading from "@/components/Loading.vue";
 export default {
+  components:{
+    Loading
+  },
   data() {
     return {
       transactions: [],
+      loading:false,
     };
   },
   mounted() {
@@ -60,11 +67,14 @@ export default {
   },
   methods: {
     async fetchBrokerTransactions() {
+      this.loading=true;
       try {
         const res = await this.$apiGet("/get_broker_transactions");
         this.transactions = res?.data || [];
       } catch (err) {
         console.error("Failed to load Broker transactions:", err);
+      }finally{
+        this.loading=false;
       }
     },
     formatDate(dateStr) {

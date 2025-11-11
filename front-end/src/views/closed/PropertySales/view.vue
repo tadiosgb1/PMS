@@ -62,135 +62,130 @@
 
           <!-- ✅ Desktop Table -->
           <div class="hidden md:block overflow-x-auto">
-            <table
-              class="min-w-full table-auto border-collapse border border-gray-300 text-sm"
-            >
-              <thead>
-                <tr class="bg-gray-200 text-gray-700">
-                  <th
-                    class="border border-gray-300 px-4 py-2 cursor-pointer"
-                    @click="sortBy('property_id.name')"
-                  >
-                    Property
-                    <SortIcon
-                      :field="'property_id.name'"
-                      :sort-key="sortKey"
-                      :sort-asc="sortAsc"
-                    />
-                  </th>
-                  <th class="border border-gray-300 px-4 py-2">Zone</th>
-                  <th class="border border-gray-300 px-4 py-2">Broker</th>
-                  <th class="border border-gray-300 px-4 py-2">Listing Price</th>
-                  <th class="border border-gray-300 px-4 py-2">Selling Price</th>
-                  <th class="border border-gray-300 px-4 py-2">Status</th>
-                  <th class="border border-gray-300 px-4 py-2">Created</th>
-                  <th class="border border-gray-300 px-4 py-2">Updated</th>
-                  <th class="border border-gray-300 px-4 py-2 text-center">
-                    Actions
-                  </th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="sale in sales"
-                  :key="sale.id"
-                  class="hover:bg-gray-100"
-                >
-                  <td class="border border-gray-300 px-4 py-2">
-                    <button
-                      @click="goToDetail(sale.property_id?.id)"
-                      class="text-green-600 hover:text-green-800"
-                      title="Detail"
-                      :disabled="!sale.property_id?.id"
-                    >
-                      {{ sale.property_id?.name || '-' }}
-                    </button>
-                  </td>
-                  <td class="border border-gray-300 px-4 py-2">
-                    <button
-                      @click="goToZoneDetail(sale.property_zone_id?.id)"
-                      class="text-green-600 hover:text-green-800"
-                      title="Detail"
-                      :disabled="!sale.property_zone_id?.id"
-                    >
-                      {{ sale.property_zone_id?.name || '-' }}
-                    </button>
-                  </td>
-                  <td class="border border-gray-300 px-4 py-2">
-                    <button
-                      @click="goToBrokerDetail(sale.broker)"
-                      class="text-green-600 hover:text-green-800"
-                      title="Detail"
-                      :disabled="!sale.broker"
-                    >
-                      {{ sale.broker || '-' }}
-                    </button>
-                  </td>
-                  <td class="border border-gray-300 px-4 py-2">
-                    {{ sale.listing_price | currency }}
-                  </td>
-                  <td class="border border-gray-300 px-4 py-2">
-                    {{ sale.selling_price | currency }}
-                  </td>
-                  <td
-                    class="border border-gray-300 px-3 py-2 whitespace-nowrap text-center"
-                  >
-                    <span
-                      class="px-3 py-1 rounded-full text-white text-xs font-semibold"
-                      :class="{
-                        'bg-green-600': sale.status === 'active',
-                        'bg-yellow-600': sale.status === 'pending'
-                      }"
-                    >
-                      {{ sale.status }}
-                    </span>
-                  </td>
-                  <td class="border border-gray-300 px-4 py-2">
-                    {{ formatDate(sale.created_at) }}
-                  </td>
-                  <td class="border border-gray-300 px-4 py-2">
-                    {{ formatDate(sale.updated_at) }}
-                  </td>
-                  <td
-                    class="border border-gray-300 px-4 py-2 text-center space-x-2"
-                  >
-                    <button
-                      @click="selectedSaleId = sale.id; showModal = true"
-                      class="relative px-4 py-2 text-green-600 border border-green-600 rounded-lg hover:text-white hover:bg-green-600 transition duration-300 ease-in-out"
-                      title="Pay Rent"
-                    >
-                      <i class="fas fa-credit-card mr-2"></i> Pay
-                    </button>
-                    <button
-                      @click="goToPayment(sale.id)"
-                      class="text-blue-600 hover:text-blue-800"
-                      title="View Payment"
-                    >
-                      View Payment
-                    </button>
-                    <button
-                      @click="openUpdateModal(sale)"
-                      class="text-blue-600 hover:text-blue-800"
-                      title="Edit"
-                    >
-                      <i class="fas fa-edit"></i>
-                    </button>
-                    <button
-                      @click="confirmDeleteSale(sale.id)"
-                      class="text-red-600 hover:text-red-800"
-                      title="Delete"
-                    >
-                      <i class="fas fa-trash-alt"></i>
-                    </button>
-                  </td>
-                </tr>
-                <tr v-if="sales.length === 0">
-                  <td colspan="9" class="text-center py-6 text-gray-500">
-                    No property sales found.
-                  </td>
-                </tr>
-              </tbody>
-            </table>
+          <table class="min-w-full table-auto border-collapse border border-gray-200 text-xs">
+  <thead>
+    <tr class="bg-gray-100 text-gray-700 uppercase tracking-wider">
+      <th
+        class="border border-gray-200 px-2 py-1 cursor-pointer text-left"
+        @click="sortBy('property_id.name')"
+      >
+        Property
+        <SortIcon
+          :field="'property_id.name'"
+          :sort-key="sortKey"
+          :sort-asc="sortAsc"
+        />
+      </th>
+      <th class="border border-gray-200 px-2 py-1 text-left">Zone</th>
+      <th class="border border-gray-200 px-2 py-1 text-left">Broker</th>
+      <th class="border border-gray-200 px-2 py-1 text-left">Listing Price</th>
+      <th class="border border-gray-200 px-2 py-1 text-left">Selling Price</th>
+      <th class="border border-gray-200 px-2 py-1 text-center">Status</th>
+      <th class="border border-gray-200 px-2 py-1 text-left">Created</th>
+      <th class="border border-gray-200 px-2 py-1 text-left">Updated</th>
+      <th class="border border-gray-200 px-2 py-1 text-center">Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr
+      v-for="sale in sales"
+      :key="sale.id"
+      class="hover:bg-gray-50 transition"
+    >
+      <td class="border border-gray-200 px-2 py-1">
+        <button
+          @click="goToDetail(sale.property_id?.id)"
+          class="text-green-600 hover:text-green-800 text-xs"
+          title="Detail"
+          :disabled="!sale.property_id?.id"
+        >
+          {{ sale.property_id?.name || '-' }}
+        </button>
+      </td>
+      <td class="border border-gray-200 px-2 py-1">
+        <button
+          @click="goToZoneDetail(sale.property_zone_id?.id)"
+          class="text-green-600 hover:text-green-800 text-xs"
+          title="Detail"
+          :disabled="!sale.property_zone_id?.id"
+        >
+          {{ sale.property_zone_id?.name || '-' }}
+        </button>
+      </td>
+      <td class="border border-gray-200 px-2 py-1">
+        <button
+          @click="goToBrokerDetail(sale.broker)"
+          class="text-green-600 hover:text-green-800 text-xs"
+          title="Detail"
+          :disabled="!sale.broker"
+        >
+          {{ sale.broker || '-' }}
+        </button>
+      </td>
+      <td class="border border-gray-200 px-2 py-1">
+        {{ sale.listing_price | currency }}
+      </td>
+      <td class="border border-gray-200 px-2 py-1">
+        {{ sale.selling_price | currency }}
+      </td>
+      <td
+        class="border border-gray-200 px-2 py-1 whitespace-nowrap text-center"
+      >
+        <span
+          class="px-2 py-0.5 rounded-full text-white text-xs font-medium"
+          :class="{
+            'bg-green-600': sale.status === 'active',
+            'bg-yellow-600': sale.status === 'pending'
+          }"
+        >
+          {{ sale.status }}
+        </span>
+      </td>
+      <td class="border border-gray-200 px-2 py-1">
+        {{ formatDate(sale.created_at) }}
+      </td>
+      <td class="border border-gray-200 px-2 py-1">
+        {{ formatDate(sale.updated_at) }}
+      </td>
+      <td class="border border-gray-200 px-2 py-1 text-center space-x-1">
+        <button
+          @click="selectedSaleId = sale.id; showModal = true"
+          class="relative px-3 py-1 text-green-600 border border-green-600 rounded-md hover:text-white hover:bg-green-600 transition duration-300 ease-in-out text-xs"
+          title="Pay Rent"
+        >
+          <i class="fas fa-credit-card mr-1"></i> Pay
+        </button>
+        <button
+          @click="goToPayment(sale.id)"
+          class="text-blue-600 hover:text-blue-800 text-xs"
+          title="View Payment"
+        >
+          View Payment
+        </button>
+        <button
+          @click="openUpdateModal(sale)"
+          class="text-blue-600 hover:text-blue-800 text-xs"
+          title="Edit"
+        >
+          <i class="fas fa-edit"></i>
+        </button>
+        <button
+          @click="confirmDeleteSale(sale.id)"
+          class="text-red-600 hover:text-red-800 text-xs"
+          title="Delete"
+        >
+          <i class="fas fa-trash-alt"></i>
+        </button>
+      </td>
+    </tr>
+    <tr v-if="sales.length === 0">
+      <td colspan="9" class="text-center py-4 text-gray-500 text-xs">
+        No property sales found.
+      </td>
+    </tr>
+  </tbody>
+</table>
+
           </div>
 
           <!-- ✅ Mobile Card View -->

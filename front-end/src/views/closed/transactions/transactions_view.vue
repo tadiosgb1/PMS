@@ -9,7 +9,7 @@
         :key="tab.key"
         @click="activeTab = tab.key"
         :class="[
-          activeTab === tab.key ? 'bg-indigo-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300',
+          activeTab === tab.key ? 'bg-primary text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300',
           'px-4 py-2 rounded-lg font-semibold transition'
         ]"
       >
