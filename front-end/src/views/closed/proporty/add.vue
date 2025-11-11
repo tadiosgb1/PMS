@@ -27,7 +27,7 @@
           <div>
             <label class="block text-gray-700">Property manager</label>
             <select v-model="form.manager_id" class="custom-input">
-              <option value="">Select Manager</option>
+              <option value="" disabled>Select Manager</option>
               <option
                 class="text-black"
                 v-for="manager in managers"
@@ -44,7 +44,7 @@
           <div>
             <label class="block text-gray-700">Property Zone</label>
             <select v-model="form.property_zone_id" class="custom-input">
-              <option value="">Select Zone</option>
+              <option value="" disabled>Select Zone</option>
               <option
                 class="text-black"
                 v-for="zone in zones"
@@ -75,6 +75,7 @@
           v-model="form.property_type"
           class="custom-input"
         >
+        <option value="" disabled>Select Property Type</option>
           <option value="land">Land</option>
           <option value="house">House</option>
           <option value="apartment">Apartment</option>

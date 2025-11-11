@@ -35,7 +35,7 @@
         <div>
             <label class="block text-gray-700">Property manager</label>
             <select v-model="form.manager_id" class="custom-input">
-              <option value="">Select Manager</option>
+              <option value="" disabled>Select Manager</option>
               <option
                 class="text-black"
                 v-for="manager in managers"
@@ -60,7 +60,7 @@
           v-model="form.property_type"
           class="custom-input"
         >
-        <option value="">Select property type</option>
+        <option value="" disabled>Select property type</option>
           <option value="land">Land</option>
           <option value="house">House</option>
           <option value="apartment">Apartment</option>
