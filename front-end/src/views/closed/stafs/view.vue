@@ -2,7 +2,7 @@
   <div>
     <Toast ref="toast" />
      
-    <Loading :visible="loading" message="Loading users..." />
+    <Loading :visible="loading" message="Loading owner staffs..." />
 
     <div class="min-h-screen bg-gray-100 ">
       <div class="bg-white shadow-md rounded-lg overflow-hidden">

@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen bg-gray-100 p-1 sm:p-1">
     <Toast ref="toast" />
-    <Loading :visible="loading" message="Loading users..." />
+    <Loading :visible="loading" message="Loading managers..." />
 
     <div class="bg-white shadow-md rounded-lg overflow-hidden">
       <!-- Header -->
