@@ -143,11 +143,7 @@ import Toast from "@/components/Toast.vue";
 import AddBroker from "./Add.vue";
 import UpdateBroker from "./Update.vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
-<<<<<<< HEAD
-import Loading from "@/components/Loading.vue"; // <-- Added Loading
-=======
 import Loading from "@/components/Loading.vue";
->>>>>>> 42219413ad9416df7a8c2f30919fe268f63746f2
 
 const SortIcon = {
   props: ["field", "sortKey", "sortAsc"],
@@ -168,11 +164,7 @@ const SortIcon = {
 
 export default {
   name: "BrokersView",
-<<<<<<< HEAD
-  components: { Toast, AddBroker, UpdateBroker, ConfirmModal, SortIcon,Loading },
-=======
   components: { Toast, AddBroker, UpdateBroker, ConfirmModal, SortIcon ,Loading},
->>>>>>> 42219413ad9416df7a8c2f30919fe268f63746f2
   data() {
     return {
       selectedBrokerId: null,
@@ -216,11 +208,7 @@ export default {
     },
 
     async fetchBrokers(customUrl = null) {
-<<<<<<< HEAD
-      this.loading = true;
-=======
       this.loading=true
->>>>>>> 42219413ad9416df7a8c2f30919fe268f63746f2
       try {
         let url = customUrl || "get_broker_profiles";
         const params = {
@@ -261,9 +249,7 @@ export default {
       }finally{
         this.loading=false;
       }
-      finally {
-        this.loading = false;
-      }
+     
     },
 
     sortBy(key) {
