@@ -396,10 +396,13 @@ export default {
     if (this.$route.query.zone_id) {
       this.zone_id_query_set = true;
     }
+   
+   
     const resultZones = await this.$getZones();
     this.zones = resultZones.zones;
-    console.log("this.zones", resultZones);
-    await this.fetchProperties();
+     console.log("this.zones", resultZones);
+
+        await this.fetchProperties();
 
   },
   async mounted() {
