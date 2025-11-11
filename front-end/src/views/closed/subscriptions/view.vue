@@ -66,7 +66,7 @@
         <!-- Table for Desktop -->
 <div class="hidden lg:block overflow-x-auto p-4">
   <table
-    class="min-w-full table-auto border-collapse text-[13px] font-medium text-gray-700"
+    class="min-w-full table-auto border-collapse text-[12px] font-medium text-gray-700"
   >
     <thead>
       <tr class="bg-gray-100 text-gray-800 uppercase tracking-wide text-[12px]">

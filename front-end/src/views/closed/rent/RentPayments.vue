@@ -2,6 +2,8 @@
   <div class="bg-white shadow rounded-lg m-3">
     <Toast ref="toast" />
 
+    <Loading :visible="loading" message="Loading rent payments..." />
+
     <!-- Header -->
     <div
       class="bg-primary text-white px-6 py-3 text-lg font-bold flex justify-between items-center"
@@ -239,8 +241,11 @@
 </template>
 
 <script>
+
+import Loading from "@/components/Loading.vue"; // <-- Added Loading
 export default {
   name: "RentPayments",
+  components:{Loading},
   data() {
     return {
       payments: [],
@@ -252,6 +257,7 @@ export default {
       previous: null,
       statusFilter: "all",
       payment_method: "",
+      loading:false
     };
   },
   computed: {
@@ -318,6 +324,7 @@ export default {
       return params;
     },
     async fetchPayments(page = 1) {
+      this.loading=true
       try {
         let params = this.buildRoleParams();
         if (this.rentId) params = { ...params, rent_id: this.rentId };
@@ -335,6 +342,10 @@ export default {
       } catch (error) {
         console.error(error);
         this.payments = [];
+      }
+
+      finally {
+        this.loading=false
       }
     },
     async fetchUrl(url) {

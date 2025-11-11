@@ -12,6 +12,7 @@
 
     <!-- Rent Detail Card -->
     <div v-if="rent" class="min-h-screen bg-gray-100 p-6">
+      <Loading :visible="loading" message="Loading rent details..." />
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
         <!-- Header -->
         <div
@@ -203,10 +204,11 @@ import AddPictureModal from "@/views/closed/rent/addRentPicture.vue";
 import UpdatePictureModal from "@/views/closed/rent/updateRentPicture.vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
 import Toast from "@/components/Toast.vue";
+import Loading from "@/components/Loading.vue"; // <-- Added Loading
 
 export default {
   name: "RentDetailView",
-  components: { AddPictureModal, UpdatePictureModal, ConfirmModal, Toast },
+  components: { AddPictureModal, UpdatePictureModal, ConfirmModal, Toast,Loading },
   data() {
     return {
       rent: null,
@@ -220,6 +222,7 @@ export default {
       imagePreviewVisible: false,
       imageToPreview: null,
       showAllPictures: false,
+      loading:false
     };
   },
    computed: {
@@ -240,12 +243,16 @@ export default {
   },
   methods: {
     async fetchRent() {
+      this.loading=true
       try {
         const response = await this.$apiGetById(`/get_rent`, this.rentId);
         this.rent = response;
       } catch (error) {
         console.error("Failed to fetch rent:", error);
         this.rent = null;
+      }
+      finally {
+        this.loading=false
       }
     },
     async fetchPictures() {
