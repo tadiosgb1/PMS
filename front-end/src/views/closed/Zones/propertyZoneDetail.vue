@@ -2,7 +2,7 @@
   <div>
     <Toast ref="toast" />
 
-        <Loading :visible="loading" message="Loading zones..." />
+    <Loading :visible="loading" message="Loading zone detail..." />
     <div class="min-h-screen bg-gray-100 p-6">
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
         <!-- Header -->
