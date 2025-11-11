@@ -2,6 +2,7 @@
   <div>
     <Toast ref="toast" />
     <div class="min-h-screen bg-gray-100 p-6">
+      <Loading :visible="loading" message="Loading Property..." />
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
         <!-- Header -->
         <div class="bg-primary text-white px-6 py-4 text-xl font-bold flex justify-between items-center">
@@ -184,6 +185,7 @@ import ConfirmModal from "@/components/ConfirmModal.vue";
 import UpdateProperty from "@/views/closed/proporty/update.vue"; // 🆕 added
 import Toast from "../../../components/Toast.vue";
 import Maintenance from "@/views/closed/maintenanceRequests/view1.vue";
+import Loading from "@/components/Loading.vue"; // <-- Added Loading
 
 export default {
   name: "PropertyDetail",
@@ -194,6 +196,7 @@ export default {
     ConfirmModal,
     Toast,
     Maintenance,
+    Loading
   },
   data() {
     return {
@@ -209,6 +212,7 @@ export default {
       imageToPreview: null,
        updateVisible: false, // 🆕 added
       propertyToEdit: null, // 🆕 added
+      loading:false
     };
   },
   computed: {
@@ -232,6 +236,7 @@ export default {
       this.updateVisible = true;
     },
     async fetchProperty() {
+      this.loading=true
       try {
         const res = await this.$apiGet(
           `/get_property/${this.$route.params.id}`
@@ -240,6 +245,10 @@ export default {
       } catch (err) {
         console.error("Failed to fetch property details", err);
         this.$refs.toast.showToast("Could not load property details.", "error");
+      }
+
+      finally  {
+  this.loading=false
       }
     },
     openUpdatePicture(picture) {

@@ -2,6 +2,7 @@
   <div class="m-3">
     <Toast ref="toast" />
     <div class="min-h-screen bg-gray-100">
+      <Loading :visible="loading" message="Loading subscription Payments..." />
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
         <!-- Header -->
         <div
@@ -272,10 +273,11 @@
 <script>
 import Toast from "@/components/Toast.vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
+import Loading from "@/components/Loading.vue"; // <-- Added Loading
 
 export default {
   name: "subscriptionPaymentView",
-  components: { Toast,ConfirmModal },
+  components: { Toast,ConfirmModal,Loading },
   data() {
     return {
       payments: [],
@@ -292,6 +294,7 @@ export default {
       showConfirm: false,
 selectedPayment: null,
 selectedAction: "", // 'approve' or 'reject'
+loading:false
     };
   },
   computed: {
@@ -342,6 +345,7 @@ selectedAction: "", // 'approve' or 'reject'
       this.$router.push(`/sub-detail/${id}`);
     },
     async fetchPayments(page = 1) {
+      this.loading=true
       try {
         let params;
         if (localStorage.getItem("is_superuser") === "true") {
@@ -386,6 +390,9 @@ selectedAction: "", // 'approve' or 'reject'
       } catch (error) {
         console.error("Failed to fetch subscription payments:", error);
         this.payments = [];
+      }
+      finally {
+        this.loading=false
       }
     },
     async fetchUrl(url) {
