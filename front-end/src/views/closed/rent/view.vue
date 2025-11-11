@@ -51,93 +51,105 @@
           </div>
 
           <!-- ✅ Table for Desktop -->
-          <div class="hidden md:block overflow-x-auto">
-            <table class="min-w-full table-auto border-collapse border border-gray-300">
-              <thead>
-                <tr class="bg-gray-200 text-gray-700">
-                  <th class="border border-gray-300 px-4 py-2">Property</th>
-                  <th class="border border-gray-300 px-4 py-2">Tenant</th>
-                  <th class="border border-gray-300 px-4 py-2">Rent Type</th>
-                  <th class="border border-gray-300 px-4 py-2">Payment Cycle</th>
-                  <th class="border border-gray-300 px-4 py-2">Start Date</th>
-                  <th class="border border-gray-300 px-4 py-2">End Date</th>
-                  <th class="border border-gray-300 px-4 py-2">Rent Amount</th>
-                  <th class="border border-gray-300 px-4 py-2">Deposit</th>
-                  <th class="border border-gray-300 px-4 py-2">Status</th>
-                  <th class="border border-gray-300 px-4 py-2 text-center">Actions</th>
-                </tr>
-              </thead>
+<div class="hidden lg:block overflow-x-auto p-4">
+  <table class="min-w-full table-auto border-collapse text-[13px] font-medium text-gray-700">
+    <thead>
+      <tr class="bg-gray-100 text-gray-800 uppercase tracking-wide text-[12px]">
+        <th class="border-b border-gray-200 px-3 py-2 text-left">Property</th>
+        <th class="border-b border-gray-200 px-3 py-2 text-left">Tenant</th>
+        <th class="border-b border-gray-200 px-3 py-2 text-left">Rent Type</th>
+        <th class="border-b border-gray-200 px-3 py-2 text-left">Payment Cycle</th>
+        <th class="border-b border-gray-200 px-3 py-2 text-left">Start Date</th>
+        <th class="border-b border-gray-200 px-3 py-2 text-left">End Date</th>
+        <th class="border-b border-gray-200 px-3 py-2 text-left">Rent Amount</th>
+        <th class="border-b border-gray-200 px-3 py-2 text-left">Deposit</th>
+        <th class="border-b border-gray-200 px-3 py-2 text-left">Status</th>
+        <th class="border-b border-gray-200 px-3 py-2 text-center">Actions</th>
+      </tr>
+    </thead>
 
-              <tbody>
-                <tr
-                  v-for="rent in rents"
-                  :key="rent.id"
-                  class="hover:bg-gray-100"
-                >
-                  <!-- Property -->
-                  <td
-                    class="border border-gray-300 px-4 py-2 text-blue-600 hover:underline cursor-pointer"
-                    @click="goToPropertyDetail(rent.property_id.id)"
-                  >
-                    {{ rent.property_id?.name || 'N/A' }}
-                  </td>
+    <tbody>
+      <tr
+        v-for="rent in rents"
+        :key="rent.id"
+        class="hover:bg-gray-50 even:bg-gray-50/40 transition-colors"
+      >
+        <!-- Property -->
+        <td
+          class="border-b border-gray-200 px-3 py-1.5 text-blue-600 hover:underline cursor-pointer truncate"
+          @click="goToPropertyDetail(rent.property_id.id)"
+        >
+          {{ rent.property_id?.name || 'N/A' }}
+        </td>
 
-                  <!-- Tenant -->
-                  <td
-                    class="border border-gray-300 px-4 py-2 text-blue-600 hover:underline cursor-pointer"
-                    @click="goToUserDetail(rent.user_id.id)"
-                  >
-                    {{ rent.user_id?.first_name }} {{ rent.user_id?.last_name }}
-                  </td>
+        <!-- Tenant -->
+        <td
+          class="border-b border-gray-200 px-3 py-1.5 text-blue-600 hover:underline cursor-pointer truncate"
+          @click="goToUserDetail(rent.user_id.id)"
+        >
+          {{ rent.user_id?.first_name }} {{ rent.user_id?.last_name }}
+        </td>
 
-                  <td class="border border-gray-300 px-4 py-2">{{ rent.rent_type }}</td>
-                  <td class="border border-gray-300 px-4 py-2">{{ rent.payment_cycle }}</td>
-                  <td class="border border-gray-300 px-4 py-2">
-                    {{ new Date(rent.start_date).toLocaleDateString() }}
-                  </td>
-                  <td class="border border-gray-300 px-4 py-2">
-                    {{ new Date(rent.end_date).toLocaleDateString() }}
-                  </td>
-                  <td class="border border-gray-300 px-4 py-2">{{ rent.rent_amount }}</td>
-                  <td class="border border-gray-300 px-4 py-2">{{ rent.deposit_amount }}</td>
+        <td class="border-b border-gray-200 px-3 py-1.5 truncate">{{ rent.rent_type }}</td>
+        <td class="border-b border-gray-200 px-3 py-1.5 truncate">{{ rent.payment_cycle }}</td>
+        <td class="border-b border-gray-200 px-3 py-1.5 truncate">
+          {{ new Date(rent.start_date).toLocaleDateString() }}
+        </td>
+        <td class="border-b border-gray-200 px-3 py-1.5 truncate">
+          {{ new Date(rent.end_date).toLocaleDateString() }}
+        </td>
+        <td class="border-b border-gray-200 px-3 py-1.5 truncate">{{ rent.rent_amount }}</td>
+        <td class="border-b border-gray-200 px-3 py-1.5 truncate">{{ rent.deposit_amount }}</td>
 
-                  <!-- Status -->
-                  <td class="border border-gray-300 px-4 py-2">
-                    <span
-                      class="px-2 py-1 rounded text-xs font-semibold"
-                      :class="{
-                        'bg-green-100 text-green-700': rent.status === 'active',
-                        'bg-red-100 text-red-700': rent.status !== 'active'
-                      }"
-                    >
-                      {{ rent.status }}
-                    </span>
-                  </td>
+        <!-- Status -->
+        <td class="border-b border-gray-200 px-3 py-1.5 text-center">
+          <span
+            class="px-2 py-1 rounded text-xs font-semibold"
+            :class="{
+              'bg-green-100 text-green-700': rent.status === 'active',
+              'bg-red-100 text-red-700': rent.status !== 'active'
+            }"
+          >
+            {{ rent.status }}
+          </span>
+        </td>
 
-                  <!-- Actions -->
-                  <td class="border border-gray-300 px-4 py-2 text-center space-x-2">
-                    <button
-                      @click="selectedRentId = rent.id; showModal = true"
-                      class="relative px-4 py-2 text-green-600 border border-green-600 rounded-lg hover:text-white hover:bg-green-600 transition duration-300 ease-in-out"
-                      title="Pay Rent"
-                    >
-                      <i class="fas fa-credit-card mr-2"></i> Pay
-                    </button>
-                    <button @click="rentDetail(rent.id)" class="text-blue-600 hover:text-blue-800">
-                      <i class="fas fa-eye"></i>
-                    </button>
-                    <button @click="goToPayments(rent.id)" class="text-orange-600 hover:text-orange-800">
-                      Payments
-                    </button>
-                  </td>
-                </tr>
+        <!-- Actions -->
+        <td class="border-b border-gray-200 px-3 py-1.5 text-center space-x-2">
+          <button
+            @click="selectedRentId = rent.id; showModal = true"
+            class="relative px-3 py-1.5 text-green-600 border border-green-600 rounded-lg hover:text-white hover:bg-green-600 transition duration-300 ease-in-out"
+            title="Pay Rent"
+          >
+            <i class="fas fa-credit-card mr-2"></i> Pay
+          </button>
 
-                <tr v-if="rents.length === 0">
-                  <td colspan="10" class="text-center py-6 text-gray-500">No rents found.</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+          <button
+            @click="rentDetail(rent.id)"
+            class="text-blue-600 hover:text-blue-800"
+            title="Details"
+          >
+            <i class="fas fa-eye"></i>
+          </button>
+
+          <button
+            @click="goToPayments(rent.id)"
+            class="text-orange-600 hover:text-orange-800"
+            title="Payments"
+          >
+            Payments
+          </button>
+        </td>
+      </tr>
+
+      <tr v-if="rents.length === 0">
+        <td colspan="10" class="text-center py-6 text-gray-500 text-[13px]">
+          No rents found.
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
           <!-- ✅ List view for Mobile -->
           <div class="md:hidden space-y-4">

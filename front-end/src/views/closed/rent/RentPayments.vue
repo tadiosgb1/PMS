@@ -62,90 +62,89 @@
       </div>
     </div>
 
-    <!-- Table (Desktop) -->
-    <div class="hidden md:block p-4 overflow-x-auto">
-      <table class="min-w-full border border-gray-200">
-        <thead class="bg-gray-50 text-sm text-gray-700 uppercase">
-          <tr>
-            <th class="px-3 py-2 text-left">#</th>
-            <th class="px-3 py-2 text-left">Amount</th>
-            <th class="px-3 py-2 text-left">Due Date</th>
-            <th class="px-3 py-2 text-left">Payment Method</th>
-            <th class="px-3 py-2 text-left">Transaction ID</th>
-            <th class="px-3 py-2 text-left">Status</th>
-            <th class="px-3 py-2 text-left">Created At</th>
-            <th class="px-3 py-2 text-left">Updated At</th>
-            <th class="px-3 py-2 text-left">Rent Info</th>
-            <th class="px-3 py-2 text-left">User</th>
-            <th class="px-3 py-2 text-center">Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr
-            v-for="(payment, index) in filteredPayments"
-            :key="payment.id"
-            class="border-t hover:bg-gray-50"
+   <!-- Table (Desktop) -->
+<div class="hidden lg:block overflow-x-auto p-4">
+  <table class="min-w-full table-auto border-collapse text-[13px] font-medium text-gray-700">
+    <thead>
+      <tr class="bg-gray-100 text-gray-800 uppercase tracking-wide text-[12px]">
+        <th class="border-b border-gray-200 px-3 py-2 text-left">#</th>
+        <th class="border-b border-gray-200 px-3 py-2 text-left">Amount</th>
+        <th class="border-b border-gray-200 px-3 py-2 text-left">Due Date</th>
+        <th class="border-b border-gray-200 px-3 py-2 text-left">Payment Method</th>
+        <th class="border-b border-gray-200 px-3 py-2 text-left">Transaction ID</th>
+        <th class="border-b border-gray-200 px-3 py-2 text-left">Status</th>
+        <th class="border-b border-gray-200 px-3 py-2 text-left">Created At</th>
+        <th class="border-b border-gray-200 px-3 py-2 text-left">Updated At</th>
+        <th class="border-b border-gray-200 px-3 py-2 text-left">Rent Info</th>
+        <th class="border-b border-gray-200 px-3 py-2 text-left">User</th>
+        <th class="border-b border-gray-200 px-3 py-2 text-center">Actions</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr
+        v-for="(payment, index) in filteredPayments"
+        :key="payment.id"
+        class="hover:bg-gray-50 even:bg-gray-50/40 transition-colors"
+      >
+        <td class="border-b border-gray-200 px-3 py-1.5 truncate">{{ index + 1 }}</td>
+        <td class="border-b border-gray-200 px-3 py-1.5 truncate">{{ payment.amount }} ETB</td>
+        <td class="border-b border-gray-200 px-3 py-1.5 truncate">{{ formatDate(payment.due_date) }}</td>
+        <td class="border-b border-gray-200 px-3 py-1.5 truncate capitalize">{{ payment.payment_method }}</td>
+        <td class="border-b border-gray-200 px-3 py-1.5 truncate font-mono text-xs">{{ payment.transaction_id }}</td>
+
+        <td class="border-b border-gray-200 px-3 py-1.5 text-center">
+          <span
+            class="px-2 py-1 rounded text-xs font-semibold"
+            :class="{
+              'bg-green-100 text-green-800': payment.status === 'paid',
+              'bg-yellow-100 text-yellow-800': payment.status === 'pending',
+              'bg-red-100 text-red-800': payment.status === 'cancelled'
+            }"
           >
-            <td class="px-3 py-2">{{ index + 1 }}</td>
-            <td class="px-3 py-2">{{ payment.amount }} ETB</td>
-            <td class="px-3 py-2">{{ formatDate(payment.due_date) }}</td>
-            <td class="px-3 py-2 capitalize">{{ payment.payment_method }}</td>
-            <td class="px-3 py-2 font-mono text-xs">{{ payment.transaction_id }}</td>
-            <td class="px-3 py-2">
-              <span
-                class="px-2 py-1 rounded text-xs font-semibold"
-                :class="{
-                  'bg-green-100 text-green-800': payment.status === 'paid',
-                  'bg-yellow-100 text-yellow-800': payment.status === 'pending',
-                  'bg-red-100 text-red-800': payment.status === 'cancelled'
-                }"
-              >
-                {{ payment.status }}
-              </span>
-            </td>
-            <td class="px-3 py-2">{{ formatDate(payment.created_at) }}</td>
-            <td class="px-3 py-2">{{ payment.updated_at ? formatDate(payment.updated_at) : '-' }}</td>
-            <td class="px-3 py-2">
-              <button
-                @click="goToRentDetail(payment.rent_id)"
-                class="text-blue-600 hover:text-blue-800"
-              >
-                View
-              </button>
-            </td>
-            <td class="px-3 py-2">
-              <button
-                @click="goToUserDetail(payment.user_id)"
-                class="text-blue-600 hover:text-blue-800"
-              >
-                View
-              </button>
-            </td>
-            <td class="px-3 py-2 text-center space-x-2">
-              <button
-                v-if="payment.status == 'pending' || payment.status == 'cancelled'"
-                @click="approve(payment)"
-                class="text-green-600 hover:text-green-800 font-semibold"
-              >
-                Approve
-              </button>
-              <button
-                v-if="payment.status == 'pending' || payment.status == 'complete'"
-                @click="reject(payment)"
-                class="text-red-600 hover:text-red-800 font-semibold"
-              >
-                Cancel
-              </button>
-            </td>
-          </tr>
-          <tr v-if="filteredPayments.length === 0">
-            <td colspan="11" class="px-3 py-4 text-center text-gray-500">
-              No payments found
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
+            {{ payment.status }}
+          </span>
+        </td>
+
+        <td class="border-b border-gray-200 px-3 py-1.5 truncate">{{ formatDate(payment.created_at) }}</td>
+        <td class="border-b border-gray-200 px-3 py-1.5 truncate">
+          {{ payment.updated_at ? formatDate(payment.updated_at) : '-' }}
+        </td>
+
+        <td class="border-b border-gray-200 px-3 py-1.5 truncate">
+          <button @click="goToRentDetail(payment.rent_id)" class="text-blue-600 hover:text-blue-800">View</button>
+        </td>
+
+        <td class="border-b border-gray-200 px-3 py-1.5 truncate">
+          <button @click="goToUserDetail(payment.user_id)" class="text-blue-600 hover:text-blue-800">View</button>
+        </td>
+
+        <td class="border-b border-gray-200 px-3 py-1.5 text-center space-x-2">
+          <button
+            v-if="payment.status == 'pending' || payment.status == 'cancelled'"
+            @click="approve(payment)"
+            class="text-green-600 hover:text-green-800 font-semibold"
+          >
+            Approve
+          </button>
+          <button
+            v-if="payment.status == 'pending' || payment.status == 'complete'"
+            @click="reject(payment)"
+            class="text-red-600 hover:text-red-800 font-semibold"
+          >
+            Cancel
+          </button>
+        </td>
+      </tr>
+
+      <tr v-if="filteredPayments.length === 0">
+        <td colspan="11" class="border-b border-gray-200 px-3 py-4 text-center text-gray-500 text-[13px]">
+          No payments found
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
     <!-- Card List (Mobile / Tablet) -->
     <div class="block md:hidden p-3 space-y-3">

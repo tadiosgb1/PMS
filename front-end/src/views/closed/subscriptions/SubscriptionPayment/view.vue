@@ -75,88 +75,85 @@
             <span class="text-orange-600">{{ totalAmountByStatus }}</span>
           </div>
 
-          <!-- Table View (Desktop) -->
-          <div class="hidden md:block overflow-x-auto">
-            <table class="min-w-full border border-gray-200">
-              <thead class="bg-gray-50">
-                <tr>
-                  <th class="px-3 py-2 text-left">Transaction ID</th>
-                  <th class="px-3 py-2 text-left">Subscription</th>
-                  <th class="px-3 py-2 text-left">Owner</th>
-                  <th class="px-3 py-2 text-left">Payment Method</th>
-                  <th class="px-3 py-2 text-left">Amount</th>
-                  <th class="px-3 py-2 text-left">Created At</th>
-                  <th class="px-3 py-2 text-left">End Date</th>
-                  <th class="px-3 py-2 text-left">Plan</th>
-                  <th class="px-3 py-2 text-left">Status</th>
-                  <th v-if="$hasPermission('pms.change_subscriptionpayment')" class="px-3 py-2 text-center">Actions</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="p in filteredAndSortedPayments"
-                  :key="p.id"
-                  class="border-t hover:bg-gray-50"
-                >
-                  <td class="px-3 py-2">{{ p.transaction_id }}</td>
-                  <td class="px-3 py-2">
-                    <button
-                      @click="goToSubDetail(p.subscription_id)"
-                      class="text-blue-600 hover:text-blue-800"
-                    >
-                      View
-                    </button>
-                  </td>
-                  <td class="px-3 py-2">
-                    <button
-                      @click="goToUserDetail(p.user_id)"
-                      class="text-blue-600 hover:text-blue-800"
-                    >
-                      View
-                    </button>
-                  </td>
-                  <td class="px-3 py-2">{{ p.payment_method }}</td>
-                  <td class="px-3 py-2">{{ p.amount }}</td>
-                  <td class="px-3 py-2">{{ p.created_at || "-" }}</td>
-                  <td class="px-3 py-2">{{ p.end_date || "-" }}</td>
-                  <td class="px-3 py-2">{{ p.planName }}</td>
-                  <td class="px-3 py-2">
-                    <span
-                      class="px-2 py-1 rounded text-xs font-semibold"
-                      :class="{
-                        'bg-green-100 text-green-700': p.status === 'paid',
-                        'bg-yellow-100 text-yellow-700': p.status === 'pending',
-                        'bg-red-100 text-red-700': p.status === 'canceled',
-                      }"
-                    >
-                      {{ p.status }}
-                    </span>
-                  </td>
-                  <td v-if="$hasPermission('pms.change_subscriptionpayment')" class="px-3 py-2 text-center">
-                    <button
-                      v-if="p.status === 'pending' || p.status === 'canceled'"
-                      @click="askConfirmation('approve', p)"
-                      class="text-blue-600 hover:text-blue-800"
-                    >
-                      Approve
-                    </button>
-                    <button
-                      v-if="p.status === 'pending' || p.status === 'paid'"
-                      @click="askConfirmation('reject', p)"
-                      class="ml-2 text-red-600 hover:text-red-800"
-                    >
-                      Reject
-                    </button>
-                  </td>
-                </tr>
-                <tr v-if="filteredAndSortedPayments.length === 0">
-                  <td colspan="10" class="text-center py-4 text-gray-500">
-                    No subscription payments found.
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+         <!-- Table View (Desktop) -->
+<div class="hidden lg:block overflow-x-auto p-4">
+  <table class="min-w-full table-auto border-collapse text-[13px] font-medium text-gray-700">
+    <thead>
+      <tr class="bg-gray-100 text-gray-800 uppercase tracking-wide text-[12px]">
+        <th class="border-b border-gray-300 px-3 py-2 text-left">Transaction ID</th>
+        <th class="border-b border-gray-300 px-3 py-2 text-left">Subscription</th>
+        <th class="border-b border-gray-300 px-3 py-2 text-left">Owner</th>
+        <th class="border-b border-gray-300 px-3 py-2 text-left">Payment Method</th>
+        <th class="border-b border-gray-300 px-3 py-2 text-left">Amount</th>
+        <th class="border-b border-gray-300 px-3 py-2 text-left">Created At</th>
+        <th class="border-b border-gray-300 px-3 py-2 text-left">End Date</th>
+        <th class="border-b border-gray-300 px-3 py-2 text-left">Plan</th>
+        <th class="border-b border-gray-300 px-3 py-2 text-left">Status</th>
+        <th v-if="$hasPermission('pms.change_subscriptionpayment')" class="border-b border-gray-300 px-3 py-2 text-center">Actions</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <tr
+        v-for="p in filteredAndSortedPayments"
+        :key="p.id"
+        class="hover:bg-gray-50 even:bg-gray-50/40 transition-colors"
+      >
+        <td class="border-b border-gray-200 px-3 py-1.5 truncate">{{ p.transaction_id }}</td>
+
+        <td class="border-b border-gray-200 px-3 py-1.5">
+          <button @click="goToSubDetail(p.subscription_id)" class="text-blue-600 hover:text-blue-800">View</button>
+        </td>
+
+        <td class="border-b border-gray-200 px-3 py-1.5">
+          <button @click="goToUserDetail(p.user_id)" class="text-blue-600 hover:text-blue-800">View</button>
+        </td>
+
+        <td class="border-b border-gray-200 px-3 py-1.5 truncate">{{ p.payment_method }}</td>
+        <td class="border-b border-gray-200 px-3 py-1.5 truncate">{{ p.amount }}</td>
+        <td class="border-b border-gray-200 px-3 py-1.5 truncate">{{ p.created_at || "-" }}</td>
+        <td class="border-b border-gray-200 px-3 py-1.5 truncate">{{ p.end_date || "-" }}</td>
+        <td class="border-b border-gray-200 px-3 py-1.5 truncate">{{ p.planName }}</td>
+
+        <td class="border-b border-gray-200 px-3 py-1.5 text-center">
+          <span
+            class="px-2 py-1 rounded text-xs font-semibold"
+            :class="{
+              'bg-green-100 text-green-700': p.status === 'paid',
+              'bg-yellow-100 text-yellow-700': p.status === 'pending',
+              'bg-red-100 text-red-700': p.status === 'canceled'
+            }"
+          >
+            {{ p.status }}
+          </span>
+        </td>
+
+        <td v-if="$hasPermission('pms.change_subscriptionpayment')" class="border-b border-gray-200 px-3 py-1.5 text-center space-x-2">
+          <button
+            v-if="p.status === 'pending' || p.status === 'canceled'"
+            @click="askConfirmation('approve', p)"
+            class="text-blue-600 hover:text-blue-800"
+          >
+            Approve
+          </button>
+          <button
+            v-if="p.status === 'pending' || p.status === 'paid'"
+            @click="askConfirmation('reject', p)"
+            class="ml-2 text-red-600 hover:text-red-800"
+          >
+            Reject
+          </button>
+        </td>
+      </tr>
+
+      <tr v-if="filteredAndSortedPayments.length === 0">
+        <td colspan="10" class="text-center py-4 text-gray-500 text-[13px]">
+          No subscription payments found.
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
           <!-- Card List View (Mobile & Tablet) -->
           <div class="md:hidden grid gap-4">
