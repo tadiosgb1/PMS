@@ -109,8 +109,8 @@
           <div v-else class="mb-8 text-gray-500">No pictures available.</div>
 
           <!-- Maintenance Requests -->
-          <div v-if="property" class="mt-10">
-            <h2 class="text-xl font-semibold mb-4">Maintenance Requests</h2>
+          <div v-if="property" >
+            <h2 class="text-xl font-semibold ">Maintenance Requests</h2>
             <Maintenance
               :visible="true"
               :propertyId="property.id"
