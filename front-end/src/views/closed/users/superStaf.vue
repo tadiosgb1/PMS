@@ -1,16 +1,16 @@
 <template>
-  <div class="min-h-screen bg-gray-100 p-4 sm:p-6">
-    <Loading :visible="loading" message="Fetching users..." />
+  <div class="min-h-screen bg-gray-100 p-0 sm:p-0">
+    <Loading :visible="loading" message="Loading super staff..." />
 
     <div class="bg-white shadow-md rounded-lg overflow-hidden">
       <!-- Header -->
       <div
-        class="bg-primary text-white px-6 py-4 text-xl font-bold flex justify-between items-center"
+        class="bg-primary text-white px-6 py-0 text-xl font-bold flex justify-between items-center"
       >
         Super Staff Users
         <button
           @click="showAddModal = true"
-          class="bg-white text-blue-700 font-semibold px-3 sm:px-4 py-2 rounded-lg shadow hover:bg-gray-100 transition flex items-center border border-gray-300"
+          class="bg-white text-blue-700 font-semibold px-3 sm:px-4 py-1 my-2 rounded-lg shadow hover:bg-gray-100 transition flex items-center border border-gray-300"
         >
           <span class="text-primary mr-1 text-lg">+</span> Add
         </button>

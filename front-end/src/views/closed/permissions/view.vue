@@ -1,6 +1,8 @@
 <template>
   <div>
     <Toast ref="toast" />
+      <Loading :visible="loading" message="Loading Permissions..." />
+
     <div class="min-h-screen bg-gray-100 p-4 md:p-6">
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
         <!-- Header -->
@@ -142,6 +144,7 @@ import Toast from "../../../components/Toast.vue";
 import AddPermission from "./add.vue";
 import UpdatePermission from "./update.vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
+import Loading from "@/components/Loading.vue"; // <-- Added Loading
 
 const SortIcon = {
   props: ["field", "sortKey", "sortAsc"],
@@ -168,6 +171,7 @@ export default {
     UpdatePermission,
     ConfirmModal,
     Toast,
+    Loading
   },
   data() {
     return {
@@ -180,6 +184,7 @@ export default {
       permissionToEdit: null,
       deleteModalVisible: false,
       permissionToDelete: null,
+      loading:false,
     };
   },
   computed: {
@@ -213,6 +218,7 @@ export default {
       }
     },
     async fetchPermissions() {
+      this.loading=true;
       const params = {
         page_size: 1000,
       };
@@ -223,6 +229,8 @@ export default {
       } catch (error) {
         console.error("Failed to fetch permissions:", error);
         alert("Failed to load permissions.");
+      }finally{
+        this.loading=false;
       }
     },
     editPermission(permission) {

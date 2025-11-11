@@ -1,11 +1,11 @@
 <template>
   <div
     v-if="visible"
-    class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50"
+    class="fixed inset-0 bg-white bg-opacity-80 flex items-center justify-center z-50"
   >
     <div class="flex flex-col items-center justify-center">
       <div class="animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
-      <p class="text-white mt-3 font-medium text-lg">{{ message }}</p>
+      <p class="text-yellow-700 mt-3 font-medium text-lg">{{ message }}</p>
     </div>
   </div>
 </template>

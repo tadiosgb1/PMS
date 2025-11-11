@@ -2,14 +2,14 @@
   <div>
     <Toast ref="toast" />
 
-    <div class="min-h-screen bg-gray-100 p-4 md:p-6 relative">
+    <div class="min-h-screen bg-gray-100 p-0 md:p-0 relative">
       <!-- Common Loading Component -->
       <Loading :visible="loading" message="Loading users..." />
 
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
         <!-- Header -->
         <div
-          class="bg-primary text-white px-6 py-4 text-xl font-bold flex justify-between items-center"
+          class="bg-primary text-white px-6 py-2 text-xl font-bold flex justify-between items-center"
         >
           <span>Users List</span>
           <button

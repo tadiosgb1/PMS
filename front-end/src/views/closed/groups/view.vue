@@ -1,29 +1,23 @@
 <template>
   <div>
     <Toast ref="toast" />
+     <Loading :visible="loading" message="Loading Groups..." />
+
     <div class="min-h-screen bg-gray-100 p-4 md:p-6">
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
         <!-- Header -->
-        <div
-          class="bg-primary text-white px-6 py-4 text-xl font-bold flex justify-between items-center"
-        >
+        <div class="bg-primary text-white px-6 py-4 text-xl font-bold flex justify-between items-center">
           Groups
-          <button
-            @click="visible = true"
-            class="bg-white text-blue-700 font-semibold px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300"
-          >
+          <button @click="visible = true"
+            class="bg-white text-blue-700 font-semibold px-4 py-2 rounded shadow hover:bg-gray-100 hover:shadow-md transition-all duration-200 border border-gray-300">
             <span class="text-primary">+</span> Add Group
           </button>
         </div>
 
         <div class="p-6">
           <!-- Search -->
-          <input
-            v-model="searchTerm"
-            type="search"
-            placeholder="Search group..."
-            class="w-full md:w-1/3 px-4 py-2 mb-6 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          />
+          <input v-model="searchTerm" type="search" placeholder="Search group..."
+            class="w-full md:w-1/3 px-4 py-2 mb-6 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" />
 
           <!-- Table for Desktop -->
           <div class="hidden md:block overflow-x-auto">
@@ -64,7 +58,8 @@
 
           <!-- Card/List view for Mobile & Tablet -->
           <div class="md:hidden flex flex-col gap-4">
-            <div v-for="group in filteredAndSortedGroups" :key="group.id" class="bg-gray-50 rounded-lg shadow p-4 flex flex-col gap-2">
+            <div v-for="group in filteredAndSortedGroups" :key="group.id"
+              class="bg-gray-50 rounded-lg shadow p-4 flex flex-col gap-2">
               <div class="flex justify-between items-center">
                 <h3 class="font-semibold text-lg">{{ group.name }}</h3>
               </div>
@@ -75,10 +70,12 @@
                 </ul>
               </div>
               <div class="flex gap-2 mt-2">
-                <button @click="editGroup(group)" class="flex items-center px-3 py-1.5 bg-blue-50 text-blue-700 text-sm font-medium rounded-lg border border-blue-200 hover:bg-blue-100 transition">
+                <button @click="editGroup(group)"
+                  class="flex items-center px-3 py-1.5 bg-blue-50 text-blue-700 text-sm font-medium rounded-lg border border-blue-200 hover:bg-blue-100 transition">
                   <i class="fas fa-edit mr-1"></i> Edit
                 </button>
-                <button @click="deleteGroup(group)" class="flex items-center px-3 py-1.5 bg-red-50 text-red-700 text-sm font-medium rounded-lg border border-red-200 hover:bg-red-100 transition">
+                <button @click="deleteGroup(group)"
+                  class="flex items-center px-3 py-1.5 bg-red-50 text-red-700 text-sm font-medium rounded-lg border border-red-200 hover:bg-red-100 transition">
                   <i class="fas fa-trash-alt mr-1"></i> Delete
                 </button>
               </div>
@@ -94,13 +91,8 @@
       <AddGroup v-if="visible" :visible="visible" @close="visible = false" @saved="fetchGroups" />
 
       <!-- Update Modal -->
-      <UpdateGroup
-        v-if="updateVisible"
-        :visible="updateVisible"
-        :groupData="selectedGroup"
-        @close="updateVisible = false"
-        @updated="fetchGroups"
-      />
+      <UpdateGroup v-if="updateVisible" :visible="updateVisible" :groupData="selectedGroup"
+        @close="updateVisible = false" @updated="fetchGroups" />
     </div>
   </div>
 </template>
@@ -110,6 +102,8 @@
 import Toast from '../../../components/Toast.vue';
 import AddGroup from './add.vue';
 import UpdateGroup from './update.vue';
+import Loading from "@/components/Loading.vue"; // <-- Added Loading
+
 
 const SortIcon = {
   props: ['field', 'sortKey', 'sortAsc'],
@@ -130,7 +124,7 @@ const SortIcon = {
 
 export default {
   name: 'GroupsView',
-  components: { SortIcon, AddGroup, UpdateGroup ,Toast},
+  components: { SortIcon, AddGroup, UpdateGroup, Toast,Loading },
   data() {
     return {
       searchTerm: '',
@@ -139,7 +133,8 @@ export default {
       selectedGroup: null,
       sortKey: 'name',
       sortAsc: true,
-      groups: []
+      groups: [],
+      loading:false,
     };
   },
   computed: {
@@ -163,16 +158,19 @@ export default {
   },
   methods: {
     async fetchGroups() {
+      this.loading=true;
       try {
         const response = await this.$apiGet('/get_groups', { page_size: 1000 });
         this.groups = response.data || [];
-        
-        console.log("groups",this.groups);
+
+        console.log("groups", this.groups);
 
       } catch (error) {
         console.error('Failed to fetch groups:', error);
         alert('Failed to load groups. Please try again later.');
         this.groups = [];
+      }finally{
+        this.loading=false;
       }
     },
     sortBy(key) {
