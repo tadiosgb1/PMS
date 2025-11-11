@@ -103,6 +103,14 @@ export default {
           color: "#3b82f6",
           permission: "pms.view_propertyzone",
         },
+
+          {
+          name: "Coworking Spaces",
+          route: "coworking-spaces",
+          icon: "fas fa-people-roof", //  better icon for shared spaces
+          color: "#22c55e",
+        },
+       
         {
           name: "Properties",
           route: "properties",
@@ -118,12 +126,32 @@ export default {
           permission: "pms.view_propertyzonesale",
             //permission: "pms.view_propertysale",
         },
+         {
+          name: "List of Property for sale",
+          route: "propertiesListForSale",
+          icon: "fas fa-building", //  fa-money-bill-wave → fixed
+          color: "#22c55e",
+        },
         {
           name: "Rent Management",
           route: "rents",
           icon: "fas fa-file-contract", //  valid
           color: "#3b82f6",
           permission: "pms.view_rent",
+        },
+
+         {
+          name: "Coworking-space-rentals",
+          route: "coworking-space-rentals",
+          icon: "fas fa-file-signature", //  relevant for contracts
+          color: "#22c55e",
+        },
+         {
+          name: "Maintenance Requests",
+          route: "maintenance-requests",
+          icon: "fas fa-screwdriver-wrench", //  fa-tools → modern name
+          color: "#ef4444",
+          permission: "pms.view_maintenancerequest",
         },
      
         {
@@ -132,25 +160,8 @@ export default {
           icon: "fas fa-money-bill-wave", //  valid
           color: "#22c55e",
         },
-        {
-          name: "Coworking Spaces",
-          route: "coworking-spaces",
-          icon: "fas fa-people-roof", //  better icon for shared spaces
-          color: "#22c55e",
-        },
-        {
-          name: "Coworking-space-rentals",
-          route: "coworking-space-rentals",
-          icon: "fas fa-file-signature", //  relevant for contracts
-          color: "#22c55e",
-        },
-           {
-          name: "Maintenance Requests",
-          route: "maintenance-requests",
-          icon: "fas fa-screwdriver-wrench", //  fa-tools → modern name
-          color: "#ef4444",
-          permission: "pms.view_maintenancerequest",
-        },
+      
+          
         {
           name: "Transactions",
           route: "transactions",
@@ -175,12 +186,7 @@ export default {
           icon: "fas fa-user", //  fa-money-bill-wave → fixed
           color: "#22c55e",
         },
-         {
-          name: "List of Property for sale",
-          route: "propertiesListForSale",
-          icon: "fas fa-building", //  fa-money-bill-wave → fixed
-          color: "#22c55e",
-        },
+        
       ],
     };
   },

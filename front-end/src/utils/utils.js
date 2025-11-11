@@ -1,7 +1,7 @@
 import axios from "axios";
 import router from '../router'; // Import the router directly
 import store from '../store';
-import { globalLoading } from '@/App.vue'; // Import the reactive loading state
+//import { globalLoading } from '@/App.vue'; // Import the reactive loading state
 router.push('/');
 // Import apiClient and baseUrl from globals
 // import { formSchema } from "./formSchema";
@@ -117,24 +117,8 @@ function getDefaultHeaders(customHeaders = {}) {
 
 
 // Function to make a GET request
-// export async function apiGet(url, params = {}, customHeaders = {}) {
-//   const apiClient = getApiClient(); // Get the API client instance
-//   try {
-//     const headers = getDefaultHeaders(customHeaders);
-//     const response = await apiClient.get(url, { params, headers });
-//     return response.data;
-//   } catch (error) {
-//     const handledError = handleApiError(error); // Handle error
-//     throw handledError; // Re-throw the error so the caller can catch it
-//   }
-// }
-
-
-
 export async function apiGet(url, params = {}, customHeaders = {}) {
   const apiClient = getApiClient(); // Get the API client instance
-  globalLoading.value = true; // Show loading before the request
-
   try {
     const headers = getDefaultHeaders(customHeaders);
     const response = await apiClient.get(url, { params, headers });
@@ -142,18 +126,30 @@ export async function apiGet(url, params = {}, customHeaders = {}) {
   } catch (error) {
     const handledError = handleApiError(error); // Handle error
     throw handledError; // Re-throw the error so the caller can catch it
-  } finally {
-    globalLoading.value = false; // Hide loading after request completes
   }
 }
 
 
+
+// export async function apiGet(url, params = {}, customHeaders = {}) {
+//   const apiClient = getApiClient(); // Get the API client instance
+//   globalLoading.value = true; // Show loading before the request
+
+//   try {
+//     const headers = getDefaultHeaders(customHeaders);
+//     const response = await apiClient.get(url, { params, headers });
+//     return response.data;
+//   } catch (error) {
+//     const handledError = handleApiError(error); // Handle error
+//     throw handledError; // Re-throw the error so the caller can catch it
+//   } finally {
+//     globalLoading.value = false; // Hide loading after request completes
+//   }
+// }
+
+
 // Function to make a GET request by ID
 // export async function apiGetById(url, id, customHeaders = {}) {
-
-
-//   //alert(url);
-//   //alert(id);
 //   const apiClient = getApiClient(); // Get the API client instancealer
 //   try {
 //     const headers = getDefaultHeaders(customHeaders);
@@ -170,7 +166,7 @@ export async function apiGet(url, params = {}, customHeaders = {}) {
 
 export async function apiGetById(url, id, customHeaders = {}) {
   const apiClient = getApiClient(); // Get the API client instance
-  globalLoading.value = true; // Show loading before request
+ // globalLoading.value = true; // Show loading before request
 
   try {
     const headers = getDefaultHeaders(customHeaders);
@@ -182,7 +178,7 @@ export async function apiGetById(url, id, customHeaders = {}) {
     const handledError = handleApiError(error); // Handle error
     throw handledError; // Re-throw so caller can catch it
   } finally {
-    globalLoading.value = false; // Hide loading after request
+    //globalLoading.value = false; // Hide loading after request
   }
 }
 
