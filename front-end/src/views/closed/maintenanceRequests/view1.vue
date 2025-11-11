@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-gray-100 p-4 md:p-6">
+  <div class="min-h-screen bg-gray-100  md:p-0">
     <Toast ref="toast" />
      <Loading :visible="loading" message="Loading Maintenance requests..." />
 
