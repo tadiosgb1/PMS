@@ -3,6 +3,7 @@
     <Toast ref="toast" />
 
     <div class="min-h-screen bg-gray-100 m-3">
+      <Loading :visible="loading" message="Loading zones..." />
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
         <!-- Header -->
         <div class="bg-primary text-white px-4 md:px-6 py-3 md:py-4 text-lg md:text-xl font-bold flex justify-between items-center">
@@ -150,6 +151,7 @@ import AddRental from "./add.vue";
 import WorkspaceRentalUpdate from "./update.vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
 import WorkspaceRentalPay from "./workspacerentalpay.vue";
+import Loading from "@/components/Loading.vue"; // <-- Added Loading
 
 const SortIcon = {
   props: ["field", "sortKey", "sortAsc"],
@@ -170,7 +172,7 @@ const SortIcon = {
 
 export default {
   name: "WorkspaceRentalView",
-  components: { Toast, AddRental, WorkspaceRentalUpdate, ConfirmModal, WorkspaceRentalPay, SortIcon },
+  components: { Toast, AddRental, WorkspaceRentalUpdate, ConfirmModal, WorkspaceRentalPay, SortIcon,Loading },
   data() {
     return {
       searchTerm: "",
@@ -225,6 +227,7 @@ export default {
       this.$router.push(`/co-work-detail/${id}`);
     },
     async fetchRentals(url = null) {
+      this.loading=true
       try {
         const response = await this.$getWorkspaceRentals(url, this.pageSize);
         this.rentals = response.rentals || [];
@@ -235,6 +238,9 @@ export default {
       } catch (err) {
         console.error("Failed to fetch rentals:", err);
         this.rentals = [];
+      }
+      finally {
+        this.loading=false
       }
     },
     sortBy(key) {

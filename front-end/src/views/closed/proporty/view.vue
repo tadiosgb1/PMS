@@ -2,6 +2,7 @@
   <div>
     <Toast ref="toast" />
     <div class="min-h-screen bg-gray-100 p-6">
+      <Loading :visible="loading" message="Loading Property..." />
       <div class="max-w-7xl mx-auto bg-white shadow rounded-lg overflow-hidden">
         <!-- Header -->
         <div
@@ -332,10 +333,11 @@ import ConfirmModal from "@/components/ConfirmModal.vue";
 import Toast from "../../../components/Toast.vue";
 import Manager from "../managers/add.vue";
 import SaleModal from "../propertiesListForSale/add.vue";
+import Loading from "@/components/Loading.vue"; // <-- Added Loading
 
 export default {
   name: "PropertyView",
-  components: { AddProperty, UpdateProperty, ConfirmModal, Toast, Manager,SaleModal },
+  components: { AddProperty, UpdateProperty, ConfirmModal, Toast, Manager,SaleModal,Loading },
   data() {
     return {
       zones: [],
@@ -383,6 +385,7 @@ export default {
 },
     //if per(view_property)
     async fetchProperties(url = null) {
+       this.loading = true;
       try {
         let params={};
         const pageUrl =
@@ -425,6 +428,9 @@ export default {
         this.totalPages = 1;
         this.next = null;
         this.previous = null;
+      }
+      finally {
+        this.loading = false;
       }
     },
     changeOrdering(field) {
