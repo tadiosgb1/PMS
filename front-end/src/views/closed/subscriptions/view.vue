@@ -2,6 +2,7 @@
   <div>
     <Toast ref="toast" />
     <div class="min-h-screen bg-gray-100 p-4 md:p-6">
+      <Loading :visible="loading" message="Loading subscriptions..." />
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
         <!-- Header -->
         <div
@@ -247,6 +248,7 @@ import PaymentModal from "./Payment.vue";
 import UpgradeSubscriptionModal from "./upgradePlan.vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
 import Toast from "@/components/Toast.vue";
+import Loading from "@/components/Loading.vue"; // <-- Added Loading
 
 export default {
   name: "subscriptionView",
@@ -257,6 +259,7 @@ export default {
     Toast,
     PaymentModal,
     UpgradeSubscriptionModal,
+    Loading
     
   },
   data() {
@@ -282,7 +285,8 @@ export default {
       pageSizes: [5, 10, 20, 50, 100],
       status:"",
       ordering: "-id",
-      subscriptionToAD:null
+      subscriptionToAD:null,
+      loading:false
      
     };
   },
@@ -310,6 +314,7 @@ export default {
       this.showUpgradeModal = true; // open the modal
     },
     async fetchSubscriptions(url = null) {
+      this.loading=true
       try {
         let params = {
           user_id__id: localStorage.getItem("userId"),
@@ -365,6 +370,9 @@ export default {
         this.totalPages = 1;
         this.next = null;
         this.previous = null;
+      }
+      finally {
+        this.loading=false
       }
     },
 

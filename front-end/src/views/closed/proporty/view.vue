@@ -361,6 +361,7 @@ export default {
       is_super_user:false,
       saleVisible: false,
       salePropertyId: null,
+      loading: false,
     };
   },
  async  created(){
