@@ -10,6 +10,7 @@
     </button>
 
     <div class="min-h-screen bg-gray-100 p-6">
+      <Loading :visible="loading" message="Loading rents..." />
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
         <div
           class="bg-orange-500 text-white px-6 py-4 text-xl font-bold flex justify-between items-center"
@@ -282,6 +283,7 @@ import ConfirmModal from "@/components/ConfirmModal.vue";
 import Toast from "@/components/Toast.vue";
 import AddPictureModal from "@/views/closed/rent/addRentPicture.vue";
 import MakePaymentModal from "@/views/closed/rent/addRentPayment.vue";
+import Loading from "@/components/Loading.vue"; // <-- Added Loading
 
 export default {
   name: "RentsView",
@@ -292,6 +294,7 @@ export default {
     Toast,
     AddPictureModal,
     MakePaymentModal,
+    Loading
   },
   data() {
     return {
@@ -313,6 +316,7 @@ export default {
       totalPages: 1,
       next: null,
       previous: null,
+     loading:false
     };
   },
   computed: {
@@ -368,6 +372,7 @@ export default {
       return params;
     },
     async fetchRents(url = `/get_rents?search=${this.searchTerm}&page_size=${this.pageSize}`) {
+      this.loading=true
       try {
         const params = this.buildRoleParams();
         const response = await this.$apiGet(url, params);
@@ -383,6 +388,9 @@ export default {
       } catch (error) {
         console.error("Failed to fetch rents:", error);
         this.rents = [];
+      }
+      finally {
+        this.loading=false
       }
     },
     goToPropertyDetail(propertyId) {
