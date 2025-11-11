@@ -184,14 +184,7 @@
             <i class="fas fa-edit"></i>
           </button>
 
-          <button
-            v-if="$hasPermission('pms.delete_property')"
-            @click="askDeleteConfirmation(property)"
-            class="text-red-600 hover:text-red-800"
-            title="Delete"
-          >
-            <i class="fas fa-trash-alt"></i>
-          </button>
+         
 
           <button
             @click="rentPay(property.id)"
@@ -208,6 +201,14 @@
             title="List for Sale"
           >
             <i class="fas fa-tag text-[13px]"></i> Sale
+          </button>
+           <button
+            v-if="$hasPermission('pms.delete_property')"
+            @click="askDeleteConfirmation(property)"
+            class="text-red-600 hover:text-red-800"
+            title="Delete"
+          >
+            <i class="fas fa-trash-alt"></i>
           </button>
         </td>
       </tr>
@@ -265,14 +266,6 @@
                   <i class="fas fa-edit"></i>
                 </button>
                 <button
-                  v-if="$hasPermission('pms.delete_property')"
-                  @click="askDeleteConfirmation(property)"
-                  class="text-red-600 hover:text-red-800"
-                  title="Delete"
-                >
-                  <i class="fas fa-trash-alt"></i>
-                </button>
-                <button
                   @click="rentPay(property.id)"
                   class="text-green-600 hover:text-green-800"
                   title="Rent Payment"
@@ -289,6 +282,14 @@
   >
     <i class="fas fa-tag"></i>
   </button>
+  <button
+                  v-if="$hasPermission('pms.delete_property')"
+                  @click="askDeleteConfirmation(property)"
+                  class="text-red-600 hover:text-red-800"
+                  title="Delete"
+                >
+                  <i class="fas fa-trash-alt"></i>
+                </button>
               </div>
             </div>
           </div>

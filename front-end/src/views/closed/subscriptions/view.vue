@@ -74,8 +74,8 @@
         <th class="border-b border-gray-300 px-3 py-2 text-left">Price</th>
         <th class="border-b border-gray-300 px-3 py-2 text-left">Start Date</th>
         <th class="border-b border-gray-300 px-3 py-2 text-left">End Date</th>
-        <th class="border-b border-gray-300 px-3 py-2 text-left">Status</th>
         <th class="border-b border-gray-300 px-3 py-2 text-left">Owner</th>
+        <th class="border-b border-gray-300 px-3 py-2 text-left">Status</th>
         <th class="border-b border-gray-300 px-3 py-2 text-center">Actions</th>
       </tr>
     </thead>
@@ -98,6 +98,9 @@
         <td class="border-b border-gray-200 px-3 py-1.5 truncate">
           {{ formatDate(subscription.end_date) }}
         </td>
+        <td class="border-b border-gray-200 px-3 py-1.5 truncate">
+          {{ subscription.ownerName || 'Unknown' }}
+        </td>
         <td
           class="border-b border-gray-200 px-3 py-1.5 text-white font-bold text-center"
           :class="{
@@ -107,9 +110,6 @@
           }"
         >
           {{ subscription.status.charAt(0).toUpperCase() + subscription.status.slice(1) }}
-        </td>
-        <td class="border-b border-gray-200 px-3 py-1.5 truncate">
-          {{ subscription.ownerName || 'Unknown' }}
         </td>
         <td class="border-b border-gray-200 px-3 py-1.5 text-center">
           <div class="flex flex-wrap justify-center gap-2">

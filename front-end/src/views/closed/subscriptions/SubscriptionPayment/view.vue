@@ -33,7 +33,7 @@
                 <option value="">All</option>
                 <option value="paid">Paid</option>
                 <option value="pending">Pending</option>
-                <option value="cancelled">Cancelled</option>
+                <option value="canceled">Cancelled</option>
               </select>
             </div>
 
@@ -71,8 +71,8 @@
             v-if="statusFilter && statusFilter !== 'pending'"
             class="mb-4 text-sm font-semibold text-gray-700"
           >
-            Total {{ statusFilter }} Amount:
-            <span class="text-orange-600">{{ totalAmountByStatus }}</span>
+            <!-- Total {{ statusFilter }} Amount:
+            <span class="text-orange-600">{{ totalAmountByStatus }}</span> -->
           </div>
 
          <!-- Table View (Desktop) -->

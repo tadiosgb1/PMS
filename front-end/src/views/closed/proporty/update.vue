@@ -60,6 +60,7 @@
           v-model="form.property_type"
           class="custom-input"
         >
+        <option value="">Select property type</option>
           <option value="land">Land</option>
           <option value="house">House</option>
           <option value="apartment">Apartment</option>
