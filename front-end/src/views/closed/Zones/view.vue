@@ -474,15 +474,19 @@ export default {
       }
       this.zoneToDelete = null;
     },
+
+
     goToZoneDetail(propertyZoneId) {
       if (propertyZoneId)
-        this.$router.push(`/pms/property-zone-detail/${propertyZoneId}`);
+        this.$router.push(`/zones/${propertyZoneId}`);
     },
+
+
     properties(zoneId) {
       this.$router.push(`/pms/properties?zone=${zoneId}`);
     },
     goToDetail(id) {
-      if (id) this.$router.push(`/users/${id}`);
+      if (id) this.$router.push(`/user_detail/${id}`);
     },
     sortBy(field) {
       if (this.sortKey === field) this.sortAsc = !this.sortAsc;

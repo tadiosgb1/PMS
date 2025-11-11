@@ -1,6 +1,8 @@
 <template>
   <div>
     <Toast ref="toast" />
+
+        <Loading :visible="loading" message="Loading zones..." />
     <div class="min-h-screen bg-gray-100 p-6">
       <div class="bg-white shadow-md rounded-lg overflow-hidden">
         <!-- Header -->
@@ -125,10 +127,11 @@ import Toast from "@/components/Toast.vue";
 import AddPropertyZonePicture from "./addPropertyZonePicture.vue";
 import UpdatePropertyZonePicture from "./updatePropertyZonePicture.vue";
 import ConfirmModal from "@/components/ConfirmModal.vue";
+import Loading from "@/components/Loading.vue"; // <-- Added Loading
 
 export default {
   name: "ZoneDetail",
-  components: { Toast, AddPropertyZonePicture, UpdatePropertyZonePicture, ConfirmModal },
+  components: { Toast, AddPropertyZonePicture, UpdatePropertyZonePicture, ConfirmModal,Loading },
   data() {
     return {
       zone: null,
@@ -140,6 +143,7 @@ export default {
       pictureToDelete: null,
       imagePreviewVisible: false,
       imageToPreview: null,
+      loading:false,
     };
   },
   mounted() {
@@ -148,12 +152,15 @@ export default {
   },
   methods: {
     async fetchZone() {
+      this.loading=true;
       try {
         const res = await this.$apiGet(`/get_property_zone/${this.$route.params.id}`);
         this.zone = res.data || res;
       } catch (err) {
         console.error("Failed to fetch zone details", err);
         this.$refs.toast.showToast("Could not load zone details.", "error");
+      }finally{
+        this.loading=false;
       }
     },
     async fetchPictures() {

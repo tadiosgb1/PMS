@@ -1,4 +1,8 @@
 <template>
+  <div>
+    <Loading :visible="loading" message="Loading user detail..." />
+
+  </div>
   <div class="bg-gray-100 p-6" v-if="user">
     <div class="bg-white shadow-md rounded-lg overflow-hidden">
       <!-- Header -->
@@ -191,15 +195,18 @@
 <script>
 import EditGroupsModal from "./EditGroupsModal.vue";
 import EditPermissionsModal from "./EditPermissionsModal.vue";
+import Loading from "@/components/Loading.vue";
+
 
 export default {
   name: "UserDetail",
-  components: { EditGroupsModal, EditPermissionsModal },
+  components: { EditGroupsModal, EditPermissionsModal,Loading },
   data() {
     return {
       user: null,
       showGroupsModal: false,
       showPermissionsModal: false,
+      loading:false,
     };
   },
   mounted() {
@@ -207,12 +214,15 @@ export default {
   },
   methods: {
     async fetchUser() {
+      this.loading=true;
       try {
         const userId = this.$route.params.id;
         const res = await this.$apiGetById("/get_user", userId);
         this.user = res;
       } catch (err) {
         console.error("Failed to fetch user:", err);
+      }finally{
+        this.loading=false;
       }
     },
     async saveProfile(user) {
